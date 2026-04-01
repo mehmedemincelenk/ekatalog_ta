@@ -2,7 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { CAROUSEL } from '../data/config';
 
 export default function HeroCarousel() {
-  const { slides, intervalMs, roundedClass } = CAROUSEL;
+  const { 
+    slides, intervalMs, roundedClass,
+    boxPosition, boxWidth, boxPadding, boxRounding, boxBg, boxBorder, boxShadow,
+    titleSize, titleWeight, titleColor, titleTracking, titleShadow,
+    subSize, subWeight, subColor, subLeading, subShadow, subSpacing
+  } = CAROUSEL;
   const [activeIndex, setActiveIndex] = useState(0);
 
   const next = useCallback(() => {
@@ -20,7 +25,7 @@ export default function HeroCarousel() {
         {slides.map((slide, idx) => (
           <div
             key={slide.id}
-            className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ease-in-out ${
+            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
               idx === activeIndex ? 'opacity-100' : 'opacity-0'
             } ${slide.bg}`}
           >
@@ -31,17 +36,16 @@ export default function HeroCarousel() {
                 className="absolute inset-0 w-full h-full object-cover"
               />
             ) : null}
-            {/* Overlay text */}
-            <div className="relative z-10 text-center px-6">
-              <h2 className="text-white text-3xl sm:text-4xl font-extrabold tracking-tight drop-shadow-md">
+            
+            {/* Glassmorphism Text Box (Sol Alt) */}
+            <div className={`absolute z-20 ${boxPosition} ${boxWidth} ${boxPadding} ${boxRounding} ${boxBg} ${boxBorder} ${boxShadow}`}>
+              <h2 className={`${titleColor} ${titleSize} ${titleWeight} ${titleTracking} ${titleShadow}`}>
                 {slide.label}
               </h2>
-              <p className="mt-2 text-stone-200 text-base sm:text-lg font-medium drop-shadow">
+              <p className={`${subSpacing} ${subColor} ${subSize} ${subWeight} ${subShadow} ${subLeading}`}>
                 {slide.sub}
               </p>
             </div>
-            {/* Subtle vignette */}
-            <div className="absolute inset-0 bg-black/30" />
           </div>
         ))}
 

@@ -5,10 +5,10 @@
 // ----- Şirket -----
 export const COMPANY = {
   name: 'Toptan Ambalajcım',   // Marka adı
-  tagline: 'Katalog',             // Navbar altı etiket
-  phone: '+90 212 000 00 00',   // Telefon numarası
-  whatsappUrl: 'https://wa.me/902120000000', // WhatsApp doğrudan bağlantı
-  address: 'Rami Kışla Cd. No:7, Eyüpsultan / İstanbul', // Açık adres
+  tagline: 'ÖMER KÖSE',             // Navbar altı etiket
+  phone: '+90 537 342 0161',   // Telefon numarası
+  whatsappUrl: 'https://wa.me/905373420161', // WhatsApp doğrudan bağlantı
+  address: 'Mahmutbey Cd. No:10, Yenibosna / İstanbul', // Açık adres
   email: 'info@toptanambalajcim.com',  // E-posta
   logoEmoji: '📦',                  // Logo sembolü
 };
@@ -47,30 +47,66 @@ export const ADMIN = {
 };
 
 // ----- Veri Depolama -----
-export const STORAGE_KEY = 'toptanambalaj_products'; // localStorage anahtarı
+export const STORAGE_KEY = 'toptanambalaj_products_v5'; // localStorage anahtarı
+
+// ============================================================
+// TAILWIND CSS TASARIM REHBERİ (KOPYA KAĞIDI)
+// ============================================================
+// YAZI BOYUTLARI:    text-[8px], text-[10px], text-xs (çok küçük), text-sm (küçük), text-base (normal büyük), text-lg, text-xl, text-2xl, text-3xl, 4xl, 5xl ...
+// YAZI KALINLIĞI:    font-light, font-normal, font-medium, font-semibold (yarı kalın), font-bold (kalın), font-extrabold
+// KÖŞE YUVARLATMA:   rounded-none, rounded-sm, rounded, rounded-md, rounded-lg, rounded-xl, rounded-2xl, rounded-full
+// BOŞLUKLAR (p/m):   p-2, p-4, p-6 (iç boşluk) | mt-2, mt-4 (üstten dış boşluk)
+// GÖLGELER:          shadow-sm, shadow, shadow-md, shadow-lg, shadow-xl, shadow-2xl, drop-shadow
+// MİN/MAX GENİŞLİK:  max-w-xs, max-w-sm, max-w-md, max-w-lg, max-w-xl VEYA özel yüzdeler max-w-[45%], max-w-[80%] vb.
+// ============================================================
 
 // ----- Carousel -----
 export const CAROUSEL = {
-  intervalMs: 3000,          // Slayt geçiş süresi (ms)
+  intervalMs: 4000,          // Slayt geçiş süresi (ms)
   roundedClass: 'rounded-md',  // Köşe yuvarlama
+
+  // Kutucuk (Glassmorphism) Görünümü
+  boxPosition: 'bottom-10 left-4 sm:bottom-12 sm:left-10', // Kutunun konumu
+  boxWidth: 'max-w-[40%] sm:max-w-md',                     // Maksimum genişlik
+  boxPadding: 'p-3 sm:p-5',                                // İç boşluk
+  boxRounding: 'rounded-2xl',                              // Köşe yuvarlama
+  boxBg: 'bg-black/25 backdrop-blur-md',                   // Arka plan (buzlu cam efekti) 
+  boxBorder: 'border border-white/20',                     // Kenarlık
+  boxShadow: 'shadow-2xl',                                 // Derinlik gölgesi
+
+  // Ana Başlık (Label) Tasarımı
+  titleSize: 'text-[14px] sm:text-3xl lg:text-4xl',
+  titleWeight: 'font-extrabold',
+  titleColor: 'text-white',
+  titleTracking: 'tracking-tight',
+  titleShadow: 'drop-shadow',
+
+  // Alt Metin (Sub) Tasarımı
+  subSize: 'text-[10px] sm:text-base',
+  subWeight: 'font-medium',
+  subColor: 'text-white/90',
+  subLeading: 'leading-relaxed',
+  subShadow: 'drop-shadow',
+  subSpacing: 'mt-0', // Alt metin ile üstteki ana başlık arasındaki boşluk
+
   slides: [
     {
       id: 1,
-      src: null,              // Resim yolu — örn. '/carousel/depo.jpg'
+      src: 'https://images.pexels.com/photos/1797428/pexels-photo-1797428.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', // Depo/Raf görünümü
       bg: 'bg-stone-800',
       label: 'Geniş Depo, Hazır Stok',
       sub: 'Aynı gün sevkiyat, minimum sipariş yok.',
     },
     {
       id: 2,
-      src: null,
+      src: 'https://images.pexels.com/photos/4481259/pexels-photo-4481259.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', // Ambalaj kutuları görünümü
       bg: 'bg-kraft-800',
       label: 'Her Ölçü, Her Materyal',
       sub: 'Kargo kutusundan streç filme, her ambalaj bizde.',
     },
     {
       id: 3,
-      src: null,
+      src: 'https://images.pexels.com/photos/236705/pexels-photo-236705.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', // Lojistik koridoru görünümü
       bg: 'bg-stone-700',
       label: "İstoç'tan Bile Ucuz!",
       sub: 'Toptan fiyata perakende kolaylığı.',
@@ -84,15 +120,8 @@ export const GRID = {
   gapClass: 'gap-2',                                      // Kart arası boşluk
 };
 
-// ----- Varsayılan Ürünler (localStorage boşsa yüklenir) -----
-export const DEFAULT_PRODUCTS = [
-  { id: 1, name: 'Kraft Kargo Kutusu (M)', category: 'Kargo Kutuları', price: '₺4,90', image: null, description: '5 katlı mikrooluklu\n40x30x30 cm\n10 adet/koli' },
-  { id: 2, name: 'Bant – Şeffaf 75m', category: 'Bantlar', price: '₺2,50', image: null, description: '48mm genişlik\n75m uzunluk\nGüçlü yapışkanlı' },
-  { id: 3, name: 'Baloncuklu Zarf (A4)', category: 'Zarflar', price: '₺3,20', image: null, description: 'A4 boyut\nÇift taraflı kilitli\n25 adet/paket' },
-  { id: 4, name: 'Streç Film Rulo 500m', category: 'Streç Film', price: '₺28,00', image: null, description: '500m uzunluk\n23 mikron kalınlık\nManuel kullanım' },
-  { id: 5, name: 'Köpük Şerit 10mm', category: 'Dolgu Malzemeleri', price: '₺6,70', image: null, description: '10mm kalınlık\n50mm genişlik\n5m/rulo' },
-  { id: 6, name: 'Kraft Kargo Kutusu (L)', category: 'Kargo Kutuları', price: '₺6,50', image: null, description: '5 katlı mikrooluklu\n50x40x40 cm\n5 adet/koli' },
-];
+// ----- Varsayılan Ürünler -----
+// Ürün verileri yüzlerce satırı bulabileceği için ayrı dosyaya taşındı: src/data/products.js
 
 // ----- Referans Logoları -----
 export const REFERENCES = [

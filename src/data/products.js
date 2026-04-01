@@ -1,0 +1,60 @@
+// ============================================================
+// ÜRÜN VERİ TABANI (FAZ 1 - LOCALSTORAGE TESTİ)
+// NOT: Şimdilik ürünler yerel hafıza (localStorage) üzerinde simüle ediliyor.
+// FAZ 2'de (Canlı Veritabanı Geçişi) buradaki tüm veriler veritabanına
+// (örn. Firebase/Supabase) taşınacak ve bu JSON sadece referans olarak kalacaktır.
+// Admin değişikliklerinin herkese anlık yansıması için veritabanı şarttır.
+// ============================================================
+
+export const DEFAULT_PRODUCTS = [
+  { id: 1, name: 'Kraft Kargo Kutusu (S)', category: 'Kargo Kutuları', price: '₺3,50', image: '/images/kraft_box.png', description: '30x20x15 cm\nTek oluklu' },
+  { id: 2, name: 'Kraft Kargo Kutusu (M)', category: 'Kargo Kutuları', price: '₺4,90', image: '/images/kraft_box.png', description: '40x30x30 cm\nÇift oluklu' },
+  { id: 3, name: 'Kraft Kargo Kutusu (L)', category: 'Kargo Kutuları', price: '₺6,50', image: '/images/kraft_box.png', description: '50x40x40 cm\nÇift oluklu' },
+  { id: 4, name: 'Kraft Kargo Kutusu (XL)', category: 'Kargo Kutuları', price: '₺8,90', image: '/images/kraft_box.png', description: '60x40x40 cm\nÇift oluklu' },
+  { id: 5, name: 'Baskılı Kargo Kutusu', category: 'Kargo Kutuları', price: '₺7,50', image: '/images/printed_kraft_box.png', description: 'Özel logolu\n40x30x20 cm' },
+  { id: 6, name: 'E-Ticaret Kutusu Bantlı', category: 'Kargo Kutuları', price: '₺5,50', image: '/images/e_commerce_mailer_box.png', description: '35x25x10 cm\nHızlı kilit' },
+  { id: 7, name: 'Bant – Şeffaf 40m', category: 'Bantlar', price: '₺1,90', image: '/images/tape.png', description: '48mm genişlik\n40m uzunluk' },
+  { id: 8, name: 'Bant – Şeffaf 75m', category: 'Bantlar', price: '₺2,50', image: '/images/tape.png', description: '48mm genişlik\nAkrilik yapışkan' },
+  { id: 9, name: 'Bant – Taba 100m', category: 'Bantlar', price: '₺3,10', image: '/images/tape.png', description: '45mm genişlik\nHotmelt' },
+  { id: 10, name: 'Koli Bandı – Çift Taraflı', category: 'Bantlar', price: '₺12,00', image: '/images/double_sided_tape.png', description: '24mm x 25m\nSüngerli' },
+  { id: 11, name: 'Kırılacak Eşya Uyarı Bandı', category: 'Bantlar', price: '₺4,50', image: '/images/fragile_warning_tape.png', description: '48mmx100m\nKırmızı baskı' },
+  { id: 12, name: 'Kağıt Kraft Bant', category: 'Bantlar', price: '₺6,80', image: '/images/kraft_paper_tape.png', description: '50mm x 50m\nDoğa dostu' },
+  { id: 13, name: 'Baloncuklu Zarf (A4)', category: 'Zarflar', price: '₺3,20', image: '/images/bubble_mailer_envelope.png', description: 'Hava kanallı\nYapışkanlı' },
+  { id: 14, name: 'Baloncuklu Zarf (A5)', category: 'Zarflar', price: '₺2,10', image: '/images/bubble_wrap.png', description: 'İçten korumalı\nTek kullanımlık' },
+  { id: 15, name: 'Kraft Zarf C4', category: 'Zarflar', price: '₺1,10', image: '/images/c4_kraft_envelope.png', description: '229x324 mm\nSilikonlu' },
+  { id: 16, name: 'Kargo Poşeti S (Siyah İç)', category: 'Zarflar', price: '₺0,80', image: '/images/black_poly_mailer.png', description: '15x25 cm\nBaskısız' },
+  { id: 17, name: 'Kargo Poşeti Cep Şeffaf M', category: 'Zarflar', price: '₺1,50', image: '/images/clear_pocket_mailer.png', description: 'Cepli tasarım\n25x35 cm' },
+  { id: 18, name: 'Şeffaf Fatura Cebi', category: 'Zarflar', price: '₺0,25', image: null, description: 'A5 boyut\nYapışkan arka' },
+  { id: 19, name: 'Streç Film Rulo 100m', category: 'Streç Film', price: '₺15,00', image: '/images/stretch_wrap_roll.png', description: '17 mikron\nEl tipi' },
+  { id: 20, name: 'Streç Film Rulo 300m', category: 'Streç Film', price: '₺24,00', image: null, description: '17 mikron\nEl tipi' },
+  { id: 21, name: 'Streç Film Rulo 500m', category: 'Streç Film', price: '₺28,00', image: null, description: '23 mikron\nGüçlendirilmiş' },
+  { id: 22, name: 'Palet Streç (Makine Tipi)', category: 'Streç Film', price: '₺55,00', image: null, description: '23 mik. 1500m\nŞeffaf' },
+  { id: 23, name: 'Mini Streç Film Rulo', category: 'Streç Film', price: '₺5,50', image: null, description: '10cm genişlik\nSaplı kullanım' },
+  { id: 24, name: 'Gıda Streç Film', category: 'Streç Film', price: '₺18,00', image: null, description: 'Gastronomi\n30cm x 300m' },
+  { id: 25, name: 'Köpük Şerit Rulo', category: 'Dolgu Malzemesi', price: '₺6,70', image: '/images/foam_edge_protector.png', description: '10mm kalınlık\n5m uzunluk' },
+  { id: 26, name: 'Balonlu Naylon 100x5m', category: 'Dolgu Malzemesi', price: '₺19,00', image: '/images/bubble_wrap.png', description: 'Mobilya koruyucu\nBüyük balon' },
+  { id: 27, name: 'Balonlu Naylon 50x10m', category: 'Dolgu Malzemesi', price: '₺15,50', image: '/images/bubble_wrap.png', description: 'Hassas kargo\nKüçük balon' },
+  { id: 28, name: 'Kırpık Kağıt Dolgu', category: 'Dolgu Malzemesi', price: '₺35,00', image: null, description: 'Geri dönüşüm\n1 kg paket' },
+  { id: 29, name: 'Hava Yastığı Dolgu 100lü', category: 'Dolgu Malzemesi', price: '₺25,00', image: null, description: 'Şişirilmiş poşet\nKoli içi' },
+  { id: 30, name: 'Strafor Fıstık (1 Çuval)', category: 'Dolgu Malzemesi', price: '₺110,00', image: '/images/packing_peanuts.png', description: 'Hafif s tipi\nBeyaz' },
+  { id: 31, name: 'Jelatin Poşet 100lü', category: 'Poşetler', price: '₺8,50', image: null, description: 'Bantlı şeffaf\n10x15 cm' },
+  { id: 32, name: 'Jelatin Poşet Textil', category: 'Poşetler', price: '₺14,00', image: null, description: 'Tişört boy\n25x35 cm' },
+  { id: 33, name: 'Naylon Torba Şeffaf 1kg', category: 'Poşetler', price: '₺22,00', image: null, description: 'Dökme mallar\nFırın boy' },
+  { id: 34, name: 'Ham Bez Çanta', category: 'Poşetler', price: '₺12,50', image: '/images/cotton_tote_bag.png', description: '35x40 cm\nBaskısız' },
+  { id: 35, name: 'Doğa Dostu Market Poşeti', category: 'Poşetler', price: '₺0,25', image: null, description: 'Biyobozunur\nMikronlu' },
+  { id: 36, name: 'Kilitli Poşet 1000li', category: 'Poşetler', price: '₺35,00', image: null, description: 'Takı ve hobi\n4x6 cm' },
+  { id: 37, name: 'Karton Bardak 7oz', category: 'Gıda Ambalajı', price: '₺0,35', image: '/images/paper_cup.png', description: 'Otomat için\n3000li koli' },
+  { id: 38, name: 'Karton Bardak 12oz (Kapaklı)', category: 'Gıda Ambalajı', price: '₺0,80', image: '/images/paper_cup.png', description: 'Sıcak içecek\nIsı yalıtımlı' },
+  { id: 39, name: 'Alüminyum Folyo Rulo', category: 'Gıda Ambalajı', price: '₺33,00', image: null, description: 'Restoran boy\n30cm x 1kg' },
+  { id: 40, name: 'Plastik Çatal 100lü', category: 'Gıda Ambalajı', price: '₺15,00', image: null, description: 'Beyaz PP\nKırılmaz' },
+  { id: 41, name: 'Sızdırmaz Kase 500ml', category: 'Gıda Ambalajı', price: '₺2,50', image: null, description: 'Kapaklı siyah\n100lü paket' },
+  { id: 42, name: 'Hamburger Kutusu (Karton)', category: 'Gıda Ambalajı', price: '₺1,40', image: null, description: 'Yağ geçirmez\nSıcak servis' },
+  { id: 43, name: 'Bant Kesme Makinesi', category: 'Ekipmanlar', price: '₺85,00', image: '/images/tape.png', description: 'Ağır metal\nErgonomik sap' },
+  { id: 44, name: 'Termal Barkod Yazıcı', category: 'Ekipmanlar', price: '₺1850,00', image: null, description: 'USB Kargo fişi\nSeri baskı' },
+  { id: 45, name: 'Termal Rulo Etiket', category: 'Aksesuarlar', price: '₺45,00', image: null, description: '100x100mm\n500 sarım' },
+  { id: 46, name: 'Karton Köşebent Paletlik', category: 'Aksesuarlar', price: '₺3,00', image: '/images/kraft_box.png', description: 'V formlu\nKalın koruyucu' },
+  { id: 47, name: 'Profesyonel Maket Bıçağı', category: 'Aksesuarlar', price: '₺25,00', image: null, description: 'Çelik gövde\nYedek bıçaklı' },
+  { id: 48, name: 'Kilitli Klips Mühür', category: 'Aksesuarlar', price: '₺12,00', image: null, description: 'Plastik takım\n100 adet' },
+  { id: 49, name: 'Hassas Pelür Kağıdı', category: 'Kağıtlar', price: '₺0,60', image: null, description: 'Ayakkabı İçi\nCamsı doku' },
+  { id: 50, name: 'Kraft Ambalaj Kağıdı', category: 'Kağıtlar', price: '₺40,00', image: '/images/kraft_box.png', description: '100cm en\n5 kg rulo' }
+];

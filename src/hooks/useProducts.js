@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { DEFAULT_PRODUCTS, STORAGE_KEY } from '../data/config';
+import { STORAGE_KEY } from '../data/config';
+import { DEFAULT_PRODUCTS } from '../data/products';
 
 export function useProducts() {
   const [products, setProducts] = useState(() => {
