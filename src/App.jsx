@@ -8,6 +8,7 @@ import References from './components/References';
 import Footer from './components/Footer';
 import { useProducts } from './hooks/useProducts';
 import { useAdminMode } from './hooks/useAdminMode';
+import { sortCategories } from './data/config';
 
 export default function App() {
   const { products, updateProduct, removeProduct, addProduct, renameCategory, removeCategoryFromProducts } = useProducts();
@@ -28,9 +29,9 @@ export default function App() {
     setActiveCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
   };
 
-  // Mevcut benzersiz kategorileri türet (Modal vs. için)
+  // Mevcut benzersiz kategorileri türet (Modal vs. için) - config sırasına göre
   const existingCategories = useMemo(() => {
-    return [...new Set(products.map((p) => p.category).filter(Boolean))].sort();
+    return sortCategories([...new Set(products.map((p) => p.category).filter(Boolean))]);
   }, [products]);
 
   // Derive filtered products from search + category
@@ -81,7 +82,6 @@ export default function App() {
 
         <ProductGrid
           products={filteredProducts}
-          categories={existingCategories}
           isAdmin={isAdmin}
           onDelete={removeProduct}
           onUpdate={updateProduct}

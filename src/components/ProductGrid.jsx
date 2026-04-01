@@ -1,7 +1,7 @@
 import { GRID, sortCategories } from '../data/config';
 import ProductCard from './ProductCard';
 
-export default function ProductGrid({ products, categories, isAdmin, onDelete, onUpdate }) {
+export default function ProductGrid({ products, isAdmin, onDelete, onUpdate }) {
   if (products.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-stone-400">
@@ -34,7 +34,6 @@ export default function ProductGrid({ products, categories, isAdmin, onDelete, o
               <ProductCard
                 key={product.id}
                 product={product}
-                categories={categories}
                 isAdmin={isAdmin}
                 onDelete={onDelete}
                 onUpdate={onUpdate}
