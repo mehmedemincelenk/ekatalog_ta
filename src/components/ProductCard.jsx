@@ -287,8 +287,8 @@ export default function ProductCard({ product, categories = [], isAdmin, onDelet
                 onClick={() => { onUpdate(product.id, { inStock: product.inStock === false ? true : false }); setShowActions(false); }}
                 className="w-full text-left px-3 py-1.5 text-xs font-semibold hover:bg-stone-50 flex items-center justify-between"
               >
-                <span className={product.inStock !== false ? 'text-green-600' : 'text-stone-500'}>
-                  {product.inStock !== false ? '✅ Stokta Var' : '❌ Stokt Tükendi'}
+                <span className={product.inStock !== false ? 'text-stone-600' : 'text-green-600'}>
+                  {product.inStock !== false ? '❌ Stokta Yok Yap' : '✅ Stoğa Ekle'}
                 </span>
               </button>
               <button 
@@ -322,7 +322,7 @@ export default function ProductCard({ product, categories = [], isAdmin, onDelet
       {/* Out of Stock Overlay (Both Admin & Client) */}
       {product.inStock === false && !product.isArchived && (
         <div className="absolute inset-0 z-[5] pointer-events-none rounded-lg flex flex-col items-center justify-center">
-          <span className="bg-kraft-200 text-kraft-900 border border-kraft-400 text-[11px] font-bold px-3 py-0.5 rounded shadow-sm pointer-events-auto select-none -translate-y-4">STOK TÜKENDİ</span>
+          <span className="bg-stone-900 text-white text-[9px] font-bold px-3 py-1 rounded shadow-lg pointer-events-auto select-none -translate-y-4 tracking-wider">STOK TÜKENDİ</span>
         </div>
       )}
     </article>
