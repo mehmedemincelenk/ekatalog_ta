@@ -1,4 +1,4 @@
-import { GRID } from '../data/config';
+import { GRID, sortCategories } from '../data/config';
 import ProductCard from './ProductCard';
 
 export default function ProductGrid({ products, categories, isAdmin, onDelete, onUpdate }) {
@@ -19,8 +19,8 @@ export default function ProductGrid({ products, categories, isAdmin, onDelete, o
     return acc;
   }, {});
 
-  // Oluşan kategori reyonlarını alfabetik olarak hizala
-  const sortedCategories = Object.keys(groupedProducts).sort();
+  // Oluşan kategori reyonlarını kendi özel sırasına (Gıda & Sos en başa vb.) göre hizala
+  const sortedCategories = sortCategories(Object.keys(groupedProducts));
 
   return (
     <div className="w-full flex flex-col">

@@ -47,7 +47,7 @@ export const ADMIN = {
 };
 
 // ----- Veri Depolama -----
-export const STORAGE_KEY = 'toptanambalaj_products_v8'; // localStorage anahtarı
+export const STORAGE_KEY = 'toptanambalaj_products_v9'; // localStorage anahtarı
 
 // ----- UI / Modal Tasarımı -----
 export const MODAL = {
@@ -150,6 +150,29 @@ export const GRID = {
   
   // Kategori Reyon Başlıkları Tasarımı
   headerClass: 'text-[12px] sm:text-sm font-extrabold text-kraft-600 tracking-wider uppercase border-b border-stone-200 pb-1 mb-2 mt-12 first:mt-4',
+};
+
+// ----- Manuel Kategori Dizilim Önceliği -----
+export const CATEGORY_ORDER = [
+  'Gıda & Sos',
+  'Temizlik & Kağıt',
+  'Ambalaj',
+  'Poşet',
+  'Alüminyum',
+  'Streç & Folyo',
+  'Baskılı Ürünler',
+  'Özel Setler'
+];
+
+export const sortCategories = (categoriesList) => {
+  return [...categoriesList].sort((a, b) => {
+    let indexA = CATEGORY_ORDER.indexOf(a);
+    let indexB = CATEGORY_ORDER.indexOf(b);
+    if (indexA === -1) indexA = 999;
+    if (indexB === -1) indexB = 999;
+    if (indexA === indexB) return a.localeCompare(b);
+    return indexA - indexB;
+  });
 };
 
 // ----- Varsayılan Ürünler -----
