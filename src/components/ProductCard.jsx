@@ -146,12 +146,16 @@ export default function ProductCard({ product, categories = [], isAdmin, onDelet
 
   // --- Image ---
   const handleImageClick = () => { if (isAdmin) fileInputRef.current?.click(); };
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => onUpdate(product.id, { image: ev.target.result });
-    reader.readAsDataURL(file);
+    try {
+      const { compressImage } = await import('../utils/image.js');
+      const compressedStr = await compressImage(file, 600, 0.7);
+      onUpdate(product.id, { image: compressedStr });
+    } catch (error) {
+      alert("Fotoğraf işlenirken cihaz desteklemedi veya hata oluştu.");
+    }
     e.target.value = '';
   };
 

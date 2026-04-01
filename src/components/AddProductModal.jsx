@@ -13,15 +13,17 @@ export default function AddProductModal({ categories = [], onAdd, onClose }) {
     setError('');
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setPreviewUrl(ev.target.result);
-      setForm((prev) => ({ ...prev, image: ev.target.result }));
-    };
-    reader.readAsDataURL(file);
+    try {
+      const { compressImage } = await import('../utils/image.js');
+      const compressedStr = await compressImage(file, 600, 0.7);
+      setPreviewUrl(compressedStr);
+      setForm((prev) => ({ ...prev, image: compressedStr }));
+    } catch (err) {
+      alert("Görsel yüklenirken cihaz desteklemedi.");
+    }
   };
 
   const handleSubmit = (e) => {

@@ -14,7 +14,12 @@ export function useCarousel() {
   });
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(slides));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(slides));
+    } catch (err) {
+      console.error('Carousel Storage Hatası:', err);
+      alert('Slayt görseli kaydedilemedi. Hafıza kotası dolmuş olabilir.');
+    }
   }, [slides]);
 
   const updateSlide = (id, changes) => {

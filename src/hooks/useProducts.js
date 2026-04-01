@@ -24,7 +24,12 @@ export function useProducts() {
   });
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+    } catch (err) {
+      console.error('Storage Hatası:', err);
+      alert('Cihaz hafızası (5MB) doldu! Hata: ' + err.message + '\nLütfen sayfayı yenileyin ve çalışmaya devam etmek için eski ürünleri veya yüksek boyutlu resimleri silerek yer açın.');
+    }
   }, [products]);
 
   const addProduct = (product) => {

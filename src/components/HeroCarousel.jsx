@@ -124,15 +124,17 @@ export default function HeroCarousel({ isAdmin }) {
           type="file" 
           accept="image/*" 
           className="hidden" 
-          onChange={(e) => {
+          onChange={async (e) => {
             const file = e.target.files?.[0];
             if (!file || !editingSlideId) return;
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-              updateSlide(editingSlideId, { src: ev.target.result });
+            try {
+              const { compressImage } = await import('../utils/image.js');
+              const compressedStr = await compressImage(file, 1200, 0.7);
+              updateSlide(editingSlideId, { src: compressedStr });
               setEditingSlideId(null);
-            };
-            reader.readAsDataURL(file);
+            } catch (err) {
+              alert("Slayt fotoğrafı işlenemedi.");
+            }
             e.target.value = '';
           }} 
         />
