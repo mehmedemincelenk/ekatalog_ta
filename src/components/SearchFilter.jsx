@@ -9,7 +9,7 @@ export default function SearchFilter({ products, search, onSearchChange, activeC
     <section className="bg-white border-b border-stone-200 py-3 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3">
         {/* Search Input */}
-        <div className="relative w-full sm:w-64 shrink-0">
+        <div className="relative flex-1 sm:flex-none sm:w-64">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 0 5 11a6 6 0 0 0 12 0z" />
