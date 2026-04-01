@@ -26,7 +26,7 @@ export const NAVBAR = {
   logoTaglineSize: 'text-[10px]',              // Tagline boyutu
   logoTaglineColor: 'text-kraft-600',           // Tagline rengi
   // Telefon & WhatsApp kombinasyon butonu
-  phoneSize: 'text-[10px]',              // Telefon yazı boyutu
+  phoneSize: 'text-[8px]',              // Telefon yazı boyutu
   phoneWeight: 'font-semibold',            // Telefon yazı kalınlığı
   phoneColor: 'text-stone-900',           // Telefon yazı rengi
   phoneHoverColor: 'hover:text-kraft-700',     // Telefon hover rengi
@@ -36,7 +36,7 @@ export const NAVBAR = {
   whatsappHoverBg: 'hover:bg-stone-900',       // Buton hover arka planı
   whatsappRounded: 'rounded',                  // Köşe yuvarlama
   // Adres
-  addressSize: 'text-[8px]',              // Adres yazı boyutu
+  addressSize: 'text-[6px]',              // Adres yazı boyutu
   addressColor: 'text-stone-600',           // Adres yazı rengi
 };
 
@@ -68,9 +68,9 @@ export const CAROUSEL = {
   // Kutucuk (Glassmorphism) Görünümü
   boxPositionMobile: 'bottom-8 left-2',          // [MOBİL] Kutunun konumu
   boxPositionPC: 'sm:bottom-10 sm:left-6',       // [PC] Kutunun konumu (Geniş ekranlar için sm: veya lg: öneki şarttır)
-  boxWidthMobile: 'max-w-[40%]',                 // [MOBİL] Kutu maksimum genişliği
+  boxWidthMobile: 'max-w-[60%]',                 // [MOBİL] Kutu maksimum genişliği
   boxWidthPC: 'sm:max-w-md',                     // [PC] Kutu maksimum genişliği
-  boxPaddingMobile: 'p-3',                       // [MOBİL] Kutu iç boşluğu
+  boxPaddingMobile: 'p-2',                       // [MOBİL] Kutu iç boşluğu
   boxPaddingPC: 'sm:p-5',                        // [PC] Kutu iç boşluğu
   boxRounding: 'rounded-xl',                     // Köşe yuvarlama
   boxBg: 'bg-black/25 backdrop-blur-md',         // Arka plan (buzlu cam efekti) 
