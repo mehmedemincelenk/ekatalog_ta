@@ -19,6 +19,7 @@ export default function App() {
 
   useEffect(() => {
     if (isAdmin) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       setShowAdminToast(true);
       const timer = setTimeout(() => setShowAdminToast(false), 2000);
       return () => clearTimeout(timer);

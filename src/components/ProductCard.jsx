@@ -133,7 +133,7 @@ export default function ProductCard({ product, categories = [], isAdmin, onDelet
   };
 
   return (
-    <article className="bg-white border border-stone-200 rounded-lg overflow-hidden flex flex-col group hover:shadow-md transition-shadow duration-200 relative">
+    <article className="bg-white border border-stone-200 rounded-lg flex flex-col group hover:shadow-md transition-shadow duration-200 relative">
 
       {/* Admin: trash button */}
       {isAdmin && (
@@ -145,9 +145,9 @@ export default function ProductCard({ product, categories = [], isAdmin, onDelet
       )}
 
       {/* Image */}
-      <div className={`relative w-full bg-stone-100 aspect-square flex items-center justify-center overflow-hidden ${isAdmin ? 'cursor-pointer' : ''}`} onClick={handleImageClick}>
+      <div className={`relative w-full bg-stone-100 aspect-square flex items-center justify-center rounded-t-lg ${isAdmin ? 'cursor-pointer' : ''}`} onClick={handleImageClick}>
         {product.image
-          ? <img src={getImageUrl(product.image)} alt={product.name} className="w-full h-full object-cover" draggable={false} />
+          ? <img src={getImageUrl(product.image)} alt={product.name} className="w-full h-full object-cover rounded-t-lg" draggable={false} />
           : <div className="flex flex-col items-center gap-1 text-stone-300 select-none">
               <span className="text-5xl">📦</span>
             </div>
