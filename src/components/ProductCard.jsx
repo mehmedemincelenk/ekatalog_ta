@@ -287,16 +287,14 @@ export default function ProductCard({ product, categories = [], isAdmin, onDelet
               className="absolute bottom-8 left-1/2 -translate-x-1/2 z-40 bg-white border border-stone-200 rounded-full shadow-2xl px-1.5 py-1.5 flex items-center gap-1.5 origin-bottom"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Stock Toggle (Cube SVG) */}
+              {/* Stock Toggle (Empty Set Character) */}
               <button 
                 type="button"
                 onClick={() => { onUpdate(product.id, { inStock: product.inStock === false ? true : false }); setShowActions(false); }}
-                className={`w-7 h-7 flex items-center justify-center rounded-full transition-colors ${product.inStock !== false ? 'bg-stone-900 text-white' : 'bg-transparent text-stone-400 hover:bg-stone-100 hover:text-stone-700'}`}
-                title={product.inStock !== false ? "Stokta Var (Kapatmak için tıkla)" : "Tükendi (Açmak için tıkla)"}
+                className={`w-7 h-7 flex items-center justify-center rounded-full transition-colors ${product.inStock === false ? 'bg-stone-900 text-white' : 'bg-transparent text-stone-400 hover:bg-stone-100 hover:text-stone-700'}`}
+                title={product.inStock === false ? "Stok Tasarrufu (Stoğa Ekle)" : "Stok Tükendi Olarak İşaretle"}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
-                </svg>
+                <span className="text-xl font-light leading-none -mt-0.5">∅</span>
               </button>
 
               {/* Archive Toggle (Archive Box SVG) */}

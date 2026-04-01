@@ -16,10 +16,27 @@ export default function HeroCarousel({ isAdmin }) {
     subSizeMobile, subSizePC, subWeight, subColor, subLeading, subShadow
   } = CAROUSEL;
   const [activeIndex, setActiveIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
 
   const next = useCallback(() => {
     setActiveIndex((i) => (i + 1) % slides.length);
   }, [slides.length]);
+
+  const prev = useCallback(() => {
+    setActiveIndex((i) => (i - 1 + slides.length) % slides.length);
+  }, [slides.length]);
+
+  const handleTouchStart = (e) => setTouchStart(e.targetTouches[0].clientX);
+  const handleTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    if (distance > 50) next();
+    if (distance < -50) prev();
+    setTouchStart(0);
+    setTouchEnd(0);
+  };
 
   const getImageUrl = (path) => {
     if (!path) return path;
@@ -35,7 +52,12 @@ export default function HeroCarousel({ isAdmin }) {
 
   return (
     <div className={`relative w-full ${heightMobile} ${heightTablet} ${heightPC} overflow-hidden ${containerWidth} ${containerPadding} ${containerMargin}`}>
-      <div className={`relative w-full h-full overflow-hidden ${roundedClass}`}>
+      <div 
+        className={`relative w-full h-full overflow-hidden ${roundedClass}`}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         {slides.map((slide, idx) => (
           <div
             key={slide.id}
