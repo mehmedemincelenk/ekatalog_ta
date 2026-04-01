@@ -74,9 +74,69 @@ function DescriptionScroll({ lines, lineClass, maxHeightClass }) {
 
 export default function ProductCard({ product, categories = [], isAdmin, onDelete, onUpdate }) {
   const fileInputRef = useRef(null);
+  const cardRef = useRef(null);
   const [isEditingCategory, setIsEditingCategory] = useState(false);
   const [newCatData, setNewCatData] = useState('');
   const [showActions, setShowActions] = useState(false);
+
+  // --- Drag & Click-Away State ---
+  const [dragPos, setDragPos] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartRef = useRef({ x: 0, y: 0 });
+
+  // Reset drag position explicitly when popover opens
+  useEffect(() => {
+    if (isEditingCategory) setDragPos({ x: 0, y: 0 });
+  }, [isEditingCategory]);
+
+  // Exterior Bound Click-Away Listener Handler
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      // Validate click exists and falls entirely outside the current card wrapper ref container
+      if (cardRef.current && !cardRef.current.contains(e.target)) {
+        setIsEditingCategory(false);
+        setShowActions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, []);
+
+  // Frame Interpolation Handlers for Drag Movement
+  useEffect(() => {
+    if (!isDragging) return;
+    const handleMove = (e) => {
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      setDragPos({
+        x: clientX - dragStartRef.current.x,
+        y: clientY - dragStartRef.current.y
+      });
+    };
+    const handleEnd = () => setIsDragging(false);
+
+    document.addEventListener("mousemove", handleMove);
+    document.addEventListener("mouseup", handleEnd);
+    document.addEventListener("touchmove", handleMove, { passive: false });
+    document.addEventListener("touchend", handleEnd);
+    return () => {
+      document.removeEventListener("mousemove", handleMove);
+      document.removeEventListener("mouseup", handleEnd);
+      document.removeEventListener("touchmove", handleMove);
+      document.removeEventListener("touchend", handleEnd);
+    };
+  }, [isDragging]);
+
+  const handleDragStart = (e) => {
+    setIsDragging(true);
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    dragStartRef.current = { x: clientX - dragPos.x, y: clientY - dragPos.y };
+  };
 
   // --- Delete ---
   const handleDeleteClick = (e) => {
@@ -134,7 +194,7 @@ export default function ProductCard({ product, categories = [], isAdmin, onDelet
   };
 
   return (
-    <article className={`bg-white border ${product.inStock === false ? 'border-transparent bg-stone-50' : 'border-stone-200'} rounded-lg flex flex-col group hover:shadow-md transition-shadow duration-200 relative`}>
+    <article ref={cardRef} className={`bg-white border ${product.inStock === false ? 'border-transparent bg-stone-50' : 'border-stone-200'} rounded-lg flex flex-col group hover:shadow-md transition-shadow duration-200 relative`}>
 
       {/* Image */}
       <div className={`relative w-full bg-stone-100 aspect-square flex items-center justify-center rounded-t-lg ${isAdmin ? 'cursor-pointer' : ''}`} onClick={handleImageClick}>
@@ -163,17 +223,25 @@ export default function ProductCard({ product, categories = [], isAdmin, onDelet
           </button>
         )}
         
-        {/* Category chip — Popover Menu (Centered over Image) */}
+        {/* Category chip — Popover Menu (Centered over Image + Draggable) */}
         {isAdmin && isEditingCategory && (
           <div 
-            className="absolute top-10 left-1/2 -translate-x-1/2 z-40 bg-white border border-stone-200 rounded-lg shadow-2xl w-44 flex flex-col items-stretch overflow-hidden origin-top"
+            style={{ transform: `translate(calc(-50% + ${dragPos.x}px), ${dragPos.y}px)` }}
+            className={`absolute top-10 left-1/2 z-50 bg-white border border-stone-200 rounded-lg w-44 flex flex-col items-stretch overflow-hidden origin-top ${isDragging ? 'shadow-3xl ring-2 ring-kraft-200 opacity-95 transition-none' : 'shadow-2xl transition-transform duration-75'}`}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex justify-between items-center mb-2 p-3 pb-0">
-              <span className="text-[10px] font-bold text-stone-600">Kategori Değiştir</span>
+            <div 
+              className="flex justify-between items-center mb-2 p-3 pb-0 cursor-move bg-stone-50 active:bg-stone-100 touch-none"
+              onMouseDown={handleDragStart}
+              onTouchStart={handleDragStart}
+            >
+              <div className="flex items-center gap-1.5 pointer-events-none select-none">
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                <span className="text-[10px] font-bold text-stone-600">Kategori (Sürükle)</span>
+              </div>
               <button type="button" onClick={() => setIsEditingCategory(false)} className="text-stone-400 hover:text-stone-700 leading-none">×</button>
             </div>
-            <div className="p-3 pt-1">
+            <div className="p-3 pt-1 bg-white">
               {categories.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-2 max-h-24 overflow-y-auto">
                   {categories.map(cat => (
