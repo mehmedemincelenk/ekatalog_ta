@@ -26,7 +26,7 @@ export const NAVBAR = {
   logoTaglineSize: 'text-[10px]',              // Tagline boyutu
   logoTaglineColor: 'text-kraft-600',           // Tagline rengi
   // Telefon & WhatsApp kombinasyon butonu
-  phoneSize: 'text-[8px]',              // Telefon yazı boyutu
+  phoneSize: 'text-[10px]',              // Telefon yazı boyutu
   phoneWeight: 'font-semibold',            // Telefon yazı kalınlığı
   phoneColor: 'text-stone-900',           // Telefon yazı rengi
   phoneHoverColor: 'hover:text-kraft-700',     // Telefon hover rengi
@@ -36,7 +36,7 @@ export const NAVBAR = {
   whatsappHoverBg: 'hover:bg-stone-900',       // Buton hover arka planı
   whatsappRounded: 'rounded',                  // Köşe yuvarlama
   // Adres
-  addressSize: 'text-[6px]',              // Adres yazı boyutu
+  addressSize: 'text-[8px]',              // Adres yazı boyutu
   addressColor: 'text-stone-600',           // Adres yazı rengi
 };
 
@@ -163,13 +163,13 @@ export const CARD_TYPOGRAPHY = {
   categoryPadding: 'px-1.5 py-0.5',           // Çip içi yatay ve dikey boşluk (padding)
 
   // İsim (tek satır, yatay marquee)
-  nameFontSize: 'text-[12px]',                // Ürün adı yazı boyutu
+  nameFontSize: 'text-[10px]',                // Ürün adı yazı boyutu
   nameWeight: 'font-semibold',                // Ürün adı yazı kalınlığı
   nameColor: 'text-stone-900',                // Ürün adı yazı rengi
   nameLeading: 'leading-snug',                // Ürün adı satır yüksekliği
 
   // Fiyat
-  priceFontSize: 'text-[14px]',               // Ürün fiyatı yazı boyutu
+  priceFontSize: 'text-[12px]',               // Ürün fiyatı yazı boyutu
   priceWeight: 'font-bold',                   // Ürün fiyatı yazı kalınlığı
   priceColor: 'text-stone-900',               // Ürün fiyatı yazı rengi
 
