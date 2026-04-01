@@ -106,7 +106,7 @@ export const CAROUSEL = {
   titleSizePC: 'sm:text-xl lg:text-2xl',        // [PC] Başlık boyutu
   titleWeight: 'font-extrabold',
   titleColor: 'text-white',
-  titleTracking: 'tracking-tight',
+  titleTracking: 'tracking-tight leading-none mb-1',
   titleShadow: 'drop-shadow',
 
   // Alt Metin (Sub) Tasarımı
@@ -114,7 +114,7 @@ export const CAROUSEL = {
   subSizePC: 'text-[12px]',                     // [PC] Alt metin boyutu
   subWeight: 'font-medium',
   subColor: 'text-white/90',
-  subLeading: 'leading-relaxed',
+  subLeading: 'leading-none',
   subShadow: 'drop-shadow',
 
   slides: [
