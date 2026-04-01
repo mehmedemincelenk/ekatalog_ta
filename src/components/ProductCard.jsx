@@ -312,19 +312,26 @@ export default function ProductCard({ product, categories = [], isAdmin, onDelet
         </div>
       )}
 
-      {/* Admin Archived Overlay */}
-      {isAdmin && product.isArchived && (
-        <div className="absolute inset-0 bg-stone-900/10 z-[5] pointer-events-none rounded-lg border-2 border-dashed border-stone-400/50 flex flex-col items-center justify-center">
-          <span className="bg-stone-900 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow pointer-events-auto select-none">ARŞİVLENDİ</span>
-        </div>
-      )}
+      {/* Status Overlays (Archived / Out of Stock) */}
+      <div className="absolute inset-0 z-[5] pointer-events-none rounded-lg flex items-center justify-center gap-3">
+        
+        {/* Out of Stock Icon */}
+        {product.inStock === false && (
+          <div className="bg-stone-900/90 text-white w-10 h-10 rounded-full shadow-xl flex items-center justify-center -translate-y-4" title="Stok Tükendi">
+            <span className="text-2xl font-light leading-none">∅</span>
+          </div>
+        )}
 
-      {/* Out of Stock Overlay (Both Admin & Client) */}
-      {product.inStock === false && !product.isArchived && (
-        <div className="absolute inset-0 z-[5] pointer-events-none rounded-lg flex flex-col items-center justify-center">
-          <span className="bg-stone-900 text-white text-[9px] font-bold px-3 py-1 rounded shadow-lg pointer-events-auto select-none -translate-y-4 tracking-wider">STOK TÜKENDİ</span>
-        </div>
-      )}
+        {/* Admin Archived Icon */}
+        {isAdmin && product.isArchived && (
+          <div className="bg-stone-900/90 text-white w-10 h-10 rounded-full shadow-xl flex items-center justify-center border border-dashed border-stone-400/50 -translate-y-4" title="Arşivlendi">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+            </svg>
+          </div>
+        )}
+
+      </div>
     </article>
   );
 }
