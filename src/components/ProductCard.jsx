@@ -8,7 +8,7 @@ const priceClass    = `${CT.priceFontSize} ${CT.priceWeight} ${CT.priceColor}`;
 const descClass     = `${CT.descFontSize} ${CT.descColor} ${CT.descLeading}`;
 
 // Scrolls text horizontally if it overflows — only for single-line fields
-function MarqueeText({ text, textClass, editableProps = {} }) {
+function MarqueeText({ text, textClass, isAdmin, editableProps = {} }) {
   const containerRef = useRef(null);
   const [overflow, setOverflow] = useState(false);
   const { className: editableClass = '', ...restEditable } = editableProps;
@@ -26,10 +26,10 @@ function MarqueeText({ text, textClass, editableProps = {} }) {
   return (
     <div
       ref={containerRef}
-      className={`overflow-hidden whitespace-nowrap ${textClass} ${editableClass}`}
+      className={`overflow-hidden ${isAdmin ? 'whitespace-normal' : 'whitespace-nowrap'} ${textClass} ${editableClass}`}
       {...restEditable}
     >
-      {overflow
+      {overflow && !isAdmin
         ? <span className="marquee-track inline-block">{text}&nbsp;&nbsp;&nbsp;{text}&nbsp;&nbsp;&nbsp;</span>
         : <span>{text}</span>
       }
@@ -172,6 +172,7 @@ export default function ProductCard({ product, isAdmin, onDelete, onUpdate }) {
         <MarqueeText
           text={product.name}
           textClass={nameClass}
+          isAdmin={isAdmin}
           editableProps={isAdmin ? {
             contentEditable: 'true',
             suppressContentEditableWarning: true,

@@ -26,9 +26,10 @@ export default function HeroCarousel({ isAdmin }) {
   };
 
   useEffect(() => {
+    if (isAdmin) return; // Admin modunda düzenleme sekteye uğramasın diye zamanlayıcı durdurulur
     const timer = setInterval(next, intervalMs);
     return () => clearInterval(timer);
-  }, [next, intervalMs]);
+  }, [next, intervalMs, isAdmin]);
 
   return (
     <div className={`relative w-full h-64 sm:h-80 lg:h-96 overflow-hidden mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-4`}>
