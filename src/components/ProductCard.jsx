@@ -254,20 +254,21 @@ export default function ProductCard({ product, categories = [], isAdmin, onDelet
           />
         ) : null}
 
-        {/* Price */}
-        <p {...makeEditable('price')} className={`mt-auto ${priceClass} ${makeEditable('price').className}`}>
-          {product.price}
-        </p>
+        {/* Price & Delete Button */}
+        <div className="mt-auto flex items-center justify-between">
+          <p {...makeEditable('price')} className={`${priceClass} ${makeEditable('price').className}`}>
+            {product.price}
+          </p>
+          {isAdmin && (
+            <button onClick={handleDeleteClick} className="w-5 h-5 flex items-center justify-center rounded-full bg-red-600 text-white hover:bg-red-700 transition-colors shadow" aria-label="Ürünü sil">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Admin: trash button (bottom right) */}
-      {isAdmin && (
-        <button onClick={handleDeleteClick} className="absolute bottom-1.5 right-1.5 z-20 w-6 h-6 flex items-center justify-center rounded-full bg-red-600 text-white hover:bg-red-700 transition-colors shadow" aria-label="Ürünü sil">
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-          </svg>
-        </button>
-      )}
     </article>
   );
 }
