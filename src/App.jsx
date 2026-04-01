@@ -13,8 +13,14 @@ export default function App() {
   const { products, updateProduct, removeProduct, addProduct, renameCategory, removeCategoryFromProducts } = useProducts();
   const { isAdmin, handleLogoClick } = useAdminMode();
   const [search, setSearch] = useState('');
-  const [activeCategory, setActiveCategory] = useState('Tümü');
+  const [activeCategories, setActiveCategories] = useState([]); // Boş dizi => 'Tümü'
   const [showAddModal, setShowAddModal] = useState(false);
+
+  // Kategori seçme / çıkarma mantığı (Tümü'ne basılırsa hepsini iptal et)
+  const toggleCategory = (cat) => {
+    if (cat === 'Tümü') { setActiveCategories([]); return; }
+    setActiveCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
+  };
 
   // Mevcut benzersiz kategorileri türet (Modal vs. için)
   const existingCategories = useMemo(() => {
@@ -26,10 +32,10 @@ export default function App() {
     const term = search.toLowerCase().trim();
     return products.filter((p) => {
       const matchSearch = !term || p.name.toLowerCase().includes(term);
-      const matchCategory = activeCategory === 'Tümü' || p.category === activeCategory;
+      const matchCategory = activeCategories.length === 0 || activeCategories.includes(p.category);
       return matchSearch && matchCategory;
     });
-  }, [products, search, activeCategory]);
+  }, [products, search, activeCategories]);
 
   const handleAddProduct = (product) => {
     addProduct(product);
@@ -45,8 +51,8 @@ export default function App() {
         products={products}
         search={search}
         onSearchChange={setSearch}
-        activeCategory={activeCategory}
-        onCategoryChange={setActiveCategory}
+        activeCategories={activeCategories}
+        onCategoryToggle={toggleCategory}
         isAdmin={isAdmin}
         renameCategory={renameCategory}
         removeCategoryFromProducts={removeCategoryFromProducts}

@@ -26,7 +26,7 @@ export const NAVBAR = {
   logoTaglineSize: 'text-[10px]',              // Tagline boyutu
   logoTaglineColor: 'text-kraft-600',           // Tagline rengi
   // Telefon & WhatsApp kombinasyon butonu
-  phoneSize: 'text-[11px]',              // Telefon yazı boyutu
+  phoneSize: 'text-[10px]',              // Telefon yazı boyutu
   phoneWeight: 'font-semibold',            // Telefon yazı kalınlığı
   phoneColor: 'text-stone-900',           // Telefon yazı rengi
   phoneHoverColor: 'hover:text-kraft-700',     // Telefon hover rengi
@@ -36,13 +36,13 @@ export const NAVBAR = {
   whatsappHoverBg: 'hover:bg-stone-900',       // Buton hover arka planı
   whatsappRounded: 'rounded',                  // Köşe yuvarlama
   // Adres
-  addressSize: 'text-[10px]',              // Adres yazı boyutu
+  addressSize: 'text-[8px]',              // Adres yazı boyutu
   addressColor: 'text-stone-600',           // Adres yazı rengi
 };
 
 // ----- Admin Modu -----
 export const ADMIN = {
-  triggerClicks: 7,     // Kaç tıkla admin açılır (footer logosu)
+  triggerClicks: 5,     // Kaç tıkla admin açılır (footer logosu)
   resetDelayMs: 2000,  // Tık sayacı sıfırlama süresi (ms)
 };
 

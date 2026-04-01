@@ -1,5 +1,5 @@
 // SearchFilter: real-time search box + dynamic category chips
-export default function SearchFilter({ products, search, onSearchChange, activeCategory, onCategoryChange, isAdmin, renameCategory, removeCategoryFromProducts }) {
+export default function SearchFilter({ products, search, onSearchChange, activeCategories = [], onCategoryToggle, isAdmin, renameCategory, removeCategoryFromProducts }) {
   // Derive unique categories from product list, always prepend "Tümü"
   const categories = ['Tümü', ...new Set(products.map((p) => p.category).filter(Boolean))];
 
@@ -26,13 +26,15 @@ export default function SearchFilter({ products, search, onSearchChange, activeC
         {/* Category chips */}
         <div className="flex flex-wrap gap-2 flex-1">
           {categories.map((cat) => {
+            const isActive = cat === 'Tümü' ? activeCategories.length === 0 : activeCategories.includes(cat);
+
             if (cat === 'Tümü') {
               return (
                 <button
                   key={cat}
-                  onClick={() => onCategoryChange(cat)}
+                  onClick={() => onCategoryToggle(cat)}
                   className={`px-3 py-1 rounded-full text-xs font-semibold border transition-colors duration-150 ${
-                    activeCategory === cat
+                    isActive
                       ? 'bg-stone-900 text-white border-stone-900'
                       : 'bg-white text-stone-600 border-stone-300 hover:border-stone-500 hover:text-stone-900'
                   }`}
@@ -45,9 +47,9 @@ export default function SearchFilter({ products, search, onSearchChange, activeC
             return (
               <div key={cat} className="group flex items-center gap-1">
                 <button
-                  onClick={() => !isAdmin && onCategoryChange(cat)}
+                  onClick={() => !isAdmin && onCategoryToggle(cat)}
                   className={`px-3 py-1 rounded-full text-xs font-semibold border transition-colors duration-150 ${
-                    activeCategory === cat && !isAdmin
+                    isActive && !isAdmin
                       ? 'bg-stone-900 text-white border-stone-900'
                       : 'bg-white text-stone-600 border-stone-300 hover:border-stone-500 hover:text-stone-900'
                   } ${isAdmin ? 'cursor-text ring-1 ring-amber-300 bg-amber-50' : ''}`}
@@ -58,8 +60,8 @@ export default function SearchFilter({ products, search, onSearchChange, activeC
                       const newName = e.currentTarget.textContent.trim();
                       if (newName && newName !== cat) {
                         renameCategory(cat, newName);
-                        // Eğer aktif kategori değiştirildiyse seçimi de güncelle
-                        if (activeCategory === cat) onCategoryChange(newName);
+                        // İsim değiştirilirken eğer aktif listesindeyse filtreyi temizle
+                        if (activeCategories.includes(cat)) onCategoryToggle('Tümü');
                       }
                       if (!newName) e.currentTarget.textContent = cat;
                     }
@@ -72,8 +74,8 @@ export default function SearchFilter({ products, search, onSearchChange, activeC
                   <button 
                     onClick={() => {
                         window.confirm(`'${cat}' kategorisini listeden tamamen silmek istediğinize emin misiniz? (Bu kategorideki ürünler kategorisiz bölümüne düşer)`) && removeCategoryFromProducts(cat);
-                        // Eğer silinen aktif kategoriyse menüyü sıfırla
-                        if (activeCategory === cat) onCategoryChange('Tümü');
+                        // Eğer silinen aktif bir kategoriyse filtreyi "Tümü"ne at
+                        if (activeCategories.includes(cat)) onCategoryToggle('Tümü');
                     }}
                     className="w-5 h-5 flex items-center justify-center rounded-full bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition-colors pb-0.5 font-bold"
                     title="Bu kategoriyi tampon bellekten tamamen sil"
