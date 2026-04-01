@@ -164,6 +164,18 @@ export const CATEGORY_ORDER = [
   'Özel Setler'
 ];
 
+export const CATEGORY_EMOJIS = {
+  'Tümü': '🛒',
+  'Gıda & Sos': '🥫',
+  'Temizlik & Kağıt': '🫧',
+  'Ambalaj': '📦',
+  'Poşet': '🛍️',
+  'Alüminyum': '🍱',
+  'Streç & Folyo': '🌯',
+  'Baskılı Ürünler': '🏷️',
+  'Özel Setler': '🍴'
+};
+
 export const sortCategories = (categoriesList) => {
   return [...categoriesList].sort((a, b) => {
     let indexA = CATEGORY_ORDER.indexOf(a);
