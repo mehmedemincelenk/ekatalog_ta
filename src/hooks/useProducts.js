@@ -6,7 +6,18 @@ export function useProducts() {
   const [products, setProducts] = useState(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : DEFAULT_PRODUCTS;
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        // Eksik resimleri DEFAULT_PRODUCTS içindeki veritabanından çekerek canlı kataloğa enjekte et
+        return parsed.map(p => {
+          if (!p.image) {
+            const defItem = DEFAULT_PRODUCTS.find(d => d.id === p.id);
+            if (defItem && defItem.image) return { ...p, image: defItem.image };
+          }
+          return p;
+        });
+      }
+      return DEFAULT_PRODUCTS;
     } catch {
       return DEFAULT_PRODUCTS;
     }
