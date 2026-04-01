@@ -1,13 +1,15 @@
+import { useState } from 'react';
+
 // SearchFilter: real-time search box + dynamic category chips
 export default function SearchFilter({ products, search, onSearchChange, activeCategories = [], onCategoryToggle, isAdmin, renameCategory, removeCategoryFromProducts }) {
-  // Derive unique categories from product list, always prepend "Tümü"
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const categories = ['Tümü', ...new Set(products.map((p) => p.category).filter(Boolean))];
 
   return (
-    <section className="bg-white border-b border-stone-200 py-4">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row gap-4 items-start md:items-center">
-        {/* Search input */}
-        <div className="relative w-full md:w-64 shrink-0">
+    <section className="bg-white border-b border-stone-200 py-3 relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3">
+        {/* Search Input */}
+        <div className="relative w-full sm:w-64 shrink-0">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 0 5 11a6 6 0 0 0 12 0z" />
@@ -23,36 +25,28 @@ export default function SearchFilter({ products, search, onSearchChange, activeC
           />
         </div>
 
-        {/* Category chips */}
-        <div className="flex flex-wrap gap-2 flex-1">
+        {/* Mobile: Filter Menu Toggle Button */}
+        <button
+          className="sm:hidden p-2 text-stone-600 border border-stone-300 rounded-md flex-shrink-0 flex items-center justify-center hover:bg-stone-50"
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          title="Kategorileri Göster"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" />
+          </svg>
+        </button>
+
+        {/* Desktop: Horizontal Scrollable Chips */}
+        <div className="hidden sm:flex overflow-x-auto whitespace-nowrap gap-2 items-center flex-1 no-scrollbar pb-1">
           {categories.map((cat) => {
             const isActive = cat === 'Tümü' ? activeCategories.length === 0 : activeCategories.includes(cat);
-
-            if (cat === 'Tümü') {
-              return (
-                <button
-                  key={cat}
-                  onClick={() => onCategoryToggle(cat)}
-                  className={`px-3 py-1 rounded-full text-xs font-semibold border transition-colors duration-150 ${
-                    isActive
-                      ? 'bg-stone-900 text-white border-stone-900'
-                      : 'bg-white text-stone-600 border-stone-300 hover:border-stone-500 hover:text-stone-900'
-                  }`}
-                >
-                  {cat}
-                </button>
-              );
-            }
-
             return (
-              <div key={cat} className="group flex items-center gap-1">
+              <div key={cat} className="group flex items-center gap-1 flex-shrink-0">
                 <button
                   onClick={() => !isAdmin && onCategoryToggle(cat)}
-                  className={`px-3 py-1 rounded-full text-xs font-semibold border transition-colors duration-150 ${
-                    isActive && !isAdmin
-                      ? 'bg-stone-900 text-white border-stone-900'
-                      : 'bg-white text-stone-600 border-stone-300 hover:border-stone-500 hover:text-stone-900'
-                  } ${isAdmin ? 'cursor-text bg-amber-50 focus:outline-none' : ''}`}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors duration-150 ${
+                    isActive && !isAdmin ? 'bg-stone-900 text-white border-stone-900' : 'bg-white text-stone-600 border-stone-300 hover:border-stone-500 hover:text-stone-900'
+                  } ${isAdmin ? 'cursor-text bg-amber-50' : ''}`}
                   contentEditable={isAdmin}
                   suppressContentEditableWarning
                   onBlur={(e) => {
@@ -60,7 +54,6 @@ export default function SearchFilter({ products, search, onSearchChange, activeC
                       const newName = e.currentTarget.textContent.trim();
                       if (newName && newName !== cat) {
                         renameCategory(cat, newName);
-                        // İsim değiştirilirken eğer aktif listesindeyse filtreyi temizle
                         if (activeCategories.includes(cat)) onCategoryToggle('Tümü');
                       }
                       if (!newName) e.currentTarget.textContent = cat;
@@ -70,24 +63,50 @@ export default function SearchFilter({ products, search, onSearchChange, activeC
                 >
                   {cat}
                 </button>
-                {isAdmin && (
-                  <button 
-                    onClick={() => {
-                        window.confirm(`'${cat}' kategorisini listeden tamamen silmek istediğinize emin misiniz? (Bu kategorideki ürünler kategorisiz bölümüne düşer)`) && removeCategoryFromProducts(cat);
-                        // Eğer silinen aktif bir kategoriyse filtreyi "Tümü"ne at
-                        if (activeCategories.includes(cat)) onCategoryToggle('Tümü');
-                    }}
-                    className="w-5 h-5 flex items-center justify-center rounded-full bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition-colors pb-0.5 font-bold"
-                    title="Bu kategoriyi tampon bellekten tamamen sil"
-                  >
-                    ×
-                  </button>
+                {isAdmin && cat !== 'Tümü' && (
+                  <button onClick={() => { window.confirm(`Silinsin mi?`) && removeCategoryFromProducts(cat); if (activeCategories.includes(cat)) onCategoryToggle('Tümü'); }} className="w-4 h-4 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-xs" title="Kategoriyi Sil">×</button>
                 )}
               </div>
             );
           })}
         </div>
       </div>
+
+      {/* Mobile: Dropdown Absolute Menu */}
+      {isDropdownOpen && (
+        <div className="absolute top-full left-0 w-full bg-stone-50 border-b border-stone-200 shadow-xl p-4 z-50 sm:hidden">
+          <div className="flex flex-wrap gap-2">
+            {categories.map((cat) => {
+              const isActive = cat === 'Tümü' ? activeCategories.length === 0 : activeCategories.includes(cat);
+              return (
+                <div key={cat} className="group flex items-center gap-1">
+                  <button
+                    onClick={() => { if(!isAdmin) { onCategoryToggle(cat); setIsDropdownOpen(false); } }}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors duration-150 shadow-sm ${
+                      isActive && !isAdmin ? 'bg-stone-900 text-white border-stone-900' : 'bg-white text-stone-600 border-stone-300'
+                    } ${isAdmin ? 'cursor-text bg-amber-50' : ''}`}
+                    contentEditable={isAdmin}
+                    suppressContentEditableWarning
+                    onBlur={(e) => {
+                      if (isAdmin) {
+                        const newName = e.currentTarget.textContent.trim();
+                        if (newName && newName !== cat) renameCategory(cat, newName);
+                        if (!newName) e.currentTarget.textContent = cat;
+                      }
+                    }}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); } }}
+                  >
+                    {cat}
+                  </button>
+                  {isAdmin && cat !== 'Tümü' && (
+                    <button onClick={() => { removeCategoryFromProducts(cat); }} className="w-5 h-5 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm">×</button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
