@@ -47,7 +47,7 @@ export const ADMIN = {
 };
 
 // ----- Veri Depolama -----
-export const STORAGE_KEY = 'toptanambalaj_products_v9'; // localStorage anahtarı
+export const STORAGE_KEY = 'toptanambalaj_products_v10'; // localStorage anahtarı
 
 // ----- UI / Modal Tasarımı -----
 export const MODAL = {
@@ -154,24 +154,32 @@ export const GRID = {
 
 // ----- Manuel Kategori Dizilim Önceliği -----
 export const CATEGORY_ORDER = [
-  'Gıda & Sos',
-  'Temizlik & Kağıt',
-  'Ambalaj',
-  'Poşet',
-  'Alüminyum',
-  'Streç & Folyo',
-  'Baskılı Ürünler',
-  'Özel Setler'
+  'TURŞU VE GIDA ÇEŞİTLERİ',
+  'BAHARAT GRUBU',
+  'PEÇETE',
+  'KÖPÜK',
+  'KAĞIT',
+  'PLASTİK ÜRÜNLERİ VE SIZDIRMAZ GRUBU',
+  'STREÇ ÇEŞİTLERİ',
+  'ALÜMİNYUM ÇEŞİTLERİ',
+  'POŞET ÇEŞİTLERİ',
+  'DETERJAN',
+  'HİJYEN SARF MALZEMELERİ'
 ];
 
 export const CATEGORY_EMOJIS = {
   'Tümü': '🛒',
-  'Gıda & Sos': '🥫',
-  'Temizlik & Kağıt': '🫧',
-  'Ambalaj': '📦',
-  'Poşet': '🛍️',
-  'Alüminyum': '🍱',
-  'Streç & Folyo': '🌯',
+  'TURŞU VE GIDA ÇEŞİTLERİ': '🥫',
+  'BAHARAT GRUBU': '🌶️',
+  'PEÇETE': '🧻',
+  'KÖPÜK': '🧼',
+  'KAĞIT': '📄',
+  'PLASTİK ÜRÜNLERİ VE SIZDIRMAZ GRUBU': '🧊',
+  'STREÇ ÇEŞİTLERİ': '🌯',
+  'ALÜMİNYUM ÇEŞİTLERİ': '🍱',
+  'POŞET ÇEŞİTLERİ': '🛍️',
+  'DETERJAN': '🫧',
+  'HİJYEN SARF MALZEMELERİ': '🧤',
   'Baskılı Ürünler': '🏷️',
   'Özel Setler': '🍴'
 };
