@@ -1,6 +1,11 @@
 import { COMPANY } from '../data/config';
 
-export default function Footer({ onLogoClick, isAdmin }) {
+interface FooterProps {
+  onLogoClick: () => void;
+  isAdmin: boolean;
+}
+
+export default function Footer({ onLogoClick, isAdmin }: FooterProps) {
   return (
     <footer className="bg-white border-t border-stone-200 mt-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col items-center gap-3">

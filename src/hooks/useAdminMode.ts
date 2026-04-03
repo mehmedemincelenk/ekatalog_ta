@@ -4,7 +4,7 @@ import { ADMIN } from '../data/config';
 export function useAdminMode() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [, setClickCount] = useState(0);
-  const [timerId, setTimerId] = useState(null);
+  const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
 
   const handleLogoClick = useCallback(() => {
     // If already in admin mode, one click exits

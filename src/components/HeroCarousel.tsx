@@ -1,11 +1,15 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { CAROUSEL } from '../data/config';
 import { useCarousel } from '../hooks/useCarousel';
 
-export default function HeroCarousel({ isAdmin }) {
+interface HeroCarouselProps {
+  isAdmin: boolean;
+}
+
+export default function HeroCarousel({ isAdmin }: HeroCarouselProps) {
   const { slides, updateSlide } = useCarousel();
-  const fileInputRef = useRef(null);
-  const [editingSlideId, setEditingSlideId] = useState(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [editingSlideId, setEditingSlideId] = useState<number | null>(null);
 
   const {
     intervalMs,
@@ -57,8 +61,8 @@ export default function HeroCarousel({ isAdmin }) {
     setActiveIndex((i) => (i - 1 + slides.length) % slides.length);
   }, [slides.length]);
 
-  const handleTouchStart = (e) => setTouchStart(e.targetTouches[0].clientX);
-  const handleTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
+  const handleTouchStart = (e: React.TouchEvent) => setTouchStart(e.targetTouches[0].clientX);
+  const handleTouchMove = (e: React.TouchEvent) => setTouchEnd(e.targetTouches[0].clientX);
   const handleTouchEnd = () => {
     if (!touchStart || !touchEnd) return;
     const distance = touchStart - touchEnd;
@@ -68,14 +72,14 @@ export default function HeroCarousel({ isAdmin }) {
     setTouchEnd(0);
   };
 
-  const getImageUrl = (path) => {
+  const getImageUrl = (path: string) => {
     if (!path) return path;
     if (path.startsWith('http') || path.startsWith('data:')) return path;
     return `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`;
   };
 
   useEffect(() => {
-    if (isAdmin) return; // Admin modunda düzenleme sekteye uğramasın diye zamanlayıcı durdurulur
+    if (isAdmin) return;
     const timer = setInterval(next, intervalMs);
     return () => clearInterval(timer);
   }, [next, intervalMs, isAdmin]);
@@ -121,7 +125,7 @@ export default function HeroCarousel({ isAdmin }) {
               ></div>
             )}
 
-            {/* Glassmorphism Text Box (Sol Alt) */}
+            {/* Glassmorphism Text Box */}
             <div
               className={`absolute z-20 ${boxPositionMobile} ${boxPositionPC} ${boxWidthMobile} ${boxWidthPC} ${boxPaddingMobile} ${boxPaddingPC} ${boxRounding} ${boxBg} ${boxBorder} ${boxShadow}`}
             >
@@ -130,7 +134,7 @@ export default function HeroCarousel({ isAdmin }) {
                 contentEditable={isAdmin}
                 suppressContentEditableWarning
                 onBlur={(e) => {
-                  const val = e.currentTarget.textContent.trim();
+                  const val = e.currentTarget.textContent?.trim() || '';
                   if (val && val !== slide.label)
                     updateSlide(slide.id, { label: val });
                 }}
@@ -148,7 +152,7 @@ export default function HeroCarousel({ isAdmin }) {
                 contentEditable={isAdmin}
                 suppressContentEditableWarning
                 onBlur={(e) => {
-                  const val = e.currentTarget.textContent.trim();
+                  const val = e.currentTarget.textContent?.trim() || '';
                   if (val !== slide.sub) updateSlide(slide.id, { sub: val });
                 }}
                 onKeyDown={(e) => {
@@ -173,7 +177,7 @@ export default function HeroCarousel({ isAdmin }) {
             const file = e.target.files?.[0];
             if (!file || !editingSlideId) return;
             try {
-              const { compressImage } = await import('../utils/image.js');
+              const { compressImage } = await import('../utils/image');
               const compressedStr = await compressImage(file, 1200, 0.7);
               updateSlide(editingSlideId, { src: compressedStr });
               setEditingSlideId(null);

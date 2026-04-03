@@ -174,9 +174,9 @@ export const CATEGORY_ORDER = [
 ];
 
 export const sortCategories = (
-  categoriesList,
-  customOrder = CATEGORY_ORDER,
-) => {
+  categoriesList: string[],
+  customOrder: string[] = CATEGORY_ORDER,
+): string[] => {
   const order = customOrder || CATEGORY_ORDER;
   return [...categoriesList].sort((a, b) => {
     let indexA = order.indexOf(a);

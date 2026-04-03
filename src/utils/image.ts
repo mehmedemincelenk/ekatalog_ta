@@ -14,7 +14,11 @@
  *
  * @returns {Promise<string>} Sıkıştırılmış resmin Base64 formatındaki URL'si
  */
-export function compressImage(file, maxSize = 250, quality = 0.6) {
+export function compressImage(
+  file: File,
+  maxSize = 250,
+  quality = 0.6,
+): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -36,6 +40,10 @@ export function compressImage(file, maxSize = 250, quality = 0.6) {
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Canvas context could not be created.'));
+          return;
+        }
 
         // Beyaz zemin (Saydamlık hatalarını önler)
         ctx.fillStyle = '#FFFFFF';
@@ -55,14 +63,16 @@ export function compressImage(file, maxSize = 250, quality = 0.6) {
           canvas.width = Math.round(width / 2);
           canvas.height = Math.round(height / 2);
           const ctx2 = canvas.getContext('2d');
-          ctx2.drawImage(img, 0, 0, canvas.width, canvas.height);
-          dataUrl = canvas.toDataURL('image/jpeg', 0.3);
+          if (ctx2) {
+            ctx2.drawImage(img, 0, 0, canvas.width, canvas.height);
+            dataUrl = canvas.toDataURL('image/jpeg', 0.3);
+          }
         }
 
         resolve(dataUrl);
       };
       img.onerror = () => reject(new Error('Resim işlenemedi.'));
-      img.src = e.target.result;
+      img.src = e.target?.result as string;
     };
     reader.onerror = () => reject(new Error('Dosya okunamadı.'));
     reader.readAsDataURL(file);

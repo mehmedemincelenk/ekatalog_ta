@@ -12,7 +12,7 @@ import { useAdminMode } from './hooks/useAdminMode';
 export default function App() {
   const { isAdmin, handleLogoClick } = useAdminMode();
   const [search, setSearch] = useState('');
-  const [activeCategories, setActiveCategories] = useState([]);
+  const [activeCategories, setActiveCategories] = useState<string[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
 
   // Business Logic Encapsulated in Hook
@@ -69,7 +69,7 @@ export default function App() {
       </div>
     );
   }
-  const toggleCategory = (cat) => {
+  const toggleCategory = (cat: string) => {
     if (cat === 'Tümü') {
       setActiveCategories([]);
       return;

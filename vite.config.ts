@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-  base: '/katalog/',
+  base: '/ekatalog_ta/',
   plugins: [react()],
   test: {
     globals: true,

@@ -3,8 +3,16 @@ import { CAROUSEL } from '../data/config';
 
 const STORAGE_KEY = 'toptanambalaj_carousel_v1';
 
+interface Slide {
+  id: number;
+  src: string;
+  bg: string;
+  label: string;
+  sub: string;
+}
+
 export function useCarousel() {
-  const [slides, setSlides] = useState(() => {
+  const [slides, setSlides] = useState<Slide[]>(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       return stored ? JSON.parse(stored) : CAROUSEL.slides;
@@ -22,7 +30,7 @@ export function useCarousel() {
     }
   }, [slides]);
 
-  const updateSlide = (id, changes) => {
+  const updateSlide = (id: number, changes: Partial<Slide>) => {
     setSlides((prev) =>
       prev.map((s) => (s.id === id ? { ...s, ...changes } : s)),
     );

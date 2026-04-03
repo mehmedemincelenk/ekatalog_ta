@@ -1,11 +1,42 @@
-import { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { CARD_TYPOGRAPHY as CT, CARD_LAYOUT as CL } from '../data/config';
+import { Product } from '../types';
+
+// --- Yardımcı Bileşen Tipleri ---
+
+interface MarqueeTextProps {
+  text: string;
+  textClass: string;
+  isAdmin: boolean;
+  editableProps?: React.HTMLAttributes<HTMLDivElement> & {
+    suppressContentEditableWarning?: boolean;
+  };
+}
+
+interface DescriptionScrollProps {
+  lines: string[];
+  lineClass: string;
+  maxHeightClass: string;
+}
+
+interface ProductCardProps {
+  product: Product;
+  categories: string[];
+  isAdmin: boolean;
+  onDelete: (id: string) => void;
+  onUpdate: (id: string, changes: Partial<Product>) => void;
+}
 
 // --- Yardımcı Bileşenler (Dahili) ---
 
 // Yatay kayan metin (Ürün Adı için)
-function MarqueeText({ text, textClass, isAdmin, editableProps = {} }) {
-  const containerRef = useRef(null);
+function MarqueeText({
+  text,
+  textClass,
+  isAdmin,
+  editableProps = {},
+}: MarqueeTextProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const [overflow, setOverflow] = useState(false);
   const { className: editableClass = '', ...restEditable } = editableProps;
 
@@ -38,8 +69,12 @@ function MarqueeText({ text, textClass, isAdmin, editableProps = {} }) {
 }
 
 // Dikey kayan açıklama satırları
-function DescriptionScroll({ lines, lineClass, maxHeightClass }) {
-  const containerRef = useRef(null);
+function DescriptionScroll({
+  lines,
+  lineClass,
+  maxHeightClass,
+}: DescriptionScrollProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const [overflow, setOverflow] = useState(false);
 
   useEffect(() => {
@@ -53,7 +88,7 @@ function DescriptionScroll({ lines, lineClass, maxHeightClass }) {
     return () => ro.disconnect();
   }, [lines]);
 
-  const renderLines = (keyPrefix) =>
+  const renderLines = (keyPrefix: string) =>
     lines.map((line, i) => (
       <div
         key={`${keyPrefix}-${i}`}
@@ -86,10 +121,10 @@ export default function ProductCard({
   isAdmin,
   onDelete,
   onUpdate,
-}) {
-  const fileInputRef = useRef(null);
-  const cardRef = useRef(null);
-  const descAreaRef = useRef(null);
+}: ProductCardProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cardRef = useRef<HTMLElement>(null);
+  const descAreaRef = useRef<HTMLTextAreaElement>(null);
 
   const [isEditingCategory, setIsEditingCategory] = useState(false);
   const [isEditingDesc, setIsEditingDesc] = useState(false);
@@ -112,8 +147,8 @@ export default function ProductCard({
 
   // Dışarı tıklama kontrolü
   useEffect(() => {
-    const handleClickOutside = () => {
-      if (cardRef.current && !cardRef.current.contains(e.target)) {
+    const handleClickOutside = (ev: MouseEvent) => {
+      if (cardRef.current && !cardRef.current.contains(ev.target as Node)) {
         setIsEditingCategory(false);
         setIsEditingDesc(false);
         setShowActions(false);
@@ -126,9 +161,9 @@ export default function ProductCard({
   // Sürükleme mantığı
   useEffect(() => {
     if (!isDragging) return;
-    const handleMove = () => {
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const handleMove = (ev: MouseEvent | TouchEvent) => {
+      const clientX = 'touches' in ev ? ev.touches[0].clientX : ev.clientX;
+      const clientY = 'touches' in ev ? ev.touches[0].clientY : ev.clientY;
       setDragPos({
         x: clientX - dragStartRef.current.x,
         y: clientY - dragStartRef.current.y,
@@ -143,9 +178,9 @@ export default function ProductCard({
     };
   }, [isDragging]);
 
-  const handleDragStart = () => {
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  const handleDragStart = (ev: React.MouseEvent | React.TouchEvent) => {
+    const clientX = 'touches' in ev ? ev.nativeEvent.touches[0].clientX : (ev as React.MouseEvent).clientX;
+    const clientY = 'touches' in ev ? ev.nativeEvent.touches[0].clientY : (ev as React.MouseEvent).clientY;
     dragStartRef.current = { x: clientX - dragPos.x, y: clientY - dragPos.y };
     setIsDragging(true);
   };
@@ -154,26 +189,26 @@ export default function ProductCard({
   const handleImageClick = () => {
     if (isAdmin) fileInputRef.current?.click();
   };
-  const handleFileChange = async () => {
-    const file = e.target.files?.[0];
+  const handleFileChange = async (ev: React.ChangeEvent<HTMLInputElement>) => {
+    const file = ev.target.files?.[0];
     if (!file) return;
     try {
-      const { compressImage } = await import('../utils/image.js');
-      const compressedStr = await compressImage(file, 600, 0.7);
+      const { compressImage } = await import('../utils/image');
+      const compressedStr = await compressImage(file, 250, 0.6) as string;
       onUpdate(product.id, { image: compressedStr });
     } catch {
       alert('Görsel işlenemedi.');
     }
-    e.target.value = '';
+    ev.target.value = '';
   };
 
-  const updateField = (field, value) => {
+  const updateField = (field: keyof Product, value: string | boolean | null) => {
     if (value !== (product[field] || ''))
       onUpdate(product.id, { [field]: value });
   };
 
   // --- Render Helpers ---
-  const getImageUrl = (path) => {
+  const getImageUrl = (path: string) => {
     if (!path) return null;
     if (path.startsWith('http') || path.startsWith('data:')) return path;
     return `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`;
@@ -186,7 +221,7 @@ export default function ProductCard({
 
   return (
     <article
-      ref={cardRef}
+      ref={cardRef as React.RefObject<HTMLDivElement>}
       className={`bg-white border ${product.inStock === false ? 'border-transparent bg-stone-50' : 'border-stone-200'} rounded-lg flex flex-col group hover:shadow-md transition-shadow duration-200 relative`}
     >
       {/* 1. IMAGE SECTION */}
@@ -196,7 +231,7 @@ export default function ProductCard({
       >
         {product.image ? (
           <img
-            src={getImageUrl(product.image)}
+            src={getImageUrl(product.image) || ''}
             alt={product.name}
             className={`w-full h-full object-cover rounded-t-lg transition-all duration-300 ${product.inStock === false ? 'grayscale opacity-60' : ''}`}
             draggable={false}
@@ -218,8 +253,8 @@ export default function ProductCard({
         {/* Category Chip (Admin) */}
         {isAdmin && !isEditingCategory && (
           <button
-            onClick={() => {
-              e.stopPropagation();
+            onClick={(ev) => {
+              ev.stopPropagation();
               setIsEditingCategory(true);
             }}
             className={`absolute top-1.5 left-1.5 z-10 ${categoryClass} hover:ring-1 hover:ring-kraft-400`}
@@ -235,7 +270,7 @@ export default function ProductCard({
               transform: `translate(calc(-50% + ${dragPos.x}px), ${dragPos.y}px)`,
             }}
             className={`absolute ${CL.catPopoverOffsetTop} left-1/2 z-50 bg-white border border-stone-200 rounded-lg ${CL.catPopoverWidth} shadow-2xl flex flex-col items-stretch overflow-hidden`}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(ev) => ev.stopPropagation()}
           >
             <div
               className="flex justify-between items-center p-3 pb-0 cursor-move bg-stone-50"
@@ -270,7 +305,7 @@ export default function ProductCard({
                 <input
                   type="text"
                   value={newCatData}
-                  onChange={(e) => setNewCatData(e.target.value)}
+                  onChange={(ev) => setNewCatData(ev.target.value)}
                   placeholder="Yeni..."
                   className="w-full border border-stone-300 rounded px-1.5 py-1 text-[10px] focus:outline-none focus:border-kraft-400"
                 />
@@ -302,11 +337,11 @@ export default function ProductCard({
               ? {
                   contentEditable: true,
                   suppressContentEditableWarning: true,
-                  onBlur: () =>
-                    updateField('name', e.currentTarget.textContent.trim()),
-                  onKeyDown: () =>
-                    e.key === 'Enter' &&
-                    (e.preventDefault(), e.currentTarget.blur()),
+                  onBlur: (ev) =>
+                    updateField('name', ev.currentTarget.textContent?.trim() || ''),
+                  onKeyDown: (ev) =>
+                    ev.key === 'Enter' &&
+                    (ev.preventDefault(), ev.currentTarget.blur()),
                   className:
                     'cursor-text focus:outline-none focus:bg-amber-50 px-0.5 rounded',
                 }
@@ -320,7 +355,7 @@ export default function ProductCard({
               <textarea
                 ref={descAreaRef}
                 value={tempDesc}
-                onChange={() => setTempDesc(e.target.value)}
+                onChange={(ev) => setTempDesc(ev.target.value)}
                 onBlur={() => (
                   setIsEditingDesc(false),
                   updateField('description', tempDesc.trim())
@@ -330,7 +365,7 @@ export default function ProductCard({
               />
             ) : (
               <div
-                onClick={() => (e.stopPropagation(), setIsEditingDesc(true))}
+                onClick={(ev) => (ev.stopPropagation(), setIsEditingDesc(true))}
                 className={`w-full px-1 py-0.5 ${descClass} cursor-text hover:bg-amber-50 rounded transition-colors ${!product.description ? 'text-stone-300 italic' : ''}`}
               >
                 {product.description || '+ Açıklama ekle'}
@@ -351,14 +386,14 @@ export default function ProductCard({
           <div
             contentEditable={isAdmin}
             suppressContentEditableWarning
-            onBlur={() => {
-              let val = e.currentTarget.textContent.trim();
+            onBlur={(ev) => {
+              let val = ev.currentTarget.textContent?.trim() || '';
               if (val && !val.startsWith('₺')) val = '₺' + val;
               updateField('price', val);
-              e.currentTarget.textContent = val;
+              ev.currentTarget.textContent = val;
             }}
-            onKeyDown={() =>
-              e.key === 'Enter' && (e.preventDefault(), e.currentTarget.blur())
+            onKeyDown={(ev) =>
+              ev.key === 'Enter' && (ev.preventDefault(), ev.currentTarget.blur())
             }
             className={`${priceClass} transition-all duration-300 ${isAdmin ? 'cursor-text focus:outline-none focus:bg-amber-50 px-0.5 rounded' : ''} ${product.inStock === false && !isAdmin ? 'line-through opacity-60 text-stone-500' : ''}`}
           >
@@ -373,7 +408,7 @@ export default function ProductCard({
           className={`absolute ${CL.actionMenuAnchorB} ${CL.actionMenuAnchorR} z-20`}
         >
           <button
-            onClick={() => (e.stopPropagation(), setShowActions(!showActions))}
+            onClick={(ev) => (ev.stopPropagation(), setShowActions(!showActions))}
             className={`${CL.iconSmall} flex items-center justify-center rounded-full transition-colors ${showActions ? 'bg-stone-200 text-stone-900' : 'text-stone-300 hover:bg-stone-100 hover:text-stone-700'}`}
           >
             <svg
@@ -395,7 +430,7 @@ export default function ProductCard({
           {showActions && (
             <div
               className={`absolute ${CL.actionPopoverOffsetB} left-1/2 -translate-x-1/2 z-40 bg-white border border-stone-200 rounded-full shadow-2xl px-1.5 py-1.5 flex items-center ${CL.gapSmall}`}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(ev) => ev.stopPropagation()}
             >
               <button
                 onClick={() => (

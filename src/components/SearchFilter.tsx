@@ -1,5 +1,30 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { sortCategories } from '../data/config';
+import { Product } from '../types';
+
+// --- Alt Bileşen Tipleri ---
+
+interface AdminCategoryItemProps {
+  cat: string;
+  onDragStart: (e: React.DragEvent, category: string) => void;
+  onDragEnd: (e: React.DragEvent) => void;
+  onDrop: (e: React.DragEvent, category: string) => void;
+  onRename: (oldName: string, newName: string) => void;
+  onDelete: (category: string) => void;
+}
+
+interface SearchFilterProps {
+  products: Product[];
+  categoryOrder: string[];
+  updateCategoryOrder: (newOrder: string[]) => void;
+  search: string;
+  onSearchChange: (value: string) => void;
+  activeCategories?: string[];
+  onCategoryToggle: (category: string) => void;
+  isAdmin: boolean;
+  renameCategory: (oldName: string, newName: string) => void;
+  removeCategoryFromProducts: (category: string) => void;
+}
 
 // --- Alt Bileşenler (Dahili) ---
 
@@ -10,7 +35,7 @@ function AdminCategoryItem({
   onDrop,
   onRename,
   onDelete,
-}) {
+}: AdminCategoryItemProps) {
   return (
     <div
       draggable
@@ -38,7 +63,7 @@ function AdminCategoryItem({
         contentEditable
         suppressContentEditableWarning
         onBlur={(e) => {
-          const newName = e.currentTarget.textContent.trim();
+          const newName = e.currentTarget.textContent?.trim() || '';
           if (newName && newName !== cat) onRename(cat, newName);
           if (!newName) e.currentTarget.textContent = cat;
         }}
@@ -59,7 +84,7 @@ function AdminCategoryItem({
   );
 }
 
-function handleDragOverInternal(e) {
+function handleDragOverInternal(e: React.DragEvent) {
   e.preventDefault();
   e.dataTransfer.dropEffect = 'move';
 }
@@ -77,9 +102,9 @@ export default function SearchFilter({
   isAdmin,
   renameCategory,
   removeCategoryFromProducts,
-}) {
+}: SearchFilterProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [draggedItem, setDraggedItem] = useState(null);
+  const [draggedItem, setDraggedItem] = useState<string | null>(null);
 
   const dynamicCategories = [
     ...new Set(products.map((p) => p.category).filter(Boolean)),
@@ -87,14 +112,16 @@ export default function SearchFilter({
   const sortedList = sortCategories(dynamicCategories, categoryOrder);
   const categories = ['Tümü', ...sortedList];
 
-  const handleDragStart = (e, category) => {
+  const handleDragStart = (e: React.DragEvent, category: string) => {
     if (!isAdmin || category === 'Tümü') return;
     setDraggedItem(category);
     e.dataTransfer.effectAllowed = 'move';
-    e.target.style.opacity = '0.4';
+    if (e.target instanceof HTMLElement) {
+      e.target.style.opacity = '0.4';
+    }
   };
 
-  const handleDrop = (e, targetCategory) => {
+  const handleDrop = (_e: React.DragEvent, targetCategory: string) => {
     if (
       !isAdmin ||
       !draggedItem ||
@@ -166,7 +193,11 @@ export default function SearchFilter({
                     key={cat}
                     cat={cat}
                     onDragStart={handleDragStart}
-                    onDragEnd={(e) => (e.target.style.opacity = '1')}
+                    onDragEnd={(e) => {
+                      if (e.target instanceof HTMLElement) {
+                        e.target.style.opacity = '1';
+                      }
+                    }}
                     onDrop={handleDrop}
                     onRename={renameCategory}
                     onDelete={removeCategoryFromProducts}

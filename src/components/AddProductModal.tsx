@@ -1,5 +1,12 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { MODAL } from '../data/config';
+import { Product } from '../types';
+
+interface AddProductModalProps {
+  categories: string[];
+  onAdd: (product: Omit<Product, 'id' | 'inStock' | 'is_archived'> & { inStock: boolean }) => void;
+  onClose: () => void;
+}
 
 const EMPTY = {
   name: '',
@@ -7,26 +14,32 @@ const EMPTY = {
   newCategory: '',
   price: '',
   description: '',
-  image: null,
+  image: null as string | null,
   inStock: true,
 };
 
-export default function AddProductModal({ categories = [], onAdd, onClose }) {
+export default function AddProductModal({
+  categories = [],
+  onAdd,
+  onClose,
+}: AddProductModalProps) {
   const [form, setForm] = useState(EMPTY);
-  const [previewUrl, setPreviewUrl] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState('');
 
-  const handleChange = (e) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     setError('');
   };
 
-  const handleImageChange = async (e) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
-      const { compressImage } = await import('../utils/image.js');
-      const compressedStr = await compressImage(file, 600, 0.7);
+      const { compressImage } = await import('../utils/image');
+      const compressedStr = await compressImage(file, 250, 0.6);
       setPreviewUrl(compressedStr);
       setForm((prev) => ({ ...prev, image: compressedStr }));
     } catch {
@@ -34,7 +47,7 @@ export default function AddProductModal({ categories = [], onAdd, onClose }) {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const finalCategory = form.newCategory.trim() || form.category.trim();
     if (!form.name.trim() || !finalCategory || !form.price.trim()) {
@@ -42,10 +55,12 @@ export default function AddProductModal({ categories = [], onAdd, onClose }) {
       return;
     }
     onAdd({
-      ...form,
       name: form.name.trim(),
       category: finalCategory,
       price: form.price.trim(),
+      description: form.description.trim(),
+      image: form.image,
+      inStock: form.inStock,
     });
     onClose();
   };
@@ -172,13 +187,7 @@ export default function AddProductModal({ categories = [], onAdd, onClose }) {
                 name="newCategory"
                 type="text"
                 value={form.newCategory}
-                onChange={(e) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    newCategory: e.target.value,
-                    category: '',
-                  }))
-                }
+                onChange={handleChange}
                 placeholder="Veya yeni kategori yazın..."
                 className="w-full border border-stone-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-kraft-400 focus:border-kraft-400 transition"
               />

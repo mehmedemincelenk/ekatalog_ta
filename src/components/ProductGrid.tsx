@@ -1,5 +1,14 @@
 import { GRID, sortCategories } from '../data/config';
+import { Product } from '../types';
 import ProductCard from './ProductCard';
+
+interface ProductGridProps {
+  products: Product[];
+  categoryOrder: string[];
+  isAdmin: boolean;
+  onDelete: (id: string) => void;
+  onUpdate: (id: string, changes: Partial<Product>) => void;
+}
 
 export default function ProductGrid({
   products,
@@ -7,7 +16,7 @@ export default function ProductGrid({
   isAdmin,
   onDelete,
   onUpdate,
-}) {
+}: ProductGridProps) {
   if (products.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-stone-400">
@@ -18,7 +27,7 @@ export default function ProductGrid({
   }
 
   // Ürünleri 'category' etiketine göre gruplara ayır
-  const groupedProducts = products.reduce((acc, product) => {
+  const groupedProducts = products.reduce((acc: Record<string, Product[]>, product) => {
     const catName = product.category || 'KATEGORİSİZ / DİĞER';
     if (!acc[catName]) acc[catName] = [];
     acc[catName].push(product);

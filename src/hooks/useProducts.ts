@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import Papa from 'papaparse';
 import {
   sortCategories,
@@ -6,6 +6,7 @@ import {
   CATEGORY_ORDER as DEFAULT_ORDER,
 } from '../data/config';
 import { Product } from '../types';
+import { useLocalStorage } from './useLocalStorage';
 
 const SHEET_URL = import.meta.env.VITE_SHEET_URL || '';
 const APPS_SCRIPT_URL = import.meta.env.VITE_SHEET_SCRIPT_URL || '';
@@ -20,10 +21,7 @@ export function useProducts(
   isAdmin = false,
 ) {
   const [products, setProducts] = useState<Product[]>([]);
-  const [categoryOrder, setCategoryOrder] = useState<string[]>(() => {
-    const stored = localStorage.getItem(ORDER_KEY);
-    return stored ? JSON.parse(stored) : DEFAULT_ORDER;
-  });
+  const [categoryOrder, setCategoryOrder] = useLocalStorage<string[]>(ORDER_KEY, DEFAULT_ORDER);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -122,16 +120,6 @@ export function useProducts(
     }, 2000);
     return () => clearTimeout(timer);
   }, [search, logSearch]);
-
-  // Kategori sıralamasını her değiştiğinde kaydet
-  const isInitialMount = useRef(true);
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-    localStorage.setItem(ORDER_KEY, JSON.stringify(categoryOrder));
-  }, [categoryOrder]);
 
   // Yeni bir kategori eklendiğinde sıralamaya dahil et
   useEffect(() => {
