@@ -11,98 +11,109 @@ import { useLocalStorage } from './useLocalStorage';
 const SHEET_URL = import.meta.env.VITE_SHEET_URL || '';
 const APPS_SCRIPT_URL = import.meta.env.VITE_SHEET_SCRIPT_URL || '';
 const ORDER_KEY = STORAGE_KEY + '_order';
+const CACHE_KEY = STORAGE_KEY + '_data_cache';
 
 /**
- * useProducts Hook
+ * useProducts Hook — Ürün verilerini yönetir, filtreler ve senkronize eder.
  */
 export function useProducts(
   search = '',
   activeCategories: string[] = [],
   isAdmin = false,
 ) {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categoryOrder, setCategoryOrder] = useLocalStorage<string[]>(ORDER_KEY, DEFAULT_ORDER);
+  const THRESHOLD = 40;
+  const [isExpanded, setIsExpanded] = useState(false);
 
+  // İlk değeri cache'den alarak başlatıyoruz
+  const [products, setProducts] = useState<Product[]>(() => {
+    const cached = localStorage.getItem(CACHE_KEY);
+    return cached ? JSON.parse(cached) : [];
+  });
+  const [categoryOrder, setCategoryOrder] = useLocalStorage<string[]>(ORDER_KEY, DEFAULT_ORDER);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Sync İşlemleri
+  // Arama veya kategori değiştiğinde görünümü daralt
+  useEffect(() => {
+    setIsExpanded(false);
+  }, [search, activeCategories]);
+
+  // Veri Dönüştürücü (Mapper) — Functional Programming yaklaşımı
+  const mapToProduct = useCallback((raw: Record<string, any>): Product => {
+    return {
+      id: String(raw.id || Date.now()),
+      name: String(raw.name || ''),
+      category: String(raw.category || 'Diğer'),
+      price: String(raw.price || '0'),
+      image: raw.image || null,
+      description: String(raw.description || ''),
+      inStock: String(raw.inStock).toLowerCase() !== 'false',
+      is_archived: String(raw.is_archived).toLowerCase() === 'true',
+    };
+  }, []);
+
+  // Sync İşlemleri — Daha güvenli fetch
   const syncWithSheet = useCallback(
-    async (action: string, payload: unknown) => {
-      if (!APPS_SCRIPT_URL) {
-        console.warn('Apps Script URL is missing!');
-        return false;
-      }
+    async (action: string, payload: Record<string, any>) => {
+      if (!APPS_SCRIPT_URL) return false;
       try {
         await fetch(APPS_SCRIPT_URL, {
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action,
-            ...(payload as Record<string, unknown>),
-          }),
+          body: JSON.stringify({ action, ...payload }),
         });
         return true;
       } catch (err) {
-        console.error('[Sync] Error sending data:', err);
+        console.error(`[Sync Error] ${action}:`, err);
         return false;
       }
     },
     [],
   );
 
-  // 1. Verileri Google Sheets'den Çek
+  // 1. Verileri Çek
   useEffect(() => {
     if (!SHEET_URL) {
-      setTimeout(() => setLoading(false), 0);
+      setLoading(false);
       return;
     }
 
-    async function fetchData() {
+    const fetchData = async () => {
       setLoading(true);
       try {
         const response = await fetch(SHEET_URL);
+        if (!response.ok) throw new Error('Bağlantı hatası');
+        
         const csvText = await response.text();
-
         Papa.parse(csvText, {
           header: true,
           skipEmptyLines: true,
           complete: (results) => {
-            const parsedData = results.data.map((item: unknown) => {
-              const i = item as Record<string, unknown>;
-              return {
-                ...i,
-                id: String(i.id),
-                inStock:
-                  i.inStock === 'TRUE' ||
-                  i.inStock === 'true' ||
-                  i.inStock === true ||
-                  !Object.prototype.hasOwnProperty.call(i, 'inStock'),
-                is_archived:
-                  i.is_archived === 'TRUE' ||
-                  i.is_archived === 'true' ||
-                  i.is_archived === true,
-              };
-            }) as Product[];
+            const parsedData = (results.data as Record<string, any>[]).map(mapToProduct);
             setProducts(parsedData);
+            // Başarılı yüklemede cache'i güncelle
+            localStorage.setItem(CACHE_KEY, JSON.stringify(parsedData));
             setError(null);
             setLoading(false);
           },
-          error: () => {
-            setError('Bakım Modu');
+          error: (err) => {
+            console.error('PapaParse Error:', err);
+            setError('Veri ayrıştırma hatası');
             setLoading(false);
           },
         });
       } catch (err) {
-        console.error(err);
-        setError('Katalog şu an bakımdadır.');
+        console.error('Fetch Error:', err);
+        if (products.length === 0) {
+          setError('Katalog şu an çevrimdışı (Google Sheets hatası).');
+        }
         setLoading(false);
       }
-    }
+    };
 
     fetchData();
-  }, []);
+  }, [mapToProduct, products.length]);
 
   // 2. Arama Loglama (Google Sheets'e Yazma)
   const logSearch = useCallback(
@@ -134,7 +145,7 @@ export function useProducts(
         0,
       );
     }
-  }, [products, categoryOrder]);
+  }, [products, categoryOrder, setCategoryOrder]);
 
   // Filtreleme Mantığı
   const filteredProducts = useMemo(() => {
@@ -147,6 +158,20 @@ export function useProducts(
       return matchSearch && matchCategory;
     });
   }, [products, search, activeCategories, isAdmin]);
+
+  // Sayfalanmış Ürünler: Admin değilse ve genişletilmemişse ilk 40'ı göster
+  const paginatedProducts = useMemo(() => {
+    if (isAdmin || isExpanded || filteredProducts.length <= THRESHOLD) {
+      return filteredProducts;
+    }
+    return filteredProducts.slice(0, THRESHOLD);
+  }, [filteredProducts, isExpanded, isAdmin, THRESHOLD]);
+
+  const hasMore = !isAdmin && !isExpanded && filteredProducts.length > THRESHOLD;
+
+  const loadMore = useCallback(() => {
+    setIsExpanded(true);
+  }, []);
 
   const existingCategories = useMemo(() => {
     const unique = [
@@ -213,8 +238,15 @@ export function useProducts(
     await syncWithSheet('UPDATE_CATEGORY_ORDER', { orderList });
   };
 
+  const reorderProducts = async (newProducts: Product[]) => {
+    setProducts(newProducts);
+    const idList = newProducts.map((p) => p.id);
+    await syncWithSheet('UPDATE_PRODUCT_ORDER', { idList });
+  };
+
   return {
-    products: filteredProducts,
+    products: paginatedProducts,
+    totalCount: filteredProducts.length,
     allProducts: products,
     existingCategories,
     categoryOrder,
@@ -226,5 +258,8 @@ export function useProducts(
     renameCategory,
     removeCategoryFromProducts,
     updateCategoryOrder,
+    reorderProducts,
+    hasMore,
+    loadMore,
   };
 }

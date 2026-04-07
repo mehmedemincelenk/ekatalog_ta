@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { sortCategories } from '../data/config';
 import { Product } from '../types';
+import { ActiveDiscount } from '../hooks/useDiscount';
 
 // --- Alt Bileşen Tipleri ---
 
@@ -9,6 +10,8 @@ interface AdminCategoryItemProps {
   onDragStart: (e: React.DragEvent, category: string) => void;
   onDragEnd: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent, category: string) => void;
+  onTouchStart: (e: React.TouchEvent, category: string) => void;
+  onTouchEnd: (e: React.TouchEvent) => void;
   onRename: (oldName: string, newName: string) => void;
   onDelete: (category: string) => void;
 }
@@ -24,6 +27,10 @@ interface SearchFilterProps {
   isAdmin: boolean;
   renameCategory: (oldName: string, newName: string) => void;
   removeCategoryFromProducts: (category: string) => void;
+  // İndirim Sistemi
+  activeDiscount?: ActiveDiscount | null;
+  onApplyDiscount?: (code: string) => void;
+  discountError?: string | null;
 }
 
 // --- Alt Bileşenler (Dahili) ---
@@ -33,6 +40,8 @@ function AdminCategoryItem({
   onDragStart,
   onDragEnd,
   onDrop,
+  onTouchStart,
+  onTouchEnd,
   onRename,
   onDelete,
 }: AdminCategoryItemProps) {
@@ -43,11 +52,15 @@ function AdminCategoryItem({
       onDragEnd={onDragEnd}
       onDragOver={handleDragOverInternal}
       onDrop={(e) => onDrop(e, cat)}
-      className="flex items-center gap-2 p-2 bg-amber-50/50 border border-amber-100 rounded-lg hover:border-amber-300 transition-all cursor-move group"
+      onTouchStart={(e) => onTouchStart(e, cat)}
+      onTouchEnd={onTouchEnd}
+      onTouchMove={(e) => e.cancelable && e.preventDefault()}
+      data-category={cat}
+      className="flex items-center gap-2 p-2 bg-amber-50/50 border border-amber-100 rounded-lg hover:border-amber-300 transition-all cursor-move group touch-none"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className="w-4 h-4 text-amber-300 group-hover:text-amber-500"
+        className="w-4 h-4 text-amber-300 group-hover:text-amber-500 shrink-0"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -70,13 +83,13 @@ function AdminCategoryItem({
         onKeyDown={(e) =>
           e.key === 'Enter' && (e.preventDefault(), e.currentTarget.blur())
         }
-        className="flex-1 text-sm font-semibold text-stone-800 focus:outline-none"
+        className="flex-1 text-sm font-semibold text-stone-800 focus:outline-none truncate"
       >
         {cat}
       </span>
       <button
         onClick={() => window.confirm(`${cat} silinsin mi?`) && onDelete(cat)}
-        className="text-red-400 hover:text-red-600 px-2 font-bold text-lg"
+        className="text-red-400 hover:text-red-600 px-2 font-bold text-lg shrink-0"
       >
         ×
       </button>
@@ -102,10 +115,14 @@ export default function SearchFilter({
   isAdmin,
   renameCategory,
   removeCategoryFromProducts,
+  activeDiscount,
+  onApplyDiscount,
+  discountError,
 }: SearchFilterProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
+  const [couponInput, setCouponInput] = useState('');
 
   const dynamicCategories = [
     ...new Set(products.map((p) => p.category).filter(Boolean)),
@@ -113,62 +130,64 @@ export default function SearchFilter({
   const sortedList = sortCategories(dynamicCategories, categoryOrder);
   const categories = ['Tümü', ...sortedList];
 
-  // Masaüstünde sınırlama mantığı (Mobilde tümü görünür olmalı)
   const DESKTOP_THRESHOLD = 8;
   const hasMore = categories.length > DESKTOP_THRESHOLD;
   
-  // Görünür kategoriler: Adminse hepsi, mobildeyse hepsi, masaüstünde 'showAll' ise hepsi, değilse limitli.
   const visibleCategories = (showAll || isAdmin || isMenuOpen) 
     ? categories 
     : categories.slice(0, DESKTOP_THRESHOLD);
+
+  const reorder = (source: string, target: string) => {
+    const newOrder = [...categoryOrder];
+    const draggedIdx = newOrder.indexOf(source);
+    const targetIdx = newOrder.indexOf(target);
+    if (draggedIdx !== -1 && targetIdx !== -1) {
+      newOrder.splice(draggedIdx, 1);
+      newOrder.splice(targetIdx, 0, source);
+      updateCategoryOrder(newOrder);
+    }
+  };
 
   const handleDragStart = (e: React.DragEvent, category: string) => {
     if (!isAdmin || category === 'Tümü') return;
     setDraggedItem(category);
     e.dataTransfer.effectAllowed = 'move';
-    if (e.target instanceof HTMLElement) {
-      e.target.style.opacity = '0.4';
-    }
+    if (e.target instanceof HTMLElement) e.target.style.opacity = '0.4';
   };
 
-  const handleDrop = (_e: React.DragEvent, targetCategory: string) => {
-    if (
-      !isAdmin ||
-      !draggedItem ||
-      draggedItem === targetCategory ||
-      targetCategory === 'Tümü'
-    )
-      return;
-    const newOrder = [...categoryOrder];
-    const draggedIdx = newOrder.indexOf(draggedItem);
-    const targetIdx = newOrder.indexOf(targetCategory);
-    if (draggedIdx !== -1 && targetIdx !== -1) {
-      newOrder.splice(draggedIdx, 1);
-      newOrder.splice(targetIdx, 0, draggedItem);
-      updateCategoryOrder(newOrder);
+  const handleDragEnterInternal = (targetCategory: string) => {
+    if (!isAdmin || !draggedItem || draggedItem === targetCategory || targetCategory === 'Tümü') return;
+    reorder(draggedItem, targetCategory);
+  };
+
+  const handleTouchStart = (_e: React.TouchEvent, category: string) => {
+    if (!isAdmin || category === 'Tümü') return;
+    setDraggedItem(category);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!isAdmin || !draggedItem) return;
+    const touch = e.changedTouches[0];
+    const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
+    const targetCategory = targetEl?.closest('[data-category]')?.getAttribute('data-category');
+
+    if (targetCategory && targetCategory !== draggedItem && targetCategory !== 'Tümü') {
+      reorder(draggedItem, targetCategory);
     }
+    setDraggedItem(null);
   };
 
   return (
     <section className="bg-white border-b border-stone-200 py-3 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+        
         {/* Search Row */}
-        <div className="flex w-full sm:w-auto items-center gap-2 shrink-0">
-          <div className="relative flex-1 sm:w-48">
+        <div className="flex w-full sm:w-auto items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
+          {/* Search Input */}
+          <div className="relative flex-1 sm:w-48 min-w-[140px]">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-4.35-4.35M17 11A6 6 0 1 0 5 11a6 6 0 0 0 12 0z"
-                />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 0 5 11a6 6 0 0 0 12 0z" />
               </svg>
             </span>
             <input
@@ -179,6 +198,7 @@ export default function SearchFilter({
               className="w-full pl-9 pr-4 py-2 border border-stone-300 rounded-md text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-kraft-400"
             />
           </div>
+
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="sm:hidden flex items-center gap-1.5 px-3 py-2 bg-stone-100 border border-stone-300 rounded-md text-[10px] font-bold text-stone-700"
@@ -194,26 +214,29 @@ export default function SearchFilter({
           {isAdmin ? (
             <div className="flex flex-col w-full gap-1 mt-2">
               <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1 px-1">
-                Reyon Sıralaması
+                Reyon Sıralaması (Sürükle-Bırak)
               </p>
-              {categories.map((cat) => {
-                if (cat === 'Tümü') return null;
-                return (
+              {sortedList.map((cat) => (
+                <div
+                  key={cat}
+                  onDragEnter={() => handleDragEnterInternal(cat)}
+                  className={`transition-all duration-200 ${draggedItem === cat ? 'scale-95' : 'scale-100'}`}
+                >
                   <AdminCategoryItem
-                    key={cat}
                     cat={cat}
                     onDragStart={handleDragStart}
                     onDragEnd={(e) => {
-                      if (e.target instanceof HTMLElement) {
-                        e.target.style.opacity = '1';
-                      }
+                      if (e.target instanceof HTMLElement) e.target.style.opacity = '1';
+                      setDraggedItem(null);
                     }}
-                    onDrop={handleDrop}
+                    onDrop={() => {}} // Drop artık handleDragEnterInternal tarafından canlı yapılıyor
+                    onTouchStart={handleTouchStart}
+                    onTouchEnd={handleTouchEnd}
                     onRename={renameCategory}
                     onDelete={removeCategoryFromProducts}
                   />
-                );
-              })}
+                </div>
+              ))}
             </div>
           ) : (
             <>
@@ -235,7 +258,6 @@ export default function SearchFilter({
                 </button>
               ))}
               
-              {/* Daha Fazla Butonu (Sadece Masaüstünde ve Gerekliyse) */}
               {hasMore && (
                 <button
                   onClick={() => setShowAll(!showAll)}

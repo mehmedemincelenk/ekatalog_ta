@@ -8,9 +8,11 @@ import References from './components/References';
 import Footer from './components/Footer';
 import { useProducts } from './hooks/useProducts';
 import { useAdminMode } from './hooks/useAdminMode';
+import { useDiscount } from './hooks/useDiscount';
 
 export default function App() {
   const { isAdmin, handleLogoClick } = useAdminMode();
+  const { activeDiscount, applyCode, error: discountError } = useDiscount();
   const [search, setSearch] = useState('');
   const [activeCategories, setActiveCategories] = useState<string[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -29,6 +31,9 @@ export default function App() {
     renameCategory,
     removeCategoryFromProducts,
     updateCategoryOrder,
+    reorderProducts,
+    hasMore,
+    loadMore,
   } = useProducts(search, activeCategories, isAdmin);
 
   useEffect(() => {
@@ -69,6 +74,7 @@ export default function App() {
       </div>
     );
   }
+
   const toggleCategory = (cat: string) => {
     if (cat === 'Tümü') {
       setActiveCategories([]);
@@ -112,11 +118,31 @@ export default function App() {
           isAdmin={isAdmin}
           onDelete={removeProduct}
           onUpdate={updateProduct}
+          onOrderUpdate={reorderProducts}
+          activeDiscount={activeDiscount}
         />
+
+        {/* Sayfalama Butonu */}
+        {hasMore && !isAdmin && (
+          <div className="flex justify-center mt-12 mb-8">
+            <button
+              onClick={loadMore}
+              className="px-8 py-3 bg-white border border-stone-200 rounded-full text-sm font-bold text-stone-600 hover:border-stone-400 hover:text-stone-900 transition-all shadow-sm active:scale-95"
+            >
+              Daha Fazla Ürün Göster
+            </button>
+          </div>
+        )}
       </main>
 
       <References />
-      <Footer onLogoClick={handleLogoClick} isAdmin={isAdmin} />
+      <Footer 
+        onLogoClick={handleLogoClick} 
+        isAdmin={isAdmin} 
+        activeDiscount={activeDiscount}
+        onApplyDiscount={applyCode}
+        discountError={discountError}
+      />
 
       {/* Floating Action Button (Admin) */}
       {isAdmin && (

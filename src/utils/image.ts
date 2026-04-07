@@ -3,16 +3,30 @@
 // Bu fonksiyon, resmin hem boyutunu hem de kalitesini bu sınıra göre otomatik ayarlar.
 
 /**
+ * getImageUrl
+ *
+ * Verilen yolu (path) kontrol eder ve geçerli bir URL döndürür.
+ * Base64, tam URL veya yerel path desteği sağlar.
+ */
+export const getImageUrl = (path: string | null | undefined): string | null => {
+  if (!path) return null;
+  if (path.startsWith('http') || path.startsWith('data:')) return path;
+  // Vite projesinde public klasöründeki resimler için BASE_URL eklenir
+  const baseUrl = import.meta.env.BASE_URL.replace(/\/$/, '');
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  return `${baseUrl}${cleanPath}`;
+};
+
+/**
+ * getPlaceholder
+ *
+ * Resim bulunamadığında veya hata verdiğinde gösterilecek emoji tabanlı placeholder.
+ */
+export const PLACEHOLDER_EMOJI = '📦';
+
+/**
  * compressImage
- *
- * Dosyayı alır, belirtilen boyut ve kalitede Base64 formatına dönüştürür.
- * Google Sheets hücre sınırına (32KB) takılmaması için otomatik olarak boyut düşürür.
- *
- * @param {File} file - İşlenecek resim dosyası
- * @param {number} maxSize - Maksimum genişlik veya yükseklik (piksel)
- * @param {number} quality - Sıkıştırma kalitesi (0.1 - 1.0 arası)
- *
- * @returns {Promise<string>} Sıkıştırılmış resmin Base64 formatındaki URL'si
+ * ... (mevcut sıkıştırma kodu aşağıda devam eder)
  */
 export function compressImage(
   file: File,

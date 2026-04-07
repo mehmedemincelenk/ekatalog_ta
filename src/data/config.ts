@@ -53,6 +53,12 @@ export const ADMIN = {
   resetDelayMs: 2000, // Tık sayacı sıfırlama süresi (ms)
 };
 
+// ----- İndirim Arayüzü -----
+export const DISCOUNT_UI = {
+  activeColor: 'text-blue-600', // İndirimli fiyat rengi
+  transitionClass: 'transition-all duration-500 ease-in-out', // Smooth geçiş efekti
+};
+
 // ----- Veri Depolama -----
 export const STORAGE_KEY = 'toptanambalaj_products_v12'; // localStorage anahtarı
 

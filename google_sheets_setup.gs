@@ -70,6 +70,38 @@ function doPost(e) {
     }
   }
 
+  else if (action === "UPDATE_PRODUCT_ORDER") {
+    var idList = contents.idList;
+    var rows = productSheet.getDataRange().getValues();
+    var headers = rows[0];
+    var dataRows = rows.slice(1);
+    
+    // Ürünleri ID'lerine göre eşleştir
+    var rowMap = {};
+    for (var m = 0; m < dataRows.length; m++) {
+      rowMap[dataRows[m][0]] = dataRows[m];
+    }
+    
+    // Sayfayı temizle ve başlıkları tekrar yaz
+    productSheet.clearContents();
+    productSheet.appendRow(headers);
+    
+    // Gelen listeye göre satırları sırayla ekle
+    for (var n = 0; n < idList.length; n++) {
+      var row = rowMap[idList[n]];
+      if (row) {
+        productSheet.appendRow(row);
+      }
+    }
+    
+    // Listede olmayan (eksik kalan) ürünler varsa onları da sona ekle (Veri kaybını önlemek için)
+    for (var id in rowMap) {
+      if (idList.indexOf(id) === -1) {
+        productSheet.appendRow(rowMap[id]);
+      }
+    }
+  }
+
   else if (action === "UPDATE_CATEGORY_ORDER" && categorySheet) {
     var orderList = contents.orderList; // [{name, emoji, order}, ...]
     categorySheet.clearContents();
