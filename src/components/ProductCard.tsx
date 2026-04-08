@@ -210,22 +210,29 @@ export default function ProductCard({
         )}
         <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
         
-        {/* Kategori Çipi (Sağ Üst Köşeye Taşındı) */}
-        {isAdmin && !isEditingCategory && (
-          <button 
-            onClick={(ev) => { ev.stopPropagation(); setIsEditingCategory(true); }} 
-            className={`absolute top-2 right-2 z-10 ${categoryClass} hover:ring-2 hover:ring-kraft-400 shadow-lg backdrop-blur-sm bg-white/90`}
-          >
-            KATEGORİ
-          </button>
-        )}
-        {isAdmin && isEditingCategory && (
-          <div style={{ transform: `translate(calc(-50% + ${dragPos.x}px), ${dragPos.y}px)` }} className={`absolute ${CL.catPopoverOffsetTop} left-1/2 z-50 bg-white border border-stone-200 rounded-lg ${CL.catPopoverWidth} shadow-2xl flex flex-col items-stretch overflow-hidden`} onClick={(ev) => ev.stopPropagation()}>
-            <div className="flex justify-between items-center p-3 pb-0 cursor-move bg-stone-50" onMouseDown={handleDragStartInternal}><span className="text-[10px] font-bold text-stone-600">Kategori Değiştir</span><button onClick={() => setIsEditingCategory(false)} className="text-stone-400 hover:text-stone-700">×</button></div>
-            <div className="p-3 pt-1 bg-white">
-              <div className="flex flex-wrap gap-1 mb-2 max-h-32 overflow-y-auto">{categories.map((cat) => (<button key={cat} onClick={() => { onUpdate(product.id, { category: cat }); setIsEditingCategory(false); }} className={`px-1.5 py-0.5 text-[9px] rounded-sm font-semibold border ${cat === product.category ? 'bg-kraft-100 text-kraft-800 border-kraft-300' : 'bg-stone-50 text-stone-600 border-stone-200'}`}>{cat}</button>))}</div>
-              <div className="flex gap-1"><input type="text" value={newCatData} onChange={(ev) => setNewCatData(ev.target.value)} placeholder="Yeni..." className="w-full border border-stone-300 rounded px-1.5 py-1 text-[10px] focus:outline-none focus:border-kraft-400" /><button onClick={() => { if (newCatData.trim()) { onUpdate(product.id, { category: newCatData.trim() }); setIsEditingCategory(false); } }} className="bg-stone-900 text-white px-2 py-0.5 rounded text-[10px] font-bold">+</button></div>
-            </div>
+        {/* Kategori Seçimi (Cihazın Orijinal Dropdown Ekranını Kullanır) */}
+        {isAdmin && (
+          <div className={`absolute top-2 right-2 z-10 ${categoryClass} shadow-lg backdrop-blur-sm bg-white/90 flex items-center justify-center overflow-hidden`}>
+            <span className="pointer-events-none">KATEGORİ</span>
+            <select
+              value={product.category || ''}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val === 'NEW_CAT') {
+                  const newName = window.prompt('Yeni kategori adını yazın:');
+                  if (newName?.trim()) onUpdate(product.id, { category: newName.trim() });
+                } else {
+                  onUpdate(product.id, { category: val });
+                }
+              }}
+              className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+            >
+              <option value="" disabled>Kategori Seçin</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+              <option value="NEW_CAT">➕ YENİ KATEGORİ EKLE...</option>
+            </select>
           </div>
         )}
       </div>
