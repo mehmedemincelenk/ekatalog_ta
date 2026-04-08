@@ -10,6 +10,7 @@ export default function HeroCarousel({ isAdmin }: HeroCarouselProps) {
   const { slides, updateSlide } = useCarousel();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [editingSlideId, setEditingSlideId] = useState<number | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const {
     intervalMs,
@@ -79,10 +80,10 @@ export default function HeroCarousel({ isAdmin }: HeroCarouselProps) {
   };
 
   useEffect(() => {
-    if (isAdmin) return;
+    if (isAdmin || isUploading) return;
     const timer = setInterval(next, intervalMs);
     return () => clearInterval(timer);
-  }, [next, intervalMs, isAdmin]);
+  }, [next, intervalMs, isAdmin, isUploading]);
 
   return (
     <div
@@ -105,9 +106,9 @@ export default function HeroCarousel({ isAdmin }: HeroCarouselProps) {
               <img
                 src={getImageUrl(slide.src)}
                 alt={slide.label}
-                className={`absolute inset-0 w-full h-full object-cover ${isAdmin ? 'cursor-pointer' : ''}`}
+                className={`absolute inset-0 w-full h-full object-cover ${isAdmin ? 'cursor-pointer' : ''} ${isUploading && editingSlideId === slide.id ? 'opacity-50 blur-sm' : ''}`}
                 onClick={() => {
-                  if (isAdmin) {
+                  if (isAdmin && !isUploading) {
                     setEditingSlideId(slide.id);
                     fileInputRef.current?.click();
                   }
@@ -117,12 +118,19 @@ export default function HeroCarousel({ isAdmin }: HeroCarouselProps) {
               <div
                 className={`absolute inset-0 w-full h-full bg-stone-200 ${isAdmin ? 'cursor-pointer' : ''}`}
                 onClick={() => {
-                  if (isAdmin) {
+                  if (isAdmin && !isUploading) {
                     setEditingSlideId(slide.id);
                     fileInputRef.current?.click();
                   }
                 }}
               ></div>
+            )}
+
+            {/* Loading Indicator */}
+            {isUploading && editingSlideId === slide.id && idx === activeIndex && (
+              <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/10">
+                <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+              </div>
             )}
 
             {/* Glassmorphism Text Box */}
@@ -176,13 +184,16 @@ export default function HeroCarousel({ isAdmin }: HeroCarouselProps) {
           onChange={async (e) => {
             const file = e.target.files?.[0];
             if (!file || !editingSlideId) return;
+            setIsUploading(true);
             try {
               const { compressImage } = await import('../utils/image');
               const compressedStr = await compressImage(file, 1200, 0.7);
               updateSlide(editingSlideId, { src: compressedStr });
-              setEditingSlideId(null);
             } catch {
               alert('Slayt fotoğrafı işlenemedi.');
+            } finally {
+              setIsUploading(false);
+              setEditingSlideId(null);
             }
             e.target.value = '';
           }}

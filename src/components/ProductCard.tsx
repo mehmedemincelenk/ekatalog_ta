@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useLayoutEffect } from 'react';
+import { useRef, useState, useEffect, useLayoutEffect, useMemo } from 'react';
 import { CARD_TYPOGRAPHY as CT, CARD_LAYOUT as CL, DISCOUNT_UI } from '../data/config';
 import { Product } from '../types';
 import { getImageUrl, PLACEHOLDER_EMOJI } from '../utils/image';
@@ -163,7 +163,7 @@ export default function ProductCard({
   const priceClass = `${CT.priceFontSize} ${CT.priceWeight} ${priceColorClass}`;
   const descClass = `${CT.descFontSize} ${CT.descColor} ${CT.descLeading}`;
 
-  const finalImageUrl = getImageUrl(product.image);
+  const finalImageUrl = useMemo(() => getImageUrl(product.image), [product.image]);
 
   return (
     <article
@@ -173,12 +173,12 @@ export default function ProductCard({
     >
       {/* Sayısal Sıralama (Sağ Üst) */}
       {isAdmin && (
-        <div className="absolute top-2 right-2 z-[25]">
+        <div className="absolute top-2 right-2 z-[25] hover:scale-105 transition-transform active:scale-95">
           <select
             value={orderIndex}
             onChange={(e) => onOrderChange?.(product.id, parseInt(e.target.value, 10))}
             style={{ textAlignLast: 'center', padding: 0 }}
-            className="appearance-none bg-white/90 backdrop-blur-sm text-stone-900 text-[11px] font-black w-7 h-7 rounded-lg shadow-lg border border-stone-200 text-center cursor-pointer hover:bg-white transition-all active:scale-90 focus:outline-none ring-2 ring-black/5"
+            className="appearance-none bg-white/90 backdrop-blur-md text-stone-900 text-[11px] font-black w-7 h-7 rounded-lg shadow-lg border border-stone-200 text-center cursor-pointer hover:bg-white transition-all focus:outline-none ring-2 ring-black/5"
           >
             {Array.from({ length: itemsInCategory }, (_, i) => (
               <option key={i + 1} value={i + 1} className="text-black">{i + 1}</option>

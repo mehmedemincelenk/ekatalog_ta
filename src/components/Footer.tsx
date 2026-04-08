@@ -20,8 +20,10 @@ export default function Footer({
   const [couponInput, setCouponInput] = useState('');
 
   const handleApply = () => {
-    if (onApplyDiscount) {
-      onApplyDiscount(couponInput);
+    if (onApplyDiscount && couponInput.trim()) {
+      onApplyDiscount(couponInput.trim());
+      // Başarılıysa inputu temizle (opsiyonel, hata yoksa temizlenebilir)
+      if (!discountError) setCouponInput('');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -82,15 +84,15 @@ export default function Footer({
                   value={couponInput}
                   onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
                   onKeyDown={(e) => e.key === 'Enter' && handleApply()}
-                  placeholder="KUPON KODU"
+                  placeholder={activeDiscount ? "KUPON AKTİF" : "KUPON KODU"}
                   className={`flex-1 px-3 py-2 border rounded-lg text-[11px] font-bold transition-all ${
-                    activeDiscount ? 'border-blue-500 bg-blue-50 text-blue-700' : 
+                    activeDiscount ? 'border-green-500 bg-green-50 text-green-700' : 
                     discountError ? 'border-red-400 bg-red-50 text-red-700' : 'border-stone-200 text-stone-600 bg-white'
                   } focus:outline-none focus:ring-1 focus:ring-blue-400`}
                 />
                 <button
                   onClick={handleApply}
-                  className="bg-stone-900 text-white px-3 py-2 rounded-lg hover:bg-stone-800 active:scale-95 transition-all shadow-sm shrink-0"
+                  className={`${activeDiscount ? 'bg-green-600' : 'bg-stone-900'} text-white px-3 py-2 rounded-lg hover:opacity-90 active:scale-95 transition-all shadow-sm shrink-0`}
                   aria-label="Uygula"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -98,7 +100,12 @@ export default function Footer({
                   </svg>
                 </button>
               </div>
-              {activeDiscount && <p className="text-[9px] font-bold text-blue-600 uppercase tracking-tight">İndirim Aktif: %{Math.round(activeDiscount.rate * 100)}</p>}
+              {activeDiscount && (
+                <div className="flex flex-col items-center md:items-end">
+                  <p className="text-[9px] font-bold text-green-600 uppercase tracking-tight">İndirim Uygulandı: %{Math.round(activeDiscount.rate * 100)}</p>
+                  <p className="text-[8px] text-stone-400 font-medium">Kod: {activeDiscount.code}</p>
+                </div>
+              )}
               {discountError && <p className="text-[9px] font-bold text-red-500 uppercase tracking-tight">{discountError}</p>}
             </div>
           )}

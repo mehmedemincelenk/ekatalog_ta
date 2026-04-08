@@ -1,24 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { sortCategories } from '../data/config';
 import { Product } from '../types';
 import { ActiveDiscount } from '../hooks/useDiscount';
 
-interface SearchFilterProps {
-  products: Product[];
-  categoryOrder: string[];
-  updateCategoryOrder: (newOrder: string[]) => void;
-  search: string;
-  onSearchChange: (value: string) => void;
-  activeCategories?: string[];
-  onCategoryToggle: (category: string) => void;
-  isAdmin: boolean;
-  renameCategory: (oldName: string, newName: string) => void;
-  removeCategoryFromProducts: (category: string) => void;
-  // İndirim Sistemi
-  activeDiscount?: ActiveDiscount | null;
-  onApplyDiscount?: (code: string) => void;
-  discountError?: string | null;
-}
+// ... (SearchFilterProps)
 
 export default function SearchFilter({
   products,
@@ -35,11 +20,15 @@ export default function SearchFilter({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
 
-  const dynamicCategories = [
-    ...new Set(products.map((p) => p.category).filter(Boolean)),
-  ];
-  const sortedList = sortCategories(dynamicCategories, categoryOrder);
-  const categories = ['Tümü', ...sortedList];
+  // Kategori hesaplamalarını optimize et
+  const { categories, sortedList } = useMemo(() => {
+    const dynamic = [...new Set(products.map((p) => p.category).filter(Boolean))];
+    const sorted = sortCategories(dynamic, categoryOrder);
+    return { 
+      sortedList: sorted, 
+      categories: ['Tümü', ...sorted] 
+    };
+  }, [products, categoryOrder]);
 
   const DESKTOP_THRESHOLD = 8;
   const hasMore = categories.length > DESKTOP_THRESHOLD;
@@ -53,7 +42,6 @@ export default function SearchFilter({
     const currentIdx = newOrder.indexOf(catName);
     if (currentIdx !== -1) {
       newOrder.splice(currentIdx, 1);
-      // newPosition 1-tabanlı olduğu için -1 yapıyoruz
       newOrder.splice(newPosition - 1, 0, catName);
       updateCategoryOrder(newOrder);
     }
@@ -76,13 +64,22 @@ export default function SearchFilter({
               value={search}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Ürün ara…"
-              className="w-full pl-9 pr-4 py-2 border border-stone-300 rounded-md text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-kraft-400"
+              className="w-full pl-9 pr-8 py-2 border border-stone-300 rounded-md text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-kraft-400 focus:border-kraft-400 transition"
             />
+            {search && (
+              <button 
+                onClick={() => onSearchChange('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 p-1"
+                title="Aramayı Temizle"
+              >
+                ×
+              </button>
+            )}
           </div>
 
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="sm:hidden flex items-center gap-1.5 px-3 py-2 bg-stone-100 border border-stone-300 rounded-md text-[10px] font-bold text-stone-700"
+            className="sm:hidden flex items-center gap-1.5 px-3 py-2 bg-stone-100 border border-stone-300 rounded-md text-[10px] font-bold text-stone-700 active:scale-95"
           >
             <span>{isMenuOpen ? '✕' : '📂'}</span> Kategoriler
           </button>
@@ -100,7 +97,7 @@ export default function SearchFilter({
                   className={`flex items-center rounded-full border transition-all ${
                     isSelected
                       ? 'bg-stone-900 text-white border-stone-900 shadow-md scale-105'
-                      : 'bg-white text-stone-600 border-stone-300 hover:border-stone-500'
+                      : 'bg-white text-stone-600 border-stone-300 hover:border-stone-500 active:scale-95'
                   }`}
                 >
                   {/* Entegre Sıra Dropdown (Admin) */}

@@ -25,13 +25,14 @@ export default function Navbar() {
           </div>
 
           {/* Contact & Social Section */}
-          <div className="flex flex-col sm:flex-row items-end sm:items-center gap-1 sm:gap-0 shrink-0">
+          <div className="flex flex-col sm:flex-row items-end sm:items-center gap-1 sm:gap-0 shrink-0 min-w-0">
             {/* Address (On PC: Left of icons) */}
             <a
               href={`https://maps.google.com/?q=${encodeURIComponent(COMPANY.address)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className={`${n.addressSize} ${n.addressColor} hover:text-stone-900 transition-colors whitespace-nowrap order-2 sm:order-1`}
+              className={`${n.addressSize} ${n.addressColor} hover:text-stone-900 transition-colors whitespace-nowrap order-2 sm:order-1 truncate max-w-[120px] sm:max-w-none`}
+              title={COMPANY.address}
             >
               {COMPANY.address}
             </a>
@@ -46,7 +47,7 @@ export default function Navbar() {
                 href={COMPANY.instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${n.instaColor} ${n.instaHoverColor} transition-colors`}
+                className={`${n.instaColor} ${n.instaHoverColor} transition-colors active:scale-90`}
                 aria-label="Instagram"
               >
                 <svg
@@ -62,7 +63,7 @@ export default function Navbar() {
                 href={COMPANY.whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`flex items-center gap-1.5 px-2 py-1 ${n.whatsappBg} ${n.whatsappHoverBg} ${n.whatsappRounded} text-white transition-colors`}
+                className={`flex items-center gap-1.5 px-2 py-1 ${n.whatsappBg} ${n.whatsappHoverBg} ${n.whatsappRounded} text-white transition-colors active:scale-95 shadow-sm`}
               >
                 <svg
                   viewBox="0 0 24 24"

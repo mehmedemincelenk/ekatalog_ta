@@ -7,11 +7,11 @@ export default function References() {
         <h2 className="text-center text-xs font-bold uppercase tracking-widest text-stone-400 mb-6">
           Referanslarımız &amp; Çalıştığımız Kurumlar
         </h2>
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {REFERENCES.map((ref) => (
             <div
               key={ref.id}
-              className="flex flex-col items-center justify-center gap-1 bg-white border border-stone-200 rounded-lg py-4 px-2 hover:border-stone-400 transition-colors"
+              className="flex flex-col items-center justify-center gap-1 bg-white border border-stone-200 rounded-lg py-4 px-2 hover:border-stone-400 active:scale-95 transition-all shadow-sm"
             >
               <span className="text-2xl" aria-hidden="true">
                 {ref.logo}

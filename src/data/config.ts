@@ -71,17 +71,6 @@ export const MODAL = {
   overlayBg: 'bg-black/50',
 };
 
-// ============================================================
-// TAILWIND CSS TASARIM REHBERİ (KOPYA KAĞIDI)
-// ============================================================
-// YAZI BOYUTLARI:    text-[8px], text-[10px], text-xs (çok küçük), text-sm (küçük), text-base (normal büyük), text-lg, text-xl, text-2xl, text-3xl, 4xl, 5xl ...
-// YAZI KALINLIĞI:    font-light, font-normal, font-medium, font-semibold (yarı kalın), font-bold (kalın), font-extrabold
-// KÖŞE YUVARLATMA:   rounded-none, rounded-sm, rounded, rounded-md, rounded-lg, rounded-xl, rounded-2xl, rounded-full
-// BOŞLUKLAR (p/m):   p-2, p-4, p-6 (iç boşluk) | mt-2, mt-4 (üstten dış boşluk)
-// GÖLGELER:          shadow-sm, shadow, shadow-md, shadow-lg, shadow-xl, shadow-2xl, drop-shadow
-// MİN/MAX GENİŞLİK:  max-w-xs, max-w-sm, max-w-md, max-w-lg, max-w-xl VEYA özel yüzdeler max-w-[45%], max-w-[80%] vb.
-// ============================================================
-
 // ----- Carousel -----
 export const CAROUSEL = {
   intervalMs: 4000, // Slayt geçiş süresi (ms)
@@ -105,13 +94,13 @@ export const CAROUSEL = {
 
   // Kutucuk (Glassmorphism) Görünümü
   boxPositionMobile: 'bottom-8 left-2', // [MOBİL] Kutunun konumu
-  boxPositionPC: 'sm:bottom-10 sm:left-6', // [PC] Kutunun konumu (Geniş ekranlar için sm: veya lg: öneki şarttır)
+  boxPositionPC: 'sm:bottom-10 sm:left-6', // [PC] Kutunun konumu
   boxWidthMobile: 'max-w-[60%]', // [MOBİL] Kutu maksimum genişliği
   boxWidthPC: 'sm:max-w-md', // [PC] Kutu maksimum genişliği
   boxPaddingMobile: 'p-2', // [MOBİL] Kutu iç boşluğu
   boxPaddingPC: 'sm:p-5', // [PC] Kutu iç boşluğu
   boxRounding: 'rounded-md', // Köşe yuvarlama
-  boxBg: 'bg-black/25 backdrop-blur-md', // Arka plan (buzlu cam efekti)
+  boxBg: 'bg-black/25 backdrop-blur-md', // Arka plan
   boxBorder: 'border border-white/20', // Kenarlık
   boxShadow: 'shadow-2xl', // Derinlik gölgesi
 
@@ -134,21 +123,21 @@ export const CAROUSEL = {
   slides: [
     {
       id: 1,
-      src: 'https://images.pexels.com/photos/1797428/pexels-photo-1797428.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', // Depo/Raf görünümü
+      src: 'https://images.pexels.com/photos/1797428/pexels-photo-1797428.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
       bg: 'bg-stone-800',
       label: 'Geniş Depo, Hazır Stok',
       sub: 'Aynı gün sevkiyat, minimum sipariş yok.',
     },
     {
       id: 2,
-      src: 'https://images.pexels.com/photos/4481259/pexels-photo-4481259.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', // Ambalaj kutuları görünümü
+      src: 'https://images.pexels.com/photos/4481259/pexels-photo-4481259.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
       bg: 'bg-kraft-800',
       label: 'Her Ölçü, Her Materyal',
       sub: 'Kargo kutusundan streç filme, her ambalaj bizde.',
     },
     {
       id: 3,
-      src: 'https://images.pexels.com/photos/236705/pexels-photo-236705.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', // Lojistik koridoru görünümü
+      src: 'https://images.pexels.com/photos/236705/pexels-photo-236705.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
       bg: 'bg-stone-700',
       label: "İstoç'tan Bile Ucuz!",
       sub: 'Toptan fiyata perakende kolaylığı.',
@@ -160,10 +149,6 @@ export const CAROUSEL = {
 export const GRID = {
   colsClass: 'grid-cols-3 md:grid-cols-4 lg:grid-cols-6', // Sütun sayısı
   gapClass: 'gap-2', // Kart arası boşluk
-
-  // Kategori Reyon Başlıkları Tasarımı
-  headerClass:
-    'text-[12px] sm:text-sm font-extrabold text-kraft-600 tracking-wider uppercase border-b border-stone-200 pb-1 mb-2 mt-12 first:mt-4',
 };
 
 // ----- Manuel Kategori Dizilim Önceliği -----
@@ -196,9 +181,6 @@ export const sortCategories = (
   });
 };
 
-// ----- Varsayılan Ürünler -----
-// Ürün verileri yüzlerce satırı bulabileceği için ayrı dosyaya taşındı: src/data/products.js
-
 // ----- Referans Logoları -----
 export const REFERENCES = [
   { id: 1, name: 'PTT Kargo', logo: '🟡' },
@@ -213,17 +195,6 @@ export const REFERENCES = [
 
 // ----- Ürün Kartı Tipografisi -----
 export const CARD_TYPOGRAPHY = {
-  // Kategori chip (resim üstü overlay)
-  categoryFontSize: 'text-[6px]', // Çip metin boyutu
-  categoryWeight: 'font-semibold', // Çip metin kalınlığı
-  categoryCase: 'uppercase', // Çip metni büyük/küçük harf durumu
-  categoryTracking: 'tracking-wider', // Çip harf arası boşluk (harf aralığı)
-  categoryColor: 'text-kraft-700', // Çip yazı rengi
-  categoryBg: 'bg-kraft-50', // Çip arka plan rengi
-  categoryBorder: 'border border-kraft-200', // Çip kenarlık rengi ve kalınlığı
-  categoryRounding: 'rounded-md', // Çip köşe yuvarlatma miktarı
-  categoryPadding: 'px-1.5 py-0.5', // Çip içi yatay ve dikey boşluk (padding)
-
   // İsim (tek satır, yatay marquee)
   nameFontSize: 'text-[10px] sm:text-[13px]', // Ürün adı yazı boyutu
   nameWeight: 'font-semibold', // Ürün adı yazı kalınlığı
@@ -235,28 +206,18 @@ export const CARD_TYPOGRAPHY = {
   priceWeight: 'font-bold', // Ürün fiyatı yazı kalınlığı
   priceColor: 'text-stone-900', // Ürün fiyatı yazı rengi
 
-  // Açıklama (çok satır, dikey oto-kaydırma)
+  // Açıklama (çok satır, dikey dikey kaydırma)
   descFontSize: 'text-[9px] sm:text-[11px]', // Açıklama yazı boyutu
   descColor: 'text-stone-500', // Açıklama yazı rengi
   descLeading: 'leading-tight', // Açıklama satır yüksekliği
-  descMaxHeight: 'max-h-[36px] sm:max-h-[44px]', // Açıklama alanı maksimum yüksekliği (kullanıcı görünümü)
+  descMaxHeight: 'max-h-[36px] sm:max-h-[44px]', // Açıklama alanı maksimum yüksekliği
   descAreaHeight: 'h-[30px]', // Admin editöründeki açıklama kutusu yüksekliği
 };
 
 // ----- Ürün Kartı Boyut ve Boşluk Ölçüleri (Layout) -----
 export const CARD_LAYOUT = {
   // İkonlar ve Rozetler
-  iconTiny: 'w-3 h-3', // Kategori menüsü taşıma ikonu vb.
   iconSmall: 'w-5 h-5', // 3-nokta (Aksiyon) ateşleme butonu
-  iconMedium: 'w-7 h-7', // Aksiyon menüsü içindeki buton ebatları
-  iconOverlay: 'w-8 h-8', // Admin ve Stok saydam ikon çemberleri
-  iconOverlaySvg: 'w-4 h-4', // Rozet içindeki ufak grafik (SVG) ebatları
-
-  // Pozisyonlandırma ve Kutu Ebatları
-  catPopoverWidth: 'w-44', // Kategori penceresi ana genişliği
-  catPopoverOffsetTop: 'top-10', // Kategori penceresinin tepeden konumu
-  catPopoverListMaxH: 'max-h-24', // Kategoriler listesi max iç kaydırma alanı
-  actionPopoverOffsetB: 'bottom-8', // 3-nokta popover alttan konumu
   actionMenuAnchorR: 'right-1.5', // 3-nokta butonu sağ hizalaması
   actionMenuAnchorB: 'bottom-1.5', // 3-nokta butonu alt hizalaması
 

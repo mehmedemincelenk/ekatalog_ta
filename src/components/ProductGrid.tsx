@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { GRID, sortCategories } from '../data/config';
 import { Product } from '../types';
 import ProductCard from './ProductCard';
@@ -29,24 +30,27 @@ export default function ProductGrid({
   activeCategories = [],
   onAddClick,
 }: ProductGridProps) {
+  // Gruplama ve Sıralama İşlemlerini Optimize Et
+  const { groupedProducts, sortedCategories } = useMemo(() => {
+    const grouped = products.reduce((acc: Record<string, Product[]>, product) => {
+      const catName = product.category || 'KATEGORİSİZ / DİĞER';
+      if (!acc[catName]) acc[catName] = [];
+      acc[catName].push(product);
+      return acc;
+    }, {});
+
+    const sorted = sortCategories(Object.keys(grouped), categoryOrder);
+    return { groupedProducts: grouped, sortedCategories: sorted };
+  }, [products, categoryOrder]);
+
   if (products.length === 0 && !isAdmin) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-stone-400">
+      <div className="flex flex-col items-center justify-center py-16 text-stone-400 animate-in fade-in duration-500">
         <span className="text-5xl mb-3">🔍</span>
-        <p className="text-sm font-medium">Ürün bulunamadı.</p>
+        <p className="text-sm font-medium italic">Aradığınız kriterde ürün bulunamadı.</p>
       </div>
     );
   }
-
-  // Gruplama
-  const groupedProducts = products.reduce((acc: Record<string, Product[]>, product) => {
-    const catName = product.category || 'KATEGORİSİZ / DİĞER';
-    if (!acc[catName]) acc[catName] = [];
-    acc[catName].push(product);
-    return acc;
-  }, {});
-
-  const sortedCategories = sortCategories(Object.keys(groupedProducts), categoryOrder);
 
   // Limitleme: Sadece ilk N kategoriyi göster (Admin değilse VE arama/filtreleme yoksa)
   const isFiltering = search.trim() !== '' || activeCategories.length > 0;
@@ -54,26 +58,31 @@ export default function ProductGrid({
     ? sortedCategories 
     : sortedCategories.slice(0, visibleCategoryLimit);
 
-  // Sayısal Sıralama Değiştirme Mantığı (Tüm mantık artık Hook içinde güvenle yapılıyor)
+  // Sayısal Sıralama Değiştirme Mantığı
   const handleOrderChange = (productId: string, newPosition: number) => {
     onOrderUpdate(productId, newPosition);
   };
 
   return (
-    <div className="w-full flex flex-col">
+    <div className="w-full flex flex-col min-h-[400px]">
       {/* Admin Yeni Ürün Ekleme Çubuğu */}
       {isAdmin && (
         <button 
           onClick={onAddClick}
-          className="w-full mb-8 py-4 border-2 border-dashed border-stone-300 rounded-xl flex items-center justify-center gap-3 text-stone-400 hover:border-stone-900 hover:text-stone-900 hover:bg-stone-50 transition-all active:scale-[0.99] group"
+          className="w-full mb-8 py-4 border-2 border-dashed border-stone-300 rounded-xl flex items-center justify-center gap-3 text-stone-400 hover:border-stone-900 hover:text-stone-900 hover:bg-stone-50 transition-all active:scale-[0.99] group shadow-sm"
         >
           <span className="text-2xl font-light group-hover:scale-125 transition-transform">+</span>
           <span className="text-xs font-bold uppercase tracking-widest">Yeni Ürün Yükle</span>
         </button>
       )}
 
-      {displayedCategories.map((catName) => (
-        <div key={catName} className="flex flex-col mb-12">
+      {products.length === 0 && isAdmin && (
+        <div className="text-center py-12 border-2 border-dashed border-stone-100 rounded-xl mb-8">
+          <p className="text-stone-400 text-sm italic">Henüz hiç ürün eklenmemiş. Yukarıdaki butonu kullanarak başlayın.</p>
+        </div>
+      )}
+
+      {displayedCategories.map((catName) => (        <div key={catName} className="flex flex-col mb-12">
           <div className="flex items-center gap-3 mb-4 px-1">
             <h2 className="text-[13px] font-black text-stone-900 tracking-tighter uppercase">{catName}</h2>
             <div className="flex-1 h-px bg-stone-200"></div>

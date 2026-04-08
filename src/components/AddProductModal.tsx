@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MODAL } from '../data/config';
 import { Product } from '../types';
 
@@ -29,25 +29,41 @@ export default function AddProductModal({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState('');
 
+  // Modal kapandığında formu temizle
+  useEffect(() => {
+    if (!isOpen) {
+      setForm(EMPTY);
+      setPreviewUrl(null);
+      setError('');
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setForm((prev) => ({ 
+      ...prev, 
+      [name]: value,
+      // Eğer yeni kategori yazılıyorsa seçili kategoriyi temizle
+      category: name === 'newCategory' && value.trim() ? '' : prev.category 
+    }));
     setError('');
   };
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setError('');
     try {
       const { compressImage } = await import('../utils/image');
-      const compressedStr = await compressImage(file, 250, 0.6);
+      const compressedStr = await compressImage(file, 400, 0.7);
       setPreviewUrl(compressedStr);
       setForm((prev) => ({ ...prev, image: compressedStr }));
-    } catch {
-      alert('Görsel yüklenirken cihaz desteklemedi.');
+    } catch (err) {
+      setError('Görsel işlenirken bir hata oluştu.');
     }
   };
 
