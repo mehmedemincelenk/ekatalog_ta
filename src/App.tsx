@@ -22,6 +22,7 @@ export default function App() {
     setProducts,
     renameCategory,
     removeCategoryFromProducts,
+    existingCategories,
   } = useProducts();
 
   const { isAdmin, handleLogoClick, logout } = useAdminMode();
@@ -43,12 +44,6 @@ export default function App() {
       return matchSearch && matchCat;
     });
   }, [products, search, activeCategories]);
-
-  // Sayfalama için kategorileri grupla
-  const allCategories = useMemo(() => {
-    const cats = [...new Set(products.map(p => p.category || 'KATEGORİSİZ'))];
-    return sortCategories(cats, categoryOrder);
-  }, [products, categoryOrder]);
 
   const toggleCategory = (cat: string) => {
     if (cat === 'Tümü') {
@@ -119,7 +114,7 @@ export default function App() {
           {!isAdmin && filteredProducts.length > 0 && (
             <div className="mt-12 flex justify-center">
               {/* Eğer gösterilecek daha fazla kategori varsa buton çıkar */}
-              {visibleCategoryLimit < allCategories.length ? (
+              {visibleCategoryLimit < existingCategories.length ? (
                 <button
                   onClick={() => setVisibleCategoryLimit(prev => prev + 1)}
                   className="bg-white border-2 border-stone-200 text-stone-900 px-10 py-4 rounded-full font-black text-xs uppercase tracking-widest hover:border-stone-900 hover:bg-stone-50 transition-all shadow-xl active:scale-95"

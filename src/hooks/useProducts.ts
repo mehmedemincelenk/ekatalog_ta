@@ -21,7 +21,7 @@ export function useProducts(
   activeCategories: string[] = [],
   isAdmin = false,
 ) {
-  const THRESHOLD = 40;
+  const THRESHOLD = 9999; // Sayfalamayı App.tsx kategori bazlı yöneteceği için burada devre dışı bırakıyoruz
   const [isExpanded, setIsExpanded] = useState(false);
 
   // İlk değeri cache'den alarak başlatıyoruz
