@@ -5,22 +5,19 @@ description: Google Sheets senkronizasyonlu admin modunu ve görsel yönetimini 
 # Admin Portal Becerisi
 
 ## 1. Giriş ve Görünüm
-- Footer logosuna 7 kez tıklanarak açılır.
-- Admin modu aktifken ürün kartlarında "Kategori" etiketi ve "Aksiyon (3-nokta)" menüsü görünür.
+- **Aktivasyon:** Footer logosuna 7 tık.
+- **Toggle:** Sağ altta sabit duran "On-Off" butonu ile admin modundan çıkış yapılır.
+- **Hızlı Erişim:** Liste başında tam genişlikte "+" (Yeni Ürün Yükle) çubuğu belirir.
 
-## 2. Google Sheets Senkronizasyonu
-Yapılan her işlem arka planda `syncWithSheet` fonksiyonunu tetikler:
-- **Ürün Ekleme:** `ADD` aksiyonu ile Sheet'e yeni satır ekler.
-- **Düzenleme:** `UPDATE` aksiyonu ile hücre bazlı güncelleme yapar.
-- **Kategori İsmi Değiştirme:** `RENAME_CATEGORY` aksiyonu ile tüm ilgili ürünleri toplu günceller.
-- **Kategori Sıralama:** Sürükle-bırak sonrası `UPDATE_CATEGORY_ORDER` ile `categories` sayfasını yeniler.
+## 2. Sıralama ve Yönetim (Hassas)
+- **Sayısal Sıralama:** Ürün ve kategoriler için dropdown tabanlı sıralama sistemi kullanılır.
+- **Kategori-Safe:** Sıralama değişimlerinde ürünler sadece kendi kategorileri içinde yer değiştirir.
+- **Hibrit Menü:** PC'de custom, mobilde native 3-nokta menüsü ile `STOK`, `ARŞİV` ve `KATEGORİ` yönetilir.
 
-## 3. Görsel Optimizasyonu (Kritik)
-Google Sheets hücre sınırı (32KB) nedeniyle görseller:
-- `maxSize: 250px`
-- `quality: 0.6`
-değerleriyle sıkıştırılmalıdır. Bu işlem `src/utils/image.js` tarafından otomatik yönetilir.
+## 3. Google Sheets Senkronizasyonu
+- **Anlık Güncelleme:** `ADD`, `UPDATE`, `DELETE`, `RENAME_CATEGORY` ve `UPDATE_PRODUCT_ORDER` aksiyonları anlık çalışır.
+- **Sıralama Kaydı:** `UPDATE_PRODUCT_ORDER` aksiyonu tüm ID listesini yeni sırasıyla Sheets'e basar.
 
-## 4. In-Place Editing
-- Admin modunda isim ve fiyat alanları `contentEditable` ile anında düzenlenir.
-- `onBlur` anında Sheets senkronizasyonu başlar.
+## 4. Görsel Optimizasyonu
+- **Sıkıştırma:** Ürün resimleri `250px`, Hero resimleri `1200px` olarak işlenir.
+- **Base64:** Sheets hücre sınırı için `quality: 0.6` standardı zorunludur.

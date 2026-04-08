@@ -215,7 +215,7 @@ export default function ProductCard({
       {isAdmin && (
         <div className={`absolute ${CL.actionMenuAnchorB} ${CL.actionMenuAnchorR} ${showActions ? 'z-[60]' : 'z-20'}`}>
           
-          {/* MASAÜSTÜ: Profesyonel Custom Menü */}
+          {/* MASAÜSTÜ: 4 Butonlu Özel Menü */}
           <div className="hidden lg:block relative">
             <button 
               onClick={(e) => { e.stopPropagation(); setShowActions(!showActions); }}
@@ -230,43 +230,35 @@ export default function ProductCard({
               <div 
                 ref={menuRef}
                 style={{ transformOrigin: menuDirection === 'right' ? 'top left' : 'top right' }}
-                className={`absolute bottom-full ${menuDirection === 'right' ? 'left-0' : 'right-0'} mb-2 w-32 bg-white border border-stone-200 rounded-xl shadow-2xl py-1.5 z-50 flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200`}
+                className={`absolute bottom-full ${menuDirection === 'right' ? 'left-0' : 'right-0'} mb-2 w-40 bg-white border border-stone-200 rounded-xl shadow-2xl py-1 z-50 flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200`}
                 onClick={(e) => e.stopPropagation()}
               >
-                {/* KATEGORİ: Tıklayınca Native Select'i Tetikler */}
-                <div className="relative w-full overflow-hidden">
-                  <button className="w-full text-left px-3 py-2 text-[11px] font-bold text-stone-700 hover:bg-stone-50 flex items-center justify-between">
-                    <span>KATEGORİ</span><span className="text-stone-300 text-[10px]">📂</span>
+                <button onClick={() => { if(window.confirm('Silinsin mi?')) onDelete(product.id); setShowActions(false); }} className="w-full text-left px-4 py-3 text-[12px] font-bold text-red-500 hover:bg-red-50 border-b border-stone-100 uppercase">SİL</button>
+                <button onClick={() => { onUpdate(product.id, { is_archived: !product.is_archived }); setShowActions(false); }} className="w-full text-left px-4 py-3 text-[12px] font-bold text-stone-700 hover:bg-stone-50 border-b border-stone-100 uppercase">{product.is_archived ? 'YAYINLA' : 'ARŞİV'}</button>
+                <button onClick={() => { onUpdate(product.id, { inStock: !product.inStock }); setShowActions(false); }} className="w-full text-left px-4 py-3 text-[12px] font-bold text-stone-700 hover:bg-stone-50 border-b border-stone-100 uppercase">{product.inStock ? 'TÜKENDİ' : 'STOK'}</button>
+                
+                <div className="relative w-full">
+                  <button className="w-full text-left px-4 py-3 text-[12px] font-bold text-stone-700 hover:bg-stone-50 flex items-center justify-between uppercase">
+                    <span>KATEGORİLER</span>
+                    <span className="text-[10px]">▼</span>
                   </button>
                   <select
-                    value=""
+                    value={product.category}
                     onChange={(e) => {
-                      const val = e.target.value;
-                      if (val === 'NEW_CAT') {
-                        const name = window.prompt('Yeni kategori adını yazın:');
-                        if (name?.trim()) onUpdate(product.id, { category: name.trim() });
-                      } else {
-                        onUpdate(product.id, { category: val });
-                      }
+                      onUpdate(product.id, { category: e.target.value });
                       setShowActions(false);
                     }}
                     className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                   >
                     <option value="" disabled>Kategori Seçin...</option>
                     {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                    <option value="NEW_CAT">+ YENİ EKLE</option>
                   </select>
                 </div>
-
-                <button onClick={() => { onUpdate(product.id, { inStock: !product.inStock }); setShowActions(false); }} className="w-full text-left px-3 py-2 text-[11px] font-bold text-stone-700 hover:bg-stone-50">{product.inStock ? 'TÜKENDİ' : 'STOKTA'}</button>
-                <button onClick={() => { onUpdate(product.id, { is_archived: !product.is_archived }); setShowActions(false); }} className="w-full text-left px-3 py-2 text-[11px] font-bold text-stone-700 hover:bg-stone-50">{product.is_archived ? 'YAYINLA' : 'ARŞİVLE'}</button>
-                <div className="h-px bg-stone-100 my-0.5"></div>
-                <button onClick={() => { if(window.confirm('Silinsin mi?')) onDelete(product.id); setShowActions(false); }} className="w-full text-left px-3 py-2 text-[11px] font-bold text-red-500 hover:bg-red-50">SİL</button>
               </div>
             )}
           </div>
 
-          {/* MOBİL / TABLET: Saf Sistem Dropdown (Native Select) */}
+          {/* MOBİL: Sistemin Kendi (Native) Dropdown Sistemi */}
           <div className="lg:hidden relative flex items-center justify-center text-stone-400">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-4 h-4 pointer-events-none">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
@@ -275,26 +267,21 @@ export default function ProductCard({
               value=""
               onChange={(e) => {
                 const val = e.target.value;
-                if (val === 'CHANGE_CAT') {
-                  const currentCat = product.category || 'Belirtilmemiş';
-                  const availableCats = categories.join(', ');
-                  const newName = window.prompt(`Mevcut Kategori: ${currentCat}\nSeçenekler: ${availableCats}\n\nYeni kategori adını yazın veya listeden birini girin:`);
-                  if (newName?.trim()) onUpdate(product.id, { category: newName.trim() });
-                }
-                else if (val === 'TOGGLE_STOCK') onUpdate(product.id, { inStock: !product.inStock });
+                if (val === 'DELETE') { if (window.confirm('Silinsin mi?')) onDelete(product.id); }
                 else if (val === 'TOGGLE_ARCHIVE') onUpdate(product.id, { is_archived: !product.is_archived });
-                else if (val === 'DELETE') {
-                  if (window.confirm('Silinsin mi?')) onDelete(product.id);
-                }
+                else if (val === 'TOGGLE_STOCK') onUpdate(product.id, { inStock: !product.inStock });
+                else if (val) onUpdate(product.id, { category: val });
                 e.target.value = '';
               }}
               className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
             >
-              <option value="" disabled>Seç...</option>
-              <option value="CHANGE_CAT">KATEGORİ</option>
-              <option value="TOGGLE_STOCK">{product.inStock ? 'TÜKENDİ' : 'STOKTA'}</option>
-              <option value="TOGGLE_ARCHIVE">{product.is_archived ? 'YAYINLA' : 'ARŞİVLE'}</option>
+              <option value="" disabled>SEÇENEKLER</option>
               <option value="DELETE">SİL</option>
+              <option value="TOGGLE_ARCHIVE">{product.is_archived ? 'YAYINLA' : 'ARŞİV'}</option>
+              <option value="TOGGLE_STOCK">{product.inStock ? 'TÜKENDİ' : 'STOK'}</option>
+              <optgroup label="KATEGORİLER">
+                {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+              </optgroup>
             </select>
           </div>
 
