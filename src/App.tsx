@@ -23,6 +23,7 @@ export default function App() {
     renameCategory,
     removeCategoryFromProducts,
     existingCategories,
+    reorderProductsInCategory,
   } = useProducts();
 
   const { isAdmin, handleLogoClick, logout } = useAdminMode();
@@ -104,7 +105,7 @@ export default function App() {
             isAdmin={isAdmin}
             onDelete={deleteProduct}
             onUpdate={updateProduct}
-            onOrderUpdate={setProducts}
+            onOrderUpdate={reorderProductsInCategory}
             activeDiscount={activeDiscount}
             visibleCategoryLimit={isAdmin ? 999 : visibleCategoryLimit}
             search={search}

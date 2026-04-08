@@ -52,24 +52,9 @@ export default function ProductGrid({
     ? sortedCategories 
     : sortedCategories.slice(0, visibleCategoryLimit);
 
-  // Sayısal Sıralama Değiştirme Mantığı
+  // Sayısal Sıralama Değiştirme Mantığı (Tüm mantık artık Hook içinde güvenle yapılıyor)
   const handleOrderChange = (productId: string, newPosition: number) => {
-    const productToMove = products.find(p => p.id === productId);
-    if (!productToMove) return;
-
-    const categoryName = productToMove.category || 'KATEGORİSİZ / DİĞER';
-    const categoryProducts = products.filter(p => (p.category || 'KATEGORİSİZ / DİĞER') === categoryName);
-    
-    const oldGlobalIdx = products.findIndex(p => p.id === productId);
-    const targetProductInCat = categoryProducts[newPosition - 1];
-    const newGlobalIdx = products.findIndex(p => p.id === targetProductInCat.id);
-
-    if (oldGlobalIdx !== -1 && newGlobalIdx !== -1) {
-      const newProducts = [...products];
-      newProducts.splice(oldGlobalIdx, 1);
-      newProducts.splice(newGlobalIdx, 0, productToMove);
-      onOrderUpdate(newProducts);
-    }
+    onOrderUpdate(productId, newPosition);
   };
 
   return (

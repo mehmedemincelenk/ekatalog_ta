@@ -105,23 +105,22 @@ export default function SearchFilter({
                 >
                   {/* Entegre Sıra Dropdown (Admin) */}
                   {isAdmin && isActualCategory && (
-                    <div className="flex items-center">
+                    <div className="flex items-center shrink-0">
                       <select
                         value={sortedList.indexOf(cat) + 1}
                         onChange={(e) => handleCategoryOrderChange(cat, parseInt(e.target.value, 10))}
-                        className="bg-transparent text-current text-[11px] font-black w-7 h-7 pl-2 cursor-pointer focus:outline-none appearance-none"
+                        className="bg-stone-100 text-stone-900 text-[12px] font-black w-9 h-8 p-0 cursor-pointer focus:outline-none appearance-none rounded-l-full active:bg-stone-200 transition-colors text-center"
                       >
                         {sortedList.map((_, i) => (
                           <option key={i + 1} value={i + 1} className="text-black">{i + 1}</option>
                         ))}
                       </select>
-                      <div className="w-px h-3 bg-current opacity-20 mx-1"></div>
                     </div>
                   )}
 
                   <button
                     onClick={() => onCategoryToggle(cat)}
-                    className="px-3 py-1.5 text-[10px] font-semibold whitespace-nowrap flex items-center gap-1.5"
+                    className={`py-1.5 text-[10px] font-semibold whitespace-nowrap flex items-center gap-1.5 transition-all active:scale-95 ${isAdmin && isActualCategory ? 'pr-3 pl-1.5' : 'px-3'}`}
                   >
                     <span
                       contentEditable={isAdmin && isActualCategory}

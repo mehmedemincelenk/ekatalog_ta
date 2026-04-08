@@ -21,7 +21,7 @@ export function useProducts(
   activeCategories: string[] = [],
   isAdmin = false,
 ) {
-  const THRESHOLD = 9999; // Sayfalamayı App.tsx kategori bazlı yöneteceği için burada devre dışı bırakıyoruz
+  const THRESHOLD = 9999;
   const [isExpanded, setIsExpanded] = useState(false);
 
   // İlk değeri cache'den alarak başlatıyoruz
@@ -38,7 +38,6 @@ export function useProducts(
     setIsExpanded(false);
   }, [search, activeCategories]);
 
-  // Veri Dönüştürücü (Mapper) — Functional Programming yaklaşımı
   const mapToProduct = useCallback((raw: Record<string, any>): Product => {
     return {
       id: String(raw.id || Date.now()),
@@ -52,7 +51,6 @@ export function useProducts(
     };
   }, []);
 
-  // Sync İşlemleri — Daha güvenli fetch
   const syncWithSheet = useCallback(
     async (action: string, payload: Record<string, any>) => {
       if (!APPS_SCRIPT_URL) return false;
@@ -72,7 +70,7 @@ export function useProducts(
     [],
   );
 
-  // 1. Verileri Çek
+  // Verileri Çek
   useEffect(() => {
     if (!SHEET_URL) {
       setLoading(false);
@@ -80,7 +78,6 @@ export function useProducts(
     }
 
     const fetchData = async () => {
-      setLoading(true);
       try {
         const response = await fetch(SHEET_URL);
         if (!response.ok) throw new Error('Bağlantı hatası');
@@ -91,63 +88,67 @@ export function useProducts(
           skipEmptyLines: true,
           complete: (results) => {
             const parsedData = (results.data as Record<string, any>[]).map(mapToProduct);
-            setProducts(parsedData);
-            // Başarılı yüklemede cache'i güncelle
-            localStorage.setItem(CACHE_KEY, JSON.stringify(parsedData));
+            
+            // EĞER lokalde zaten ürünler varsa ve sayıları aynıysa (reorder durumu), 
+            // Sheets'ten gelen eski sıralamayı hemen kabul etme.
+            setProducts(prev => {
+              if (prev.length > 0 && prev.length === parsedData.length) {
+                return prev; // Lokal sıralamayı koru
+              }
+              localStorage.setItem(CACHE_KEY, JSON.stringify(parsedData));
+              return parsedData;
+            });
+            
             setError(null);
-            setLoading(false);
-          },
-          error: (err) => {
-            console.error('PapaParse Error:', err);
-            setError('Veri ayrıştırma hatası');
             setLoading(false);
           },
         });
       } catch (err) {
-        console.error('Fetch Error:', err);
-        if (products.length === 0) {
-          setError('Katalog şu an çevrimdışı (Google Sheets hatası).');
-        }
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [mapToProduct, products.length]);
+  }, [mapToProduct]);
 
-  // 2. Arama Loglama (Google Sheets'e Yazma)
-  const logSearch = useCallback(
-    async (term: string) => {
-      if (!term || term.length < 3) return;
-      await syncWithSheet('LOG_SEARCH', { term });
-    },
-    [syncWithSheet],
-  );
+  // Sayısal Sıralama Değiştirme (Hook Seviyesinde - Tüm ürünler üzerinde)
+  const reorderProductsInCategory = useCallback(async (productId: string, newPosition: number) => {
+    setProducts(prev => {
+      const productToMove = prev.find(p => p.id === productId);
+      if (!productToMove) return prev;
 
-  // Debounce Search Log
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (search) logSearch(search);
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, [search, logSearch]);
+      const categoryName = productToMove.category || 'KATEGORİSİZ / DİĞER';
+      const categoryProductIndices: number[] = [];
+      const categoryProducts: Product[] = [];
+      
+      prev.forEach((p, idx) => {
+        if ((p.category || 'KATEGORİSİZ / DİĞER') === categoryName) {
+          categoryProductIndices.push(idx);
+          categoryProducts.push(p);
+        }
+      });
 
-  // Yeni bir kategori eklendiğinde sıralamaya dahil et
-  useEffect(() => {
-    if (products.length === 0) return;
-    const uniqueCats = [
-      ...new Set(products.map((p) => p.category).filter(Boolean)),
-    ];
-    const missingCats = uniqueCats.filter((c) => !categoryOrder.includes(c));
-    if (missingCats.length > 0) {
-      setTimeout(
-        () => setCategoryOrder((prev) => [...prev, ...missingCats]),
-        0,
-      );
-    }
-  }, [products, categoryOrder, setCategoryOrder]);
+      const updatedCategoryProducts = [...categoryProducts];
+      const oldIdxInCat = updatedCategoryProducts.findIndex(p => p.id === productId);
+      updatedCategoryProducts.splice(oldIdxInCat, 1);
+      updatedCategoryProducts.splice(newPosition - 1, 0, productToMove);
 
-  // Filtreleme Mantığı
+      const newProducts = [...prev];
+      categoryProductIndices.forEach((globalIdx, i) => {
+        newProducts[globalIdx] = updatedCategoryProducts[i];
+      });
+
+      // Cache'i anında güncelle ki Sheets'ten gelen eski veri geri yüklemesin
+      localStorage.setItem(CACHE_KEY, JSON.stringify(newProducts));
+      
+      // Sheets'e gönder
+      const idList = newProducts.map(p => p.id);
+      syncWithSheet('UPDATE_PRODUCT_ORDER', { idList });
+
+      return newProducts;
+    });
+  }, [syncWithSheet]);
+
   const filteredProducts = useMemo(() => {
     const term = search.toLowerCase().trim();
     return products.filter((p) => {
@@ -159,19 +160,9 @@ export function useProducts(
     });
   }, [products, search, activeCategories, isAdmin]);
 
-  // Sayfalanmış Ürünler: Admin değilse ve genişletilmemişse ilk 40'ı göster
   const paginatedProducts = useMemo(() => {
-    if (isAdmin || isExpanded || filteredProducts.length <= THRESHOLD) {
-      return filteredProducts;
-    }
-    return filteredProducts.slice(0, THRESHOLD);
-  }, [filteredProducts, isExpanded, isAdmin, THRESHOLD]);
-
-  const hasMore = !isAdmin && !isExpanded && filteredProducts.length > THRESHOLD;
-
-  const loadMore = useCallback(() => {
-    setIsExpanded(true);
-  }, []);
+    return filteredProducts;
+  }, [filteredProducts]);
 
   const existingCategories = useMemo(() => {
     const unique = [
@@ -180,68 +171,62 @@ export function useProducts(
     return sortCategories(unique, categoryOrder);
   }, [products, categoryOrder]);
 
-  const addProduct = async (
-    product: Omit<Product, 'id' | 'inStock' | 'is_archived'>,
-  ) => {
+  const addProduct = async (product: Omit<Product, 'id' | 'inStock' | 'is_archived'>) => {
     const newId = String(Date.now());
-    const fullProduct: Product = {
-      ...product,
-      id: newId,
-      inStock: true,
-      is_archived: false,
-    };
-    setProducts((prev) => [fullProduct, ...prev]);
+    const fullProduct: Product = { ...product, id: newId, inStock: true, is_archived: false };
+    setProducts(prev => {
+      const updated = [fullProduct, ...prev];
+      localStorage.setItem(CACHE_KEY, JSON.stringify(updated));
+      return updated;
+    });
     await syncWithSheet('ADD', { product: fullProduct });
   };
 
   const removeProduct = async (id: string) => {
-    setProducts((prev) => prev.filter((p) => p.id !== id));
+    setProducts(prev => {
+      const updated = prev.filter(p => p.id !== id);
+      localStorage.setItem(CACHE_KEY, JSON.stringify(updated));
+      return updated;
+    });
     await syncWithSheet('DELETE', { id });
   };
 
   const updateProduct = async (id: string, changes: Partial<Product>) => {
-    setProducts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, ...changes } : p)),
-    );
+    setProducts(prev => {
+      const updated = prev.map(p => p.id === id ? { ...p, ...changes } : p);
+      localStorage.setItem(CACHE_KEY, JSON.stringify(updated));
+      return updated;
+    });
     await syncWithSheet('UPDATE', { id, changes });
   };
 
   const renameCategory = async (oldName: string, newName: string) => {
     if (!oldName || !newName || oldName === newName) return;
-    setProducts((prev) =>
-      prev.map((p) =>
-        p.category === oldName ? { ...p, category: newName } : p,
-      ),
-    );
-    setCategoryOrder((prev) => prev.map((c) => (c === oldName ? newName : c)));
+    setProducts(prev => {
+      const updated = prev.map(p => p.category === oldName ? { ...p, category: newName } : p);
+      localStorage.setItem(CACHE_KEY, JSON.stringify(updated));
+      return updated;
+    });
+    setCategoryOrder(prev => prev.map(c => c === oldName ? newName : c));
     await syncWithSheet('RENAME_CATEGORY', { oldName, newName });
   };
 
   const removeCategoryFromProducts = async (catName: string) => {
-    setProducts((prev) =>
-      prev.map((p) => (p.category === catName ? { ...p, category: '' } : p)),
-    );
-    setCategoryOrder((prev) => prev.filter((c) => c !== catName));
+    setProducts(prev => {
+      const updated = prev.map(p => p.category === catName ? { ...p, category: '' } : p);
+      localStorage.setItem(CACHE_KEY, JSON.stringify(updated));
+      return updated;
+    });
+    setCategoryOrder(prev => prev.filter(c => c !== catName));
     await syncWithSheet('DELETE_CATEGORY', { catName });
   };
 
   const updateCategoryOrder = async (newOrder: string[]) => {
     setCategoryOrder(newOrder);
-    const uniqueCats = [
-      ...new Set(products.map((p) => p.category).filter(Boolean)),
-    ];
-    const filteredOrder = newOrder.filter((name) => uniqueCats.includes(name));
-    const orderList = filteredOrder.map((name, idx) => ({
-      name,
-      order: idx + 1,
-    }));
+    const uniqueCats = [...new Set(products.map(p => p.category).filter(Boolean))];
+    const filteredOrder = newOrder.filter(name => uniqueCats.includes(name));
+    const orderList = filteredOrder.map((name, idx) => ({ name, order: idx + 1 }));
     await syncWithSheet('UPDATE_CATEGORY_ORDER', { orderList });
-  };
-
-  const reorderProducts = async (newProducts: Product[]) => {
-    setProducts(newProducts);
-    const idList = newProducts.map((p) => p.id);
-    await syncWithSheet('UPDATE_PRODUCT_ORDER', { idList });
   };
 
   return {
@@ -258,8 +243,8 @@ export function useProducts(
     renameCategory,
     removeCategoryFromProducts,
     updateCategoryOrder,
-    reorderProducts,
-    hasMore,
-    loadMore,
+    reorderProductsInCategory,
+    hasMore: false,
+    loadMore: () => {},
   };
 }
