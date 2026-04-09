@@ -88,60 +88,58 @@ export default function FloatingAdminMenu({
       {isOpen && (
         <div className="flex flex-col items-center gap-3 w-full animate-in slide-in-from-bottom-5 fade-in duration-300 pb-2 border-b border-white/20">
           
-          {/* SİTE AYARLARI */}
+          {/* SİTE AYARLARI (2 SÜTUNLU IZGARA) */}
           {showSettings && !isSelectMode && (
-            <div className="flex flex-col items-center gap-2 w-full pt-2">
-              <FloatingButton onClick={() => handlePromptUpdate('title', 'Marka Adı', settings.title)} icon="🏷️" label="Başlık" variant="secondary" />
-              <FloatingButton onClick={() => handlePromptUpdate('subtitle', 'Alt Başlık', settings.subtitle)} icon="👤" label="Alt" variant="secondary" />
-              <FloatingButton onClick={() => handlePromptUpdate('whatsapp', 'WhatsApp No', settings.whatsapp)} icon="💬" label="WhatsApp" variant="secondary" className="text-green-600 border-green-100" />
-              <FloatingButton onClick={() => handlePromptUpdate('instagram', 'Instagram Link', settings.instagram)} icon="📸" label="Instagram" variant="secondary" />
-              <FloatingButton onClick={() => handlePromptUpdate('address', 'Firma Adresi', settings.address)} icon="📍" label="Adres" variant="secondary" />
-              <FloatingButton onClick={() => handlePromptUpdate('logoEmoji', 'Logo Emojisi', settings.logoEmoji || DEFAULT_COMPANY.logoEmoji)} icon="✨" label="Logo" variant="secondary" />
+            <div className="grid grid-cols-2 gap-2 w-full pt-2">
+              <FloatingButton onClick={() => handlePromptUpdate('title', 'Marka Adı', settings.title)} icon="🏷️" label="Başlık" variant="secondary" className="!w-full" />
+              <FloatingButton onClick={() => handlePromptUpdate('subtitle', 'Alt Başlık', settings.subtitle)} icon="👤" label="Alt" variant="secondary" className="!w-full" />
+              <FloatingButton onClick={() => handlePromptUpdate('whatsapp', 'WhatsApp No', settings.whatsapp)} icon="💬" label="WhatsApp" variant="secondary" className="text-green-600 border-green-100 !w-full" />
+              <FloatingButton onClick={() => handlePromptUpdate('instagram', 'Instagram Link', settings.instagram)} icon="📸" label="Instagram" variant="secondary" className="!w-full" />
+              <FloatingButton onClick={() => handlePromptUpdate('address', 'Firma Adresi', settings.address)} icon="📍" label="Adres" variant="secondary" className="!w-full" />
+              <FloatingButton onClick={() => handlePromptUpdate('logoEmoji', 'Logo Emojisi', settings.logoEmoji || DEFAULT_COMPANY.logoEmoji)} icon="✨" label="Logo" variant="secondary" className="!w-full" />
             </div>
           )}
 
-          {/* TOPLU İŞLEMLER (YAZI TABANLI, 2x2 IZGARA) */}
+          {/* TOPLU İŞLEMLER (TEK SÜTUNLU LİSTE) */}
           {isSelectMode && selectedCount > 0 && (
             <div className="flex flex-col items-center gap-2 w-full pt-2">
-              <div className="bg-stone-900 text-white text-[10px] font-black px-4 py-2 rounded-full mb-2 shadow-lg">
+              <div className="bg-stone-900 text-white text-[10px] font-black px-4 py-2 rounded-full mb-1 shadow-lg">
                 {selectedCount} SEÇİLİ
               </div>
-              <div className="grid grid-cols-2 gap-2 w-full">
-                <FloatingButton onClick={() => onDelete?.()} icon={<span className="text-[11px] font-black tracking-widest uppercase">SİL</span>} showLabel={false} variant="secondary" className="!w-full text-red-600 border-red-100" />
-                <FloatingButton onClick={() => onArchiveToggle?.()} icon={<span className="text-[11px] font-black tracking-widest uppercase">ARŞİV</span>} showLabel={false} variant="secondary" className="!w-full" />
-                <FloatingButton onClick={() => onStockToggle?.()} icon={<span className="text-[11px] font-black tracking-widest uppercase">STOK</span>} showLabel={false} variant="secondary" className="!w-full" />
-                
-                <div className="relative group/cat w-full">
-                  <FloatingButton onClick={() => {}} icon={<span className="text-[11px] font-black tracking-widest uppercase">REYON</span>} showLabel={false} variant="secondary" className="!w-full" />
-                  <select 
-                    onChange={(e) => { if(e.target.value) { onChangeCategory?.(e.target.value); e.target.value = ""; } }}
-                    value=""
-                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full appearance-none z-[5]"
-                  >
-                    <option value="" disabled>Seç...</option>
-                    {categories.map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <FloatingButton onClick={() => onChangeName?.()} icon={<span className="text-[11px] font-black tracking-widest uppercase">AÇIKLAMA</span>} showLabel={false} variant="secondary" className="!w-full" />
-                <FloatingButton onClick={() => onChangePrice?.()} icon={<span className="text-[11px] font-black tracking-widest uppercase">FİYAT</span>} showLabel={false} variant="secondary" className="!w-full" />
+              <FloatingButton onClick={() => onDelete?.()} icon={<span className="text-[11px] font-black tracking-widest uppercase">SİL</span>} showLabel={false} variant="secondary" className="!w-full text-red-600 border-red-100" />
+              <FloatingButton onClick={() => onArchiveToggle?.()} icon={<span className="text-[11px] font-black tracking-widest uppercase">ARŞİV</span>} showLabel={false} variant="secondary" className="!w-full" />
+              <FloatingButton onClick={() => onStockToggle?.()} icon={<span className="text-[11px] font-black tracking-widest uppercase">STOK</span>} showLabel={false} variant="secondary" className="!w-full" />
+              
+              <div className="relative group/cat w-full">
+                <FloatingButton onClick={() => {}} icon={<span className="text-[11px] font-black tracking-widest uppercase">REYON</span>} showLabel={false} variant="secondary" className="!w-full" />
+                <select 
+                  onChange={(e) => { if(e.target.value) { onChangeCategory?.(e.target.value); e.target.value = ""; } }}
+                  value=""
+                  className="absolute inset-0 opacity-0 cursor-pointer w-full h-full appearance-none z-[5]"
+                >
+                  <option value="" disabled>Seç...</option>
+                  {categories.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
               </div>
+
+              <FloatingButton onClick={() => onChangeName?.()} icon={<span className="text-[11px] font-black tracking-widest uppercase">AÇIKLAMA</span>} showLabel={false} variant="secondary" className="!w-full" />
+              <FloatingButton onClick={() => onChangePrice?.()} icon={<span className="text-[11px] font-black tracking-widest uppercase">FİYAT</span>} showLabel={false} variant="secondary" className="!w-full" />
             </div>
           )}
 
-          {/* ANA AKSİYONLAR */}
+          {/* ANA AKSİYONLAR (YAN YANA) */}
           {!isSelectMode && (
-            <div className="flex flex-col items-center gap-2 pt-2">
+            <div className="grid grid-cols-2 gap-2 w-full pt-2">
               <FloatingButton 
                 onClick={() => setShowSettings(!showSettings)} 
                 icon={ICONS.settings} 
                 label="Ayarlar" 
                 variant="secondary" 
-                className={showSettings ? 'border-kraft-400 text-kraft-600' : ''}
+                className={`!w-full ${showSettings ? 'border-kraft-400 text-kraft-600' : ''}`}
               />
-              <FloatingButton onClick={() => { onAddClick(); setIsOpen(false); }} icon={ICONS.add} label="Ekle" variant="secondary" />
+              <FloatingButton onClick={() => { onAddClick(); setIsOpen(false); }} icon={ICONS.add} label="Ekle" variant="secondary" className="!w-full" />
             </div>
           )}
           
