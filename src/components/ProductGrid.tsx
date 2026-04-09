@@ -94,7 +94,7 @@ export default function ProductGrid({
                 itemsInCategory={groupedProducts[catName].length}
                 activeDiscount={activeDiscount}
                 isSelectMode={isSelectMode}
-                isSelected={selectedIds?.has(product.id)}
+                isSelected={selectedIds?.has(product.id) || (isSelectMode && activeCategories.includes(product.category))}
                 onSelectToggle={() => onSelectToggle?.(product.id)}
               />
             ))}

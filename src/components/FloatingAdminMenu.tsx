@@ -72,8 +72,15 @@ export default function FloatingAdminMenu({
     setShowSettings(false);
   }, [updateSetting]);
 
+  // Mod Değiştirme
+  const handleToggleSelectMode = () => {
+    toggleSelectMode();
+    setShowSettings(false);
+    if (isSelectMode) setIsOpen(false);
+  };
+
   return (
-    <div ref={menuRef} className="fixed bottom-6 right-6 z-[100] flex flex-col items-center gap-3">
+    <div ref={menuRef} className="fixed bottom-6 right-6 z-[100] flex flex-col items-end gap-3">
       
       {/* ÜST KATMAN: GENİŞLEYEN ARAÇLAR */}
       {isOpen && (
@@ -83,8 +90,8 @@ export default function FloatingAdminMenu({
           {showSettings && !isSelectMode && (
             <div className="flex flex-col items-center gap-2 mb-2 p-2 bg-white/40 backdrop-blur-md rounded-3xl border border-white/20 shadow-xl animate-in zoom-in-95 duration-200">
               <FloatingButton onClick={() => handlePromptUpdate('title', 'Marka Adı', settings.title)} icon="🏷️" label="Başlık" variant="secondary" />
-              <FloatingButton onClick={() => handlePromptUpdate('subtitle', 'Alt Başlık', settings.subtitle)} icon="👤" label="Alt Başlık" variant="secondary" />
-              <FloatingButton onClick={() => handlePromptUpdate('whatsapp', 'WhatsApp No', settings.whatsapp)} icon="💬" label="WhatsApp" variant="success" />
+              <FloatingButton onClick={() => handlePromptUpdate('subtitle', 'Alt Başlık', settings.subtitle)} icon="👤" label="Alt" variant="secondary" />
+              <FloatingButton onClick={() => handlePromptUpdate('whatsapp', 'WhatsApp No', settings.whatsapp)} icon="💬" label="WhatsApp" variant="secondary" className="text-green-600 border-green-100" />
               <FloatingButton onClick={() => handlePromptUpdate('instagram', 'Instagram Link', settings.instagram)} icon="📸" label="Instagram" variant="secondary" />
               <FloatingButton onClick={() => handlePromptUpdate('address', 'Firma Adresi', settings.address)} icon="📍" label="Adres" variant="secondary" />
               <FloatingButton onClick={() => handlePromptUpdate('logoEmoji', 'Logo Emojisi', settings.logoEmoji || DEFAULT_COMPANY.logoEmoji)} icon="✨" label="Logo" variant="secondary" />
@@ -95,85 +102,74 @@ export default function FloatingAdminMenu({
           {isSelectMode && selectedCount > 0 && (
             <div className="flex flex-col items-center gap-2 mb-2 p-2 bg-white/40 backdrop-blur-md rounded-3xl border border-white/20 shadow-xl animate-in zoom-in-95 duration-200 text-stone-900">
               <div className="bg-stone-900 text-white text-[10px] font-black px-3 py-1.5 rounded-full mb-1 whitespace-nowrap shadow-lg">
-                {selectedCount} ÜRÜN SEÇİLİ
+                {selectedCount} SEÇİLİ
               </div>
-              <FloatingButton onClick={() => onDelete?.()} icon={ICONS.delete} label="Seçilenleri Sil" variant="secondary" className="text-red-600 border-red-100" />
-              <FloatingButton onClick={() => onArchiveToggle?.()} icon={ICONS.archive} label="Arşivle / Yayınla" variant="secondary" />
-              <FloatingButton onClick={() => onStockToggle?.()} icon={ICONS.stock} label="Stok Durumu" variant="secondary" />
+              <FloatingButton onClick={() => onDelete?.()} icon={ICONS.delete} label="Sil" variant="secondary" className="text-red-600 border-red-100" />
+              <FloatingButton onClick={() => onArchiveToggle?.()} icon={ICONS.archive} label="Arşiv" variant="secondary" />
+              <FloatingButton onClick={() => onStockToggle?.()} icon={ICONS.stock} label="Stok" variant="secondary" />
               
               <div className="relative group/cat">
-                <FloatingButton onClick={() => {}} icon={ICONS.tag} label="Reyon Değiştir" variant="secondary" />
+                <FloatingButton onClick={() => {}} icon={ICONS.tag} label="Reyon" variant="secondary" />
                 <select 
                   onChange={(e) => { if(e.target.value) { onChangeCategory?.(e.target.value); e.target.value = ""; } }}
                   value=""
                   className="absolute inset-0 opacity-0 cursor-pointer w-full h-full appearance-none z-[5]"
                 >
-                  <option value="" disabled>Kategori Seç...</option>
+                  <option value="" disabled>Seç...</option>
                   {categories.map(cat => (
                     <option key={cat} value={cat}>{cat}</option>
                   ))}
                 </select>
               </div>
 
-              <FloatingButton onClick={() => onChangeName?.()} icon={ICONS.edit} label="İsimlere Ek Yap" variant="secondary" />
-              <FloatingButton onClick={() => onChangePrice?.()} icon={ICONS.price} label="Fiyatları Güncelle" variant="secondary" />
+              <FloatingButton onClick={() => onChangeName?.()} icon={ICONS.edit} label="İsim" variant="secondary" />
+              <FloatingButton onClick={() => onChangePrice?.()} icon={ICONS.price} label="Fiyat" variant="secondary" />
             </div>
           )}
 
           {/* ORTA KATMAN: ANA AKSİYONLAR */}
-          {!isSelectMode ? (
+          {!isSelectMode && (
             <>
               <FloatingButton 
                 onClick={() => setShowSettings(!showSettings)} 
                 icon={showSettings ? ICONS.close : ICONS.settings} 
-                label="Site Ayarlarını Düzenle" 
+                label="Ayarlar" 
                 variant="secondary" 
                 className={showSettings ? 'border-kraft-400' : ''}
               />
-              <FloatingButton onClick={() => { onAddClick(); setIsOpen(false); }} icon={ICONS.add} label={LABELS.newProductBtn} variant="secondary" />
+              <FloatingButton onClick={() => { onAddClick(); setIsOpen(false); }} icon={ICONS.add} label="Ekle" variant="secondary" />
             </>
-          ) : (
-            // Seçim modundayken ama ürün seçilmemişken rehber bir etiket gösterilebilir
-            selectedCount === 0 && (
-              <div className="bg-white/40 backdrop-blur text-stone-800 text-[9px] font-bold px-3 py-2 rounded-xl mb-2 border border-white/20">
-                LÜTFEN ÜRÜN SEÇİN
-              </div>
-            )
           )}
           
           {/* ÇOKLU SEÇİM TOGGLE */}
           <FloatingButton 
-            onClick={() => { 
-              toggleSelectMode(); 
-              if (!isSelectMode) setShowSettings(false); 
-              else if (isSelectMode && selectedCount === 0) setIsOpen(false); 
-            }} 
+            onClick={handleToggleSelectMode} 
             icon={isSelectMode ? ICONS.close : ICONS.select} 
-            label={isSelectMode ? 'Seçimi Kapat' : 'Çoklu Seçim'} 
+            label={isSelectMode ? 'Kapat' : 'Seç'} 
             variant="secondary"
             className={isSelectMode ? 'border-kraft-400' : ''}
           />
         </div>
       )}
 
-      {/* ANA KONTROLLER (ALT SABİT KISIM) */}
-      <div className="flex flex-col gap-3">
+      {/* ANA KONTROLLER (YATAY DİZİLİM - Hamburger Güç Tuşunun Sağında) */}
+      <div className="flex flex-row gap-3 items-center">
+        {/* ÇIKIŞ BUTONU */}
+        <FloatingButton 
+          onClick={onLogout} 
+          icon={ICONS.power} 
+          label="Çıkış" 
+          variant="secondary" 
+          className="text-red-600 border-red-100"
+        />
+
         {/* HAMBURGER BUTONU (Ana Tetikleyici) */}
         <FloatingButton 
           onClick={() => { setIsOpen(!isOpen); if(isOpen) setShowSettings(false); }} 
           icon={isOpen ? ICONS.close : ICONS.hamburger}
-          label="Yönetim Araçları"
+          label="Menü"
           variant="secondary"
-          className={`${isSelectMode && !isOpen ? "border-kraft-500 ring-4 ring-kraft-100 shadow-kraft-500/20 shadow-xl" : "border-stone-300"}`}
-        />
-
-        {/* ÇIKIŞ BUTONU (En Altta) */}
-        <FloatingButton 
-          onClick={onLogout} 
-          icon={ICONS.power} 
-          label={LABELS.adminCloseBtn} 
-          variant="secondary" 
-          className="text-red-600 border-red-100"
+          className={`${isSelectMode && !isOpen ? "border-kraft-500 ring-4 ring-kraft-100 shadow-kraft-500/20 shadow-xl" : "border-stone-300"} bg-stone-50/80 backdrop-blur-md`}
         />
       </div>
 
