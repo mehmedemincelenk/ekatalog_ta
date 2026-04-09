@@ -7,6 +7,7 @@ export interface CompanySettings {
   instagram: string;
   title: string;
   subtitle: string;
+  logoEmoji: string;
 }
 
 export function useSettings(isAdmin: boolean) {
@@ -16,6 +17,7 @@ export function useSettings(isAdmin: boolean) {
     instagram: DEFAULT_COMPANY.instagramUrl,
     title: DEFAULT_COMPANY.name,
     subtitle: DEFAULT_COMPANY.tagline,
+    logoEmoji: DEFAULT_COMPANY.logoEmoji,
   });
   
   const [loading, setLoading] = useState(true);

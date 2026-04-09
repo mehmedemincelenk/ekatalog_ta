@@ -186,7 +186,32 @@ export default function App() {
 
   return (
     <div className={`min-h-screen flex flex-col ${UI.layout.bodyBg}`}>
-      <Navbar settings={settings} />
+      <Navbar settings={settings} isAdmin={isAdmin} updateSetting={updateSetting} />
+      
+      {isAdmin && (
+        <FloatingAdminMenu 
+          settings={settings} 
+          updateSetting={updateSetting} 
+          onAddClick={() => setIsModalOpen(true)}
+          isSelectMode={isSelectMode}
+          toggleSelectMode={() => { setIsSelectMode(!isSelectMode); setSelectedIds(new Set()); }}
+          onLogout={logout}
+        />
+      )}
+
+      {isAdmin && isSelectMode && (
+        <BulkActionsPanel
+          selectedCount={getTargetIds().length}
+          categories={existingCategories}
+          onCancel={() => { setIsSelectMode(false); setSelectedIds(new Set()); }}
+          onDelete={handleBulkDelete}
+          onArchiveToggle={handleBulkArchive}
+          onStockToggle={handleBulkStock}
+          onChangeCategory={handleBulkCategory}
+          onChangeName={handleBulkName}
+          onChangePrice={handleBulkPrice}
+        />
+      )}
       
       <main className="flex-grow">
         <HeroCarousel isAdmin={isAdmin} />
@@ -207,21 +232,7 @@ export default function App() {
             visibleCategoryLimit={isAdmin ? UI.layout.adminLimit : visibleCategoryLimit}
             search={search} activeCategories={activeCategories} onAddClick={() => setIsModalOpen(true)}
             isSelectMode={isSelectMode} selectedIds={selectedIds} onSelectToggle={toggleSelection}
-            settings={settings} updateSetting={updateSetting} toggleSelectMode={() => { setIsSelectMode(!isSelectMode); setSelectedIds(new Set()); }}
           />
-
-          {/* ADMİN ÇIKIŞ BUTONU */}
-          {isAdmin && (
-            <button 
-              onClick={logout} 
-              className="fixed bottom-6 right-6 z-[100] bg-stone-900 text-white w-12 h-12 rounded-full shadow-2xl flex items-center justify-center border-2 border-white/20 active:scale-90 transition-all group"
-            >
-              <span className="absolute right-14 bg-stone-900 text-white text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                {LABELS.adminCloseBtn}
-              </span>
-              🚪
-            </button>
-          )}
 
           {!isAdmin && products.length > 0 && (
             <div className="mt-12 flex justify-center">
