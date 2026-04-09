@@ -6,6 +6,7 @@ import ProductGrid from './components/ProductGrid';
 import Footer from './components/Footer';
 import AddProductModal from './components/AddProductModal';
 import BulkActionsPanel from './components/BulkActionsPanel';
+import FloatingAdminMenu from './components/FloatingAdminMenu';
 import { useProducts } from './hooks/useProducts';
 import { useAdminMode } from './hooks/useAdminMode';
 import { useDiscount } from './hooks/useDiscount';
