@@ -1,16 +1,7 @@
 import { useState } from 'react';
-import { COMPANY, FOOTER, LABELS } from '../data/config';
+import { FOOTER, LABELS, DEFAULT_COMPANY } from '../data/config';
 import { ActiveDiscount } from '../hooks/useDiscount';
-
-/**
- * FOOTER BİLEŞENİ (TEORİK ANALİZ)
- * ----------------------------
- * Bir girişimci olarak burayı sitenin "Resmi Kimliği" ve "Satış Dönüştürücü" alanı olarak görebilirsin.
- * 
- * 1. Marka Güveni: Logo ve telif hakları ile kurumsallığı pekiştirir.
- * 2. Erişilebilirlik: Lokasyon bilgisi ile fiziksel varlığı kanıtlar.
- * 3. Satış Teşviki (Kupon): Kullanıcıyı sepete yönlendirmek için son bir "avantaj" sunar.
- */
+import { CompanySettings } from '../hooks/useSettings';
 
 interface FooterProps {
   onLogoClick: () => void;
@@ -19,6 +10,7 @@ interface FooterProps {
   onApplyDiscount?: (code: string) => void;
   discountError?: string | null;
   onDeleteAll?: () => void;
+  settings: CompanySettings;
 }
 
 export default function Footer({ 
@@ -27,16 +19,12 @@ export default function Footer({
   activeDiscount,
   onApplyDiscount,
   discountError,
-  onDeleteAll
+  onDeleteAll,
+  settings
 }: FooterProps) {
   // TEKNİK NOT: couponInput, kullanıcının o an yazdığı metni tutan "geçici" bir hafızadır.
   const [couponInput, setCouponInput] = useState('');
 
-  /**
-   * handleApply (İŞ MANTIĞI):
-   * Kullanıcı butona bastığında, yazdığı kodu büyük harfe çevirerek (Upper Case) 
-   * sisteme göndeririz. Eğer hata yoksa kutuyu temizleriz.
-   */
   const handleApply = () => {
     if (onApplyDiscount && couponInput.trim()) {
       onApplyDiscount(couponInput.trim());
@@ -54,10 +42,10 @@ export default function Footer({
           {/* 1. BÖLÜM: MARKA VE TELİF */}
           <div className="flex flex-col items-center md:items-start gap-3">
             <button onClick={onLogoClick} className="flex items-center gap-2 group outline-none">
-              <span className="text-3xl group-active:scale-90 transition-transform">{COMPANY.logoEmoji}</span>
+              <span className="text-3xl group-active:scale-90 transition-transform">{DEFAULT_COMPANY.logoEmoji}</span>
               <div className="flex flex-col items-start leading-none text-left">
-                <span className="font-bold text-stone-900 tracking-tight text-lg">{COMPANY.name}</span>
-                <span className="text-[11px] text-kraft-600 mt-0.5">{COMPANY.tagline}</span>
+                <span className="font-bold text-stone-900 tracking-tight text-lg">{settings.title}</span>
+                <span className="text-[11px] text-kraft-600 mt-0.5">{settings.subtitle}</span>
               </div>
               {/* ADMİN MODU: Sadece kurucu olarak sen içerideysen bu etiketi görürsün. */}
               {isAdmin && (
@@ -67,7 +55,7 @@ export default function Footer({
               )}
             </button>
             <p className="text-[10px] text-stone-400 text-center md:text-left leading-relaxed">
-              {f.labels.rightsReserved(COMPANY.name)}
+              {f.labels.rightsReserved(settings.title)}
             </p>
           </div>
 
@@ -77,12 +65,12 @@ export default function Footer({
               {f.labels.locationTitle}
             </span>
             <a 
-              href={`${f.style.mapBaseUrl}${encodeURIComponent(COMPANY.address)}`} 
+              href={`${f.style.mapBaseUrl}${encodeURIComponent(settings.address)}`} 
               target="_blank" 
               rel="noopener noreferrer" 
               className="text-xs text-stone-500 hover:text-stone-900 transition-colors max-w-[200px] leading-relaxed"
             >
-              {COMPANY.address}
+              {settings.address}
             </a>
           </div>
 

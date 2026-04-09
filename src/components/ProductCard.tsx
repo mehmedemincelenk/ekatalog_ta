@@ -162,6 +162,7 @@ const DescriptionScroll = memo(({ lines, lineClass, maxHeightClass }: any) => {
 
 const ProductCard = memo(({
   product, categories = [], isAdmin, onDelete, onUpdate, onOrderChange, orderIndex = 1, itemsInCategory = 1, activeDiscount,
+  isSelectMode, isSelected, onSelectToggle
 }: any) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cardRef = useRef<HTMLElement>(null);
@@ -204,11 +205,29 @@ const ProductCard = memo(({
   // Fiyatın içinde ₺ işareti yoksa sonuna ekle
   const formattedPrice = displayPrice.includes('₺') ? displayPrice : `${displayPrice} ₺`;
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    if (isAdmin && isSelectMode) {
+      e.preventDefault();
+      onSelectToggle?.();
+    }
+  };
+
   return (
-    <article ref={cardRef as React.RefObject<HTMLDivElement>} data-product-id={product.id} className={`bg-white border ${product.inStock === false ? 'border-transparent bg-stone-50' : 'border-stone-200'} rounded-lg flex flex-col group hover:shadow-md transition-all duration-300 relative`}>
-      
+    <article 
+      ref={cardRef as React.RefObject<HTMLDivElement>} 
+      data-product-id={product.id} 
+      onClick={handleCardClick}
+      className={`bg-white border ${isSelected ? 'border-kraft-600 ring-4 ring-kraft-200 shadow-md transform scale-[1.02]' : product.inStock === false ? 'border-transparent bg-stone-50' : 'border-stone-200'} rounded-lg flex flex-col group transition-all duration-300 relative ${isAdmin && isSelectMode ? 'cursor-pointer' : ''}`}
+    >
+      {/* SEÇİM İKONU (Admin Multi-Select) */}
+      {isAdmin && isSelectMode && (
+        <div className={`absolute top-2 left-2 z-40 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all shadow-sm ${isSelected ? 'bg-kraft-600 border-kraft-600 text-white' : 'bg-white/80 backdrop-blur border-stone-300 text-transparent'}`}>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clipRule="evenodd" /></svg>
+        </div>
+      )}
+
       {/* SIRA NUMARASI (Admin) */}
-      {isAdmin && (
+      {isAdmin && !isSelectMode && (
         <div className="absolute top-2 right-2 z-[25] hover:scale-105 active:scale-95 transition-transform">
           <div className="relative w-7 h-7 bg-white/90 backdrop-blur-md rounded-lg shadow-lg border border-stone-200 flex items-center justify-center overflow-hidden">
             <select 

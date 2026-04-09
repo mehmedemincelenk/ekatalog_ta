@@ -1,4 +1,5 @@
-import { COMPANY, NAVBAR, FOOTER } from '../data/config';
+import { NAVBAR, FOOTER, DEFAULT_COMPANY } from '../data/config';
+import { CompanySettings } from '../hooks/useSettings';
 
 /**
  * NAVBAR BİLEŞENİ (STRATEJİK ANALİZ)
@@ -11,7 +12,7 @@ import { COMPANY, NAVBAR, FOOTER } from '../data/config';
  * 4. Sabitleme (Sticky): Sayfa aşağı kaysa da Navbar üstte kalır, böylece müşteri her an rotasını bulabilir.
  */
 
-export default function Navbar() {
+export default function Navbar({ settings }: { settings: CompanySettings }) {
   const n = NAVBAR; // config.ts'deki tasarım ayarlarını aldık.
 
   return (
@@ -21,13 +22,13 @@ export default function Navbar() {
           
           {/* 1. BÖLÜM: LOGO VE MARKA KİMLİĞİ */}
           <div className="flex items-center gap-2 select-none shrink-0 cursor-default">
-            <span className={n.logo.emojiSize}>{COMPANY.logoEmoji}</span>
+            <span className={n.logo.emojiSize}>{DEFAULT_COMPANY.logoEmoji}</span>
             <div className="flex flex-col">
               <div className={`${n.logo.nameSize} ${n.logo.nameWeight} text-stone-900 leading-none tracking-tight`}>
-                {COMPANY.name}
+                {settings.title}
               </div>
               <div className={`${n.logo.taglineSize} ${n.logo.taglineColor} font-medium`}>
-                {COMPANY.tagline}
+                {settings.subtitle}
               </div>
             </div>
           </div>
@@ -37,13 +38,13 @@ export default function Navbar() {
             
             {/* FİZİKSEL ADRES: Google Haritalar entegrasyonu ile güven verir. */}
             <a
-              href={`${FOOTER.style.mapBaseUrl}${encodeURIComponent(COMPANY.address)}`}
+              href={`${FOOTER.style.mapBaseUrl}${encodeURIComponent(settings.address)}`}
               target="_blank"
               rel="noopener noreferrer"
               className={`${n.address.size} ${n.address.color} ${n.address.hoverColor} transition-colors whitespace-nowrap order-2 sm:order-1 truncate max-w-[120px] sm:max-w-none`}
-              title={COMPANY.address}
+              title={settings.address}
             >
-              {COMPANY.address}
+              {settings.address}
             </a>
 
             {/* TASARIMSAL AYIRICI: Sadece bilgisayarlarda temiz bir görüntü sağlar. */}
@@ -53,7 +54,7 @@ export default function Navbar() {
             <div className="flex items-center gap-2 sm:gap-3 order-1 sm:order-3">
               {/* Instagram: Marka estetiğini ve güncelliğini kanıtlar. */}
               <a 
-                href={COMPANY.instagramUrl} 
+                href={settings.instagram} 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className={`${n.contact.instaColor} ${n.contact.instaHover} transition-all active:scale-90`}
@@ -66,7 +67,7 @@ export default function Navbar() {
 
               {/* WhatsApp: Tek tıkla satışa dönüştüren en kritik buton. */}
               <a 
-                href={COMPANY.whatsappUrl} 
+                href={`https://wa.me/${settings.whatsapp.replace(/[^0-9]/g, '')}`} 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className={`flex items-center gap-1.5 px-2 py-1 ${n.contact.whatsappBg} ${n.contact.whatsappHover} ${n.contact.whatsappRounded} text-white transition-all active:scale-95 shadow-md`}
@@ -77,7 +78,7 @@ export default function Navbar() {
                   <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.553 4.117 1.524 5.845L0 24l6.338-1.503A11.927 11.927 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.79 9.79 0 01-5.013-1.381l-.36-.213-3.761.892.944-3.652-.235-.374A9.779 9.779 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z" />
                 </svg>
                 <span className={`${n.contact.phoneSize} ${n.contact.phoneWeight}`}>
-                  {COMPANY.phone}
+                  {settings.whatsapp}
                 </span>
               </a>
             </div>

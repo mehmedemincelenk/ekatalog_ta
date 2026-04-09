@@ -9,7 +9,7 @@
  */
 
 // ----- 1. ŞİRKET BİLGİLERİ -----
-export const COMPANY = {
+export const DEFAULT_COMPANY = {
   name: 'Toptan Ambalajcım',
   tagline: 'ÖMER KÖSE',
   phone: '+90 537 342 0161',

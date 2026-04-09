@@ -20,17 +20,21 @@ interface ProductGridProps {
   isAdmin: boolean;
   onDelete: (id: string) => void;
   onUpdate: (id: string, changes: Partial<Product>) => void;
-  onOrderUpdate: (productId: string, newPosition: number) => void;
-  activeDiscount?: { code: string; rate: number; category?: string } | null;
-  visibleCategoryLimit?: number;
-  search?: string;
-  activeCategories?: string[];
-  onAddClick?: () => void;
+  onOrderUpdate: (id: string, newPosition: number) => void;
+  activeDiscount?: ActiveDiscount | null;
+  visibleCategoryLimit: number;
+  search: string;
+  activeCategories: string[];
+  onAddClick: () => void;
+  isSelectMode?: boolean;
+  selectedIds?: Set<string>;
+  onSelectToggle?: (id: string) => void;
 }
 
 export default function ProductGrid({
   products, categoryOrder, isAdmin, onDelete, onUpdate, onOrderUpdate,
-  activeDiscount, visibleCategoryLimit = 999, search = '', activeCategories = [], onAddClick,
+  activeDiscount, visibleCategoryLimit, search, activeCategories, onAddClick,
+  isSelectMode, selectedIds, onSelectToggle
 }: ProductGridProps) {
   
   /**
@@ -112,6 +116,9 @@ export default function ProductGrid({
                 orderIndex={idx + 1}
                 itemsInCategory={groupedProducts[catName].length}
                 activeDiscount={activeDiscount}
+                isSelectMode={isSelectMode}
+                isSelected={selectedIds?.has(product.id)}
+                onSelectToggle={() => onSelectToggle?.(product.id)}
               />
             ))}
           </div>
