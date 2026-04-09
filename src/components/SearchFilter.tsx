@@ -59,12 +59,12 @@ const CategoryChip = memo(({
             <select
               value={currentIndex + 1}
               onChange={(e) => onOrderChange(cat, parseInt(e.target.value, 10))}
-              className={`bg-stone-100 text-stone-900 text-[12px] font-black w-9 h-8 p-0 cursor-pointer appearance-none rounded-l-full text-center focus:outline-none`}
+              className={`bg-stone-100 text-stone-900 text-[12px] font-black w-9 h-8 p-0 cursor-pointer appearance-none rounded-l-full text-center flex items-center justify-center focus:outline-none leading-none`}
             >
               {Array.from({ length: totalCount }, (_, i) => (<option key={i + 1} value={i + 1}>{i + 1}</option>))}
             </select>
           ) : (
-            <span className={`text-[10px] font-black px-2 py-1 rounded-l-full ${isSelected ? 'bg-white/20 text-white' : 'bg-stone-100 text-stone-500'}`}>
+            <span className={`text-[10px] font-black w-7 h-8 flex items-center justify-center rounded-l-full ${isSelected ? 'bg-white/20 text-white' : 'bg-stone-100 text-stone-500'}`}>
               {productCount || 0}
             </span>
           )}

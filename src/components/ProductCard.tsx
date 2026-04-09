@@ -18,66 +18,61 @@ import { calculateDiscount } from '../utils/price';
 // --- YARDIMCI BİLEŞENLER ---
 
 /**
- * AdminActionMenu: Ürün üzerindeki yönetim butonlarını içeren akıllı menü.
+ * AdminActionMenu: Ürün yönetimini sağlayan sistem varsayılanı dropdown.
  */
 const AdminActionMenu = memo(({ 
   product, categories, onDelete, onUpdate 
 }: { 
   product: Product, categories: string[], onDelete: (id: string) => void, onUpdate: (id: string, changes: Partial<Product>) => void 
 }) => {
-  const menuRef = useRef<HTMLDivElement>(null);
-  const [showActions, setShowActions] = useState(false);
-  const [menuView, setMenuView] = useState<'main' | 'categories'>('main');
-  const [menuDirection, setMenuDirection] = useState<'left' | 'right'>('right');
-
   const a = LABELS.adminActions;
 
-  useLayoutEffect(() => {
-    if (showActions && menuRef.current) {
-      const rect = menuRef.current.getBoundingClientRect();
-      setMenuDirection(rect.right > window.innerWidth - 20 ? 'left' : 'right');
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    if (!val) return;
+
+    if (val === 'DELETE') {
+      if (window.confirm(a.confirmDelete)) onDelete(product.id);
+    } else if (val === 'ARCHIVE') {
+      onUpdate(product.id, { is_archived: !product.is_archived });
+    } else if (val === 'STOCK') {
+      onUpdate(product.id, { inStock: !product.inStock });
+    } else if (val.startsWith('CAT:')) {
+      onUpdate(product.id, { category: val.replace('CAT:', '') });
     }
-    if (!showActions) setMenuView('main');
-  }, [showActions]);
-
-  useEffect(() => {
-    const handleClickOutside = (ev: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(ev.target as Node) && !(ev.target as HTMLElement).closest('.admin-trigger')) {
-        setShowActions(false);
-      }
-    };
-    if (showActions) document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showActions]);
-
-  const handleAction = (action: () => void) => { action(); setShowActions(false); };
+    
+    // Dropdown'ı sıfırla (Görsel temizlik için)
+    e.target.value = "";
+  };
 
   return (
-    <div className={`absolute right-1.5 bottom-1.5 ${showActions ? 'z-[60]' : 'z-20'}`}>
-      <div className="relative">
-        <button onClick={(e) => { e.stopPropagation(); setShowActions(!showActions); }} className={`w-5 h-5 admin-trigger flex items-center justify-center text-stone-400 hover:text-stone-900 transition-colors active:scale-90`}>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-4 h-4 pointer-events-none"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" /></svg>
-        </button>
-
-        {showActions && (
-          <div ref={menuRef} style={{ transformOrigin: menuDirection === 'right' ? 'top left' : 'top right' }} className={`absolute bottom-full ${menuDirection === 'right' ? 'left-0' : 'right-0'} mb-2 w-48 bg-white/80 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl py-1.5 z-50 flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200`} onClick={(e) => e.stopPropagation()}>
-            {menuView === 'main' ? (
-              <>
-                <button onClick={() => { if(window.confirm(a.confirmDelete)) handleAction(() => onDelete(product.id)); }} className="w-full text-left px-4 py-3 text-[13px] font-semibold text-red-500 hover:bg-red-50/50 transition-colors border-b border-black/5 uppercase">{a.delete}</button>
-                <button onClick={() => handleAction(() => onUpdate(product.id, { is_archived: !product.is_archived }))} className="w-full text-left px-4 py-3 text-[13px] font-semibold text-stone-800 hover:bg-black/5 transition-colors border-b border-black/5 uppercase">{product.is_archived ? a.publish : a.archive}</button>
-                <button onClick={() => handleAction(() => onUpdate(product.id, { inStock: !product.inStock }))} className="w-full text-left px-4 py-3 text-[13px] font-semibold text-stone-800 hover:bg-black/5 transition-colors border-b border-black/5 uppercase">{product.inStock ? a.outOfStock : a.inStock}</button>
-                <button onClick={() => setMenuView('categories')} className="w-full text-left px-4 py-3 text-[13px] font-semibold text-stone-800 hover:bg-black/5 transition-colors flex items-center justify-between uppercase"><span>{a.categories}</span><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3 h-3 opacity-30"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></button>
-              </>
-            ) : (
-              <div className="flex flex-col max-h-64 overflow-hidden">
-                <button onClick={() => setMenuView('main')} className="w-full text-left px-3 py-2 text-[11px] font-bold text-kraft-600 bg-kraft-50/50 border-b border-black/5 uppercase flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3 h-3"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg> {LABELS.backBtn}</button>
-                <div className="overflow-y-auto py-1">
-                  {categories.map(cat => (<button key={cat} onClick={() => handleAction(() => onUpdate(product.id, { category: cat }))} className={`w-full text-left px-4 py-2.5 text-[12px] font-medium hover:bg-black/5 ${product.category === cat ? 'text-kraft-700 font-bold' : 'text-stone-600'}`}>{cat}</button>))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+    <div className="absolute right-1 bottom-1 z-30 group/admin">
+      <div className="relative flex items-center justify-center w-6 h-6 bg-stone-100 rounded-md border border-stone-200 group-hover/admin:bg-white group-hover/admin:border-stone-400 transition-all shadow-sm overflow-hidden">
+        {/* Görsel İkon (Dropdown'ın üzerinde durur) */}
+        <span className="pointer-events-none text-stone-400 group-hover/admin:text-stone-900 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" /></svg>
+        </span>
+        
+        {/* Gerçek Select Elemanı (Görünmez ama tıklanabilir) */}
+        <select 
+          onChange={handleChange}
+          value=""
+          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full appearance-none"
+        >
+          <option value="" disabled>Seçiniz...</option>
+          <optgroup label="--- İŞLEMLER ---">
+            <option value="STOCK">{product.inStock ? '❌ ' + a.outOfStock : '✅ ' + a.inStock}</option>
+            <option value="ARCHIVE">{product.is_archived ? '📤 ' + a.publish : '📦 ' + a.archive}</option>
+            <option value="DELETE">🗑️ {a.delete}</option>
+          </optgroup>
+          <optgroup label="--- REYON DEĞİŞTİR ---">
+            {categories.map(cat => (
+              <option key={cat} value={`CAT:${cat}`} disabled={product.category === cat}>
+                {product.category === cat ? '📍 ' : '🏷️ '} {cat}
+              </option>
+            ))}
+          </optgroup>
+        </select>
       </div>
     </div>
   );
@@ -185,7 +180,11 @@ const ProductCard = memo(({
       {/* SIRA NUMARASI (Admin) */}
       {isAdmin && (
         <div className="absolute top-2 right-2 z-[25] hover:scale-105 active:scale-95 transition-transform">
-          <select value={orderIndex} onChange={(e) => onOrderChange?.(product.id, parseInt(e.target.value, 10))} className="appearance-none bg-white/90 backdrop-blur-md text-stone-900 text-[11px] font-black w-7 h-7 rounded-lg shadow-lg border border-stone-200 text-center cursor-pointer focus:outline-none outline-none">
+          <select 
+            value={orderIndex} 
+            onChange={(e) => onOrderChange?.(product.id, parseInt(e.target.value, 10))} 
+            className="appearance-none bg-white/90 backdrop-blur-md text-stone-900 text-[11px] font-black w-7 h-7 rounded-lg shadow-lg border border-stone-200 text-center flex items-center justify-center cursor-pointer focus:outline-none outline-none leading-none"
+          >
             {Array.from({ length: itemsInCategory }, (_, i) => (<option key={i + 1} value={i + 1}>{i + 1}</option>))}
           </select>
         </div>

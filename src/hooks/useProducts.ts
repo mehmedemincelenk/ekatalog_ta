@@ -166,15 +166,18 @@ export function useProducts(
     syncWithSheet(TECH.sheetActions.reorderCategories, { orderList: result.map((name, i) => ({ name, order: i + 1 })) });
   }, [categoryOrder, setCategoryOrder, syncWithSheet]);
 
-  // FİLTRELEME (Sadece Görünüm İçin)
+  // FİLTRELEME VE SIRALAMA
   const filteredProducts = useMemo(() => {
     const term = search.toLowerCase().trim();
-    return products.filter(p => {
+    const filtered = products.filter(p => {
       if (!isAdmin && p.is_archived) return false;
       const mS = !term || p.name.toLowerCase().includes(term) || (p.description || '').toLowerCase().includes(term);
       const mC = activeCategories.length === 0 || activeCategories.includes(p.category);
       return mS && mC;
     });
+
+    // Alfabetik Sıralama (Türkçe Karakter Uyumlu)
+    return [...filtered].sort((a, b) => a.name.localeCompare(b.name, 'tr'));
   }, [products, search, activeCategories, isAdmin]);
 
   const existingCategories = useMemo(() => {
