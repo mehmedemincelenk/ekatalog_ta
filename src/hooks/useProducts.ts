@@ -35,7 +35,7 @@ export function useProducts(
     }
   }, [products]);
 
-  const syncWithSheet = useCallback(async (action: string, payload: Record<string, any>) => {
+  const syncWithSheet = useCallback(async (action: string, payload: Record<string, unknown>) => {
     const url = import.meta.env.VITE_SHEET_SCRIPT_URL;
     if (!url) return;
     try {
@@ -51,7 +51,7 @@ export function useProducts(
     }
   }, []);
 
-  const mapToProduct = useCallback((raw: Record<string, any>): Product => ({
+  const mapToProduct = useCallback((raw: Record<string, unknown>): Product => ({
     id: String(raw.id || crypto.randomUUID()),
     name: String(raw.name || ''),
     category: String(raw.category || TECH.products.defaultCategory),
@@ -74,7 +74,7 @@ export function useProducts(
           header: true,
           skipEmptyLines: true,
           complete: (results) => {
-            const parsed = (results.data as Record<string, any>[])
+            const parsed = (results.data as Record<string, unknown>[])
               .filter(raw => raw.name) // Sadece adı olan geçerli satırları al
               .map(mapToProduct);
             

@@ -161,7 +161,7 @@ export default function SearchFilter({
 
         {/* REYON (KATEGORİ) LİSTESİ */}
         <div className={`${isMenuOpen ? 'flex' : 'hidden'} sm:flex flex-wrap gap-2 items-center flex-1 transition-all w-full`}>
-          {visibleCategories.map((cat, idx) => (
+          {visibleCategories.map((cat) => (
             <CategoryChip 
               key={cat} 
               cat={cat} 
