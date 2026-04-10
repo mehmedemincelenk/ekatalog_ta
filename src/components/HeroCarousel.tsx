@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { CAROUSEL, TECH, LABELS } from '../data/config';
 import { useCarousel } from '../hooks/useCarousel';
+import { compressImage } from '../utils/image';
 
 /**
  * HERO CAROUSEL BİLEŞENİ (MARKA VİTRİNİ)
@@ -41,7 +42,7 @@ const CarouselSlide = memo(({
   // Yazı değiştiğinde (Admin düzenlemesi) kaydet.
   const handleBlur = (field: 'label' | 'sub', e: React.FocusEvent<HTMLElement>) => {
     const val = e.currentTarget.textContent?.trim() || '';
-    if (val !== (slide as any)[field]) onUpdate(slide.id, { [field]: val });
+    if (val !== slide[field]) onUpdate(slide.id, { [field]: val });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -160,7 +161,6 @@ export default function HeroCarousel({ isAdmin }: HeroCarouselProps) {
           if (!file || !editingSlideId) return;
           setIsUploading(true);
           try {
-            const { compressImage } = await import('../utils/image');
             // TEKNİK: Afişler için 1200px genişlik kullanıyoruz (Yüksek kalite).
             const compressedStr = await compressImage(file, TECH.image.heroSize, TECH.image.uploadQuality);
             updateSlide(editingSlideId, { src: compressedStr });

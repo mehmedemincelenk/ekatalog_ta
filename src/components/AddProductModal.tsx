@@ -1,6 +1,7 @@
-import React, { useState, useEffect, memo } from 'react';
-import { UI, TECH, LABELS, MODAL } from '../data/config';
+import React, { useState, memo } from 'react';
+import { TECH, LABELS, MODAL } from '../data/config';
 import { Product } from '../types';
+import { compressImage } from '../utils/image';
 
 /**
  * ADD PRODUCT MODAL (GİRİŞİMCİ ANALİZİ)
@@ -112,12 +113,14 @@ export default function AddProductModal({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState('');
 
-  // Modal kapandığında formu temizle.
-  useEffect(() => {
-    if (!isOpen) { setForm(EMPTY_FORM); setPreviewUrl(null); setError(''); }
-  }, [isOpen]);
-
   if (!isOpen) return null;
+
+  const handleClose = () => {
+    setForm(EMPTY_FORM);
+    setPreviewUrl(null);
+    setError('');
+    onClose();
+  };
 
   // Giriş Alanlarını Yönet (Yazılanı State'e Aktar)
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -136,7 +139,6 @@ export default function AddProductModal({
     const file = e.target.files?.[0];
     if (!file) return;
     try {
-      const { compressImage } = await import('../utils/image');
       // TEKNİK: Sheets hücresine sığması için 400px genişliğe indiriyoruz.
       const compressedStr = await compressImage(file, TECH.image.modalUploadSize, TECH.image.uploadQuality);
       setPreviewUrl(compressedStr);
@@ -163,7 +165,7 @@ export default function AddProductModal({
       image: form.image,
       inStock: form.inStock,
     });
-    onClose();
+    handleClose();
   };
 
   return (
@@ -173,7 +175,7 @@ export default function AddProductModal({
         {/* BAŞLIK */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-stone-100">
           <h2 className="text-sm font-black text-stone-900 uppercase tracking-tight">{LABELS.newProductBtn}</h2>
-          <button onClick={onClose} className="text-stone-400 hover:text-stone-900 transition-colors text-2xl leading-none">×</button>
+          <button type="button" onClick={handleClose} className="text-stone-400 hover:text-stone-900 transition-colors text-2xl leading-none">×</button>
         </div>
 
         {/* FORM GÖVDESİ */}

@@ -1,7 +1,7 @@
-import { useRef, useState, useEffect, useLayoutEffect, useMemo, memo } from 'react';
-import { UI, LABELS, TECH, CARD_STYLE } from '../data/config';
+import { useRef, useState, useEffect, memo } from 'react';
+import { LABELS, TECH, CARD_STYLE } from '../data/config';
 import { Product } from '../types';
-import { getImageUrl, PLACEHOLDER_EMOJI } from '../utils/image';
+import { getImageUrl, PLACEHOLDER_EMOJI, compressImage } from '../utils/image';
 import { calculateDiscount } from '../utils/price';
 
 /**
@@ -108,7 +108,7 @@ const AdminActionMenu = memo(({
 /**
  * MarqueeText: Ürün ismi çok uzunsa otomatik kaydırır.
  */
-const MarqueeText = memo(({ text, textClass, isAdmin, editableProps = {} }: any) => {
+const MarqueeText = memo(({ text, textClass, isAdmin, editableProps = {} }: unknown) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [overflow, setOverflow] = useState(false);
   const { className: editableClass = '', ...restEditable } = editableProps;
@@ -133,7 +133,7 @@ const MarqueeText = memo(({ text, textClass, isAdmin, editableProps = {} }: any)
 /**
  * DescriptionScroll: Ürün açıklaması taştığında dikeyde kaydırır.
  */
-const DescriptionScroll = memo(({ lines, lineClass, maxHeightClass }: any) => {
+const DescriptionScroll = memo(({ lines, lineClass, maxHeightClass }: unknown) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [overflow, setOverflow] = useState(false);
 
@@ -162,7 +162,7 @@ const DescriptionScroll = memo(({ lines, lineClass, maxHeightClass }: any) => {
 
 const ProductCard = memo(({
   product, categories = [], isAdmin, onDelete, onUpdate, onOrderChange, orderIndex = 1, itemsInCategory = 1, activeDiscount
-}: any) => {
+}: unknown) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cardRef = useRef<HTMLElement>(null);
   const descAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -186,7 +186,6 @@ const ProductCard = memo(({
     const file = ev.target.files?.[0];
     if (!file) return;
     try {
-      const { compressImage } = await import('../utils/image');
       const compressedStr = await compressImage(file, TECH.image.productSize, TECH.image.quality) as string;
       onUpdate(product.id, { image: compressedStr });
     } catch { alert(LABELS.saveError); }
@@ -237,7 +236,7 @@ const ProductCard = memo(({
       {/* ÜRÜN BİLGİLERİ */}
       <div className={`px-2 py-2 flex flex-col gap-0.5 flex-grow`}>
         {/* ÜRÜN İSMİ (Düzenlenebilir) */}
-        <MarqueeText text={product.name} textClass={`${s.nameSize} ${s.nameWeight} ${s.nameColor} ${s.nameLeading} transition-all duration-300 ${product.inStock === false ? 'opacity-60 text-stone-500' : ''}`} isAdmin={isAdmin} editableProps={isAdmin ? { contentEditable: true, suppressContentEditableWarning: true, onBlur: (ev: any) => updateField('name', ev.currentTarget.textContent?.trim() || ''), onKeyDown: (e: any) => e.key === 'Enter' && (e.preventDefault(), e.currentTarget.blur()), className: `cursor-text focus:outline-none ${s.adminEditBg} px-0.5 rounded outline-none` } : {}} />
+        <MarqueeText text={product.name} textClass={`${s.nameSize} ${s.nameWeight} ${s.nameColor} ${s.nameLeading} transition-all duration-300 ${product.inStock === false ? 'opacity-60 text-stone-500' : ''}`} isAdmin={isAdmin} editableProps={isAdmin ? { contentEditable: true, suppressContentEditableWarning: true, onBlur: (ev: unknown) => updateField('name', ev.currentTarget.textContent?.trim() || ''), onKeyDown: (e: unknown) => e.key === 'Enter' && (e.preventDefault(), e.currentTarget.blur()), className: `cursor-text focus:outline-none ${s.adminEditBg} px-0.5 rounded outline-none` } : {}} />
         
         {/* ÜRÜN AÇIKLAMASI */}
         <div className="relative min-h-[24px]">
@@ -254,7 +253,7 @@ const ProductCard = memo(({
 
         {/* FİYAT ALANI */}
         <div className="mt-auto">
-          <div contentEditable={isAdmin} suppressContentEditableWarning onBlur={(e: any) => { let val = e.currentTarget.textContent?.trim() || ''; if (val && !val.startsWith('₺')) val = '₺' + val; updateField('price', val); }} onKeyDown={(e: any) => e.key === 'Enter' && (e.preventDefault(), e.currentTarget.blur())} className={`${s.priceSize} ${s.priceWeight} ${isDiscountActive ? s.discountColor : s.priceColor} transition-all duration-500 ${isAdmin ? `cursor-text focus:outline-none ${s.adminEditBg} px-0.5 rounded outline-none` : ''} ${product.inStock === false && !isAdmin ? 'line-through opacity-60 text-stone-500' : ''}`}>
+          <div contentEditable={isAdmin} suppressContentEditableWarning onBlur={(e: unknown) => { let val = e.currentTarget.textContent?.trim() || ''; if (val && !val.startsWith('₺')) val = '₺' + val; updateField('price', val); }} onKeyDown={(e: unknown) => e.key === 'Enter' && (e.preventDefault(), e.currentTarget.blur())} className={`${s.priceSize} ${s.priceWeight} ${isDiscountActive ? s.discountColor : s.priceColor} transition-all duration-500 ${isAdmin ? `cursor-text focus:outline-none ${s.adminEditBg} px-0.5 rounded outline-none` : ''} ${product.inStock === false && !isAdmin ? 'line-through opacity-60 text-stone-500' : ''}`}>
             {formattedPrice}
           </div>
         </div>

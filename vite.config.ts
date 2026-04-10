@@ -6,6 +6,11 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   // React eklentisini aktif ediyoruz ki .tsx dosyalarımızı anlayabilsin.
   plugins: [react()],
+  test: {
+    environment: 'jsdom',
+    setupFiles: ['./vitest.setup.ts'],
+    globals: true,
+  },
   
   // Sitemizi Github Pages gibi bir klasör altında yayınlayacaksak burayı ayarlarız.
   // '/' demek sitemiz ana dizinde (orneksite.com) çalışacak demektir.

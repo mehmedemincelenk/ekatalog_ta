@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { TECH, STORAGE } from '../data/config';
 
 /**
@@ -14,15 +14,13 @@ import { TECH, STORAGE } from '../data/config';
  *    mağaza güvenliği için sayacı otomatik sıfırlar.
  */
 export function useAdminMode() {
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [clickCount, setClickCount] = useState(0);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // 1. Oturum Kontrolü: Mağaza açıldığında "Anahtar bende mi?" diye hafızaya bak.
-  useEffect(() => {
+  const [isAdmin, setIsAdmin] = useState(() => {
     const session = localStorage.getItem(STORAGE.adminSession);
-    if (session) setIsAdmin(true);
-  }, []);
+    return !!session;
+  });
+
+  const clickCountRef = useRef(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   /**
    * handleLogoClick (GİZLİ KAPI):
@@ -32,21 +30,19 @@ export function useAdminMode() {
     // Varsa eski sıfırlama zamanlayıcısını iptal et.
     if (timerRef.current) clearTimeout(timerRef.current);
 
-    setClickCount((prev) => {
-      const newCount = prev + 1;
-      // Hedef tıklama sayısına ulaşıldı mı?
-      if (newCount >= TECH.adminTriggerClicks) {
-        setIsAdmin(true);
-        // Hafızaya "Admin içeride" notu düş.
-        localStorage.setItem(STORAGE.adminSession, 'active_' + Date.now());
-        return 0;
-      }
-      return newCount;
-    });
+    clickCountRef.current += 1;
+
+    // Hedef tıklama sayısına ulaşıldı mı?
+    if (clickCountRef.current >= TECH.adminTriggerClicks) {
+      setIsAdmin(true);
+      // Hafızaya "Admin içeride" notu düş.
+      localStorage.setItem(STORAGE.adminSession, 'active_' + Date.now());
+      clickCountRef.current = 0;
+    }
 
     // Belirlenen süre içinde tekrar tıklanmazsa sayacı temizle (Güvenlik Kuralı).
     timerRef.current = setTimeout(() => {
-      setClickCount(0);
+      clickCountRef.current = 0;
     }, TECH.adminResetDelay);
   }, []);
 
@@ -58,7 +54,7 @@ export function useAdminMode() {
     if (timerRef.current) clearTimeout(timerRef.current);
     setIsAdmin(false);
     localStorage.removeItem(STORAGE.adminSession);
-    setClickCount(0);
+    clickCountRef.current = 0;
   }, []);
 
   return { isAdmin, handleLogoClick, logout };

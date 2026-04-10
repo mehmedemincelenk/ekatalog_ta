@@ -16,7 +16,7 @@ interface FloatingButtonProps {
 }
 
 export default function FloatingButton({ 
-  onClick, icon, label, variant = 'secondary', className = '' 
+  onClick, icon, variant = 'secondary', className = ''
 }: FloatingButtonProps) {
   
   const variants = {

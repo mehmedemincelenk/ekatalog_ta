@@ -1,6 +1,7 @@
 import { NAVBAR, FOOTER, DEFAULT_COMPANY } from '../data/config';
 import { CompanySettings } from '../hooks/useSettings';
 import React, { useRef } from 'react';
+import { compressImage } from '../utils/image';
 
 /**
  * NAVBAR BİLEŞENİ (DÜZENLENEBİLİR VERSİYON)
@@ -35,7 +36,6 @@ export default function Navbar({ settings, isAdmin, updateSetting }: NavbarProps
     const file = ev.target.files?.[0];
     if (!file || !updateSetting) return;
     try {
-      const { compressImage } = await import('../utils/image');
       const compressedStr = await compressImage(file, 200, 0.8) as string;
       updateSetting('logoEmoji', compressedStr);
     } catch {
@@ -50,7 +50,7 @@ export default function Navbar({ settings, isAdmin, updateSetting }: NavbarProps
     
     return (
       <div 
-        onClick={(e) => isAdmin ? fileInputRef.current?.click() : null}
+        onClick={() => isAdmin ? fileInputRef.current?.click() : null}
         className={`flex items-center justify-center ${isAdmin ? 'cursor-pointer hover:opacity-70 transition-opacity' : ''}`}
       >
         {isImage ? (
@@ -73,13 +73,13 @@ export default function Navbar({ settings, isAdmin, updateSetting }: NavbarProps
             {renderLogo()}
             <div className="flex flex-col">
               <div 
-                onClick={(e) => handleEdit(e, 'title', 'Marka Adı', settings.title)}
+                onClick={() => handleEdit(e, 'title', 'Marka Adı', settings.title)}
                 className={`${n.logo.nameSize} ${n.logo.nameWeight} text-stone-900 leading-none tracking-tight ${isAdmin ? 'cursor-pointer hover:bg-stone-100 rounded px-1' : ''}`}
               >
                 {settings.title}
               </div>
               <div 
-                onClick={(e) => handleEdit(e, 'subtitle', 'Alt Başlık', settings.subtitle)}
+                onClick={() => handleEdit(e, 'subtitle', 'Alt Başlık', settings.subtitle)}
                 className={`${n.logo.taglineSize} ${n.logo.taglineColor} font-medium ${isAdmin ? 'cursor-pointer hover:bg-stone-100 rounded px-1 mt-0.5' : ''}`}
               >
                 {settings.subtitle}
@@ -95,7 +95,7 @@ export default function Navbar({ settings, isAdmin, updateSetting }: NavbarProps
               href={`${FOOTER.style.mapBaseUrl}${encodeURIComponent(settings.address)}`}
               target="_blank" 
               rel="noopener noreferrer"
-              onClick={(e) => isAdmin && handleEdit(e, 'address', 'Firma Adresi', settings.address)}
+              onClick={() => isAdmin && handleEdit(e, 'address', 'Firma Adresi', settings.address)}
               className={`${n.address.size} ${n.address.color} ${n.address.hoverColor} transition-colors whitespace-nowrap order-2 sm:order-1 truncate max-w-[120px] sm:max-w-none ${isAdmin ? 'cursor-pointer hover:bg-stone-100 rounded px-1' : ''}`}
             >
               {settings.address}
@@ -107,7 +107,7 @@ export default function Navbar({ settings, isAdmin, updateSetting }: NavbarProps
             <div className="flex items-center gap-2 sm:gap-3 order-1 sm:order-3">
               {/* Instagram */}
               <button 
-                onClick={(e) => isAdmin ? handleEdit(e, 'instagram', 'Instagram Linki', settings.instagram) : window.open(settings.instagram, '_blank')}
+                onClick={() => isAdmin ? handleEdit(e, 'instagram', 'Instagram Linki', settings.instagram) : window.open(settings.instagram, '_blank')}
                 className={`${n.contact.instaColor} ${n.contact.instaHover} transition-all active:scale-90 ${isAdmin ? 'ring-2 ring-stone-100 rounded-full p-1' : ''}`}
               >
                 <svg viewBox="0 0 26 26" className={`${n.contact.instaIconSize} fill-current`} aria-hidden="true">
@@ -117,7 +117,7 @@ export default function Navbar({ settings, isAdmin, updateSetting }: NavbarProps
 
               {/* WhatsApp */}
               <div 
-                onClick={(e) => isAdmin && handleEdit(e, 'whatsapp', 'WhatsApp Numarası', settings.whatsapp)}
+                onClick={() => isAdmin && handleEdit(e, 'whatsapp', 'WhatsApp Numarası', settings.whatsapp)}
                 className={`flex items-center gap-1.5 px-2 py-1 ${n.contact.whatsappBg} ${n.contact.whatsappHover} ${n.contact.whatsappRounded} text-white transition-all active:scale-95 shadow-md ${isAdmin ? 'cursor-pointer ring-2 ring-green-200' : ''}`}
               >
                 {!isAdmin ? (

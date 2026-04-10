@@ -11,7 +11,6 @@ import { useAdminMode } from './hooks/useAdminMode';
 import { useDiscount } from './hooks/useDiscount';
 import { useSettings } from './hooks/useSettings';
 import { UI, LABELS } from './data/config';
-import { Product } from './types';
 
 /**
  * APP BİLEŞENİ (STRATEJİK ANALİZ)
@@ -21,14 +20,14 @@ import { Product } from './types';
 export default function App() {
   const { isAdmin, handleLogoClick, logout } = useAdminMode();
   const { activeDiscount, applyCode, error: discountError } = useDiscount();
-  const { settings, updateSetting, loading: settingsLoading } = useSettings(isAdmin);
+  const { settings, updateSetting } = useSettings(isAdmin);
 
   const [search, setSearch] = useState('');
   const [activeCategories, setActiveCategories] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const {
-    products, categoryOrder, loading, addProduct, deleteProduct, updateProduct,
+    products, categoryOrder, addProduct, deleteProduct, updateProduct,
     renameCategory, removeCategoryFromProducts, existingCategories, reorderCategory, reorderProductsInCategory,
     deleteAllProducts
   } = useProducts(search, activeCategories, isAdmin);

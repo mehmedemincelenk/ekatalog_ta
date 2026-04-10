@@ -1,4 +1,4 @@
-import { useMemo, memo } from 'react';
+import { useMemo } from 'react';
 import { UI, LABELS, sortCategories } from '../data/config';
 import { Product } from '../types';
 import ProductCard from './ProductCard';
@@ -26,7 +26,7 @@ interface ProductGridProps {
 
 export default function ProductGrid({
   products, categoryOrder, isAdmin, onDelete, onUpdate, onOrderUpdate,
-  activeDiscount, visibleCategoryLimit, search, activeCategories, onAddClick
+  activeDiscount, visibleCategoryLimit, search, activeCategories
 }: ProductGridProps) {
   
   const { groupedProducts, sortedCategories } = useMemo(() => {
