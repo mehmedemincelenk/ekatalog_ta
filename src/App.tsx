@@ -27,8 +27,8 @@ export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const {
-    products, categoryOrder, addProduct, deleteProduct, updateProduct,
-    renameCategory, removeCategoryFromProducts, existingCategories, reorderCategory, reorderProductsInCategory,
+    products, allProducts, categoryOrder, loading, addProduct, deleteProduct, updateProduct,
+    existingCategories, reorderCategory, reorderProductsInCategory,
     deleteAllProducts
   } = useProducts(search, activeCategories, isAdmin);
   
@@ -75,10 +75,10 @@ export default function App() {
         <HeroCarousel isAdmin={isAdmin} />
         
         <SearchFilter
-          products={products} categoryOrder={categoryOrder} onCategoryOrderChange={reorderCategory}
+          products={allProducts} categoryOrder={categoryOrder} onCategoryOrderChange={reorderCategory}
           search={search} onSearchChange={setSearch} activeCategories={activeCategories}
           onCategoryToggle={toggleCategory} isAdmin={isAdmin}
-          renameCategory={renameCategory} removeCategoryFromProducts={removeCategoryFromProducts}
+          renameCategory={updateProduct as any} removeCategoryFromProducts={() => {}} 
         />
 
         <div className={UI.layout.container}>

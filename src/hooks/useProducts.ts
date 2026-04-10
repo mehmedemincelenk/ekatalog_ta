@@ -184,12 +184,14 @@ export function useProducts(
   }, [products, search, activeCategories, isAdmin]);
 
   const existingCategories = useMemo(() => {
+    // FİLTRE UYGULANMAMIŞ ham ürün listesinden kategorileri al
     const unique = [...new Set(products.map(p => p.category).filter(Boolean))];
     return sortCategories(unique, categoryOrder);
   }, [products, categoryOrder]);
 
   return {
     products: filteredProducts,
+    allProducts: products, // Tüm ürünleri ekledik
     totalCount: filteredProducts.length,
     existingCategories,
     categoryOrder,
