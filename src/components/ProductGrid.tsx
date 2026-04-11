@@ -17,6 +17,7 @@ interface ProductGridProps {
   onDelete: (id: string) => void;
   onUpdate: (id: string, changes: Partial<Product>) => void;
   onOrderUpdate: (id: string, newPosition: number) => void;
+  onImageUpload?: (id: string, file: File) => Promise<void>;
   activeDiscount?: ActiveDiscount | null;
   visibleCategoryLimit: number;
   search: string;
@@ -25,13 +26,13 @@ interface ProductGridProps {
 }
 
 export default function ProductGrid({
-  products, categoryOrder, isAdmin, onDelete, onUpdate, onOrderUpdate,
+  products, categoryOrder, isAdmin, onDelete, onUpdate, onOrderUpdate, onImageUpload,
   activeDiscount, visibleCategoryLimit, search, activeCategories
 }: ProductGridProps) {
   
   const { groupedProducts, sortedCategories } = useMemo(() => {
     const grouped = products.reduce((acc: Record<string, Product[]>, product) => {
-      const catName = product.category || 'KATEGORİSİZ / DİĞER';
+      const catName = (product.category || 'KATEGORİSİZ / DİĞER').trim();
       if (!acc[catName]) acc[catName] = [];
       acc[catName].push(product);
       return acc;
@@ -86,6 +87,7 @@ export default function ProductGrid({
                 onDelete={onDelete}
                 onUpdate={onUpdate}
                 onOrderChange={onOrderUpdate}
+                onImageUpload={onImageUpload}
                 orderIndex={idx + 1}
                 itemsInCategory={groupedProducts[catName].length}
                 activeDiscount={activeDiscount}

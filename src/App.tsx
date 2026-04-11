@@ -35,7 +35,7 @@ export default function App() {
   const {
     products, allProducts, categoryOrder, loading, addProduct, deleteProduct, updateProduct,
     existingCategories, reorderCategory, reorderProductsInCategory,
-    deleteAllProducts
+    deleteAllProducts, renameCategory, removeCategoryFromProducts, uploadImage
   } = useProducts(search, activeCategories, isAdmin);
   
   const [visibleCategoryLimit, setVisibleCategoryLimit] = useState(UI.category.initialVisible);
@@ -81,20 +81,27 @@ export default function App() {
           products={allProducts} categoryOrder={categoryOrder} onCategoryOrderChange={reorderCategory}
           search={search} onSearchChange={setSearch} activeCategories={activeCategories}
           onCategoryToggle={toggleCategory} isAdmin={isAdmin}
-          renameCategory={updateProduct as any} removeCategoryFromProducts={() => {}} 
+          renameCategory={renameCategory} removeCategoryFromProducts={removeCategoryFromProducts} 
         />
 
         <div className={UI.layout.container}>
           
-          <ProductGrid
-            products={products} categoryOrder={categoryOrder} isAdmin={isAdmin}
-            onDelete={deleteProduct} onUpdate={updateProduct} onOrderUpdate={reorderProductsInCategory}
-            activeDiscount={activeDiscount} 
-            visibleCategoryLimit={isAdmin ? UI.layout.adminLimit : visibleCategoryLimit}
-            search={search} activeCategories={activeCategories} onAddClick={() => setIsModalOpen(true)}
-          />
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <div className="w-10 h-10 border-4 border-stone-200 border-t-stone-900 rounded-full animate-spin"></div>
+            </div>
+          ) : (
+            <ProductGrid
+              products={products} categoryOrder={categoryOrder} isAdmin={isAdmin}
+              onDelete={deleteProduct} onUpdate={updateProduct} onOrderUpdate={reorderProductsInCategory}
+              onImageUpload={uploadImage}
+              activeDiscount={activeDiscount} 
+              visibleCategoryLimit={isAdmin ? UI.layout.adminLimit : visibleCategoryLimit}
+              search={search} activeCategories={activeCategories} onAddClick={() => setIsModalOpen(true)}
+            />
+          )}
 
-          {!isAdmin && products.length > 0 && (
+          {!isAdmin && !loading && products.length > 0 && (
             <div className="mt-12 flex justify-center">
               {visibleCategoryLimit < existingCategories.length ? (
                 <button 

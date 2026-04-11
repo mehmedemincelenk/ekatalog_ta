@@ -111,16 +111,11 @@ export const TECH = {
   adminTriggerClicks: 7,
   adminResetDelay: 2000,
   image: {
-    productSize: 250,
-    modalUploadSize: 400,
-    heroSize: 1200,
-    quality: 0.6,
-    uploadQuality: 0.7,
-    sheetCellLimit: 32000,
+    lqSize: 250, // Katalog hızı için
+    hqSize: 1200, // AI düzenleme için
+    quality: 0.7,
+    uploadQuality: 0.8,
     placeholderEmoji: '📦',
-    qualityFallback: 0.4,
-    criticalQualityFallback: 0.3,
-    charLimitWarning: 30000,
   },
   discount: {
     min: 1,
@@ -204,7 +199,8 @@ export const CAROUSEL = {
 
 // ----- 6. REYON SIRALAMASI -----
 export const CATEGORY_ORDER = [
-  'TURŞU VE GIDA ÇEŞİTLERİ',
+  'TURŞU',
+  'GIDA',
   'BAHARAT GRUBU',
   'PEÇETE',
   'KÖPÜK',
@@ -214,7 +210,8 @@ export const CATEGORY_ORDER = [
   'ALÜMİNYUM ÇEŞİTLERİ',
   'POŞET ÇEŞİTLERİ',
   'DETERJAN',
-  'HİJYEN SARF MALZEMELERİ',
+  'HİJYEN',
+  'SARF',
 ];
 
 export const sortCategories = (cats: string[], custom = CATEGORY_ORDER): string[] => {

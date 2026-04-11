@@ -113,10 +113,14 @@ export default function SearchFilter({
 
   // Kategorileri ve ürün sayılarını hesapla (TÜM ÜRÜNLER ÜZERİNDEN)
   const { categories, sortedList, counts } = useMemo(() => {
-    // ÖNEMLİ: Filtrelenmiş değil, ana ürün listesinden kategorileri alıyoruz
-    // Böylece seçim yapılınca diğer kategoriler kaybolmaz.
+    // 1. Ürünlerden gelen dinamik kategoriler
     const dynamic = [...new Set(products.map((p) => p.category).filter(Boolean))];
-    const sorted = sortCategories(dynamic, categoryOrder);
+    
+    // 2. Hem Supabase'den gelen sırayı hem de ürünlerdeki kategorileri birleştir
+    const allPossibleCats = [...new Set([...categoryOrder, ...dynamic])];
+    
+    // 3. Bu listeyi global sıralamaya göre diz
+    const sorted = sortCategories(allPossibleCats, categoryOrder);
     
     const stats: Record<string, number> = {};
     products.forEach(p => {
@@ -130,7 +134,7 @@ export default function SearchFilter({
       categories: [LABELS.filter.allCategories, ...sorted],
       counts: stats
     };
-  }, [products, categoryOrder]); // Sadece ana ürün listesi veya sıralama değişince hesapla
+  }, [products, categoryOrder]);
 
   const visibleCategories = (showAll || isAdmin || isMenuOpen) ? categories : categories.slice(0, UI.category.desktopThreshold);
 

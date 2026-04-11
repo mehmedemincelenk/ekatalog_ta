@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { DEFAULT_COMPANY, STORAGE } from '../data/config';
+import { DEFAULT_COMPANY, CATEGORY_ORDER as DEFAULT_ORDER } from '../data/config';
 
 export interface CompanySettings {
   whatsapp: string;
@@ -10,6 +10,7 @@ export interface CompanySettings {
   subtitle: string;
   name: string;
   logoEmoji: string;
+  categoryOrder: string[];
 }
 
 const STORE_SLUG = import.meta.env.VITE_STORE_SLUG;
@@ -23,6 +24,7 @@ export function useSettings(isAdmin: boolean) {
     subtitle: DEFAULT_COMPANY.tagline,
     name: DEFAULT_COMPANY.name,
     logoEmoji: DEFAULT_COMPANY.logoEmoji,
+    categoryOrder: DEFAULT_ORDER,
   });
 
   const [loading, setLoading] = useState(true);
@@ -44,6 +46,7 @@ export function useSettings(isAdmin: boolean) {
         subtitle: data.tagline || DEFAULT_COMPANY.tagline,
         name: data.name || DEFAULT_COMPANY.name,
         logoEmoji: data.logo_url || DEFAULT_COMPANY.logoEmoji,
+        categoryOrder: data.category_order || DEFAULT_ORDER,
       });
     }
     setLoading(false);
@@ -53,7 +56,7 @@ export function useSettings(isAdmin: boolean) {
     fetchSettings();
   }, [fetchSettings]);
 
-  const updateSetting = useCallback(async (key: keyof CompanySettings, value: string) => {
+  const updateSetting = useCallback(async (key: keyof CompanySettings, value: any) => {
     // Yerel state'i hemen güncelle (Optimistic Update)
     setSettings(prev => ({ ...prev, [key]: value }));
 
@@ -65,6 +68,7 @@ export function useSettings(isAdmin: boolean) {
       if (key === 'name' || key === 'title') payload.name = value;
       if (key === 'subtitle') payload.tagline = value;
       if (key === 'logoEmoji') payload.logo_url = value;
+      if (key === 'categoryOrder') payload.category_order = value;
 
       const { error } = await supabase
         .from('stores')
@@ -73,7 +77,6 @@ export function useSettings(isAdmin: boolean) {
 
       if (error) {
         console.error('Update setting error', error);
-        // Hata durumunda eski veriyi geri çekebiliriz
         fetchSettings();
       }
     }
