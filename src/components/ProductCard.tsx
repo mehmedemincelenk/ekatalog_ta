@@ -189,6 +189,15 @@ const ProductCard = memo(({
   const s = CARD_STYLE;
   const a = LABELS.adminActions;
 
+  // Zoom açıkken kaydırma yapılırsa kapat (Apple Style)
+  useEffect(() => {
+    if (!isZoomOpen) return;
+    
+    const handleScroll = () => setIsZoomOpen(false);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isZoomOpen]);
+
   useEffect(() => {
     if (product.image && optimisticPreview) setOptimisticPreview(null);
   }, [product.image]);
@@ -236,7 +245,7 @@ const ProductCard = memo(({
 
         <div className={`relative w-full bg-stone-100 aspect-square flex items-center justify-center rounded-t-lg transition-all duration-500 overflow-hidden ${!isAdmin ? 'cursor-zoom-in' : 'cursor-pointer'} group/img`} onClick={() => { if (isAdmin && !isUploading) fileInputRef.current?.click(); else if (!isAdmin && currentImage) setIsZoomOpen(true); }}>
           {currentImage && !imgError ? (
-            <img src={currentImage} alt={product.name} onError={() => setImgError(true)} className={`w-full h-full object-cover rounded-t-lg transition-all duration-700 group-hover/img:scale-110 ${product.inStock === false ? 'grayscale opacity-60' : ''} ${isUploading ? 'opacity-50 blur-[2px]' : ''}`} draggable={false} loading="lazy" />
+            <img src={currentImage} alt={product.name} onError={() => setImgError(true)} className={`w-full h-full object-cover rounded-t-lg transition-all duration-500 ${product.inStock === false ? 'grayscale opacity-60' : ''} ${isUploading ? 'opacity-50 blur-[2px]' : ''}`} draggable={false} loading="lazy" />
           ) : (
             <div className="flex flex-col items-center gap-1 text-stone-300 select-none">
               <span className="text-5xl">{PLACEHOLDER_EMOJI}</span>
@@ -289,39 +298,41 @@ const ProductCard = memo(({
 
       {isZoomOpen && hqImage && (
         <div 
-          className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-white/80 backdrop-blur-3xl p-6 animate-in fade-in duration-700" 
+          className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-white/20 backdrop-blur-md p-4 md:p-8 animate-in fade-in duration-500" 
           onClick={() => setIsZoomOpen(false)}
         >
-          {/* İnce Kapatma İkonu */}
-          <button className="absolute top-8 right-8 text-stone-400 hover:text-stone-900 transition-colors p-2">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-10 h-10"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+          {/* Sade Kapatma İkonu */}
+          <button className="absolute top-6 right-6 text-stone-500 hover:text-stone-900 transition-colors p-2 z-[210]">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 md:w-10 md:h-10"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
           
-          <div className="max-w-3xl w-full flex flex-col items-center gap-12" onClick={e => e.stopPropagation()}>
-            {/* Ürün Görseli (Oval Köşeli & Zarif Gölgesi) */}
-            <div className="relative w-full aspect-square md:aspect-auto md:h-[50vh] flex items-center justify-center">
+          <div className="w-full max-w-4xl flex flex-col items-center justify-center gap-6 md:gap-10" onClick={e => e.stopPropagation()}>
+            {/* Ürün Görseli (Akıllı Sığdırma) */}
+            <div className="w-full flex items-center justify-center max-h-[55vh] md:max-h-[60vh]">
               <img 
                 src={hqImage} 
                 alt={product.name} 
-                className="max-w-full max-h-full object-contain rounded-2xl md:rounded-3xl shadow-2xl animate-in zoom-in-95 duration-1000" 
+                className="max-w-full max-h-[55vh] md:max-h-[60vh] object-contain rounded-xl md:rounded-2xl shadow-2xl animate-in zoom-in-95 duration-700" 
               />
             </div>
 
-            {/* Sade Bilgi Alanı */}
-            <div className="text-center space-y-4 animate-in slide-in-from-bottom-4 duration-1000">
-              <div className="space-y-1">
-                <span className="text-stone-400 text-[10px] font-bold uppercase tracking-[0.2em]">{product.category}</span>
-                <h3 className="text-2xl md:text-4xl font-light text-stone-900 tracking-tight">{product.name}</h3>
+            {/* Bilgi Alanı (Net ve Sade) */}
+            <div className="text-center space-y-3 w-full max-w-2xl animate-in slide-in-from-bottom-2 duration-700">
+              <div className="space-y-0.5">
+                <span className="text-stone-400 text-[9px] font-black uppercase tracking-[0.15em]">{product.category}</span>
+                <h3 className="text-xl md:text-3xl font-bold text-stone-900 tracking-tight">{product.name}</h3>
               </div>
               
               {product.description && (
-                <p className="text-stone-500 text-sm md:text-base max-w-lg mx-auto leading-relaxed font-normal">
+                <p className="text-stone-600 text-xs md:text-sm leading-relaxed font-medium px-4">
                   {product.description}
                 </p>
               )}
 
-              <div className="pt-4">
-                <span className="text-xl md:text-2xl font-semibold text-stone-900">{formattedPrice}</span>
+              <div className="pt-2">
+                <span className="text-lg md:text-xl font-black text-stone-900 bg-white/60 backdrop-blur-sm px-5 py-2 rounded-full border border-white/20 shadow-sm">
+                  {formattedPrice}
+                </span>
               </div>
             </div>
           </div>
