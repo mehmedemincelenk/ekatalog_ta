@@ -92,15 +92,17 @@ export default function Footer({ isAdmin, activeDiscount, onApplyDiscount, disco
         </div>
       </div>
 
-      {/* BOTTOM THIN BAR */}
-      <div className={footerTheme.bottomBar.layout} onClick={() => window.open('https://wa.me/905550000000?text=E-Katalog%20bilgisi%20almak%20istiyorum', '_blank')}>
-        <p className={footerTheme.bottomBar.text}>
-          <span className="text-amber-400">e-katalog</span> 200₺/ay • 
-          <span className="ml-2 inline-flex items-center group-hover:scale-105 transition-transform">
-            Hemen Al <span className="inline-block animate-bounce ml-1.5">👆</span>
-          </span>
-        </p>
-      </div>
+      {/* BOTTOM THIN BAR - Hidden for now */}
+      {false && (
+        <div className={footerTheme.bottomBar.layout} onClick={() => window.open('https://wa.me/905550000000?text=E-Katalog%20bilgisi%20almak%20istiyorum', '_blank')}>
+          <p className={footerTheme.bottomBar.text}>
+            <span className="text-amber-400">e-katalog</span> 200₺/ay • 
+            <span className="ml-2 inline-flex items-center group-hover:scale-105 transition-transform">
+              Hemen Al <span className="inline-block animate-bounce ml-1.5">👆</span>
+            </span>
+          </p>
+        </div>
+      )}
     </footer>
   );
 }
