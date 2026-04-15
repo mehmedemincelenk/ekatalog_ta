@@ -6,6 +6,7 @@ import { calculatePromotionalPrice } from '../utils/price';
 import Button from './Button';
 import { AdminActionMenu } from './AdminActionMenu';
 import { MarqueeText } from './MarqueeText';
+import { ActiveDiscount } from '../hooks/useDiscount';
 
 /**
  * PRODUCT CARD COMPONENT (100% Tokenized & Professional English)
@@ -23,7 +24,8 @@ interface ProductCardProps {
   onImageUpload?: (id: string, file: File) => Promise<void>;
   orderIndex?: number;
   itemsInCategory?: number;
-  activeDiscount?: any;
+  activeDiscount?: ActiveDiscount | null;
+  isPriority?: boolean;
 }
 
 const ProductCard = memo(({
@@ -36,7 +38,8 @@ const ProductCard = memo(({
   onImageUpload, 
   orderIndex = 1, 
   itemsInCategory = 1, 
-  activeDiscount
+  activeDiscount,
+  isPriority = false
 }: ProductCardProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cardContainerRef = useRef<HTMLElement>(null);
@@ -73,7 +76,7 @@ const ProductCard = memo(({
     
     try { 
       await onImageUpload(product.id, selectedFile); 
-    } catch (error) { 
+    } catch { 
       alert(LABELS.saveError); 
       setOptimisticImagePreview(null); 
     } finally { 
@@ -88,41 +91,22 @@ const ProductCard = memo(({
     }
   };
 
+  // DISCOUNT CALCULATION
   const isPromotionActive = activeDiscount && (!activeDiscount.category || activeDiscount.category === product.category);
-  const currentPriceValue = isPromotionActive ? calculatePromotionalPrice(product.price, activeDiscount.rate) : product.price;
-  const formattedPriceLabel = currentPriceValue.includes('₺') ? currentPriceValue : `${currentPriceValue} ₺`;
+  const originalPriceLabel = product.price.includes('₺') ? product.price : `${product.price} ₺`;
+  const discountedPriceValue = isPromotionActive ? calculatePromotionalPrice(product.price, activeDiscount.rate) : null;
+  const discountedPriceLabel = discountedPriceValue ? (discountedPriceValue.includes('₺') ? discountedPriceValue : `${discountedPriceValue} ₺`) : null;
 
   const primaryImageSource = optimisticImagePreview || (product.image ? resolveVisualAssetUrl(product.image) : null);
   const highDefinitionImageSource = product.image ? resolveVisualAssetUrl(product.image.replace('/lq/', '/hq/').split('?')[0]) : null;
 
-  const handleWhatsAppCustomerInquiry = () => {
-    const storeWhatsAppNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '';
-    const encodedMessage = encodeURIComponent(`Merhaba, *${product.name}* (${product.category}) ürününüz hakkında bilgi almak istiyorum.\n\nFiyat: ${formattedPriceLabel}`);
-    window.open(`https://wa.me/${storeWhatsAppNumber}?text=${encodedMessage}`, '_blank');
-  };
-
   return (
     <>
       <article 
-        ref={cardContainerRef as any} 
+        ref={cardContainerRef} 
         data-product-id={product.id} 
         className={`${theme.container} ${THEME.radius.card} ${product.inStock === false ? theme.outOfStockBorder : theme.activeBorder} ${theme.shadow}`}
       >
-        {/* ADMIN ORDER SELECTION PANEL */}
-        <div className={`${theme.orderSelect.container} ${isAdmin ? theme.orderSelect.adminAnimation : theme.orderSelect.userAnimation}`}>
-          <div className={`${theme.orderSelect.wrapper} ${THEME.radius.input}`}>
-            <select 
-              value={orderIndex} 
-              onChange={(e) => onOrderChange?.(product.id, parseInt(e.target.value, 10))} 
-              className={theme.orderSelect.select}
-            >
-              {Array.from({ length: itemsInCategory }, (_, i) => (
-                <option key={i + 1} value={i + 1}>{i + 1}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
         {/* IMAGE VISUAL SECTION */}
         <div 
           className={`${theme.image.wrapper} ${theme.image.aspect} ${theme.image.bg} ${THEME.radius.image} ${!isAdmin ? theme.image.cursorUser : theme.image.cursorAdmin}`} 
@@ -138,10 +122,11 @@ const ProductCard = memo(({
               onError={() => setHasImageError(true)} 
               className={`w-full h-full ${theme.image.fit} ${THEME.radius.image} ${theme.image.transition} ${product.inStock === false ? theme.image.outOfStock : ''} ${isUploadingImage ? theme.image.uploading : ''}`} 
               draggable={false} 
-              loading={isZoomDetailOpen ? "eager" : "lazy"} 
+              loading={isPriority || isZoomDetailOpen ? "eager" : "lazy"} 
+              {...(isPriority ? { fetchpriority: "high" } : {})}
             />
           ) : (
-            <div className={theme.image.placeholderIcon}>
+            <div className={`${theme.image.placeholderIcon} absolute inset-0 flex items-center justify-center`}>
               <span>{PLACEHOLDER_VISUAL_SYMBOL}</span>
             </div>
           )}
@@ -168,8 +153,8 @@ const ProductCard = memo(({
             editableProps={isAdmin ? { 
               contentEditable: true, 
               suppressContentEditableWarning: true, 
-              onBlur: (event: any) => handleDataFieldUpdate('name', event.currentTarget.textContent?.trim() || ''), 
-              onKeyDown: (event: any) => event.key === 'Enter' && (event.preventDefault(), event.currentTarget.blur()), 
+              onBlur: (event: React.FocusEvent<HTMLDivElement>) => handleDataFieldUpdate('name', event.currentTarget.textContent?.trim() || ''), 
+              onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => event.key === 'Enter' && (event.preventDefault(), event.currentTarget.blur()), 
               className: `${theme.typography.editable} ${theme.adminMenu.editHighlight} ${theme.adminMenu.editPadding} ${THEME.radius.input}` 
             } : {}} 
           />
@@ -189,77 +174,114 @@ const ProductCard = memo(({
             )}
           </div>
 
+          {/* PRICE AREA: ORIGINAL (GRAY/STRIKE) + NEW (GREEN) */}
           <div className={theme.innerLayout.footerWrapper}>
-            <div 
-              contentEditable={isAdmin} 
-              suppressContentEditableWarning 
-              onBlur={(event: any) => { 
-                let inputPrice = event.currentTarget.textContent?.trim() || ''; 
-                if (inputPrice && !inputPrice.startsWith('₺')) inputPrice = '₺' + inputPrice; 
-                handleDataFieldUpdate('price', inputPrice); 
-              }} 
-              onKeyDown={(event: any) => event.key === 'Enter' && (event.preventDefault(), event.currentTarget.blur())} 
-              className={`${theme.typography.price} ${isPromotionActive ? theme.typography.discountPrice : 'text-stone-900'} ${isAdmin ? `${theme.typography.editable} ${theme.adminMenu.editHighlight} ${theme.adminMenu.editPadding} ${THEME.radius.input}` : ''} ${product.inStock === false && !isAdmin ? theme.typography.priceOutOfStock : ''}`}
-            >
-              {formattedPriceLabel}
+            <div className="flex flex-wrap items-center gap-1.5 min-h-[20px]">
+              {isPromotionActive && !isAdmin ? (
+                <>
+                  <span className={`${theme.typography.price} text-stone-400 line-through text-[10px] sm:text-[11px]`}>
+                    {originalPriceLabel}
+                  </span>
+                  <span className={`${theme.typography.price} text-green-600`}>
+                    {discountedPriceLabel}
+                  </span>
+                </>
+              ) : (
+                <div 
+                  contentEditable={isAdmin} 
+                  suppressContentEditableWarning 
+                  onBlur={(event: React.FocusEvent<HTMLDivElement>) => { 
+                    let inputPrice = event.currentTarget.textContent?.trim() || ''; 
+                    if (inputPrice && !inputPrice.startsWith('₺')) inputPrice = '₺' + inputPrice; 
+                    handleDataFieldUpdate('price', inputPrice); 
+                  }} 
+                  onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => event.key === 'Enter' && (event.preventDefault(), event.currentTarget.blur())} 
+                  className={`${theme.typography.price} ${isAdmin ? `${theme.typography.editable} ${theme.adminMenu.editHighlight} ${theme.adminMenu.editPadding} ${THEME.radius.input}` : 'text-stone-900'} ${product.inStock === false && !isAdmin ? theme.typography.priceOutOfStock : ''}`}
+                >
+                  {originalPriceLabel}
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* ADMIN MANAGEMENT ACTIONS */}
-        <div className={`${theme.innerLayout.adminActionsWrapper} ${isAdmin ? theme.innerLayout.adminActionsActive : theme.innerLayout.adminActionsInactive}`}>
-          <AdminActionMenu product={product} categories={categories} onDelete={onDelete} onUpdate={onUpdate} />
-        </div>
+        {/* ADMIN TOOLS */}
+        {isAdmin && (
+          <>
+            <div className="absolute top-2 left-2 z-30">
+              <div className={`${theme.orderSelect.wrapper} ${THEME.radius.badge} shadow-xl`}>
+                <select 
+                  value={orderIndex} 
+                  onChange={(e) => onOrderChange?.(product.id, parseInt(e.target.value, 10))} 
+                  className={theme.orderSelect.select}
+                >
+                  {Array.from({ length: itemsInCategory }, (_, i) => (
+                    <option key={i + 1} value={i + 1}>{i + 1}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="absolute top-2 right-2 z-30">
+              <div className="shadow-xl rounded-full bg-white/90 backdrop-blur-md">
+                <AdminActionMenu product={product} categories={categories} onDelete={onDelete} onUpdate={onUpdate} />
+              </div>
+            </div>
+          </>
+        )}
 
-        {/* PRODUCT STATUS BADGES */}
+        {/* STATUS BADGES */}
         <div className={theme.status.wrapper}>
-          {!product.inStock && (<div className={theme.status.badge}>🚫</div>)}
+          {!product.inStock && (
+            <div className={theme.status.outOfStockLabel}>
+              TÜKENDİ
+            </div>
+          )}
           {product.is_archived && (<div className={theme.status.badge}>📦</div>)}
         </div>
       </article>
 
-      {/* EXPANDED DETAIL VIEW MODAL */}
+      {/* QUICK VIEW MODAL (Apple-Style Minimalism) */}
       {isZoomDetailOpen && highDefinitionImageSource && (
         <div className={THEME.modal.overlay} onClick={() => setIsZoomDetailOpen(false)}>
-          <div className={THEME.modal.closeButtonWrapper}>
-            <Button 
-              onClick={() => setIsZoomDetailOpen(false)} 
-              icon={THEME.icons.close} 
-              variant="secondary" 
-              size="md" 
-              mode="rectangle" 
-              className={THEME.modal.closeButtonCustom} 
-            />
+          <div className="absolute top-4 right-4 z-[210]">
+            <Button onClick={() => setIsZoomDetailOpen(false)} icon={THEME.icons.close} variant="secondary" size="md" mode="rectangle" className="!rounded-full shadow-2xl" />
           </div>
           
-          <div className={THEME.modal.contentWrapper} onClick={event => event.stopPropagation()}>
-            <div className={THEME.modal.imageWrapper}>
-              <img 
-                src={highDefinitionImageSource} 
-                alt={product.name} 
-                className={`${THEME.modal.image} ${THEME.radius.modal}`} 
-              />
+          <div className="bg-white w-full max-w-lg mx-auto overflow-hidden shadow-2xl animate-in slide-in-from-bottom-8 duration-500 rounded-3xl" onClick={e => e.stopPropagation()}>
+            {/* PRODUCT VISUAL */}
+            <div className="relative aspect-[4/3] bg-stone-50">
+              <img src={highDefinitionImageSource} alt={product.name} className="w-full h-full object-cover" />
+              <div className="absolute top-4 left-4">
+                <span className="bg-black/5 backdrop-blur-md text-stone-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+                  {product.category}
+                </span>
+              </div>
             </div>
 
-            <div className={THEME.modal.contentWrapper}>
-              <div className={THEME.modal.headerWrapper}>
-                <span className={theme.typography.categoryBadge}>{product.category}</span>
-                <h3 className={THEME.modal.title}>{product.name}</h3>
+            {/* PRODUCT INFO & ACTIONS */}
+            <div className="p-8 space-y-6">
+              <div className="space-y-2 text-center">
+                <h3 className="text-xl sm:text-2xl font-black text-stone-900 tracking-tighter leading-none">
+                  {product.name}
+                </h3>
+                {product.description && (
+                  <p className="text-stone-500 text-xs sm:text-sm font-medium leading-relaxed max-w-[90%] mx-auto">
+                    {product.description}
+                  </p>
+                )}
               </div>
-              {product.description && <p className={THEME.modal.description}>{product.description}</p>}
-              <div className={THEME.modal.actionArea}>
-                <span className={`${THEME.modal.priceBadge} ${THEME.radius.badge}`}>
-                  {formattedPriceLabel}
-                </span>
-                <Button 
-                  onClick={handleWhatsAppCustomerInquiry} 
-                  variant="whatsapp" 
-                  mode="rectangle" 
-                  size="lg" 
-                  icon={THEME.icons.whatsapp}
-                >
-                  WHATSAPP'TAN SOR
-                </Button>
+
+              <div className="pt-4 flex flex-col items-center gap-2">
+                <div className="flex flex-col items-center">
+                  {isPromotionActive ? (
+                    <div className="flex items-center gap-3">
+                      <span className="text-stone-300 line-through text-sm font-bold">{originalPriceLabel}</span>
+                      <span className="text-green-600 text-2xl font-black tracking-tighter">{discountedPriceLabel}</span>
+                    </div>
+                  ) : (
+                    <span className="text-stone-900 text-2xl font-black tracking-tighter">{originalPriceLabel}</span>
+                  )}
+                </div>
               </div>
             </div>
           </div>

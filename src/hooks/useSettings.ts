@@ -38,7 +38,9 @@ export function useSettings(isAdministrativeModeActive: boolean) {
    * synchronizeStoreSettings: Retrieves remote configuration from Supabase repository.
    */
   const synchronizeStoreSettings = useCallback(async () => {
-    setIsSettingsDataLoading(true);
+    // Initial loading is already true, so we only need to set it for subsequent refreshes
+    // if we wanted to show a loading state again. 
+    
     const { data: storeConfig, error: fetchError } = await supabase
       .from('stores')
       .select('*')
@@ -61,19 +63,28 @@ export function useSettings(isAdministrativeModeActive: boolean) {
   }, []);
 
   useEffect(() => {
-    synchronizeStoreSettings();
+    // Standard data-fetching pattern for React components
+    const initializeSettings = async () => {
+      await synchronizeStoreSettings();
+    };
+    
+    void initializeSettings();
   }, [synchronizeStoreSettings]);
 
   /**
    * modifyStoreConfiguration: Updates specific branding or contact fields.
    * Uses optimistic UI updates for immediate feedback.
    */
-  const modifyStoreConfiguration = useCallback(async (settingKey: keyof CompanySettings, newValue: any) => {
+  const modifyStoreConfiguration = useCallback(async (
+    settingKey: keyof CompanySettings, 
+    newValue: string | string[]
+  ) => {
+    console.log(`🛠️ Ayar Güncelleniyor: ${settingKey}`, newValue);
     // Optimistic UI Update: Reflected immediately in the interface
     setActiveStoreSettings(previousSettings => ({ ...previousSettings, [settingKey]: newValue }));
 
     if (isAdministrativeModeActive) {
-      const updatePayload: any = {};
+      const updatePayload: Record<string, string | string[]> = {};
       
       // Mapping logic: UI field keys to database column names
       if (settingKey === 'whatsapp') updatePayload.phone = newValue;
@@ -84,15 +95,21 @@ export function useSettings(isAdministrativeModeActive: boolean) {
       if (settingKey === 'logoEmoji') updatePayload.logo_url = newValue;
       if (settingKey === 'categoryOrder') updatePayload.category_order = newValue;
 
-      const { error: persistenceError } = await supabase
+      console.log('📡 Supabase Güncelleme Gönderiliyor...', updatePayload);
+      const { error: persistenceError, data } = await supabase
         .from('stores')
         .update(updatePayload)
-        .eq('slug', STORE_SLUG);
+        .eq('slug', STORE_SLUG)
+        .select();
 
       if (persistenceError) {
-        console.error('Configuration persistence failed:', persistenceError);
+        console.error('❌ Supabase Güncelleme Hatası:', persistenceError);
         synchronizeStoreSettings(); // Rollback to server state on failure
+      } else {
+        console.log('✅ Supabase Güncelleme Başarılı:', data);
       }
+    } else {
+      console.warn('⚠️ Admin modu aktif olmadığı için Supabase güncellenmedi.');
     }
   }, [isAdministrativeModeActive, synchronizeStoreSettings]);
 

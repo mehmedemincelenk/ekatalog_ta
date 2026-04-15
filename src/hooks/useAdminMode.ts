@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { TECH, STORAGE, LABELS } from '../data/config';
+import { TECH, STORAGE } from '../data/config';
 import { supabase } from '../lib/supabase';
 
 const STORE_SLUG = import.meta.env.VITE_STORE_SLUG;
@@ -12,9 +12,12 @@ export function useAdminMode() {
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
   const [correctPin, setCorrectPin] = useState('');
   
-  const clickCount = useRef(0);
-  const timer = useRef<any>(null);
+  const hasFirstClicked = useRef(false);
+  const firstClickTimer = useRef<NodeJS.Timeout | null>(null);
+  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const timeoutTimer = useRef<NodeJS.Timeout | null>(null);
 
+  // 1. PIN PRELOAD
   useEffect(() => {
     let isMounted = true;
     async function preload() {
@@ -29,23 +32,62 @@ export function useAdminMode() {
     return () => { isMounted = false; };
   }, []);
 
-  const handleLogoClick = useCallback(() => {
+  // 2. LOGOUT
+  const logout = useCallback(() => {
+    setIsAdmin(false);
+    sessionStorage.removeItem(STORAGE.adminSession);
+    if (timeoutTimer.current) clearTimeout(timeoutTimer.current);
+  }, []);
+
+  // 3. TIMEOUT
+  const resetTimeout = useCallback(() => {
+    if (!isAdmin) return;
+    if (timeoutTimer.current) clearTimeout(timeoutTimer.current);
+    timeoutTimer.current = setTimeout(logout, TECH.auth.timeoutMs);
+  }, [isAdmin, logout]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    const handleActivity = () => resetTimeout();
+    events.forEach(name => document.addEventListener(name, handleActivity));
+    resetTimeout();
+    return () => {
+      events.forEach(name => document.removeEventListener(name, handleActivity));
+      if (timeoutTimer.current) clearTimeout(timeoutTimer.current);
+    };
+  }, [isAdmin, resetTimeout]);
+
+  // 4. TRIGGER: 1 Click -> Release -> Press and Hold
+  const handleLogoPointerDown = useCallback(() => {
     if (isAdmin) return;
 
-    clickCount.current += 1;
-    console.log(`🔑 Giriş Denemesi: ${clickCount.current}/3`); 
-
-    if (timer.current) clearTimeout(timer.current);
-    
-    if (clickCount.current >= 3) {
-      clickCount.current = 0;
-      setIsPinModalOpen(true);
+    if (!hasFirstClicked.current) {
+      // First click start
+      hasFirstClicked.current = true;
+      if (firstClickTimer.current) clearTimeout(firstClickTimer.current);
+      
+      // If no second press within 1s, reset
+      firstClickTimer.current = setTimeout(() => {
+        hasFirstClicked.current = false;
+      }, 1000);
+    } else {
+      // This is the second press (the hold phase)
+      if (firstClickTimer.current) clearTimeout(firstClickTimer.current);
+      
+      longPressTimer.current = setTimeout(() => {
+        setIsPinModalOpen(true);
+        hasFirstClicked.current = false;
+      }, 1000); // 1 second hold is enough for professional feel
     }
-
-    timer.current = setTimeout(() => {
-      clickCount.current = 0;
-    }, 3000); 
   }, [isAdmin]);
+
+  const handleLogoPointerUp = useCallback(() => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  }, []);
 
   const onPinSuccess = useCallback(() => {
     setIsAdmin(true);
@@ -53,14 +95,10 @@ export function useAdminMode() {
     setIsPinModalOpen(false);
   }, []);
 
-  const logout = useCallback(() => {
-    setIsAdmin(false);
-    sessionStorage.removeItem(STORAGE.adminSession);
-  }, []);
-
   return { 
     isAdmin, 
-    handleLogoClick, 
+    handleLogoPointerDown, 
+    handleLogoPointerUp,
     logout, 
     isPinModalOpen, 
     setIsPinModalOpen, 

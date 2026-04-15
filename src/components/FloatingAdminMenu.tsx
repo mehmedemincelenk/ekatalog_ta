@@ -11,11 +11,13 @@ import Button from './Button';
 interface FloatingAdminMenuProps {
   onAdminLogout: () => void;
   onProductAddTrigger: () => void;
+  onBulkUpdateTrigger?: () => void;
 }
 
 export default function FloatingAdminMenu({ 
   onAdminLogout, 
-  onProductAddTrigger 
+  onProductAddTrigger,
+  onBulkUpdateTrigger
 }: FloatingAdminMenuProps) {
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
   const menuContainerRef = useRef<HTMLDivElement>(null);
@@ -77,6 +79,17 @@ export default function FloatingAdminMenu({
             mode="circle"
             aria-label="Logout"
           />
+
+          {onBulkUpdateTrigger && (
+            <Button 
+              onClick={() => handleManagementAction(onBulkUpdateTrigger)}
+              icon="🏷️"
+              variant="secondary"
+              size="sm"
+              mode="circle"
+              aria-label="Bulk Update Prices"
+            />
+          )}
 
           <Button 
             onClick={() => handleManagementAction(onProductAddTrigger)}

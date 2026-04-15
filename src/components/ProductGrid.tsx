@@ -17,10 +17,11 @@ interface ProductGridProps {
   onDelete: (id: string) => void;
   onUpdate: (id: string, changes: Partial<Product>) => void;
   onOrderUpdate: (id: string, newPosition: number) => void;
+  onOrderChange?: (id: string, newPosition: number) => void;
   onImageUpload?: (id: string, file: File) => Promise<void>;
   activeDiscount?: ActiveDiscount | null;
   visibleCategoryLimit: number;
-  search: string;
+  onLoadMore?: () => void;
   activeCategories: string[];
   onAddClick?: () => void;
 }
@@ -35,7 +36,7 @@ const ProductGrid = memo(({
   onImageUpload,
   activeDiscount, 
   visibleCategoryLimit,
-  search,
+  onLoadMore,
   activeCategories,
   onAddClick
 }: ProductGridProps) => {
@@ -55,40 +56,40 @@ const ProductGrid = memo(({
   const displayCategories = useMemo(() => {
     const existingInProducts = Object.keys(groupedProducts);
     const allCategories = [...new Set([...categoryOrder, ...existingInProducts])];
-    
-    // Filter by search or category filter if active
+
+    // Filter by category filter if active
     let filtered = allCategories;
     if (activeCategories.length > 0) {
       filtered = allCategories.filter(cat => activeCategories.includes(cat));
-    } else if (search) {
-      filtered = existingInProducts;
     }
 
-    return sortCategories(filtered, categoryOrder);
-  }, [groupedProducts, categoryOrder, search, activeCategories]);
+    const sorted = sortCategories(filtered, categoryOrder);
+
+    // In admin mode, we show all categories
+    if (isAdmin) return sorted;
+
+    // In user mode, we show:
+    // 1. Categories that have products
+    // 2. OR categories that are explicitly selected (even if empty, to show empty state)
+    return sorted.filter(cat => (groupedProducts[cat] || []).length > 0 || activeCategories.includes(cat));
+  }, [groupedProducts, categoryOrder, activeCategories, isAdmin]);
 
   // Limit visible categories for smooth initial load
   const visibleCategories = displayCategories.slice(0, visibleCategoryLimit);
 
-  if (products.length === 0 && !isAdmin) {
-    return (
-      <div className={theme.emptyState.wrapper}>
-        <div className={theme.emptyState.iconSize}>{THEME.icons.search}</div>
-        <p className={theme.emptyState.text}>{LABELS.noProductsFound}</p>
-      </div>
-    );
-  }
+  // LCP Optimization
+  let priorityCounter = 0;
 
-  if (products.length === 0 && isAdmin) {
+  // 1. GLOBAL SEARCH EMPTY STATE (Positioned higher for mobile keyboard)
+  if (displayCategories.length === 0 && !isAdmin) {
     return (
-      <div className={theme.emptyState.adminWrapper}>
-        <p className="text-stone-500 mb-6 font-medium">{LABELS.noProductsAdmin}</p>
-        <button 
-          onClick={onAddClick}
-          className="bg-stone-900 text-white px-8 py-3 rounded-full font-black text-xs uppercase tracking-widest hover:scale-105 transition-transform"
-        >
-          {LABELS.newProductBtn}
-        </button>
+      <div className="flex flex-col items-center justify-start min-h-[60vh] pt-20 w-full text-center animate-in fade-in duration-700">
+        <div className="w-16 h-16 mb-6 opacity-20 text-stone-400">
+          {THEME.icons.search}
+        </div>
+        <p className={`${THEME.font.base} text-stone-400 italic px-8`}>
+          {LABELS.noProductsFound}
+        </p>
       </div>
     );
   }
@@ -97,7 +98,6 @@ const ProductGrid = memo(({
     <div className={theme.layout}>
       {visibleCategories.map((category) => {
         const categoryProducts = groupedProducts[category] || [];
-        if (categoryProducts.length === 0 && !isAdmin) return null;
 
         return (
           <section key={category} className={theme.sectionSpacing}>
@@ -109,26 +109,60 @@ const ProductGrid = memo(({
               </span>
             </div>
 
-            <div className={`${theme.cols} ${theme.gap}`}>
-              {categoryProducts.map((product, index) => (
-                <ProductCard 
-                  key={product.id}
-                  product={product}
-                  categories={categoryOrder}
-                  isAdmin={isAdmin}
-                  onDelete={onDelete}
-                  onUpdate={onUpdate}
-                  onOrderChange={onOrderUpdate}
-                  onImageUpload={onImageUpload}
-                  orderIndex={index + 1}
-                  itemsInCategory={categoryProducts.length}
-                  activeDiscount={activeDiscount}
-                />
-              ))}
-            </div>
+            {categoryProducts.length > 0 ? (
+              <div className={`${theme.cols} ${theme.gap}`}>
+                {categoryProducts.map((product, index) => {
+                  const isPriority = priorityCounter < 4;
+                  priorityCounter++;
+                  return (
+                    <ProductCard 
+                      key={product.id}
+                      product={product}
+                      categories={categoryOrder}
+                      isAdmin={isAdmin}
+                      onDelete={onDelete}
+                      onUpdate={onUpdate}
+                      onOrderChange={onOrderUpdate}
+                      onImageUpload={onImageUpload}
+                      orderIndex={index + 1}
+                      itemsInCategory={categoryProducts.length}
+                      activeDiscount={activeDiscount}
+                      isPriority={isPriority}
+                    />
+                  );
+                })}
+              </div>
+            ) : (
+              /* CATEGORY-SPECIFIC EMPTY STATE */
+              <div className="py-16 border-2 border-dashed border-stone-100 rounded-2xl flex flex-col items-center justify-center bg-stone-50/30">
+                <p className="text-stone-400 text-xs font-medium italic mb-4">
+                  {isAdmin ? "Bu reyon henüz boş." : "Bu reyonda henüz ürün bulunmuyor."}
+                </p>
+                {isAdmin && (
+                  <button 
+                    onClick={onAddClick}
+                    className="bg-stone-900/5 text-stone-900 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-stone-900 hover:text-white transition-all border border-stone-200"
+                  >
+                    + BU REYONA ÜRÜN EKLE
+                  </button>
+                )}
+              </div>
+            )}
           </section>
         );
       })}
+
+      {/* LOAD MORE BUTTON */}
+      {displayCategories.length > visibleCategoryLimit && (
+        <div className="flex justify-center pt-12 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <button 
+            onClick={onLoadMore}
+            className="px-12 py-4 bg-white border-2 border-stone-200 text-stone-900 font-black text-[11px] uppercase tracking-[0.2em] rounded-full hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all active:scale-95 shadow-lg"
+          >
+            DAHA FAZLASI
+          </button>
+        </div>
+      )}
     </div>
   );
 });

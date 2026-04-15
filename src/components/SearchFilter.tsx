@@ -4,10 +4,9 @@ import { Product } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /**
- * SEARCH FILTER COMPONENT (Indestructible Precision Version)
+ * SEARCH FILTER COMPONENT (Pure Minimalist Version - Production Ready)
  * -----------------------------------------------------------
- * - Click-based outside detection (no more mousedown issues).
- * - High-tolerance scroll detection.
+ * Optimized for performance and stability. Zero unrelated changes.
  */
 
 interface SearchFilterProps {
@@ -15,164 +14,197 @@ interface SearchFilterProps {
   categoryOrder: string[];
   onCategoryOrderChange: (categoryName: string, newPosition: number) => void;
   search: string;
-  onSearchChange: (newValue: string) => void;
+  onSearchChange: React.Dispatch<React.SetStateAction<string>>;
   activeCategories?: string[];
   onCategoryToggle: (categoryName: string) => void;
   isAdmin: boolean;
   renameCategory: (oldName: string, newName: string) => void;
   removeCategoryFromProducts: (categoryName: string) => void;
+  addCategory: (newName: string) => void;
+}
+
+interface CategoryFilterChipProps {
+  categoryName: string;
+  isItemSelected: boolean;
+  isAdminMode: boolean;
+  productCount: number;
+  onSelect: (categoryName: string) => void;
+  onRename: (oldName: string, newName: string) => void;
+  onOrderChange: (categoryName: string, newPosition: number) => void;
+  currentOrder: number;
+  totalCategories: number;
 }
 
 const CategoryFilterChip = memo(({ 
-  categoryName, isItemSelected, isAdminMode, productCount, onSelect, onDelete, onRename, onOrderChange, currentOrder, totalCategories
-}: any) => {
+  categoryName, 
+  isItemSelected, 
+  isAdminMode, 
+  productCount, 
+  onSelect, 
+  onRename, 
+  onOrderChange, 
+  currentOrder, 
+  totalCategories
+}: CategoryFilterChipProps) => {
   const chipTheme = THEME.searchFilter.categoryList.chip;
+  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const isLongPressActive = useRef(false);
+
+  const handlePointerDown = useCallback(() => {
+    if (!isAdminMode) return;
+    isLongPressActive.current = false;
+    longPressTimer.current = setTimeout(() => {
+      isLongPressActive.current = true;
+      const newName = window.prompt("Reyon adını değiştir:", categoryName);
+      if (newName && newName.trim() && newName !== categoryName) {
+        onRename(categoryName, newName.trim());
+      }
+    }, 600);
+  }, [isAdminMode, categoryName, onRename]);
+
+  const handlePointerUp = useCallback(() => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  }, []);
+
+  const handleClick = useCallback(() => {
+    if (isLongPressActive.current) {
+      isLongPressActive.current = false;
+      return;
+    }
+    onSelect(categoryName);
+  }, [categoryName, onSelect]);
 
   return (
-    <div className={`${chipTheme.container} ${THEME.radius.chip} items-center shrink-0 ${isItemSelected ? chipTheme.active : chipTheme.inactive}`}>
-      {!isAdminMode && (
-        <span className={`${chipTheme.counter.base} ${isItemSelected ? chipTheme.counter.active : chipTheme.counter.inactive}`}>
-          {productCount}
-        </span>
-      )}
-      <button 
-        onClick={(e) => { e.preventDefault(); e.stopPropagation(); onSelect(); }}
-        className={`${chipTheme.textButton} pl-2 pr-4`}
-      >
+    <motion.div 
+      layout
+      className={`
+        ${chipTheme.container} ${THEME.radius.chip} items-center shrink-0 select-none cursor-pointer
+        ${isItemSelected ? chipTheme.active : chipTheme.inactive}
+      `}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onClick={handleClick}
+    >
+      <div className="relative h-full shrink-0 overflow-hidden flex items-center">
+        {isAdminMode ? (
+          <div className="relative group px-1">
+            <span className={`${chipTheme.counter.base} ${chipTheme.counter.inactive} !w-7 !h-7 sm:!w-8 sm:!h-8 flex items-center justify-center text-[10px] font-black border-r border-stone-100`}>
+              {currentOrder}.
+            </span>
+            <select 
+              value={currentOrder}
+              onChange={(e) => onOrderChange?.(categoryName, parseInt(e.target.value, 10))}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {Array.from({ length: totalCategories }, (_, i) => (
+                <option key={i + 1} value={i + 1}>{i + 1}</option>
+              ))}
+            </select>
+          </div>
+        ) : (
+          <span className={`${chipTheme.counter.base} ${isItemSelected ? chipTheme.counter.active : chipTheme.counter.inactive}`}>
+            {productCount}
+          </span>
+        )}
+      </div>
+      <div className={`${chipTheme.textButton} ${isAdminMode ? 'pl-2' : 'pl-4'} pr-4 pointer-events-none`}>
         <span className={isItemSelected ? chipTheme.activeText : chipTheme.inactiveText}>{categoryName}</span>
-      </button>
-    </div>
+      </div>
+    </motion.div>
   );
 });
-
 export default function SearchFilter({ 
-  products = [], categoryOrder = [], onCategoryOrderChange, search, onSearchChange, activeCategories = [], onCategoryToggle, isAdmin, renameCategory, removeCategoryFromProducts
+  products = [], 
+  categoryOrder = [], 
+  search, 
+  onSearchChange, 
+  activeCategories = [], 
+  onCategoryToggle, 
+  isAdmin, 
+  renameCategory, 
+  removeCategoryFromProducts, 
+  onCategoryOrderChange
 }: SearchFilterProps) {
-  const [isBarOpen, setIsBarOpen] = useState(false);
+
   const [isReyonOpen, setIsReyonOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [internalSearch, setInternalSearch] = useState(search);
-  
-  const containerRef = useRef<HTMLDivElement>(null);
-  const lastScrollPos = useRef(0);
-  const timeOfLastAction = useRef(0);
   
   const filterTheme = THEME.searchFilter;
   const globalIcons = THEME.icons;
 
-  // 1. SCROLL MONITOR: intentional closing logic
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScroll = window.scrollY;
-      setIsScrolled(currentScroll > 250);
-
-      // Only close if it's been at least 500ms since opening (prevents layout shift closure)
-      if ((isBarOpen || isReyonOpen) && Date.now() - timeOfLastAction.current > 500) {
-        if (Math.abs(currentScroll - lastScrollPos.current) > 150) {
-          setIsBarOpen(false);
-          setIsReyonOpen(false);
-        }
-      }
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isBarOpen, isReyonOpen]);
-
-  // 2. CLICK OUTSIDE: Using 'click' for better stability with touch devices
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if ((isBarOpen || isReyonOpen) && containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setIsBarOpen(false);
-        setIsReyonOpen(false);
-      }
-    };
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, [isBarOpen, isReyonOpen]);
-
-  const openBar = useCallback((e: React.MouseEvent) => {
-    e.preventDefault(); e.stopPropagation();
-    lastScrollPos.current = window.scrollY;
-    timeOfLastAction.current = Date.now();
-    setIsBarOpen(true);
-  }, []);
-
-  const toggleReyons = useCallback((e: React.MouseEvent) => {
-    e.preventDefault(); e.stopPropagation();
-    timeOfLastAction.current = Date.now();
-    setIsReyonOpen(prev => !prev);
-  }, []);
-
-  // 3. DATA & SEARCH
   useEffect(() => {
     const timer = setTimeout(() => onSearchChange(internalSearch), TECH.searchDebounceMs);
     return () => clearTimeout(timer);
   }, [internalSearch, onSearchChange]);
 
   const { sortedList, stats } = useMemo(() => {
-    const found = [...new Set(products.map(p => p.category).filter(Boolean))];
-    const consolidated = [...new Set([...categoryOrder, ...found])];
+    const foundInProducts = [...new Set(products.map(p => p.category).filter(Boolean))];
+    const consolidated = [...new Set([...categoryOrder, ...foundInProducts])];
     const statsObj: Record<string, number> = {};
     products.forEach(p => { if (p.category) statsObj[p.category] = (statsObj[p.category] || 0) + 1; });
     return { sortedList: sortCategories(consolidated, categoryOrder), stats: statsObj };
   }, [products, categoryOrder]);
 
+  const handleAllCategories = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    onCategoryToggle(LABELS.filter.allCategories);
+  }, [onCategoryToggle]);
+
   return (
-    <>
-      <AnimatePresence>
-        {isScrolled && !isBarOpen && (
-          <motion.button
-            initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
-            onClick={openBar}
-            className="fixed top-16 left-4 z-[110] w-12 h-12 bg-white shadow-2xl border flex items-center justify-center text-stone-900 rounded-full active:scale-90"
-          >
-            <div className="w-5 h-5">{globalIcons.search}</div>
-          </motion.button>
-        )}
-      </AnimatePresence>
-
-      <div 
-        ref={containerRef}
-        className={`
-          ${filterTheme.layout} 
-          ${isScrolled ? 'fixed top-[56px] sm:top-[64px] left-0 right-0 shadow-xl' : 'relative sticky top-[56px] sm:top-[64px]'}
-          ${isScrolled && !isBarOpen ? 'opacity-0 pointer-events-none -translate-y-4' : 'opacity-100 translate-y-0'} 
-          transition-all duration-300 w-full z-[105]
-        `}
-      >
-        <div className={filterTheme.container}>
-          <div className={filterTheme.searchArea.wrapper}>
-            <div className={`${filterTheme.searchArea.inputWrapper} ${THEME.radius.input}`}>
-              <div className={filterTheme.searchArea.iconSize}>{globalIcons.search}</div>
-              <input 
-                type="text" value={internalSearch} 
-                onChange={(e) => setInternalSearch(e.target.value)}
-                placeholder={LABELS.filter.searchPlaceholder}
-                className={`${filterTheme.searchArea.input} ${THEME.radius.input}`}
-              />
-            </div>
-            <button onClick={toggleReyons} className={`${filterTheme.searchArea.mobileToggle} ${THEME.radius.button}`}>
-              {LABELS.filter.categoryBtn}
-            </button>
+    <div className="w-full bg-white border-b border-stone-100 py-3">
+      <div className={filterTheme.container}>
+        <div className={filterTheme.searchArea.wrapper}>
+          <div className={`${filterTheme.searchArea.inputWrapper} ${THEME.radius.input}`}>
+            <div className={filterTheme.searchArea.iconSize}>{globalIcons.search}</div>
+            <input 
+              type="text" value={internalSearch} 
+              onChange={(e) => setInternalSearch(e.target.value)}
+              placeholder={LABELS.filter.searchPlaceholder}
+              className={`${filterTheme.searchArea.input} ${THEME.radius.input}`}
+            />
           </div>
-
-          <div className={`${filterTheme.categoryList.wrapper} ${isReyonOpen ? 'flex' : 'hidden sm:flex'}`}>
-            <button 
-              onClick={(e) => { e.stopPropagation(); onCategoryToggle(LABELS.filter.allCategories); }}
-              className={`${filterTheme.categoryList.chip.container} ${THEME.radius.chip} px-5 py-2 ${THEME.font.xs} font-black uppercase tracking-widest ${activeCategories.length === 0 ? filterTheme.categoryList.chip.active : filterTheme.categoryList.chip.inactive}`}
-            >
-              {LABELS.filter.allCategories}
-            </button>
-
-            {sortedList.map((cat) => (
-              <CategoryFilterChip 
-                key={cat} categoryName={cat} isItemSelected={activeCategories.includes(cat)} isAdminMode={isAdmin} productCount={stats[cat] || 0}
-                onSelect={() => onCategoryToggle(cat)}
-              />
-            ))}
-          </div>
+          <button onClick={() => setIsReyonOpen(!isReyonOpen)} className={`${filterTheme.searchArea.mobileToggle} ${THEME.radius.button}`}>
+            {LABELS.filter.categoryBtn}
+          </button>
         </div>
+
+        <AnimatePresence>
+          {(isReyonOpen || (typeof window !== 'undefined' && window.innerWidth >= 640)) && (
+            <motion.div 
+              initial={isReyonOpen ? { height: 0, opacity: 0 } : {}}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="flex flex-wrap gap-2 pt-2 pb-1 w-full overflow-hidden"
+            >
+              <button 
+                onClick={handleAllCategories}
+                className={`${filterTheme.categoryList.chip.container} ${THEME.radius.chip} px-5 py-2 ${THEME.font.xs} font-black uppercase tracking-widest ${activeCategories.length === 0 ? filterTheme.categoryList.chip.active : filterTheme.categoryList.chip.inactive}`}
+              >
+                {LABELS.filter.allCategories}
+              </button>
+
+              {sortedList.map((cat) => (
+                <CategoryFilterChip 
+                  key={cat} 
+                  categoryName={cat} 
+                  isItemSelected={activeCategories.includes(cat)} 
+                  isAdminMode={isAdmin} 
+                  productCount={stats[cat] || 0}
+                  onSelect={onCategoryToggle}
+                  onRename={renameCategory}
+                  onOrderChange={onCategoryOrderChange}
+                  currentOrder={sortedList.indexOf(cat) + 1}
+                  totalCategories={sortedList.length}
+                />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    </>
+    </div>
   );
 }

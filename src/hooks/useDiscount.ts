@@ -4,6 +4,7 @@ import { TECH, LABELS } from '../data/config';
 export type ActiveDiscount = {
   code: string;
   rate: number;
+  category?: string;
 };
 
 /**

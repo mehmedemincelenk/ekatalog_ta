@@ -46,25 +46,31 @@ export function useCarousel(isAdministrativeModeActive: boolean) {
    * modifySlideContent: Updates local state and persists changes to Supabase if admin.
    */
   const modifySlideContent = useCallback(async (slideId: number, contentChanges: Partial<Slide>) => {
+    let finalizedSlides: Slide[] = [];
+
     setMarketingSlides(previousSlides => {
-      const updatedSlides = previousSlides.map(slide => 
+      finalizedSlides = previousSlides.map(slide => 
         slide.id === slideId ? { ...slide, ...contentChanges } : slide
       );
-      
-      // Persistent update for administrative actions
-      if (isAdministrativeModeActive) {
-        supabase
-          .from('stores')
-          .update({ carousel_slides: updatedSlides })
-          .eq('slug', STORE_SLUG)
-          .then(({ error: updateError }) => {
-            if (updateError) console.error('Persistent carousel update failed:', updateError);
-          });
-      }
-      
-      return updatedSlides;
+      return finalizedSlides;
     });
-  }, [isAdministrativeModeActive]);
+
+    // Persistent update for administrative actions
+    if (isAdministrativeModeActive) {
+      // Small timeout to ensure finalizedSlides is populated from the functional update if needed, 
+      // but in this case we can compute it directly to be safe.
+      const currentSlides = marketingSlides.map(slide => 
+        slide.id === slideId ? { ...slide, ...contentChanges } : slide
+      );
+
+      const { error: updateError } = await supabase
+        .from('stores')
+        .update({ carousel_slides: currentSlides })
+        .eq('slug', STORE_SLUG);
+
+      if (updateError) console.error('Persistent carousel update failed:', updateError);
+    }
+  }, [isAdministrativeModeActive, marketingSlides]);
 
   /**
    * uploadHeroVisualAsset: Processes and uploads a new high-quality image for a slide.

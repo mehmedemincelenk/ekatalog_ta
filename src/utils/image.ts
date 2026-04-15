@@ -36,7 +36,7 @@ const transformFileToVisualElement = (visualFile: File): Promise<HTMLImageElemen
 /**
  * processDualQualityVisuals: Generates high-definition and preview-optimized copies from a single file.
  */
-export async function processDualQualityVisuals(visualFile: File): Promise<{ hq: Blob, lq: Blob }> {
+export async function processDualQualityVisuals(visualFile: File, hqMaxWidth?: number): Promise<{ hq: Blob, lq: Blob }> {
   const visualElement = await transformFileToVisualElement(visualFile);
   
   /**
@@ -72,7 +72,8 @@ export async function processDualQualityVisuals(visualFile: File): Promise<{ hq:
   };
 
   // Tier 1: High-Definition Asset for Zoom/Detail views
-  const highDefinitionAsset = await generateOptimizedBlob(TECH.storage.productHqWidth, TECH.storage.hqQuality);
+  const hqLimit = hqMaxWidth || TECH.storage.productHqWidth;
+  const highDefinitionAsset = await generateOptimizedBlob(hqLimit, TECH.storage.hqQuality);
   
   // Tier 2: Lightweight Preview Asset for Catalog/Grid views
   const previewLightweightAsset = await generateOptimizedBlob(TECH.storage.productLqWidth, TECH.storage.lqQuality);

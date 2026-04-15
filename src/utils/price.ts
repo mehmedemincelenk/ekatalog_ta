@@ -10,14 +10,37 @@ import { TECH } from '../data/config';
 const { commerce } = TECH;
 
 /**
- * transformCurrencyStringToNumber: Converts localized price strings (e.g., "₺150,50") into pure numbers.
+ * transformCurrencyStringToNumber: Converts localized price strings into pure numbers.
+ * Handles: "1.250,50", "1,250.50", "1250,50", "1250.50", "₺1.250,50"
  * @param localizedPrice - The raw currency string from UI or storage.
  */
-export const transformCurrencyStringToNumber = (localizedPrice: string): number => {
+export const transformCurrencyStringToNumber = (localizedPrice: string | number): number => {
+  if (typeof localizedPrice === 'number') return localizedPrice;
   if (!localizedPrice) return 0;
-  // Cleanup: Remove non-numeric characters except decimals, and normalize comma to dot
-  const normalizedValue = localizedPrice.replace(/[^\d.,]/g, '').replace(',', '.');
-  return parseFloat(normalizedValue) || 0;
+
+  // 1. Remove currency symbols and non-numeric/separator characters
+  let cleanValue = localizedPrice.toString().replace(/[^\d.,]/g, '');
+
+  // 2. Logic to determine decimal vs thousand separator:
+  // We look for the LAST separator (comma or dot).
+  const lastDotIndex = cleanValue.lastIndexOf('.');
+  const lastCommaIndex = cleanValue.lastIndexOf(',');
+
+  if (lastDotIndex > lastCommaIndex) {
+    // Dot is likely the decimal (International style: 1,250.50)
+    // Remove all commas and keep the dot
+    cleanValue = cleanValue.replace(/,/g, '');
+  } else if (lastCommaIndex > lastDotIndex) {
+    // Comma is likely the decimal (Turkish style: 1.250,50)
+    // Remove all dots and replace comma with dot for parseFloat
+    cleanValue = cleanValue.replace(/\./g, '').replace(',', '.');
+  } else {
+    // Only one type of separator or none at all (e.g., "1250,50" or "1250.50")
+    cleanValue = cleanValue.replace(',', '.');
+  }
+
+  const result = parseFloat(cleanValue);
+  return isNaN(result) ? 0 : result;
 };
 
 /**

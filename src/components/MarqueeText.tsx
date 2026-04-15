@@ -5,7 +5,7 @@ interface MarqueeTextProps {
   text: string;
   textClass: string;
   isAdmin: boolean;
-  editableProps?: any;
+  editableProps?: React.HTMLAttributes<HTMLDivElement>;
 }
 
 /**

@@ -37,6 +37,7 @@ export const TECH = {
   auth: {
     sessionActiveValue: 'authorized_admin_active',
     pinLength: 4,
+    timeoutMs: 3600000, // 1 hour inactivity timeout
   },
   carousel: {
     intervalMs: 5000,

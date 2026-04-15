@@ -11,11 +11,11 @@ const BR = {
 };
 
 const FS = {
-  xs: 'text-[9px] leading-tight font-medium uppercase tracking-wider',
-  sm: 'text-[10px] leading-snug font-semibold',
-  base: 'text-xs sm:text-sm leading-normal font-bold',
-  lg: 'text-base sm:text-xl leading-tight font-black tracking-tight',
-  xl: 'text-xl sm:text-3xl leading-none font-black tracking-tighter',
+  xs: 'text-[8px] leading-tight font-medium uppercase tracking-wider',
+  sm: 'text-[9px] leading-snug font-semibold',
+  base: 'text-[11px] sm:text-xs leading-normal font-bold',
+  lg: 'text-sm sm:text-lg leading-tight font-black tracking-tight',
+  xl: 'text-lg sm:text-2xl leading-none font-black tracking-tighter',
 };
 
 export const THEME = {
@@ -86,9 +86,9 @@ export const THEME = {
   },
   
   navbar: {
-    layout: 'bg-white/80 backdrop-blur-xl border-b border-stone-100 sticky top-0 z-[100] h-14 sm:h-16',
-    container: 'max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 h-full flex items-center',
-    innerWrapper: 'flex justify-between items-center gap-2 w-full',
+    layout: 'bg-white/80 backdrop-blur-xl border-b border-stone-100 sticky top-0 z-[100] h-14 sm:h-[72px]',
+    container: 'w-full px-2 h-full flex items-center',
+    innerWrapper: 'flex justify-between items-center w-full',
     brand: {
       wrapper: 'flex items-center gap-1.5 shrink-0',
       logoWrapper: 'flex items-center justify-center transition-all active:scale-90',
@@ -101,16 +101,17 @@ export const THEME = {
       editHighlight: `cursor-pointer hover:bg-stone-100 ${BR.low} px-1 transition-colors`,
     },
     contact: {
-      wrapper: 'flex items-center shrink-0 min-w-0',
-      address: 'hidden md:block text-xs text-stone-500 hover:text-stone-900 transition-colors whitespace-nowrap truncate max-w-[200px] px-1',
+      wrapper: 'flex items-center shrink-0 min-w-0 gap-2 sm:gap-4',
+      address: 'hidden sm:block text-[10px] text-stone-500 hover:text-stone-900 transition-colors whitespace-nowrap truncate max-w-[150px] md:max-w-[250px] px-1',
+      mobileAddress: 'block sm:hidden text-[8px] text-stone-400 font-medium truncate max-w-[80px]',
       mapUrlBase: 'https://www.google.com/maps/search/?api=1&query=',
-      separator: 'hidden lg:block w-px h-4 bg-stone-200 mx-3',
-      actions: 'flex items-center gap-2',
+      separator: 'hidden sm:block w-px h-4 bg-stone-200',
+      actions: 'flex items-center gap-1.5 sm:gap-2',
       instagram: 'text-stone-400 hover:text-pink-600 transition-all active:scale-75 cursor-pointer',
-      instagramIconSize: 'w-5 h-5 sm:w-6 sm:h-6',
-      whatsapp: `flex items-center gap-1.5 px-3.5 py-2 sm:px-4 sm:py-2 bg-stone-900 text-white ${BR.low} transition-all active:scale-95 shadow-sm hover:bg-black`,
-      whatsappIconSize: 'w-3.5 h-3.5 sm:w-4 sm:h-4',
-      phoneText: `${FS.xs} font-black tracking-tight`,
+      instagramIconSize: 'w-4 h-4 sm:w-5 sm:h-5',
+      whatsapp: `flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 bg-stone-900 text-white ${BR.low} transition-all active:scale-95 shadow-sm hover:bg-black`,
+      whatsappIconSize: 'w-3 h-3 sm:w-4 sm:h-4',
+      phoneText: `text-[9px] sm:${FS.xs} font-black tracking-tight`,
     }
   },
 
@@ -125,8 +126,7 @@ export const THEME = {
   },
 
   heroCarousel: {
-    layout: `relative w-full group/carousel overflow-hidden ${BR.md}`,
-    heights: 'h-[240px] sm:h-[320px] md:h-[400px]',
+    layout: `relative w-full group/carousel overflow-hidden ${BR.md} aspect-[16/9]`,
     container: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6',
     slide: {
       base: 'absolute inset-0 transition-opacity duration-700 ease-in-out',
@@ -149,7 +149,7 @@ export const THEME = {
   },
 
   searchFilter: {
-    layout: 'bg-white border-b border-stone-200 py-3 relative sticky top-[56px] sm:top-[64px] z-40',
+    layout: 'bg-white border-b border-stone-200 py-3 relative sticky top-[56px] sm:top-[72px] z-40',
     container: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-start sm:items-center gap-3',
     searchArea: {
       wrapper: 'flex w-full sm:w-auto items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap',
@@ -163,18 +163,18 @@ export const THEME = {
       wrapper: 'flex flex-wrap gap-2 items-center flex-1 transition-all w-full',
       chip: {
         container: `flex items-stretch overflow-hidden border transition-all duration-300 ${BR.full}`,
-        active: 'bg-stone-900 text-white border-stone-900 shadow-lg scale-105',
+        active: 'bg-stone-900 text-white border-stone-900 shadow-md scale-102',
         activeText: 'text-white',
-        inactive: 'bg-white text-stone-600 border-stone-200 hover:border-stone-400 active:scale-95',
+        inactive: 'bg-white text-stone-600 border-stone-200 hover:border-stone-400 active:scale-98',
         inactiveText: 'text-stone-600',
         counter: {
-          base: `${FS.xs} font-black w-7 h-7 flex items-center justify-center shrink-0 transition-colors`,
+          base: `${FS.xs} font-black w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center shrink-0 transition-colors`,
           active: 'bg-white/20 text-white',
           inactive: 'bg-stone-50 text-stone-400 border-r border-stone-100',
         },
-        adminSelectWrapper: 'relative w-10 h-full bg-white border-r border-stone-200 flex items-center justify-center overflow-hidden',
+        adminSelectWrapper: 'relative w-8 h-full bg-white border-r border-stone-200 flex items-center justify-center overflow-hidden',
         adminSelect: `absolute inset-0 w-full h-full bg-transparent text-stone-900 ${FS.xs} font-black appearance-none text-center m-0 p-0 border-none outline-none cursor-pointer z-10`,
-        textButton: `py-2 ${FS.xs} font-black whitespace-nowrap flex items-center gap-1.5`,
+        textButton: `py-1.5 sm:py-2 ${FS.xs} font-black whitespace-nowrap flex items-center gap-1.5 px-1`,
         deleteIcon: 'ml-1 text-red-400 hover:text-red-600 font-black text-xs transition-colors',
       },
       showMoreButton: `${BR.full} hidden sm:flex items-center gap-1.5 px-4 py-2 ${FS.xs} font-black bg-stone-50 text-stone-400 hover:bg-stone-100 hover:text-stone-700 transition-all`,
@@ -202,58 +202,37 @@ export const THEME = {
   },
 
   footer: {
-    layout: 'bg-white border-t border-stone-200 mt-16 relative',
+    layout: 'bg-white border-t border-stone-200 relative',
     container: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10',
-    grid: 'grid grid-cols-1 md:grid-cols-3 items-start gap-12 md:gap-8',
-    brand: {
-      wrapper: 'flex flex-col items-center md:items-start gap-3',
-      logoImg: 'w-10 h-10 object-contain group-active:scale-90 transition-transform',
-      logoEmoji: 'text-3xl group-active:scale-90 transition-transform',
-      name: `${FS.lg} text-stone-900`,
-      tagline: `${FS.sm} text-kraft-600 mt-0.5`,
-      socialLinks: 'flex items-center gap-3 mt-1',
-      copyright: `${FS.xs} text-stone-400 text-center md:text-left leading-relaxed`,
-    },
-    location: {
-      wrapper: 'flex flex-col items-center gap-4 text-center',
-      label: `${FS.xs} font-black text-stone-300 mb-1`,
-      addressLink: `${FS.sm} text-stone-500 hover:text-stone-900 transition-colors max-w-[200px] leading-relaxed`,
-      qrFrame: `bg-stone-50 p-2 ${BR.low} border border-stone-100 shadow-sm cursor-pointer hover:scale-105 transition-transform group`,
-      qrIcon: 'w-10 h-10 grayscale group-hover:grayscale-0 transition-all',
-      qrLabel: `${FS.xs} font-bold text-stone-300`,
-    },
+    grid: 'flex flex-col items-center justify-center gap-6',
     coupons: {
-      wrapper: 'flex flex-col items-center md:items-end gap-2.5',
-      label: `${FS.xs} font-black text-stone-300`,
-      inputWrapper: 'flex gap-1 w-full max-w-[240px]',
-      input: `flex-1 px-3 py-2 border ${BR.low} ${FS.xs} font-bold transition-all outline-none`,
-      inputActive: 'border-green-500 bg-green-50 text-green-700',
-      inputError: 'border-red-400 bg-red-50 text-red-700',
-      inputDefault: 'border-stone-200 text-stone-600 bg-white',
-      button: `text-white px-3 py-2 ${BR.low} hover:opacity-90 active:scale-95 transition-all shadow-sm shrink-0`,
-      activeStatus: 'flex flex-col items-center md:items-end animate-in fade-in slide-in-from-top-1',
-      errorStatus: `${FS.xs} font-bold text-red-500`,
+      wrapper: 'flex flex-col items-center gap-2 w-full max-w-[240px]',
+      label: `${FS.xs} font-black text-stone-300 tracking-[0.2em] uppercase`,
+      inputWrapper: 'flex items-stretch gap-1 w-full h-10',
+      input: `flex-1 px-4 py-2 border border-stone-200 text-stone-900 bg-stone-50/50 outline-none transition-all duration-300 ${FS.sm} font-bold focus:border-stone-900 focus:bg-white`,
+      button: `w-10 h-10 flex items-center justify-center bg-stone-900 text-white transition-all active:scale-90 shrink-0`,
+      statusWrapper: 'mt-1 animate-in fade-in duration-300 text-center',
+      statusText: `${FS.xs} font-bold uppercase tracking-tight`,
+      successText: 'text-green-600',
+      errorText: 'text-red-500',
     },
-    qrModal: {
-      overlay: 'fixed inset-0 z-[200] bg-black/90 backdrop-blur-xl flex items-center justify-center cursor-pointer animate-in fade-in duration-300',
-      content: `bg-white p-8 ${BR.lg} shadow-2xl flex flex-col items-center gap-6 animate-in zoom-in-95 duration-300`,
-      qrImg: 'w-64 h-64',
-      title: `${FS.sm} font-black text-stone-900`,
-      closeHint: `${FS.xs} text-stone-400`,
+    bottomBar: {
+      layout: 'w-full py-3 bg-stone-900 flex items-center justify-center relative overflow-hidden group cursor-pointer',
+      text: 'text-[10px] sm:text-[11px] font-black text-white uppercase tracking-[0.3em] relative z-10 transition-transform duration-500 group-hover:scale-105',
     }
   },
 
   productCard: {
     container: `bg-white border-2 transition-all duration-300 relative flex flex-col group ${BR.md}`,
     activeBorder: 'border-stone-200',
-    outOfStockBorder: 'border-transparent bg-stone-50',
+    outOfStockBorder: 'border-transparent bg-stone-50/50 grayscale-[0.8] opacity-70',
     shadow: 'hover:shadow-xl',
-    padding: 'p-3',
+    padding: 'px-2 pt-2 pb-1',
     gap: 'gap-1',
     innerLayout: {
       contentWrapper: 'flex flex-col gap-1 flex-grow',
       descriptionWrapper: 'relative min-h-[24px]',
-      footerWrapper: 'mt-auto pt-1',
+      footerWrapper: 'mt-auto',
       adminActionsWrapper: 'transition-all duration-300',
       adminActionsActive: 'opacity-100 scale-100',
       adminActionsInactive: 'opacity-0 scale-90 pointer-events-none',
@@ -264,7 +243,7 @@ export const THEME = {
       bg: 'bg-stone-100',
       fit: 'object-cover',
       transition: 'transition-all duration-500',
-      outOfStock: 'grayscale opacity-60',
+      outOfStock: 'grayscale opacity-40',
       uploading: 'opacity-50 blur-[2px]',
       placeholderIcon: 'text-5xl text-stone-300 select-none flex items-center justify-center',
       placeholderFrame: `bg-white px-2 py-1 border border-stone-200 shadow-sm flex items-center justify-center ${BR.low}`,
@@ -275,13 +254,13 @@ export const THEME = {
     },
     typography: {
       name: `${FS.sm} text-stone-900 leading-tight tracking-tight`,
-      nameOutOfStock: 'opacity-60 text-stone-500',
+      nameOutOfStock: 'opacity-40 text-stone-400',
       nameTransition: 'transition-all duration-300',
       description: `${FS.xs} text-stone-500 leading-snug font-medium normal-case`,
       descriptionClamp: 'line-clamp-2',
       descriptionFull: 'w-full',
       price: `${FS.base} font-black tracking-tight transition-all duration-500`,
-      priceOutOfStock: 'line-through opacity-60 text-stone-500',
+      priceOutOfStock: 'line-through opacity-30 text-stone-400 scale-95 origin-left',
       discountPrice: 'text-kraft-600',
       categoryBadge: `${FS.xs} text-stone-400`,
       editable: 'cursor-text focus:outline-none outline-none',
@@ -295,7 +274,7 @@ export const THEME = {
       categoryListWrapper: 'max-h-48 overflow-y-auto py-1 custom-scrollbar',
       categoryActive: 'text-stone-900 bg-stone-100',
       categoryInactive: 'text-stone-500',
-      mobileToggle: `lg:hidden relative flex items-center justify-center w-11 h-11 bg-stone-50/80 backdrop-blur border border-stone-200 transition-all shadow-sm overflow-hidden active:scale-90 ${BR.low}`,
+      mobileToggle: `lg:hidden relative flex items-center justify-center w-6 h-6 bg-stone-50/80 backdrop-blur border border-stone-200 transition-all shadow-sm overflow-hidden active:scale-90 ${BR.low}`,
       mobileIconColor: 'text-stone-500',
       backBtn: `w-full text-left px-4 py-2 ${FS.xs} font-black text-stone-400 bg-stone-50/50 border-b border-stone-100 uppercase flex items-center gap-2`,
       editHighlight: 'bg-amber-50/50',
@@ -307,7 +286,7 @@ export const THEME = {
       container: 'absolute top-2 right-2 z-[25] transition-all duration-300 transform',
       adminAnimation: 'opacity-100 scale-100',
       userAnimation: 'opacity-0 scale-90 pointer-events-none',
-      wrapper: `relative w-7 h-7 bg-white/90 backdrop-blur-md shadow-lg border border-stone-200 flex items-center justify-center overflow-hidden ${BR.low}`,
+      wrapper: `relative w-6 h-6 bg-white/90 backdrop-blur-md shadow-lg border border-stone-200 flex items-center justify-center overflow-hidden ${BR.low}`,
       select: `absolute inset-0 w-full h-full bg-transparent text-stone-900 ${FS.xs} font-black appearance-none text-center m-0 p-0 border-none outline-none cursor-pointer`,
     },
     uploadOverlay: {
@@ -318,12 +297,13 @@ export const THEME = {
     status: {
       wrapper: 'absolute inset-0 z-[5] pointer-events-none rounded-lg flex items-center justify-center gap-2',
       badge: `bg-stone-900/90 text-white w-9 h-9 ${BR.full} shadow-2xl flex items-center justify-center -translate-y-4`,
+      outOfStockLabel: `bg-white/90 text-stone-900 px-3 py-1 ${BR.low} shadow-xl ${FS.xs} font-black tracking-widest border border-stone-100`,
       iconSize: 'text-lg',
     }
   },
 
   addProductModal: {
-    overlay: 'fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-md p-4',
+    overlay: 'fixed inset-0 z-[300] flex items-center justify-center bg-black/40 backdrop-blur-md p-4',
     container: `bg-white w-full max-w-sm ${BR.lg} shadow-2xl flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-300`,
     header: 'flex items-center justify-between px-6 py-5 border-b border-stone-100',
     headerButton: `!w-11 !h-11 !bg-stone-100 !text-stone-500 hover:!bg-stone-200 hover:!text-stone-900 ${BR.low}`,
@@ -351,14 +331,13 @@ export const THEME = {
   },
 
   references: {
-    layout: 'bg-stone-50/50 border-t border-stone-100 py-12 md:py-16',
-    container: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',
-    headerTitle: `text-center ${FS.xs} font-black text-stone-400 mb-8 md:mb-12`,
-    grid: 'grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8',
+    layout: 'py-8 md:py-12 border-t border-stone-200',
+    container: 'max-w-4xl mx-auto px-6',
+    headerTitle: `text-center ${FS.xs} font-black text-stone-300 mb-16 tracking-[0.3em] uppercase`,
+    grid: 'grid grid-cols-3 gap-8 md:gap-16 items-center justify-items-center',
     card: {
-      base: `flex flex-col items-center justify-center gap-2 bg-white border border-stone-100 py-6 px-4 hover:border-stone-300 hover:shadow-md active:scale-95 transition-all shadow-sm ${BR.low}`,
-      logoSize: 'text-3xl filter grayscale hover:grayscale-0 transition-all duration-500',
-      name: `${FS.xs} font-black text-stone-500 text-center`,
+      base: 'w-full flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-700 opacity-40 hover:opacity-100',
+      logoSize: 'text-3xl md:text-5xl select-none',
     }
   },
 

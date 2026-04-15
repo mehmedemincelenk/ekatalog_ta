@@ -163,10 +163,14 @@ export default function AddProductModal({
 
     setIsSubmittingData(true);
     try {
+      const { transformCurrencyStringToNumber, formatNumberToCurrency } = await import('../utils/price');
+      const numericPrice = transformCurrencyStringToNumber(formState.productPrice);
+      const standardizedPriceLabel = formatNumberToCurrency(numericPrice);
+
       await onProductAddition({
         name: formState.productName.trim(),
         category: finalizedCategory,
-        price: formState.productPrice.trim(),
+        price: standardizedPriceLabel,
         description: formState.productDescription.trim(),
         image: null,
         inStock: formState.isProductInStock,

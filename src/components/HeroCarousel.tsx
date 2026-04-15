@@ -24,7 +24,7 @@ const CarouselSlideUnit = memo(({
   return (
     <div className={`
       ${carouselTheme.slide.base} 
-      ${isCurrentlyActive ? 'opacity-100' : 'opacity-0'} 
+      ${isCurrentlyActive ? 'opacity-100 pointer-events-auto z-10' : 'opacity-0 pointer-events-none z-0'} 
       ${slideData.bg}
     `}>
       {/* BACKGROUND IMAGE OR PLACEHOLDER */}
@@ -39,6 +39,7 @@ const CarouselSlideUnit = memo(({
           `} 
           onClick={() => isAdmin && !isCurrentlyUploading && onImageUpdateTrigger(slideData.id)} 
           loading={isCurrentlyActive ? "eager" : "lazy"}
+          {...(isCurrentlyActive ? { fetchpriority: "high" } : {})}
         />
       ) : (
         <div 
@@ -109,7 +110,6 @@ export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
   return (
     <div className={`
       ${carouselTheme.layout} 
-      ${carouselTheme.heights} 
       ${carouselTheme.container}
     `}>
       <div 

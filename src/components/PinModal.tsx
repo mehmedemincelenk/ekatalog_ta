@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { THEME, LABELS } from '../data/config';
 
 /**
- * PIN MODAL COMPONENT (100% Tokenized & Professional English)
+ * PIN MODAL COMPONENT (Brute-Force Protected)
  * -----------------------------------------------------------
- * Apple-style secure entry interface for administrative access.
+ * Apple-style secure entry interface with progressive lockout logic.
  */
 
 interface PinModalProps {
@@ -22,45 +22,77 @@ export default function PinModal({
 }: PinModalProps) {
   const [currentPinAttempt, setCurrentPinAttempt] = useState('');
   const [hasAuthError, setHasAuthError] = useState(false);
+  
+  // SECURITY STATE
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [lockoutTimeLeft, setLockoutTimeLeft] = useState(0);
+  const lockoutTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const theme = THEME.pinModal;
   const globalIcons = THEME.icons;
 
-  // Process PIN when it reaches 4 digits
+  // Handle Lockout Countdown
   useEffect(() => {
-    if (currentPinAttempt.length === 4) {
-      if (currentPinAttempt === authorizedPinCode) {
-        onAuthenticationSuccess();
-        setCurrentPinAttempt('');
-      } else {
-        setHasAuthError(true);
-        // Standard iPhone haptic error feedback duration
-        const errorResetTimeout = setTimeout(() => {
-          setHasAuthError(false);
-          setCurrentPinAttempt('');
-        }, 500);
-        return () => clearTimeout(errorResetTimeout);
-      }
+    if (lockoutTimeLeft > 0) {
+      lockoutTimerRef.current = setInterval(() => {
+        setLockoutTimeLeft(prev => prev - 1);
+      }, 1000);
+    } else {
+      if (lockoutTimerRef.current) clearInterval(lockoutTimerRef.current);
     }
-  }, [currentPinAttempt, authorizedPinCode, onAuthenticationSuccess]);
+    return () => { if (lockoutTimerRef.current) clearInterval(lockoutTimerRef.current); };
+  }, [lockoutTimeLeft]);
+
+  // Process PIN Verification
+  const processPinEntry = useCallback((pin: string) => {
+    if (pin === authorizedPinCode) {
+      onAuthenticationSuccess();
+      setCurrentPinAttempt('');
+      setFailedAttempts(0);
+    } else {
+      const newFailedCount = failedAttempts + 1;
+      setFailedAttempts(newFailedCount);
+      setHasAuthError(true);
+
+      // LOCKOUT LOGIC:
+      // 3 failed tries = 30s lockout
+      // 5+ failed tries = 5min lockout
+      if (newFailedCount >= 5) {
+        setLockoutTimeLeft(300); // 5 minutes
+      } else if (newFailedCount >= 3) {
+        setLockoutTimeLeft(30); // 30 seconds
+      }
+
+      setTimeout(() => {
+        setHasAuthError(false);
+        setCurrentPinAttempt('');
+      }, 500);
+    }
+  }, [authorizedPinCode, onAuthenticationSuccess, failedAttempts]);
 
   const handleDigitEntry = useCallback((digit: string) => {
+    if (lockoutTimeLeft > 0) return;
     if (currentPinAttempt.length < 4 && !hasAuthError) {
-      setCurrentPinAttempt(previousPin => previousPin + digit);
+      const nextPin = currentPinAttempt + digit;
+      setCurrentPinAttempt(nextPin);
+      
+      if (nextPin.length === 4) {
+        processPinEntry(nextPin);
+      }
     }
-  }, [currentPinAttempt.length, hasAuthError]);
+  }, [currentPinAttempt, hasAuthError, lockoutTimeLeft, processPinEntry]);
 
   const handleDeleteDigit = useCallback(() => {
+    if (lockoutTimeLeft > 0) return;
     if (!hasAuthError) {
       setCurrentPinAttempt(previousPin => previousPin.slice(0, -1));
     }
-  }, [hasAuthError]);
+  }, [hasAuthError, lockoutTimeLeft]);
 
   if (!isModalOpen) return null;
 
   return (
     <div className={theme.overlay} role="dialog">
-      {/* BACKGROUND DISMISSAL AREA */}
       <div className="absolute inset-0" onClick={onModalClose} />
 
       <div 
@@ -72,14 +104,20 @@ export default function PinModal({
         <div className={theme.headerWrapper}>
           <div className={theme.headerIconWrapper}>
             <div className={theme.headerIconSize}>
-              {globalIcons.lock}
+              {lockoutTimeLeft > 0 ? '⏳' : globalIcons.lock}
             </div>
           </div>
-          <h2 className={theme.typography.title}>Giriş Yapın</h2>
-          <p className={theme.typography.subtitle}>Mağaza yönetim şifrenizi girin</p>
+          <h2 className={theme.typography.title}>
+            {lockoutTimeLeft > 0 ? 'Güvenlik Kilidi' : 'Giriş Yapın'}
+          </h2>
+          <p className={theme.typography.subtitle}>
+            {lockoutTimeLeft > 0 
+              ? `${lockoutTimeLeft} saniye sonra tekrar deneyin` 
+              : 'Mağaza yönetim şifrenizi girin'}
+          </p>
         </div>
 
-        {/* PIN STATUS INDICATORS (APPLE STYLE) */}
+        {/* PIN STATUS INDICATORS */}
         <div className={theme.dotsWrapper}>
           {[0, 1, 2, 3].map(index => (
             <div 
@@ -87,49 +125,33 @@ export default function PinModal({
               className={`
                 ${theme.dotBase} 
                 ${currentPinAttempt.length > index ? theme.dotActive : theme.dotInactive} 
-                ${hasAuthError ? theme.dotError : ''}
+                ${hasAuthError || lockoutTimeLeft > 0 ? theme.dotError : ''}
               `}
             />
           ))}
         </div>
 
         {/* SECURE NUMBER PAD */}
-        <div className={theme.keyboardGrid}>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(number => (
-            <button
-              key={number}
-              onClick={() => handleDigitEntry(String(number))}
-              className={theme.keyButton}
-            >
-              <span className={theme.typography.keyText}>{number}</span>
+        <div className={`transition-opacity duration-300 ${lockoutTimeLeft > 0 ? 'opacity-20 pointer-events-none' : 'opacity-100'}`}>
+          <div className={theme.keyboardGrid}>
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(number => (
+              <button key={number} onClick={() => handleDigitEntry(String(number))} className={theme.keyButton}>
+                <span className={theme.typography.keyText}>{number}</span>
+              </button>
+            ))}
+            
+            <button onClick={onModalClose} className={theme.cancelButton}>
+              {LABELS.pinModal.cancelLabel}
             </button>
-          ))}
-          
-          {/* DISMISS ACTION */}
-          <button 
-            onClick={onModalClose}
-            className={theme.cancelButton}
-          >
-            {LABELS.pinModal.cancelLabel}
-          </button>
 
-          {/* ZERO KEY */}
-          <button
-            onClick={() => handleDigitEntry('0')}
-            className={theme.keyButton}
-          >
-            <span className={theme.typography.keyText}>0</span>
-          </button>
+            <button onClick={() => handleDigitEntry('0')} className={theme.keyButton}>
+              <span className={theme.typography.keyText}>0</span>
+            </button>
 
-          {/* BACKSPACE ACTION */}
-          <button
-            onClick={handleDeleteDigit}
-            className={theme.deleteButton}
-          >
-            <div className={theme.deleteIconSize}>
-              {globalIcons.backspace}
-            </div>
-          </button>
+            <button onClick={handleDeleteDigit} className={theme.deleteButton}>
+              <div className={theme.deleteIconSize}>{globalIcons.backspace}</div>
+            </button>
+          </div>
         </div>
 
       </div>

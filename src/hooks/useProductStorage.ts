@@ -37,7 +37,7 @@ export function useProductStorage() {
       }
 
       // SEO-Optimized Naming Strategy
-      const turkishCharMap: any = { 'ç':'c','ğ':'g','ı':'i','ö':'o','ş':'s','ü':'u','Ç':'C','Ğ':'G','İ':'I','Ö':'O','Ş':'S','Ü':'U' };
+      const turkishCharMap: Record<string, string> = { 'ç':'c','ğ':'g','ı':'i','ö':'o','ş':'s','ü':'u','Ç':'C','Ğ':'G','İ':'I','Ö':'O','Ş':'S','Ü':'U' };
       const sanitizedProductName = (targetProduct.name)
         .replace(/[çğıöşüÇĞİÖŞÜ]/g, (char) => turkishCharMap[char])
         .toLowerCase()
@@ -70,7 +70,7 @@ export function useProductStorage() {
       const { data: { publicUrl } } = supabase.storage.from(TECH.storage.bucket).getPublicUrl(lqStoragePath);
       return `${publicUrl}?t=${Date.now()}`;
 
-    } catch (criticalError: any) {
+    } catch (criticalError: unknown) {
       console.error('Visual asset deployment failed:', criticalError);
       throw criticalError;
     }

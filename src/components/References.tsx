@@ -1,4 +1,4 @@
-import { THEME, REFERENCES, LABELS } from '../data/config';
+import { THEME, REFERENCES } from '../data/config';
 
 /**
  * REFERENCES COMPONENT (100% Tokenized & Professional English)
@@ -13,9 +13,9 @@ export default function References() {
     <section className={referencesTheme.layout}>
       <div className={referencesTheme.container}>
         
-        {/* HEADER: Authoritative and clean social proof title */}
+        {/* HEADER: Minimalist section title */}
         <h2 className={referencesTheme.headerTitle}>
-          {LABELS.referencesTitle}
+          referanslar
         </h2>
 
         {/* LOGO GRID: Adaptive display for various device sizes */}
@@ -31,11 +31,6 @@ export default function References() {
                 aria-hidden="true"
               >
                 {referenceItem.logo}
-              </span>
-              
-              {/* BRAND IDENTITY: Clean and readable brand naming */}
-              <span className={referencesTheme.card.name}>
-                {referenceItem.name}
               </span>
             </div>
           ))}

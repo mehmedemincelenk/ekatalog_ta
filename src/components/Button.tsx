@@ -8,7 +8,7 @@ import { THEME } from '../data/config';
  */
 
 interface ButtonProps {
-  onClick: (event: React.MouseEvent) => void;
+  onClick?: (event: React.MouseEvent) => void;
   icon?: React.ReactNode;
   children?: React.ReactNode;
   variant?: keyof typeof THEME.button.variants;
