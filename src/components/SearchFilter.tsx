@@ -154,8 +154,20 @@ export default function SearchFilter({
     onCategoryToggle(LABELS.filter.allCategories);
   }, [onCategoryToggle]);
 
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // SCROLL SYNC: Ensure the selected category is always visible
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      const activeItem = scrollContainerRef.current.querySelector('.active-category');
+      if (activeItem) {
+        activeItem.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+  }, [activeCategories]);
+
   return (
-    <div className="w-full bg-white border-b border-stone-100 py-3">
+    <div className="w-full bg-white border-b border-stone-100 py-3 relative">
       <div className={filterTheme.container}>
         <div className={filterTheme.searchArea.wrapper}>
           <div className={`${filterTheme.searchArea.inputWrapper} ${THEME.radius.input}`}>
@@ -167,29 +179,38 @@ export default function SearchFilter({
               className={`${filterTheme.searchArea.input} ${THEME.radius.input}`}
             />
           </div>
-          <button onClick={() => setIsReyonOpen(!isReyonOpen)} className={`${filterTheme.searchArea.mobileToggle} ${THEME.radius.button}`}>
+          <button onClick={() => setIsReyonOpen(!isReyonOpen)} className={`${filterTheme.searchArea.mobileToggle} ${THEME.radius.button} sm:hidden`}>
             {LABELS.filter.categoryBtn}
           </button>
         </div>
 
-        <AnimatePresence>
-          {(isReyonOpen || (typeof window !== 'undefined' && window.innerWidth >= 640)) && (
-            <motion.div 
-              initial={isReyonOpen ? { height: 0, opacity: 0 } : {}}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="flex flex-wrap gap-2 pt-2 pb-1 w-full overflow-hidden"
+        <div className="relative mt-3 sm:mt-0 sm:ml-4 flex-1 min-w-0">
+          <div 
+            ref={scrollContainerRef}
+            className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth py-1 px-1 -mx-1"
+            style={{ 
+              msOverflowStyle: 'none', 
+              scrollbarWidth: 'none',
+              WebkitOverflowScrolling: 'touch'
+            }}
+          >
+            <style dangerouslySetInnerHTML={{ __html: `
+              .no-scrollbar::-webkit-scrollbar { display: none; }
+            `}} />
+            
+            <button 
+              onClick={handleAllCategories}
+              className={`
+                ${filterTheme.categoryList.chip.container} ${THEME.radius.chip} px-5 py-2.5 ${THEME.font.xs} font-black uppercase tracking-widest shrink-0 transition-all active:scale-95
+                ${activeCategories.length === 0 ? filterTheme.categoryList.chip.active + ' active-category' : filterTheme.categoryList.chip.inactive}
+              `}
             >
-              <button 
-                onClick={handleAllCategories}
-                className={`${filterTheme.categoryList.chip.container} ${THEME.radius.chip} px-5 py-2 ${THEME.font.xs} font-black uppercase tracking-widest ${activeCategories.length === 0 ? filterTheme.categoryList.chip.active : filterTheme.categoryList.chip.inactive}`}
-              >
-                {LABELS.filter.allCategories}
-              </button>
+              {LABELS.filter.allCategories}
+            </button>
 
-              {sortedList.map((cat) => (
+            {sortedList.map((cat) => (
+              <div key={cat} className={activeCategories.includes(cat) ? 'active-category' : ''}>
                 <CategoryFilterChip 
-                  key={cat} 
                   categoryName={cat} 
                   isItemSelected={activeCategories.includes(cat)} 
                   isAdminMode={isAdmin} 
@@ -200,10 +221,14 @@ export default function SearchFilter({
                   currentOrder={sortedList.indexOf(cat) + 1}
                   totalCategories={sortedList.length}
                 />
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </div>
+            ))}
+          </div>
+          
+          {/* GRADIENT OVERLAYS: Fade effect for scrolling indicator */}
+          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10 hidden sm:block"></div>
+          <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none z-10 hidden sm:block"></div>
+        </div>
       </div>
     </div>
   );
