@@ -4,10 +4,9 @@ import Button from './Button';
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white font-sans selection:bg-stone-900 selection:text-white">
-      {/* HERO SECTION */}
       <section className="pt-12 pb-20 px-4 text-center">
-        <div className="max-w-4xl mx-auto space-y-10">
-          <h1 className="text-6xl md:text-8xl font-black text-stone-900 tracking-tighter leading-[0.85] animate-in slide-in-from-bottom-8 duration-700">
+        <div className="max-w-4xl mx-auto space-y-8">
+          <h1 className="text-5xl md:text-7xl font-black text-stone-900 tracking-tighter leading-[0.85] animate-in slide-in-from-bottom-8 duration-700">
             basit. sade.<br />ekatalog.
           </h1>
           
@@ -15,15 +14,17 @@ export default function LandingPage() {
             Katalog maliyetinden kurtulun. Ürünlerinizi saniyeler içinde güncelleyin. Üstelik web adresiniz (sirketiniz.ekatalog.site) ömür boyu bizden 0₺.
           </p>
 
-          <div className="flex flex-col items-center pt-4">
-            <div className="bg-green-500 text-white px-10 py-4 rounded-2xl shadow-xl shadow-green-500/10 border border-green-400">
-              <span className="text-4xl font-black tracking-tighter">200₺</span>
-              <span className="text-green-100 font-bold ml-2 text-sm">/ ay</span>
+          <div className="pt-10 flex justify-center">
+            <div className="max-w-[280px] md:max-w-[320px] rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-stone-900 bg-stone-900 ring-1 ring-stone-200">
+              <img src="/images/catalog_preview.png" alt="E-Katalog Önizleme" className="w-full h-auto" />
             </div>
-            <p className="mt-4 text-stone-400 font-black text-[10px] uppercase tracking-[0.25em]">BİR KOLİ BANDI FİYATINA</p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
+          <div className="pt-4">
+            <p className="text-2xl font-black text-stone-900">sadece 200₺/ay</p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
             <a href="https://wa.me/905550000000" target="_blank" rel="noreferrer" className="w-full sm:w-auto">
               <Button variant="primary" size="lg" className="!rounded-full px-20 shadow-2xl font-black text-[12px] w-full sm:w-auto">
                 HEMEN BAŞLAYIN
