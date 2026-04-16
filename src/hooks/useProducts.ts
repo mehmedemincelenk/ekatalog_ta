@@ -29,9 +29,16 @@ export function useProducts(
    * @param isSilent - If true, loading state is not visually triggered (background sync).
    */
   const synchronizeInventory = useCallback(async (isSilent = false) => {
+    const currentSlug = getActiveStoreSlug();
+
     // 1. ANA SAYFA KONTROLÜ: Eğer ana sayfadaysak dükkan ID'si olmayacaktır, sorgu atma.
-    if (!storeSettings.id || getActiveStoreSlug() === 'main-site') {
+    if (currentSlug === 'main-site') {
       if (!isSilent) setIsInventoryLoading(false);
+      return;
+    }
+
+    // 2. DÜKKAN YÜKLENME KONTROLÜ: ID gelene kadar bekle
+    if (!storeSettings.id) {
       return;
     }
     
