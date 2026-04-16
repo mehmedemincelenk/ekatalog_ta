@@ -4,13 +4,20 @@ import Button from './Button';
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white font-sans selection:bg-stone-900 selection:text-white">
+      {/* STICKY PROMO BAR */}
+      <div className="sticky top-0 z-[100] bg-green-600 text-white py-3 px-4 text-center shadow-lg">
+        <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em]">
+          internet adresiniz <span className="bg-black/10 px-2 py-0.5 rounded">sirketiniz.ekatalog.site</span> ömür boyu 0₺
+        </p>
+      </div>
+
       <section className="pt-12 pb-20 px-4 text-center">
         <div className="max-w-4xl mx-auto space-y-8">
           <h1 className="text-5xl md:text-7xl font-black text-stone-900 tracking-tighter leading-[0.85] animate-in slide-in-from-bottom-8 duration-700">
             basit. sade.<br />ekatalog.
           </h1>
           
-          <p className="max-w-2xl mx-auto text-xl text-stone-500 font-medium leading-relaxed">
+          <p className="max-w-xl mx-auto text-base md:text-lg text-stone-500 font-medium leading-relaxed">
             Katalog maliyetinden kurtulun. Ürünlerinizi saniyeler içinde güncelleyin. Üstelik web adresiniz (sirketiniz.ekatalog.site) ömür boyu bizden 0₺.
           </p>
 
@@ -20,8 +27,9 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="pt-4">
-            <p className="text-2xl font-black text-stone-900">sadece 200₺/ay</p>
+          <div className="pt-6 space-y-2">
+            <p className="text-4xl font-black text-green-600 tracking-tighter">200₺<span className="text-sm opacity-50 ml-1">/ay</span></p>
+            <p className="text-stone-400 font-black text-[10px] uppercase tracking-[0.25em]">aylık bir koli bandı fiyatına</p>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
