@@ -14,19 +14,25 @@ export default function LandingPage() {
           </div>
           
           <h1 className="text-5xl md:text-7xl font-black text-stone-900 tracking-tighter leading-[0.9] animate-in slide-in-from-bottom-8 duration-700 delay-100">
-            Modern Bir<br />E-Kataloğunuz<br />Olsun.
+            E-Kataloğunuzu<br />Bugün<br />Yayına Alın.
           </h1>
           
           <p className="max-w-xl mx-auto text-lg text-stone-500 font-medium leading-relaxed animate-in slide-in-from-bottom-8 duration-700 delay-200">
             Ürünlerinizi profesyonel bir şekilde sergileyin, siparişleri doğrudan WhatsApp'tan alın. Karmaşık e-ticaret siteleriyle uğraşmayın, hızın tadını çıkarın.
           </p>
 
-          <div className="pt-4 animate-in fade-in duration-1000 delay-300">
+          <div className="pt-4 animate-in fade-in duration-1000 delay-300 flex flex-col items-center">
             <div className="inline-block bg-green-500 text-white px-6 py-3 rounded-2xl shadow-xl shadow-green-500/20 border border-green-400">
               <span className="text-3xl font-black tracking-tight">200₺</span>
               <span className="text-green-100 font-medium ml-2">/ aylık</span>
             </div>
-            <p className="text-[10px] text-stone-400 mt-3 font-bold uppercase tracking-widest">Sadece bir koli bandı fiyatına!</p>
+            <div className="mt-4 space-y-1">
+              <p className="text-stone-900 font-black text-[11px] uppercase tracking-[0.1em] flex items-center justify-center gap-2">
+                <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                Ek Olarak: Bedava Web Sitesi Adı Hediye!
+              </p>
+              <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest">Sadece bir koli bandı fiyatına!</p>
+            </div>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 animate-in slide-in-from-bottom-8 duration-700 delay-300">
@@ -57,7 +63,7 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-16">
           <div className="flex-1 space-y-8 text-center md:text-left">
             <h2 className="text-4xl md:text-5xl font-black text-stone-900 tracking-tight leading-tight">
-              Müşterileriniz Size<br />Hayran Kalsın.
+              Müşterilerinize<br />Güven Verin.
             </h2>
             <p className="text-lg text-stone-500 font-medium leading-relaxed">
               Fiyat listesi sormak isteyen müşterilerinize PDF göndermeyin. Onlara dükkanınıza özel, prestijli bir katalog adresi verin.
@@ -82,7 +88,7 @@ export default function LandingPage() {
              <div className="space-y-4 relative z-10">
                 <div className="w-16 h-1 bg-white/20 rounded-full mb-8"></div>
                 <h3 className="text-white text-3xl font-black tracking-tight leading-none">Kartvizitinizde<br />Harika Duracak.</h3>
-                <p className="text-white/50 text-sm font-medium">Müşterileriniz linke tıkladığında kataloğunuzun şıklığıyla karşılaşacak.</p>
+                <p className="text-white/50 text-sm font-medium">Müşterileriniz linke tıkladığında kataloğunuzun kalitesiyle karşılaşacak.</p>
              </div>
              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
                 <div className="flex items-center justify-between text-white text-xs font-bold uppercase tracking-[0.2em]">
@@ -129,7 +135,7 @@ export default function LandingPage() {
             Gelecek Dijitalde,<br />Dükkanınız Geride Kalmasın.
           </h2>
           <p className="text-stone-400 text-lg font-medium">
-            Ayda sadece 200₺'ye modern bir e-katalog sahibi olun.<br />Taahhüt yok, gizli ücret yok.
+            Ayda sadece 200₺'ye e-katalog sahibi olun.<br />Taahhüt yok, gizli ücret yok.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
             <a href="https://wa.me/905550000000" target="_blank" rel="noreferrer" className="w-full sm:w-auto group">
@@ -148,7 +154,7 @@ export default function LandingPage() {
                 size="lg" 
                 className="!bg-transparent !text-white !border-white/20 !rounded-full px-10 font-bold hover:!bg-white/10 transition-all"
               >
-                ÖRNEK KATALOĞU İNCELE
+                TEKRAR ÖRNEĞE BAK
               </Button>
             </a>
           </div>
