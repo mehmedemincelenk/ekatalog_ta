@@ -7,7 +7,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white font-sans selection:bg-stone-900 selection:text-white">
       {/* HERO SECTION */}
-      <section className="pt-20 pb-24 px-4 text-center">
+      <section className="pt-12 pb-24 px-4 text-center">
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-stone-100 rounded-full animate-in fade-in zoom-in duration-700">
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-500">Dükkanınız İçin En Akıllı Yatırım</span>
@@ -22,9 +22,9 @@ export default function LandingPage() {
           </p>
 
           <div className="pt-4 animate-in fade-in duration-1000 delay-300">
-            <div className="inline-block bg-stone-900 text-white px-6 py-3 rounded-2xl shadow-xl">
+            <div className="inline-block bg-green-500 text-white px-6 py-3 rounded-2xl shadow-xl shadow-green-500/20 border border-green-400">
               <span className="text-3xl font-black tracking-tight">200₺</span>
-              <span className="text-stone-400 font-medium ml-2">/ aylık</span>
+              <span className="text-green-100 font-medium ml-2">/ aylık</span>
             </div>
             <p className="text-[10px] text-stone-400 mt-3 font-bold uppercase tracking-widest">Sadece bir koli bandı fiyatına!</p>
           </div>
