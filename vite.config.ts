@@ -9,7 +9,6 @@ import { VitePWA } from 'vite-plugin-pwa';
  * Optimized for performance and full PWA support (Apple Home Screen compatible).
  */
 export default defineConfig({
-  base: '/ekatalog_ta/',
   plugins: [
     react(),
     VitePWA({
