@@ -110,7 +110,7 @@ const ProductGrid = memo(({
             </div>
 
             {categoryProducts.length > 0 ? (
-              <div className={`${theme.cols} ${theme.gap}`}>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-2 gap-y-4 sm:gap-x-6 sm:gap-y-10">
                 {categoryProducts.map((product, index) => {
                   const isPriority = priorityCounter < 4;
                   priorityCounter++;
