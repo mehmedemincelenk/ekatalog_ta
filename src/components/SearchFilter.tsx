@@ -157,6 +157,40 @@ export default function SearchFilter({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
+  const autoScrollRef = useRef<number | null>(null);
+  const [isUserInteracting, setIsUserInteracting] = useState(false);
+
+  // AUTO-SCROLL LOGIC: Subtle movement when idle
+  const startAutoScroll = useCallback(() => {
+    if (autoScrollRef.current) return;
+    
+    const performScroll = () => {
+      if (scrollContainerRef.current && !isUserInteracting) {
+        const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+        
+        // Loop back to start if reached end
+        if (scrollLeft >= scrollWidth - clientWidth - 1) {
+          scrollContainerRef.current.scrollLeft = 0;
+        } else {
+          scrollContainerRef.current.scrollLeft += 0.5; // Very slow and smooth
+        }
+      }
+      autoScrollRef.current = requestAnimationFrame(performScroll);
+    };
+    autoScrollRef.current = requestAnimationFrame(performScroll);
+  }, [isUserInteracting]);
+
+  const stopAutoScroll = useCallback(() => {
+    if (autoScrollRef.current) {
+      cancelAnimationFrame(autoScrollRef.current);
+      autoScrollRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    startAutoScroll();
+    return () => stopAutoScroll();
+  }, [startAutoScroll, stopAutoScroll]);
 
   // SCROLL SYNC & ARROW VISIBILITY
   const updateArrows = useCallback(() => {
@@ -176,13 +210,13 @@ export default function SearchFilter({
   useEffect(() => {
     if (scrollContainerRef.current) {
       const activeItem = scrollContainerRef.current.querySelector('.active-category');
-      if (activeItem) {
+      if (activeItem && isUserInteracting) { // Only snap if user clicked/changed
         activeItem.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
       }
     }
-  }, [activeCategories]);
+  }, [activeCategories, isUserInteracting]);
 
-  const scroll = (direction: 'left' | 'right') => {
+  const scrollManual = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
       const scrollAmount = 200;
       scrollContainerRef.current.scrollBy({ 
@@ -195,16 +229,26 @@ export default function SearchFilter({
   // MOUSE DRAG SCROLLING
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
+  const [scrollLeftState, setScrollLeftState] = useState(0);
 
   const handleMouseDown = (e: React.MouseEvent) => {
+    setIsUserInteracting(true);
     setIsDragging(true);
     setStartX(e.pageX - (scrollContainerRef.current?.offsetLeft || 0));
-    setScrollLeft(scrollContainerRef.current?.scrollLeft || 0);
+    setScrollLeftState(scrollContainerRef.current?.scrollLeft || 0);
+    stopAutoScroll();
   };
 
-  const handleMouseLeave = () => setIsDragging(false);
-  const handleMouseUp = () => setIsDragging(false);
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+    setIsUserInteracting(false);
+    startAutoScroll();
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+    setTimeout(() => setIsUserInteracting(false), 3000); // Resume auto-scroll after 3s idle
+  };
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging) return;
@@ -212,7 +256,7 @@ export default function SearchFilter({
     const x = e.pageX - (scrollContainerRef.current?.offsetLeft || 0);
     const walk = (x - startX) * 2;
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollLeft = scrollLeft - walk;
+      scrollContainerRef.current.scrollLeft = scrollLeftState - walk;
     }
   };
 
@@ -234,11 +278,15 @@ export default function SearchFilter({
           </button>
         </div>
 
-        <div className="relative mt-3 sm:mt-0 sm:ml-4 flex-1 min-w-0 group/scroll">
+        <div 
+          className="relative mt-3 sm:mt-0 sm:ml-4 flex-1 min-w-0 group/scroll"
+          onMouseEnter={() => setIsUserInteracting(true)}
+          onMouseLeave={() => setIsUserInteracting(false)}
+        >
           {/* LEFT ARROW */}
           {showLeftArrow && (
             <button 
-              onClick={() => scroll('left')}
+              onClick={() => scrollManual('left')}
               className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 flex items-center justify-center bg-white/90 backdrop-blur shadow-lg border border-stone-100 rounded-full text-stone-900 hidden sm:flex transition-opacity hover:bg-white"
             >
               <span className="w-4 h-4">{globalIcons.chevronLeft}</span>
@@ -252,6 +300,8 @@ export default function SearchFilter({
             onMouseLeave={handleMouseLeave}
             onMouseUp={handleMouseUp}
             onMouseMove={handleMouseMove}
+            onTouchStart={() => setIsUserInteracting(true)}
+            onTouchEnd={() => setTimeout(() => setIsUserInteracting(false), 3000)}
             className={`
               flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth py-1 px-1 -mx-1
               ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}
@@ -296,7 +346,7 @@ export default function SearchFilter({
           {/* RIGHT ARROW */}
           {showRightArrow && (
             <button 
-              onClick={() => scroll('right')}
+              onClick={() => scrollManual('right')}
               className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 flex items-center justify-center bg-white/90 backdrop-blur shadow-lg border border-stone-100 rounded-full text-stone-900 hidden sm:flex transition-opacity hover:bg-white"
             >
               <span className="w-4 h-4">{globalIcons.chevronRight}</span>
