@@ -7,7 +7,7 @@ export default function LandingPage() {
       {/* STICKY PROMO BAR */}
       <div className="sticky top-0 z-[100] bg-green-600 text-white py-3 px-4 text-center shadow-lg overflow-hidden">
         <p className="text-[10px] md:text-[12px] font-medium uppercase tracking-[0.1em] md:tracking-[0.2em] whitespace-nowrap opacity-90">
-          <span className="font-black bg-black/10 px-2 py-0.5 rounded mx-1 normal-case opacity-100">www.markaniz.ekatalog.site</span> website adresi <span className="font-black underline decoration-2 underline-offset-4">hediye!</span>
+          website adresi <span className="font-black opacity-100">hediye!</span> <span className="mx-2 opacity-50">→</span> <span className="font-black bg-black/10 px-2 py-0.5 rounded normal-case opacity-100">www.markaniz.ekatalog.site</span>
         </p>
       </div>
 
@@ -45,21 +45,38 @@ export default function LandingPage() {
                </p>
             </div>
 
-            <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-stone-900 font-bold text-[10px] uppercase tracking-[0.2em]">
-               <span className="flex items-center gap-2 opacity-60">Sınırsız Ürün</span>
-               <span className="flex items-center gap-2 opacity-60">WhatsApp Sipariş</span>
-               <span className="flex items-center gap-2 opacity-60">QR Kod Hediye</span>
+            {/* ALL FEATURES LIST */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-4 text-stone-900 font-bold text-[11px] uppercase tracking-[0.15em] border-t border-stone-100 pt-8 w-full max-w-2xl">
+               <span className="flex items-center gap-2">
+                 <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> Sınırsız Ürün
+               </span>
+               <span className="flex items-center gap-2">
+                 <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> WhatsApp Sipariş
+               </span>
+               <span className="flex items-center gap-2">
+                 <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> QR Kod Hediye
+               </span>
+               <span className="flex items-center gap-2">
+                 <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> Toplu Fiyat Zam/İndirim
+               </span>
+               <span className="flex items-center gap-2">
+                 <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> Sınırsız Reyon
+               </span>
+               <span className="flex items-center gap-2">
+                 <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> Hızlı Arama & Filtre
+               </span>
+               <span className="flex items-center gap-2">
+                 <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> Mobil Yönetim Paneli
+               </span>
+               <span className="flex items-center gap-2">
+                 <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> Stok Kontrolü
+               </span>
+               <span className="flex items-center gap-2">
+                 <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> Özel Web Adresi
+               </span>
             </div>
             
-            <p className="text-[10px] font-bold text-stone-300 uppercase tracking-widest">Kredi kartı gerekmez. İstediğiniz zaman durdurun.</p>
-          </div>
-
-          <div className="flex justify-center pt-10">
-            <a href="https://wa.me/905550000000" target="_blank" rel="noreferrer" className="w-full sm:w-auto">
-              <Button variant="primary" size="lg" className="!rounded-full px-24 shadow-2xl font-black text-[14px] w-full sm:w-auto hover:scale-105 transition-transform">
-                WHATSAPP'TAN İLETİŞİME GEÇ
-              </Button>
-            </a>
+            <p className="text-[10px] font-bold text-stone-300 uppercase tracking-widest">Cayma bedeli yok, istediğiniz zaman iptal edin.</p>
           </div>
         </div>
       </section>
