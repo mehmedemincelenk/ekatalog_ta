@@ -39,6 +39,7 @@ function CatalogView() {
     removeCategoryFromProducts, 
     addCategory, 
     bulkUpdatePrices,
+    uploadImage,
     loading: productsLoading 
   } = useProducts(search, activeCategories, isAdmin);
   
@@ -94,6 +95,7 @@ function CatalogView() {
           <ProductGrid 
             products={filteredProducts} categoryOrder={categoryOrder} isAdmin={isAdmin}
             onDelete={deleteProduct} onUpdate={updateProduct} onOrderUpdate={reorderProductsInCategory}
+            onImageUpload={uploadImage}
             activeDiscount={activeDiscount} visibleCategoryLimit={visibleCategoryLimit}
             onLoadMore={() => setVisibleCategoryLimit(prev => prev + 3)}
             activeCategories={activeCategories} onAddClick={() => setIsAddModalOpen(true)}
