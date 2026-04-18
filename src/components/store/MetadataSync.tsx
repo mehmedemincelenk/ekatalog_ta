@@ -6,6 +6,7 @@ import { CompanySettings } from '../../hooks/store/useSettings';
  * METADATA SYNC
  * -----------------------------------------------------------
  * Isolated component that handles side-effects like Title and Favicon.
+ * Now located within the store module.
  */
 const MetadataSync = memo(({ settings }: { settings: CompanySettings }) => {
   usePageMetadata(settings);

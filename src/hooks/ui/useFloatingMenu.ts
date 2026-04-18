@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useClickOutside } from './useClickOutside';
 
 /**
  * useFloatingMenu: Logic hook for expandable floating menus.
  * Handles auto-close on inactivity and click-outside detection.
+ * Refactored to use useClickOutside for cleaner logic.
  */
 export function useFloatingMenu() {
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
-  const menuContainerRef = useRef<HTMLDivElement>(null);
   const autoCloseTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const clearAutoCloseTimer = useCallback(() => {
@@ -16,36 +17,29 @@ export function useFloatingMenu() {
     }
   }, []);
 
+  const closeMenu = useCallback(() => {
+    setIsMenuExpanded(false);
+  }, []);
+
   const toggleMenu = useCallback(() => {
     clearAutoCloseTimer();
     setIsMenuExpanded(prev => !prev);
   }, [clearAutoCloseTimer]);
 
-  const closeMenu = useCallback(() => {
-    setIsMenuExpanded(false);
-  }, []);
+  // Handle outside clicks using dedicated hook
+  const menuContainerRef = useClickOutside(closeMenu, isMenuExpanded);
 
+  // Handle auto-close timer logic
   useEffect(() => {
-    const handlePointerDownOutside = (event: PointerEvent) => {
-      if (menuContainerRef.current && !menuContainerRef.current.contains(event.target as Node)) {
-        closeMenu();
-      }
-    };
-
     if (isMenuExpanded) {
-      document.addEventListener('pointerdown', handlePointerDownOutside);
       clearAutoCloseTimer();
-      // Auto-close after 3 seconds of inactivity
+      // Auto-close after 3 seconds of inactivity (Apple-style polish)
       autoCloseTimerRef.current = setTimeout(() => closeMenu(), 3000);
     } else {
-      document.removeEventListener('pointerdown', handlePointerDownOutside);
       clearAutoCloseTimer();
     }
 
-    return () => {
-      document.removeEventListener('pointerdown', handlePointerDownOutside);
-      clearAutoCloseTimer();
-    };
+    return () => clearAutoCloseTimer();
   }, [isMenuExpanded, clearAutoCloseTimer, closeMenu]);
 
   const wrapAction = useCallback((actionCallback: () => void) => {

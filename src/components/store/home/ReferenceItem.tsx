@@ -1,8 +1,8 @@
 import { memo } from 'react';
-import { THEME } from '../../data/config';
-import SmartImage from '../ui/SmartImage';
-import ImageActionWrapper from '../admin/ImageActionWrapper';
-import { useAsyncAction } from '../../hooks/ui/useAsyncAction';
+import { THEME } from '../../../data/config';
+import SmartImage from '../../ui/SmartImage';
+import ImageActionWrapper from '../../admin/ImageActionWrapper';
+import { useAsyncAction } from '../../../hooks/ui/useAsyncAction';
 
 interface ReferenceItemProps {
   id: number;

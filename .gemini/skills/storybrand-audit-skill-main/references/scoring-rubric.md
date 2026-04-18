@@ -65,7 +65,7 @@
 
 | Score | What It Looks Like |
 |-------|-------------------|
-| 1-2 | Homepage/content is about the company. No customer desire. "Founded in 2003, we are an award-winning..." |
+| 1-2 | lastuserpage/content is about the company. No customer desire. "Founded in 2003, we are an award-winning..." |
 | 3-4 | Customer vaguely implied. Desire unclear. "We help businesses succeed." |
 | 5-6 | Customer named, desire is soft/broad. "Small business owners who want to grow." |
 | 7-8 | Specific customer, specific desire. "Busy parents who want healthy dinners in 20 minutes." |
@@ -168,7 +168,7 @@ Max = 86
 
 ---
 
-## Bonus Scoring (Website Homepages Only)
+## Bonus Scoring (Website lastuserpages Only)
 
 ### Hero Image (+0 to +3)
 StoryBrand emphasizes that the above-fold image should show the customer in their SUCCESS state — not the company's building, team photo, or product in isolation.
@@ -526,7 +526,7 @@ After element-by-element rewrites, provide structural recommendations for any sy
 
 ## Content-Type Quick Checks
 
-### Website Homepage (10 criteria)
+### Website lastuserpage (10 criteria)
 Above-fold Grunt Test pass, aspirational hero image, direct CTA above fold, transitional CTA present, stakes section, 3-step plan, empathy + authority, success/transformation, minimal nav (≤7), one clear storyline
 
 ### Email

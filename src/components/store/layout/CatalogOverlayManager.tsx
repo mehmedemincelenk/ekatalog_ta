@@ -48,7 +48,6 @@ export const CatalogOverlayManager = memo(({
 
     {admin.isPinModalOpen && (
       <PinModal 
-        authorizedPinCode={admin.correctPin} 
         onAuthenticationSuccess={admin.onPinSuccess} 
         onModalClose={() => admin.setIsPinModalOpen(false)} 
       />

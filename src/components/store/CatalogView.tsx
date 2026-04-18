@@ -1,9 +1,9 @@
-import Navbar from './catalog/Navbar';
-import Footer from './catalog/footer/Footer';
+import Navbar from './layout/Navbar';
+import Footer from './layout/footer/Footer';
 import MetadataSync from './MetadataSync';
 import LoadingSpinner from '../ui/LoadingSpinner';
-import { CatalogMain } from './catalog/CatalogMain';
-import { CatalogOverlayManager } from './catalog/CatalogOverlayManager';
+import { CatalogMain } from './layout/CatalogMain';
+import { CatalogOverlayManager } from './layout/CatalogOverlayManager';
 import { useCatalogLogic } from '../../hooks/useCatalogLogic';
 import { UI } from '../../data/config';
 
@@ -11,7 +11,7 @@ import { UI } from '../../data/config';
  * CATALOG VIEW (Declarative Layout)
  * -----------------------------------------------------------
  * The main layout orchestrator for the store application.
- * Modularized for better maintainability.
+ * Now located in src/components/store/
  */
 export default function CatalogView() {
   const {
@@ -68,6 +68,7 @@ export default function CatalogView() {
       />
 
       <Footer 
+        onLogoClick={admin.logoGestureActions.onPointerDown}
         isAdmin={admin.isAdmin} 
         activeDiscount={activeDiscount} 
         onApplyDiscount={actions.applyDiscount} 

@@ -1,5 +1,5 @@
-import CatalogView from './components/layout/CatalogView';
-import LandingPage from './components/layout/LandingPage';
+import CatalogView from './components/store/CatalogView';
+import LandingPage from './components/mainpage/LandingPage';
 import { getActiveStoreSlug } from './utils/helpers/store';
 
 /**

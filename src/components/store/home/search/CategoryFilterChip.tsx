@@ -1,6 +1,6 @@
 import { memo } from 'react';
-import { THEME } from '../../../data/config';
-import { useLongPress } from '../../../hooks/ui/useLongPress';
+import { THEME } from '../../../../data/config';
+import { useLongPress } from '../../../../hooks/ui/useLongPress';
 import CategoryBadge from './CategoryBadge';
 
 interface CategoryFilterChipProps {

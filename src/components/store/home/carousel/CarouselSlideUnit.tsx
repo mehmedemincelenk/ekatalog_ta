@@ -1,8 +1,8 @@
 import { memo } from 'react';
-import { THEME } from '../../../data/config';
-import { Slide } from '../../../hooks/catalog/useCarousel';
-import SmartImage from '../../ui/SmartImage';
-import ImageActionWrapper from '../../admin/ImageActionWrapper';
+import { THEME } from '../../../../data/config';
+import { Slide } from '../../../../hooks/catalog/useCarousel';
+import SmartImage from '../../../ui/SmartImage';
+import ImageActionWrapper from '../../../admin/ImageActionWrapper';
 
 interface CarouselSlideUnitProps {
   slideData: Slide;

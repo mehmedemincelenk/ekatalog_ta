@@ -6,7 +6,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 /**
  * VITE CONFIGURATION (Senior Tier)
  * --------------------------------
- * Optimized for performance and full PWA support (Apple Home Screen compatible).
+ * Optimized for performance and full PWA support (Apple lastuser Screen compatible).
  */
 export default defineConfig({
   plugins: [

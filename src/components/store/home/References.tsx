@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { THEME } from '../../data/config';
+import { THEME } from '../../../data/config';
 import ReferenceItem from './ReferenceItem';
 
 interface ReferencesProps {
@@ -27,7 +27,7 @@ const References = memo(({ references, isAdmin, onUpdate }: ReferencesProps) => 
 
         {/* LOGO GRID */}
         <div className={referencesTheme.grid}>
-          {references.map((item) => (
+          {references.map((item: { id: number; logo: string; name: string }) => (
             <ReferenceItem 
               key={item.id}
               id={item.id}

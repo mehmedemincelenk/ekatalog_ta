@@ -1,6 +1,6 @@
 import { memo } from 'react';
-import { THEME } from '../../../data/config';
-import OrderSelector from '../../ui/OrderSelector';
+import { THEME } from '../../../../data/config';
+import OrderSelector from '../../../ui/OrderSelector';
 
 interface CategoryBadgeProps {
   isAdminMode: boolean;

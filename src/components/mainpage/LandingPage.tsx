@@ -1,14 +1,14 @@
 import { usePricingRotation } from '../../hooks/mainpage/usePricingRotation';
-import { StickyPromoBar } from '../mainpage/StickyPromoBar';
-import { HeroSection } from '../mainpage/HeroSection';
-import { PricingSection } from '../mainpage/PricingSection';
-import { CTASection } from '../mainpage/CTASection';
-import { LandingFooter } from '../mainpage/LandingFooter';
+import { StickyPromoBar } from './StickyPromoBar';
+import { HeroSection } from './HeroSection';
+import { PricingSection } from './PricingSection';
+import { CTASection } from './CTASection';
+import { LandingFooter } from './LandingFooter';
 
 /**
  * LANDING PAGE (ekatalog.site)
  * -----------------------------------------------------------
- * Main sales page for the product. Modular and optimized.
+ * Main sales page for the product. Now fully encapsulated in mainpage/ module.
  */
 export default function LandingPage() {
   const { currentPhrase } = usePricingRotation();

@@ -1,12 +1,12 @@
-import { THEME } from '../../../data/config';
-import { useCarousel } from '../../../hooks/catalog/useCarousel';
-import { useHeroCarousel } from '../../../hooks/ui/useHeroCarousel';
-import Button from '../../ui/Button';
+import { THEME } from '../../../../data/config';
+import { useCarousel, type Slide } from '../../../../hooks/catalog/useCarousel';
+import { useHeroCarousel } from '../../../../hooks/ui/useHeroCarousel';
+import Button from '../../../ui/Button';
 import CarouselSlideUnit from './CarouselSlideUnit';
 import CarouselNavigation from './CarouselNavigation';
 import CarouselIndicators from './CarouselIndicators';
 import CarouselEmptyState from './CarouselEmptyState';
-import ImageActionWrapper from '../../admin/ImageActionWrapper';
+import ImageActionWrapper from '../../../admin/ImageActionWrapper';
 
 /**
  * HERO CAROUSEL (Coordinator)
@@ -63,7 +63,7 @@ export default function HeroCarousel({ isAdminModeActive }: { isAdminModeActive:
         {...touchHandlers}
       >
         {/* SLIDE DEPLOYMENT */}
-        {slides.map((slide, index) => (
+        {slides.map((slide: Slide, index: number) => (
           <CarouselSlideUnit 
             key={slide.id} 
             slideData={slide} 

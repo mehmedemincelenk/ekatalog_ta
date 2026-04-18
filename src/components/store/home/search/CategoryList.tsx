@@ -1,5 +1,5 @@
 import { memo, useMemo } from 'react';
-import { THEME, LABELS } from '../../../data/config';
+import { THEME, LABELS } from '../../../../data/config';
 import { motion, AnimatePresence } from 'framer-motion';
 import CategoryFilterChip from './CategoryFilterChip';
 
@@ -44,7 +44,7 @@ const CategoryList = memo(({
         totalCategories={0}
       />
 
-      {list.map((cat) => (
+      {list.map((cat: string) => (
         <CategoryFilterChip 
           key={cat} 
           categoryName={cat} 

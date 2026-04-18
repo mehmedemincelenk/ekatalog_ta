@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import ModalBase from './ModalBase';
+import { ModalActions } from './ModalActions';
 
 interface ConfirmModalProps {
   title: string;
@@ -15,43 +16,34 @@ interface ConfirmModalProps {
  * CONFIRM MODAL
  * -----------------------------------------------------------
  * A specialized modal for final confirmation of critical actions.
- * Replaces window.confirm with a consistent, blurred Apple-style UI.
+ * Now uses Shared ModalActions for design consistency.
  */
 const ConfirmModal = memo(({ 
   title, 
   message, 
   onConfirm, 
   onCancel, 
-  confirmLabel = "EVET", 
-  cancelLabel = "VAZGEÇ",
+  confirmLabel, 
+  cancelLabel,
   variant = 'primary'
 }: ConfirmModalProps) => {
   return (
     <ModalBase onClose={onCancel} className="!max-w-[320px] p-0" overlayClass="!backdrop-blur-xl">
       <div className="flex flex-col">
-        {/* TEXT CONTENT */}
+        {/* 1. TEXT CONTENT SECTION */}
         <div className="px-6 pt-8 pb-6 text-center space-y-2">
           <h2 className="text-sm font-black text-stone-900 uppercase tracking-[0.2em]">{title}</h2>
           <p className="text-xs text-stone-400 font-medium leading-relaxed">{message}</p>
         </div>
 
-        {/* ACTION BUTTONS (Horizontal Split) */}
-        <div className="flex border-t border-stone-100 h-14">
-          <button 
-            onClick={onCancel}
-            className="flex-1 text-[10px] font-black text-stone-400 hover:text-stone-900 hover:bg-stone-50 transition-colors uppercase tracking-widest border-r border-stone-100"
-          >
-            {cancelLabel}
-          </button>
-          <button 
-            onClick={onConfirm}
-            className={`flex-1 text-[10px] font-black uppercase tracking-widest transition-colors ${
-              variant === 'danger' ? 'text-red-600 hover:bg-red-50' : 'text-green-600 hover:bg-green-50'
-            }`}
-          >
-            {confirmLabel}
-          </button>
-        </div>
+        {/* 2. ACTION BAR SECTION (Shared Component) */}
+        <ModalActions 
+          onCancel={onCancel}
+          onConfirm={onConfirm}
+          cancelLabel={cancelLabel}
+          confirmLabel={confirmLabel}
+          variant={variant}
+        />
       </div>
     </ModalBase>
   );

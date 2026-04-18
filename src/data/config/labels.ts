@@ -94,4 +94,9 @@ export const LABELS = {
   rightsReservedText: "Tüm Hakları Saklıdır.",
   discountApplied: (rate: number) => `%${rate * 100} İndirim Uygulandı`,
   codeLabel: (code: string) => `Kod: ${code}`,
+  confirmation: {
+    yes: "EVET",
+    no: "VAZGEÇ",
+    update: "GÜNCELLE",
+  },
 };

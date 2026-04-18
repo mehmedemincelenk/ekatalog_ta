@@ -1,6 +1,6 @@
 import { memo } from 'react';
-import { THEME, LABELS } from '../../../data/config';
-import Button from '../../ui/Button';
+import { THEME, LABELS } from '../../../../data/config';
+import Button from '../../../ui/Button';
 
 interface CarouselNavigationProps {
   onPrev: () => void;

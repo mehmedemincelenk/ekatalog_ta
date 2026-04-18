@@ -91,7 +91,7 @@ const ProductGrid = memo(({
             onClick={onLoadMore}
             className="px-12 py-4 bg-white border-2 border-stone-200 text-stone-900 font-black text-[11px] uppercase tracking-[0.2em] rounded-full hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all active:scale-95 shadow-lg"
           >
-            {LABELS.loadMore || "DAHA FAZLASI"}
+            {LABELS.loadMoreBtn || "DAHA FAZLASI"}
           </button>
         </div>
       )}

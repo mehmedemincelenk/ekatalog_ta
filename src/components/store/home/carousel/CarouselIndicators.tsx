@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { THEME, LABELS } from '../../../data/config';
+import { THEME, LABELS } from '../../../../data/config';
 
 interface CarouselIndicatorsProps {
   slidesCount: number;
@@ -17,7 +17,7 @@ const CarouselIndicators = memo(({ slidesCount, currentIndex, onDotClick }: Caro
 
   return (
     <div className={theme.navigation.dotsWrapper}>
-      {Array.from({ length: slidesCount }).map((_, dotIndex) => (
+      {Array.from({ length: slidesCount }).map((_, dotIndex: number) => (
         <button 
           key={dotIndex} 
           onClick={() => onDotClick(dotIndex)} 

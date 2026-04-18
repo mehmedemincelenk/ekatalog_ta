@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { THEME, LABELS } from '../../../data/config';
+import { THEME, LABELS } from '../../../../data/config';
 
 interface SearchBarProps {
   value: string;

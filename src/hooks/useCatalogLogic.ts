@@ -125,6 +125,7 @@ export function useCatalogLogic(): CatalogLogic {
     activeCategories,
     visibleCategoryLimit,
     isAddModalOpen,
+    isBulkUpdateModalOpen,
     isLoading,
     filteredProducts,
     allProducts: productController.allProducts,

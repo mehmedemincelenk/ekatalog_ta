@@ -25,6 +25,9 @@ export default function FloatingAdminMenu({
     wrapAction
   } = useFloatingMenu();
 
+  // Explicit type cast for div ref
+  const divRef = menuContainerRef as React.RefObject<HTMLDivElement>;
+
   const menuTheme = THEME.floatingAdminMenu;
   const globalIcons = THEME.icons;
 

@@ -1,17 +1,22 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { getActiveStoreSlug } from '../../utils/helpers/store';
+import { verifyStorePin } from '../../utils/helpers/auth';
 
 /**
  * usePinAuth: Logic hook for PIN-based authentication.
- * Handles digit entry, backspacing, brute-force protection, and lockout timers.
+ * Handles digit entry, server-side verification, and brute-force protection.
  */
-export function usePinAuth(authorizedPinCode: string, onSuccess: () => void) {
+export function usePinAuth(onSuccess: () => void) {
   const [currentPinAttempt, setCurrentPinAttempt] = useState('');
   const [hasAuthError, setHasAuthError] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
   
   // SECURITY STATE
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [lockoutTimeLeft, setLockoutTimeLeft] = useState(0);
   const lockoutTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const STORE_SLUG = getActiveStoreSlug();
 
   // Handle Lockout Countdown
   useEffect(() => {
@@ -25,9 +30,13 @@ export function usePinAuth(authorizedPinCode: string, onSuccess: () => void) {
     return () => { if (lockoutTimerRef.current) clearInterval(lockoutTimerRef.current); };
   }, [lockoutTimeLeft]);
 
-  // Process PIN Verification
-  const verifyPin = useCallback((pin: string) => {
-    if (pin === authorizedPinCode) {
+  // Process PIN Verification (Server-Side)
+  const verifyPin = useCallback(async (pin: string) => {
+    setIsVerifying(true);
+    
+    const isValid = await verifyStorePin(STORE_SLUG, pin);
+
+    if (isValid) {
       onSuccess();
       setCurrentPinAttempt('');
       setFailedAttempts(0);
@@ -48,10 +57,12 @@ export function usePinAuth(authorizedPinCode: string, onSuccess: () => void) {
         setCurrentPinAttempt('');
       }, 500);
     }
-  }, [authorizedPinCode, onSuccess, failedAttempts]);
+    setIsVerifying(false);
+  }, [STORE_SLUG, onSuccess, failedAttempts]);
 
   const enterDigit = useCallback((digit: string) => {
-    if (lockoutTimeLeft > 0) return;
+    if (lockoutTimeLeft > 0 || isVerifying) return;
+    
     if (currentPinAttempt.length < 4 && !hasAuthError) {
       const nextPin = currentPinAttempt + digit;
       setCurrentPinAttempt(nextPin);
@@ -60,14 +71,14 @@ export function usePinAuth(authorizedPinCode: string, onSuccess: () => void) {
         verifyPin(nextPin);
       }
     }
-  }, [currentPinAttempt, hasAuthError, lockoutTimeLeft, verifyPin]);
+  }, [currentPinAttempt, hasAuthError, lockoutTimeLeft, isVerifying, verifyPin]);
 
   const deleteDigit = useCallback(() => {
-    if (lockoutTimeLeft > 0) return;
+    if (lockoutTimeLeft > 0 || isVerifying) return;
     if (!hasAuthError) {
       setCurrentPinAttempt(previousPin => previousPin.slice(0, -1));
     }
-  }, [hasAuthError, lockoutTimeLeft]);
+  }, [hasAuthError, lockoutTimeLeft, isVerifying]);
 
   const resetAuth = useCallback(() => {
     setCurrentPinAttempt('');
@@ -78,6 +89,7 @@ export function usePinAuth(authorizedPinCode: string, onSuccess: () => void) {
     currentPinAttempt,
     hasAuthError,
     lockoutTimeLeft,
+    isVerifying,
     enterDigit,
     deleteDigit,
     resetAuth

@@ -1,9 +1,9 @@
-import { Product } from '../../../types';
-import { THEME } from '../../../data/config';
-import { useSearchFilterLogic } from '../../../hooks/catalog/useSearchFilterLogic';
+import { Product } from '../../../../types';
+import { THEME } from '../../../../data/config';
+import { useSearchFilterLogic } from '../../../../hooks/catalog/useSearchFilterLogic';
 import SearchBar from './SearchBar';
 import CategoryList from './CategoryList';
-import InputModal from '../../ui/InputModal';
+import InputModal from '../../../ui/InputModal';
 
 /**
  * SEARCH FILTER (Orchestrator)

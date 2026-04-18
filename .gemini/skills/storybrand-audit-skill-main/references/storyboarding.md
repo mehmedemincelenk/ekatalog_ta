@@ -50,7 +50,7 @@ Most companies position themselves as the hero (founding story, awards, journey)
 ### Three Levels of Problem
 - **External:** The tangible obstacle ("My roof is leaking")
 - **Internal:** How it makes them *feel* ("I'm embarrassed my house looks terrible")
-- **Philosophical:** Why it's just wrong ("Homeowners shouldn't live in fear of their roof collapsing")
+- **Philosophical:** Why it's just wrong ("lastuserowners shouldn't live in fear of their roof collapsing")
 
 **Critical insight:** Companies sell solutions to external problems, but customers *buy* solutions to internal problems.
 
@@ -120,7 +120,7 @@ Two qualities:
 
 ## 4. Website Application
 
-### The StoryBrand Homepage Wireframe
+### The StoryBrand lastuserpage Wireframe
 
 1. **Header/Hero (Above the Fold)** — Headline (what you offer, ~10 words), sub-headline (how life gets better), Direct CTA button, aspirational image showing customer SUCCESS (not your building)
 2. **Stakes Section** — Brief description of what happens without action
@@ -241,7 +241,7 @@ Each element scored on specificity, clarity, emotional resonance, and customer-c
 | Below 30 | F | Fundamentally broken. Start from BrandScript. |
 
 ### Content-Type Rubrics
-Separate rubrics exist for: Website homepage (10 criteria/20pts), Email (8/16pts), Sales deck (9/18pts), Social media (6/12pts), Video script (8/16pts). Each criterion scored 0/1/2.
+Separate rubrics exist for: Website lastuserpage (10 criteria/20pts), Email (8/16pts), Sales deck (9/18pts), Social media (6/12pts), Video script (8/16pts). Each criterion scored 0/1/2.
 
 ### Fix Priority
 1. Grunt Test failures (clarity first)

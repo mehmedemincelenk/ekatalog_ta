@@ -1,6 +1,6 @@
 import { memo } from 'react';
-import { THEME } from '../../../data/config';
-import ImageActionWrapper from '../../admin/ImageActionWrapper';
+import { THEME } from '../../../../data/config';
+import ImageActionWrapper from '../../../admin/ImageActionWrapper';
 
 interface CarouselEmptyStateProps {
   onAdd: (file: File) => void;

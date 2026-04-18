@@ -15,7 +15,7 @@ Audit any piece of communication against Donald Miller's StoryBrand SB7 framewor
 ## Audit Procedure
 
 ### Step 1: Identify Content Type
-Determine: website homepage, email, sales deck, social post, video script, or other. This selects which content-type checklist to apply alongside the core 7-element audit.
+Determine: website lastuserpage, email, sales deck, social post, video script, or other. This selects which content-type checklist to apply alongside the core 7-element audit.
 
 ### Step 2: Gather the Content
 - **Websites/URLs:** Fetch or screenshot the page. Capture above-fold content separately — this is where the Grunt Test applies.
@@ -50,7 +50,7 @@ Weighted Score = (Character × 1.2) + (Problem × 1.3) + (Guide × 1.0)
               + (Plan × 1.0) + (CTA × 1.3) + (Failure × 0.8) + (Success × 1.0)
 Final Score = Weighted Score − Penalties + Grunt Test Modifier + Bonuses
 ```
-For website homepages: add Hero Image bonus (+0 to +3) and Hero Specificity bonus (+0 to +2). Max score = 91.
+For website lastuserpages: add Hero Image bonus (+0 to +3) and Hero Specificity bonus (+0 to +2). Max score = 91.
 Assign letter grade: A (80-91), B (65-79), C (50-64), D (35-49), F (<35).
 
 ### Step 7: Generate Recommendations

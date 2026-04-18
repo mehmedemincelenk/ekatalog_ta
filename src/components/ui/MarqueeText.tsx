@@ -1,5 +1,6 @@
-import { useRef, useState, useEffect, memo } from 'react';
+import { useRef, memo } from 'react';
 import { THEME } from '../../data/config';
+import { useTextOverflow } from '../../hooks/ui/useTextOverflow';
 
 interface MarqueeTextProps {
   text: string;
@@ -9,10 +10,11 @@ interface MarqueeTextProps {
 }
 
 /**
- * MARQUEE TEXT COMPONENT (100% Tokenized & Professional English)
+ * MARQUEE TEXT COMPONENT
  * -----------------------------------------------------------
  * Handles overflow text with a sliding animation for customers, 
- * while keeping it editable for admins. Managed via THEME tokens.
+ * while keeping it editable for admins. 
+ * Refactored: Logic is extracted to useTextOverflow hook.
  */
 export const MarqueeText = memo(({ 
   text, 
@@ -21,26 +23,12 @@ export const MarqueeText = memo(({
   editableProps = {} 
 }: MarqueeTextProps) => {
   const textContainerRef = useRef<HTMLDivElement>(null);
-  const [hasTextOverflow, setHasTextOverflow] = useState(false);
+  
+  // Logical separation: Only UI concerns remain here
+  const hasTextOverflow = useTextOverflow(textContainerRef, text);
+  
   const { className: extraEditableClassName = '', ...remainingEditableProps } = editableProps;
-
   const marqueeTheme = THEME.typography.marquee;
-
-  useEffect(() => {
-    const element = textContainerRef.current;
-    if (!element) return;
-    
-    const checkTextOverflow = () => {
-      // Threshold of 2px to avoid sub-pixel rounding issues
-      setHasTextOverflow(element.scrollWidth > element.clientWidth + 2);
-    };
-    
-    checkTextOverflow();
-    const overflowObserver = new ResizeObserver(checkTextOverflow);
-    overflowObserver.observe(element);
-    
-    return () => overflowObserver.disconnect();
-  }, [text]);
 
   return (
     <div 
@@ -52,7 +40,7 @@ export const MarqueeText = memo(({
       `} 
       {...remainingEditableProps}
     >
-      {/* ANIMATED TRACK: Only active for customers when text overflows */}
+      {/* ANIMATED TRACK: Only active when text overflows and not in admin mode */}
       {hasTextOverflow && !isAdmin ? (
         <span className={marqueeTheme.track}>
           {text}&nbsp;&nbsp;&nbsp;{text}&nbsp;&nbsp;&nbsp;
@@ -63,4 +51,3 @@ export const MarqueeText = memo(({
     </div>
   );
 });
-

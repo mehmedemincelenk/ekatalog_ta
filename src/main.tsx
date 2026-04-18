@@ -17,7 +17,7 @@ import { registerSW } from 'virtual:pwa-register';
  *    ve tarayıcıya "Bunu göster" talimatı verilir.
  */
 
-// PWA: Register Service Worker for home screen installation and updates
+// PWA: Register Service Worker for lastuser screen installation and updates
 registerSW({ immediate: true });
 
 createRoot(document.getElementById('root')!).render(

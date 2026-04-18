@@ -1,6 +1,8 @@
-import { useState, memo, useEffect, useRef } from 'react';
+import { useState, memo } from 'react';
 import { THEME, LABELS } from '../../data/config';
 import ModalBase from './ModalBase';
+import { ModalActions } from './ModalActions';
+import { useAutoFocus } from '../../hooks/ui/useAutoFocus';
 
 interface InputModalProps {
   title: string;
@@ -15,7 +17,7 @@ interface InputModalProps {
  * INPUT MODAL
  * -----------------------------------------------------------
  * A clean, minimalist text input interface that replaces 
- * the native window.prompt. Features auto-focus and background blur.
+ * the native window.prompt. Features auto-focus via custom hook.
  */
 const InputModal = memo(({ 
   title, 
@@ -23,16 +25,11 @@ const InputModal = memo(({
   placeholder = "", 
   onConfirm, 
   onCancel,
-  submitLabel = "GÜNCELLE" 
+  submitLabel
 }: InputModalProps) => {
   const [inputValue, setInputValue] = useState(initialValue);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const theme = THEME.addProductModal; // Reusing consistent modal tokens
-
-  // Auto-focus on mount for faster UX
-  useEffect(() => {
-    setTimeout(() => inputRef.current?.focus(), 100);
-  }, []);
+  const inputRef = useAutoFocus<HTMLInputElement>();
+  const theme = THEME.addProductModal;
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,22 +58,12 @@ const InputModal = memo(({
           />
         </div>
 
-        {/* FOOTER ACTIONS */}
-        <div className="flex border-t border-stone-100 h-14">
-          <button 
-            type="button"
-            onClick={onCancel}
-            className="flex-1 text-[10px] font-black text-stone-400 hover:text-stone-900 hover:bg-stone-50 transition-colors uppercase tracking-widest border-r border-stone-100"
-          >
-            {LABELS.form.cancelBtn}
-          </button>
-          <button 
-            type="submit"
-            className="flex-1 text-[10px] font-black text-green-600 hover:bg-green-50 transition-colors uppercase tracking-widest"
-          >
-            {submitLabel}
-          </button>
-        </div>
+        {/* FOOTER ACTIONS (Shared Component) */}
+        <ModalActions 
+          onCancel={onCancel}
+          confirmLabel={submitLabel || LABELS.confirmation.update}
+          isForm={true}
+        />
       </form>
     </ModalBase>
   );

@@ -1,8 +1,8 @@
 import { memo } from 'react';
-import HeroCarousel from '../../home/carousel/HeroCarousel';
-import SearchFilter from '../../home/search/SearchFilter';
+import HeroCarousel from '../home/carousel/HeroCarousel';
+import SearchFilter from '../home/search/SearchFilter';
 import ProductGrid from '../../product/grid/ProductGrid';
-import References from '../../home/References';
+import References from '../home/References';
 
 interface CatalogMainProps {
   isAdmin: boolean;
@@ -21,8 +21,6 @@ interface CatalogMainProps {
 
 /**
  * CATALOG MAIN CONTENT
- * -----------------------------------------------------------
- * Groups the primary scrollable sections of the catalog.
  */
 export const CatalogMain = memo(({
   isAdmin,
