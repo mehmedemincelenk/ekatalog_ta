@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * INDEX.CSS (GÖRSEL AKIŞ VE CANLILIK)
+ * ---------------------------------
+ * Bir kurucu olarak bu dosya sitenin "Karakter Analizidir".
+ */
+
+body {
+  margin: 0;
+}
+
+@layer base {
+  body {
+    /* Sitenin genel zemin rengi ve ana yazı tipi */
+    @apply bg-stone-50 text-stone-900 font-sans;
+  }
+}
+
+@layer utilities {
+  /* CAROUSEL GEÇİŞİ: Afişler arası yumuşak geçiş */
+  .carousel-slide {
+    transition: opacity 0.8s ease-in-out;
+  }
+
+  /* ADMİN EDİTÖRÜ: Yazıların etrafındaki o çirkin mavi çerçeveyi kaldırır. */
+  [contenteditable='true'],
+  .admin-textarea {
+    outline: none !important;
+    cursor: text;
+  }
+
+  /* HATA TİTREŞİMİ: Apple tarzı PIN hata efekti */
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+  .animate-shake {
+    animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+  }
+
+  /* ADMİN BUTONU NEFES ALMA: Sağ alttaki admin butonunun dikkat çekmesini sağlar. */
+  @keyframes admin-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(180, 140, 80, 0.5); }
+    50% { box-shadow: 0 0 0 8px rgba(180, 140, 80, 0); }
+  }
+  .admin-fab {
+    animation: admin-pulse 2s ease-in-out infinite;
+  }
+
+  /**
+   * MARQUEE (YATAY KAYAN YAZI): 
+   * Ürün ismi çok uzunsa kartı bozmaz, yana doğru akar.
+   */
+  @keyframes marquee-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .marquee-track {
+    animation: marquee-scroll 6s linear infinite;
+    white-space: nowrap;
+  }
+
+  /* ÖZEL SCROLLBAR: Modern ve zarif kaydırma çubukları. */
+  .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
+
+  /* HAFİF GEÇİŞLER: Sistemin "yaşadığını" hissettiren premium efektler */
+  .fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Tüm hover geçişlerini standartlaştırır */
+  .transition-standard {
+    transition: all 0.2s ease-in-out;
+  }
+}
