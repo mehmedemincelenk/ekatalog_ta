@@ -1,7 +1,8 @@
 import { memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { THEME } from '../data/config';
 import { Slide } from '../hooks/useCarousel';
+import OrderSelector from './OrderSelector';
+import Button from './Button';
 
 interface CarouselSlideUnitProps {
   slideData: Slide;
@@ -63,55 +64,28 @@ const CarouselSlideUnit = memo(({
       {/* ADMIN CONTROLS ON SLIDE */}
       {isAdmin && isCurrentlyActive && (
         <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
-          <div 
-            className="relative flex items-center justify-center bg-white/90 backdrop-blur-md w-8 h-8 rounded-full shadow-2xl border border-white/20 cursor-pointer hover:bg-white transition-all active:scale-95 group"
-          >
-            {/* DISPLAY NUMBER */}
-            <div className="flex items-center justify-center overflow-hidden h-4 w-4">
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={currentIndex}
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: -20, opacity: 0 }}
-                  transition={{ duration: 0.3, ease: 'easeOut' }}
-                  className="text-stone-900 font-black text-xs absolute"
-                >
-                  {currentIndex}
-                </motion.span>
-              </AnimatePresence>
-            </div>
+          <OrderSelector 
+            currentOrder={currentIndex}
+            totalCount={totalSlides}
+            onChange={(newIdx) => onReorderSlide?.(slideData.id, newIdx)}
+          />
 
-            {/* HIDDEN DROPDOWN OVERLAY (Ilham: CategoryFilterChip) */}
-            <select 
-              value={currentIndex}
-              onChange={(e) => {
-                const newIdx = parseInt(e.target.value, 10);
-                if (newIdx !== currentIndex) onReorderSlide?.(slideData.id, newIdx);
-              }}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {Array.from({ length: totalSlides }, (_, i) => (
-                <option key={i + 1} value={i + 1}>{i + 1}. Sıra</option>
-              ))}
-            </select>
-          </div>
-
-          <button 
+          <Button 
             onClick={(e) => { e.stopPropagation(); onAddSlide?.(); }}
-            className="w-8 h-8 bg-white/90 backdrop-blur-md text-stone-900 rounded-full flex items-center justify-center shadow-2xl hover:bg-white transition-all active:scale-90 border border-white/20"
+            variant="glass"
+            mode="square"
+            size="xs"
+            icon={globalIcons.plus}
             title="Yeni Slide Ekle"
-          >
-            {globalIcons.plus}
-          </button>
-          <button 
+          />
+          <Button 
             onClick={(e) => { e.stopPropagation(); onDeleteSlide?.(slideData.id); }}
-            className="w-8 h-8 bg-red-500/90 backdrop-blur-md text-white rounded-full flex items-center justify-center shadow-2xl hover:bg-red-600 transition-all active:scale-90 border border-white/10"
+            variant="danger"
+            mode="square"
+            size="xs"
+            icon={<span>✕</span>}
             title="Slide Sil"
-          >
-            ✕
-          </button>
+          />
         </div>
       )}
 

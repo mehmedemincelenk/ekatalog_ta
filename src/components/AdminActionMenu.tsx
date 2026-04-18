@@ -56,8 +56,8 @@ export const AdminActionMenu = memo(({
 
   return (
     <div className="relative">
-      <div className={`${theme.adminMenu.mobileToggle} ${THEME.radius.badge}`}>
-        <div className={`absolute inset-0 flex items-center justify-center pointer-events-none ${theme.adminMenu.mobileIconColor} scale-75`}>
+      <div className="w-7 h-7 rounded-md bg-white/95 backdrop-blur-md shadow-2xl border border-white/40 flex items-center justify-center cursor-pointer hover:bg-white transition-all active:scale-95 group">
+        <div className={`flex items-center justify-center pointer-events-none ${theme.adminMenu.mobileIconColor} scale-75`}>
           {THEME.icons.dots}
         </div>
         <select 

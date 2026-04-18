@@ -12,7 +12,7 @@ import { transformCurrencyStringToNumber, formatNumberToCurrency } from '../util
 import { processDualQualityVisuals } from '../utils/image';
 
 const REPOSITORY_TABLE = 'prods';
-const STORE_SLUG = getActiveStoreSlug();
+
 
 /**
  * USE PRODUCTS HOOK (INVENTORY & CATALOG ENGINE)
@@ -65,7 +65,7 @@ export function useProducts(
     }
     
     if (!isSilent) setIsInventoryLoading(false);
-  }, [storeSettings.id, STORE_SLUG]);
+  }, [storeSettings.id]);
 
   useEffect(() => { synchronizeInventory(); }, [synchronizeInventory]);
 

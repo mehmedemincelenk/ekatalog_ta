@@ -7,7 +7,7 @@ interface DisplaySettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   settings: CompanySettings;
-  updateSetting: (key: keyof CompanySettings, value: any) => void;
+  updateSetting: <K extends keyof CompanySettings>(key: K, value: CompanySettings[K]) => void;
 }
 
 const DisplaySettingsModal = memo(({ isOpen, onClose, settings, updateSetting }: DisplaySettingsModalProps) => {

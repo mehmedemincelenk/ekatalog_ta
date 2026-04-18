@@ -2,6 +2,7 @@ import React, { useState, useMemo, memo, useEffect, useRef, useCallback } from '
 import { THEME, LABELS, TECH, sortCategories } from '../data/config';
 import { Product } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
+import OrderSelector from './OrderSelector';
 
 /**
  * SEARCH FILTER COMPONENT (Smart Hybrid Version)
@@ -78,20 +79,13 @@ const CategoryFilterChip = memo(({
     >
       <div className="relative h-full shrink-0 overflow-hidden flex items-center">
         {isAdminMode ? (
-          <div className="relative group px-1">
-            <span className={`${chipTheme.counter.base} ${chipTheme.counter.inactive} !w-7 !h-7 sm:!w-8 sm:!h-8 flex items-center justify-center text-[10px] font-black border-r border-stone-100`}>
-              {currentOrder}.
-            </span>
-            <select 
-              value={currentOrder}
-              onChange={(e) => onOrderChange?.(categoryName, parseInt(e.target.value, 10))}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {Array.from({ length: totalCategories }, (_, i) => (
-                <option key={i + 1} value={i + 1}>{i + 1}</option>
-              ))}
-            </select>
+          <div className="relative group px-1 h-8 flex items-center border-r border-stone-100">
+            <OrderSelector 
+              currentOrder={currentOrder}
+              totalCount={totalCategories}
+              onChange={(newPos) => onOrderChange(categoryName, newPos)}
+              className="!shadow-none !bg-transparent !border-none !h-7 !w-7"
+            />
           </div>
         ) : (
           <span className={`${chipTheme.counter.base} ${isItemSelected ? chipTheme.counter.active : chipTheme.counter.inactive}`}>

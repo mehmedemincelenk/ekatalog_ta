@@ -43,7 +43,7 @@ export function useCarousel(isAdministrativeModeActive: boolean) {
       setMarketingSlides(storeData.carousel_data.slides);
     }
     setIsCarouselContentLoading(false);
-  }, [STORE_SLUG]);
+  }, []);
 
   useEffect(() => {
     synchronizeCarouselSlides();
@@ -77,7 +77,7 @@ export function useCarousel(isAdministrativeModeActive: boolean) {
 
       if (updateError) console.error('Persistent carousel update failed:', updateError);
     }
-  }, [isAdministrativeModeActive, marketingSlides, STORE_SLUG]);
+  }, [isAdministrativeModeActive, marketingSlides]);
 
   /**
    * uploadHeroVisualAsset: Processes and uploads a new high-quality image for a slide.
@@ -142,7 +142,7 @@ export function useCarousel(isAdministrativeModeActive: boolean) {
       
       if (error) console.error('Failed to save new slide:', error);
     }
-  }, [isAdministrativeModeActive, marketingSlides, STORE_SLUG]);
+  }, [isAdministrativeModeActive, marketingSlides]);
 
   /**
    * removeSlide: Deletes a specific slide from the carousel.
@@ -161,7 +161,7 @@ export function useCarousel(isAdministrativeModeActive: boolean) {
       
       if (error) console.error('Failed to delete slide:', error);
     }
-  }, [isAdministrativeModeActive, marketingSlides, STORE_SLUG]);
+  }, [isAdministrativeModeActive, marketingSlides]);
 
   /**
    * reorderSlides: Moves a slide to a specific index within the sequence.
@@ -188,7 +188,7 @@ export function useCarousel(isAdministrativeModeActive: boolean) {
       
       if (error) console.error('Failed to reorder slides:', error);
     }
-  }, [isAdministrativeModeActive, marketingSlides, STORE_SLUG]);
+  }, [isAdministrativeModeActive, marketingSlides]);
 
   return { 
     slides: marketingSlides, 

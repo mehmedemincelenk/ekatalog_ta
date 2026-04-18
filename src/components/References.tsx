@@ -1,5 +1,7 @@
 import { THEME, REFERENCES } from '../data/config';
 import { useSettings } from '../hooks/useSettings';
+import OrderSelector from './OrderSelector';
+import Button from './Button';
 
 interface ReferencesProps {
   isAdmin?: boolean;
@@ -10,7 +12,6 @@ export default function References({ isAdmin = false, isInlineEnabled = true }: 
   const { settings, updateSetting } = useSettings(isAdmin);
   const referencesTheme = THEME.references;
   const globalIcons = THEME.icons;
-  const commonTheme = THEME.productCard;
 
   const activeReferences = settings.referencesData && settings.referencesData.length > 0 
     ? settings.referencesData 
@@ -87,27 +88,24 @@ export default function References({ isAdmin = false, isInlineEnabled = true }: 
                 <>
                   {/* ORDER SELECTOR */}
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className={`${commonTheme.orderSelect.wrapper} shadow-lg border-stone-200 !w-8 !h-8 bg-white`}>
-                      <select 
-                        value={index + 1} 
-                        onChange={(e) => handleOrderChange(ref.id, parseInt(e.target.value, 10))} 
-                        className={commonTheme.orderSelect.select}
-                      >
-                        {activeReferences.map((_, i) => (
-                          <option key={i + 1} value={i + 1}>{i + 1}</option>
-                        ))}
-                      </select>
-                    </div>
+                    <OrderSelector 
+                      currentOrder={index + 1}
+                      totalCount={activeReferences.length}
+                      onChange={(newPos) => handleOrderChange(ref.id, newPos)}
+                    />
                   </div>
  
                   {/* DELETE BUTTON */}
-                  <button 
-                    onClick={() => handleDelete(ref.id)}
-                    className="absolute -top-2 -right-2 w-6 h-6 bg-stone-900 text-white rounded-full flex items-center justify-center text-[10px] shadow-xl opacity-0 group-hover:opacity-100 transition-all hover:scale-110 z-20 border-2 border-white"
-                    aria-label="Referansı Sil"
-                  >
-                    ✕
-                  </button>
+                  <div className="absolute -top-2 -right-2 z-20 opacity-0 group-hover:opacity-100 transition-all">
+                    <Button 
+                      onClick={() => handleDelete(ref.id)}
+                      variant="danger"
+                      mode="square"
+                      size="xs"
+                      icon={<span>✕</span>}
+                      title="Referansı Sil"
+                    />
+                  </div>
                 </>
               )}
             </div>

@@ -13,10 +13,11 @@ interface ButtonProps {
   children?: React.ReactNode;
   variant?: keyof typeof THEME.button.variants;
   size?: keyof typeof THEME.button.sizes.circle; // Sizes are shared across modes
-  mode?: 'circle' | 'rectangle';
+  mode?: 'circle' | 'rectangle' | 'square';
   className?: string;
   disabled?: boolean;
   type?: 'button' | 'submit';
+  title?: string;
 }
 
 const Button = memo(({ 
@@ -28,19 +29,28 @@ const Button = memo(({
   mode = 'circle',
   className = '', 
   disabled = false,
-  type = 'button'
+  type = 'button',
+  title
 }: ButtonProps) => {
   
   const buttonTheme = THEME.button;
-  const variantStyles = buttonTheme.variants[variant];
-  const sizeStyles = buttonTheme.sizes[mode][size];
-  const globalRadius = mode === 'circle' ? 'rounded-full' : THEME.radius.button;
+  const variantStyles = buttonTheme.variants[variant as keyof typeof buttonTheme.variants] || buttonTheme.variants.secondary;
+  const sizeStyles = buttonTheme.sizes[mode as keyof typeof buttonTheme.sizes][size as keyof (typeof buttonTheme.sizes)['circle']] || buttonTheme.sizes.circle.md;
+  
+  const getRadius = () => {
+    if (mode === 'circle') return 'rounded-full';
+    if (mode === 'square') return 'rounded-md';
+    return THEME.radius.button;
+  };
+
+  const globalRadius = getRadius();
 
   return (
     <button 
       type={type}
       onClick={onClick}
       disabled={disabled}
+      title={title}
       className={`
         ${buttonTheme.base} 
         ${globalRadius} 

@@ -73,15 +73,16 @@ export const THEME = {
     variants: {
       primary: 'bg-stone-900 text-white border-stone-800 shadow-xl hover:bg-stone-800',
       secondary: 'bg-white text-stone-900 border-stone-200 shadow-lg hover:bg-stone-50',
-      danger: 'bg-red-50 text-red-600 border-red-100 shadow-md hover:bg-red-600 hover:text-white',
       success: 'bg-green-50 text-green-700 border-green-100 shadow-md hover:bg-green-600 hover:text-white',
       kraft: 'bg-kraft-600 text-white border-kraft-700 shadow-xl hover:bg-kraft-700',
-      glass: 'bg-stone-200/40 backdrop-blur-xl text-stone-900 border-white/20 hover:bg-stone-200/60 shadow-none',
+      glass: 'bg-white/40 backdrop-blur-md text-stone-900 border-white/20 hover:bg-white shadow-xl',
+      danger: 'bg-red-500/90 text-white backdrop-blur-md border-white/20 hover:bg-red-600 shadow-xl',
       ghost: 'bg-transparent text-stone-500 border-transparent hover:bg-stone-100 shadow-none',
       whatsapp: `bg-stone-900 text-white ${BR.low} transition-all active:scale-95 shadow-sm hover:bg-black`,
     },
     sizes: {
       circle: { xs: 'w-6 h-6', sm: 'w-9 h-9', md: 'w-11 h-11', lg: 'w-14 h-14' },
+      square: { xs: 'w-7 h-7 text-[10px]', sm: 'w-8 h-8 text-xs', md: 'w-10 h-10 text-sm', lg: 'w-12 h-12 text-base' },
       rectangle: { xs: 'px-2 py-1 text-[9px]', sm: 'px-4 py-2 text-[11px]', md: 'px-6 py-3 text-xs', lg: 'px-8 py-4 text-sm' }
     }
   },

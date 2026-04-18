@@ -48,7 +48,7 @@ export const MarqueeText = memo(({
     <div 
       ref={textContainerRef} 
       onClick={(e) => {
-        if (internalOnClick) (internalOnClick as any)(e);
+        if (internalOnClick) (internalOnClick as React.MouseEventHandler<HTMLDivElement>)(e);
         if (onClick) onClick(e);
       }}
       className={`

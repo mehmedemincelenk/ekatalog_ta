@@ -7,6 +7,7 @@ import Button from './Button';
 import { AdminActionMenu } from './AdminActionMenu';
 import { MarqueeText } from './MarqueeText';
 import { ActiveDiscount } from '../hooks/useDiscount';
+import OrderSelector from './OrderSelector';
 
 /**
  * PRODUCT CARD COMPONENT (100% Tokenized & Professional English)
@@ -228,17 +229,12 @@ const ProductCard = memo(({
         {isAdmin && (
           <>
             <div className="absolute top-2 left-2 z-30">
-              <div className={`${theme.orderSelect.wrapper} ${THEME.radius.badge} shadow-xl`}>
-                <select 
-                  value={orderIndex} 
-                  onChange={(e) => onOrderChange?.(product.id, parseInt(e.target.value, 10))} 
-                  className={theme.orderSelect.select}
-                >
-                  {Array.from({ length: itemsInCategory }, (_, i) => (
-                    <option key={i + 1} value={i + 1}>{i + 1}</option>
-                  ))}
-                </select>
-              </div>
+              <OrderSelector 
+                currentOrder={orderIndex}
+                totalCount={itemsInCategory}
+                onChange={(newPos) => onOrderChange?.(product.id, newPos)}
+                className="shadow-xl"
+              />
             </div>
             <div className="absolute top-2 right-2 z-30">
               <div className="shadow-xl rounded-full bg-white/90 backdrop-blur-md">
