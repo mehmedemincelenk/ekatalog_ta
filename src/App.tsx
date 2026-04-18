@@ -1,132 +1,25 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import Navbar from './components/Navbar';
-import HeroCarousel from './components/HeroCarousel';
-import SearchFilter from './components/SearchFilter';
-import ProductGrid from './components/ProductGrid';
-import Footer from './components/Footer';
-import FloatingAdminMenu from './components/FloatingAdminMenu';
-import AddProductModal from './components/AddProductModal';
-import BulkPriceUpdateModal from './components/BulkPriceUpdateModal';
-import PinModal from './components/PinModal';
-import References from './components/References';
-import LandingPage from './components/LandingPage';
-import { useProducts } from './hooks/useProducts';
-import { useAdminMode } from './hooks/useAdminMode';
-import { useDiscount } from './hooks/useDiscount';
-import { useSettings } from './hooks/useSettings';
-import { UI } from './data/config';
-import { getActiveStoreSlug } from './utils/store';
+import CatalogView from './components/layout/CatalogView';
+import LandingPage from './components/layout/LandingPage';
+import { getActiveStoreSlug } from './utils/helpers/store';
 
 /**
- * CATALOG VIEW: Sadece dükkanlar için çalışan ana bileşen.
- */
-function CatalogView() {
-  const { isAdmin, handleLogoPointerDown, handleLogoPointerUp, logout, isPinModalOpen, setIsPinModalOpen, correctPin, onPinSuccess } = useAdminMode();
-  const { settings, loading: settingsLoading } = useSettings(isAdmin);
-  const [search, setSearch] = useState('');
-  const [activeCategories, setActiveCategories] = useState<string[]>([]);
-
-  const { 
-    products, 
-    allProducts,
-    categoryOrder, 
-    addProduct, 
-    updateProduct, 
-    deleteProduct, 
-    reorderCategory: updateCategoryOrder, 
-    reorderProductsInCategory,
-    renameCategory, 
-    removeCategoryFromProducts, 
-    addCategory, 
-    bulkUpdatePrices,
-    uploadImage,
-    loading: productsLoading 
-  } = useProducts(search, activeCategories, isAdmin);
-  
-  const { activeDiscount, applyCode, error: discountError } = useDiscount();
-
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isBulkUpdateModalOpen, setIsBulkUpdateModalOpen] = useState(false);
-  const [visibleCategoryLimit, setVisibleCategoryLimit] = useState(2);
-
-  // FAVICON & TITLE SYNC
-  useEffect(() => {
-    if (!settings.id) return;
-    document.title = settings.title || 'E-Katalog';
-    if (settings.logoEmoji && (settings.logoEmoji.startsWith('data:image') || settings.logoEmoji.startsWith('http'))) {
-      const link: HTMLLinkElement = document.querySelector("link[rel*='icon']") || document.createElement('link');
-      link.type = 'image/x-icon';
-      link.rel = 'shortcut icon';
-      link.href = settings.logoEmoji;
-      document.getElementsByTagName('head')[0].appendChild(link);
-    }
-  }, [settings.logoEmoji, settings.title, settings.id]);
-
-  if (settingsLoading || productsLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-stone-50">
-        <div className="w-10 h-10 border-4 border-stone-200 border-t-stone-900 rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
-  const filteredProducts = products.filter((p) => {
-    const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) || 
-                         (p.description?.toLowerCase().includes(search.toLowerCase()));
-    const matchesCategory = activeCategories.length === 0 || activeCategories.includes(p.category);
-    const isVisible = !p.is_archived || isAdmin;
-    return matchesSearch && matchesCategory && isVisible;
-  });
-
-  return (
-    <div className={`min-h-screen ${UI.layout.bodyBg} ${UI.layout.selection} font-sans`}>
-      <Navbar onLogoPointerDown={handleLogoPointerDown} onLogoPointerUp={handleLogoPointerUp} onLogout={logout} isAdmin={isAdmin} settings={settings} />
-      <main>
-        <HeroCarousel isAdminModeActive={isAdmin} />
-        <SearchFilter 
-          products={products} categoryOrder={categoryOrder} onCategoryOrderChange={updateCategoryOrder}
-          search={search} onSearchChange={setSearch} activeCategories={activeCategories} onCategoryToggle={(cat) => {
-            if (cat === 'Tüm Ürünler') setActiveCategories([]);
-            else setActiveCategories((prev) => prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]);
-          }}
-          isAdmin={isAdmin} renameCategory={renameCategory} removeCategoryFromProducts={removeCategoryFromProducts}
-        />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <ProductGrid 
-            products={filteredProducts} categoryOrder={categoryOrder} isAdmin={isAdmin}
-            onDelete={deleteProduct} onUpdate={updateProduct} onOrderUpdate={reorderProductsInCategory}
-            onImageUpload={uploadImage}
-            activeDiscount={activeDiscount} visibleCategoryLimit={visibleCategoryLimit}
-            onLoadMore={() => setVisibleCategoryLimit(prev => prev + 3)}
-            activeCategories={activeCategories} onAddClick={() => setIsAddModalOpen(true)}
-          />
-        </div>
-        {!isAdmin && <References />}
-      </main>
-      <Footer onLogoClick={() => {}} isAdmin={isAdmin} activeDiscount={activeDiscount} onApplyDiscount={applyCode} discountError={discountError} settings={settings} />
-      {isAdmin && (
-        <>
-          <FloatingAdminMenu onProductAddTrigger={() => setIsAddModalOpen(true)} onBulkUpdateTrigger={() => setIsBulkUpdateModalOpen(true)} />
-          <AddProductModal isModalOpen={isAddModalOpen} onModalClose={() => setIsAddModalOpen(false)} onProductAddition={addProduct} availableCategories={categoryOrder} />
-          <BulkPriceUpdateModal isOpen={isBulkUpdateModalOpen} onClose={() => setIsBulkUpdateModalOpen(false)} allProducts={allProducts} categories={categoryOrder} onUpdate={bulkUpdatePrices} />
-        </>
-      )}
-      <PinModal isModalOpen={isPinModalOpen} authorizedPinCode={correctPin} onAuthenticationSuccess={onPinSuccess} onModalClose={() => setIsPinModalOpen(false)} />
-    </div>
-  );
-}
-
-/**
- * MAIN APP: Ana sayfa mı yoksa dükkan mı olduğuna burada karar verilir.
+ * MAIN APP
+ * -----------------------------------------------------------
+ * Acts as a traffic controller (Conductor).
+ * Decides whether to show the Landing Page or a specific Store Catalog.
  */
 export default function App() {
   const currentSlug = getActiveStoreSlug();
 
-  // Eğer ana sayfadaysak kataloğa dair HİÇBİR hook çalışmaz, direkt tanıtım sayfası gelir.
+  // Route to the marketing landing page for the main domain
   if (currentSlug === 'main-site') {
     return <LandingPage />;
   }
 
-  // Sadece subdomain varsa kataloğu yükle.
+  // Route to the dynamic catalog view for subdomains
   return <CatalogView />;
 }
+
+
+
+

@@ -1,5 +1,3 @@
-import React from "react";
-
 /**
  * BASE DESIGN TOKENS
  */
@@ -61,6 +59,7 @@ export const THEME = {
     backspace: <svg viewBox="0 0 24 24" className="w-full h-full fill-current"><path d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12.59L17.59 17 14 13.41 10.41 17 9 15.59 12.59 12 9 8.41 10.41 7 14 10.59 17.59 7 19 8.41 15.41 12 19 15.59z" /></svg>,
     chevronLeft: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-full h-full"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>,
     chevronRight: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-full h-full"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>,
+    chevronDown: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>,
     power: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-full h-full p-0.5"><path strokeLinecap="round" strokeLinejoin="round" d="M5.636 5.636a9 9 0 1 0 12.728 0M12 3v9" /></svg>,
     plus: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-full h-full p-0.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>,
     check: <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>,
@@ -149,8 +148,8 @@ export const THEME = {
   },
 
   searchFilter: {
-    layout: 'bg-white border-b border-stone-200 py-3 relative sticky top-[56px] sm:top-[72px] z-40',
-    container: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-start sm:items-center gap-3',
+    layout: 'w-full bg-white border-b border-stone-100 py-3 relative z-40',
+    container: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',
     searchArea: {
       wrapper: 'flex w-full sm:w-auto items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap',
       inputWrapper: `relative flex-1 sm:w-48 min-w-[140px] ${BR.low}`,
@@ -171,15 +170,25 @@ export const THEME = {
           base: `${FS.xs} font-black w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center shrink-0 transition-colors`,
           active: 'bg-white/20 text-white',
           inactive: 'bg-stone-50 text-stone-400 border-r border-stone-100',
+          admin: 'relative group px-1 text-[10px] sm:text-xs !w-7 !h-7 sm:!w-8 sm:!h-8',
         },
         adminSelectWrapper: 'relative w-8 h-full bg-white border-r border-stone-200 flex items-center justify-center overflow-hidden',
         adminSelect: `absolute inset-0 w-full h-full bg-transparent text-stone-900 ${FS.xs} font-black appearance-none text-center m-0 p-0 border-none outline-none cursor-pointer z-10`,
         textButton: `py-1.5 sm:py-2 ${FS.xs} font-black whitespace-nowrap flex items-center gap-1.5 px-1`,
         deleteIcon: 'ml-1 text-red-400 hover:text-red-600 font-black text-xs transition-colors',
       },
-      showMoreButton: `${BR.full} hidden sm:flex items-center gap-1.5 px-4 py-2 ${FS.xs} font-black bg-stone-50 text-stone-400 hover:bg-stone-100 hover:text-stone-700 transition-all`,
+      showMoreButton: `shrink-0 px-6 py-2.5 border-2 border-dashed border-stone-200 text-stone-400 font-black text-[10px] uppercase tracking-widest ${BR.full} hover:border-stone-900 hover:text-stone-900 transition-all active:scale-95`,
       addCategoryButton: `flex items-center justify-center w-9 h-9 border-2 border-dashed border-stone-200 text-stone-300 hover:border-stone-900 hover:text-stone-900 transition-all active:scale-90 group bg-stone-50/30 ${BR.low}`,
     }
+  },
+
+  imageActionWrapper: {
+    base: 'relative w-full h-full',
+    adminClickable: 'cursor-pointer group',
+    hoverHint: 'absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 z-10',
+    uploadingOverlay: 'absolute inset-0 z-30 flex flex-col items-center justify-center bg-white/40 backdrop-blur-[1px] animate-in fade-in duration-300',
+    spinner: `w-8 h-8 border-4 border-stone-300 border-t-stone-900 ${BR.full} animate-spin mb-2 shadow-sm`,
+    uploadLabel: `${FS.xs} font-black text-stone-900 bg-white/90 px-2 py-0.5 rounded shadow-sm uppercase tracking-tighter`,
   },
 
   productGrid: {
@@ -291,7 +300,7 @@ export const THEME = {
     },
     uploadOverlay: {
       wrapper: 'absolute inset-0 flex flex-col items-center justify-center bg-white/30 backdrop-blur-[1px] z-10',
-      spinner: `w-8 h-8 border-4 border-stone-300 border-t-stone-900 ${BR.full} animate-spin mb-2`,
+      spinner: `w-8 h-8 border-4 border-stone-300 border-t-stone-900 ${BR.full} animate-spin mb-2 shadow-sm`,
       label: `${FS.xs} font-black text-stone-900 bg-white/80 px-2 py-0.5 rounded shadow-sm`
     },
     status: {
@@ -344,6 +353,7 @@ export const THEME = {
   pinModal: {
     overlay: 'fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/40 backdrop-blur-xl animate-in fade-in duration-500',
     container: 'relative w-full max-w-[240px] sm:max-w-[280px] flex flex-col items-center select-none transform transition-transform duration-300',
+    modalBaseOverride: '!max-w-[240px] sm:!max-w-[280px] !bg-transparent !shadow-none !rounded-none',
     headerWrapper: 'text-center mb-6',
     headerIconWrapper: `w-12 h-12 bg-white/10 backdrop-blur-md ${BR.md} flex items-center justify-center mx-auto mb-3 shadow-xl border border-white/20`,
     headerIconSize: 'w-6 h-6 text-white',
@@ -354,7 +364,7 @@ export const THEME = {
     dotError: 'bg-red-500 border-red-500',
     keyboardGrid: 'grid grid-cols-3 gap-x-4 gap-y-3 w-full',
     keyButton: `group relative w-14 h-14 sm:w-16 sm:h-16 ${BR.full} bg-white/10 hover:bg-white/20 active:bg-white/30 border border-white/10 backdrop-blur-md transition-all flex items-center justify-center mx-auto overflow-hidden active:scale-90`,
-    cancelButton: `w-14 h-14 sm:w-16 sm:h-16 ${BR.full} flex items-center justify-center mx-auto text-white/40 hover:text-white/80 transition-colors ${FS.xs} font-bold active:scale-95`,
+    cancelButton: `w-14 h-14 sm:w-16 h-16 ${BR.full} flex items-center justify-center mx-auto text-white/40 hover:text-white/80 transition-colors ${FS.xs} font-bold active:scale-95`,
     deleteButton: `w-14 h-14 sm:w-16 sm:h-16 ${BR.full} flex items-center justify-center mx-auto text-white/60 hover:text-white active:scale-90 transition-all`,
     deleteIconSize: 'w-6 h-6',
     typography: {
