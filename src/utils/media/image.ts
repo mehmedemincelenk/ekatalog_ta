@@ -17,6 +17,24 @@ export const resolveVisualAssetUrl = (assetPath: string | null | undefined): str
 export const PLACEHOLDER_VISUAL_SYMBOL = TECH.storage.placeholderEmoji;
 
 /**
+ * sanitizeFileName: Prepares a safe string for storage paths.
+ * Replaces Turkish characters and non-alphanumeric symbols.
+ */
+export const sanitizeFileName = (input: string): string => {
+  const turkishMap: Record<string, string> = { 
+    'ç':'c','ğ':'g','ı':'i','ö':'o','ş':'s','ü':'u',
+    'Ç':'C','Ğ':'G','İ':'I','Ö':'O','Ş':'S','Ü':'U' 
+  };
+  
+  return input
+    .replace(/[çğıöşüÇĞİÖŞÜ]/g, (m: string) => turkishMap[m])
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]+/g, '')
+    .substring(0, TECH.products.maxFileNameLength);
+};
+
+/**
  * transformFileToVisualElement: Asynchronously converts a raw File object to an HTML Image.
  */
 const transformFileToVisualElement = (visualFile: File): Promise<HTMLImageElement> => {

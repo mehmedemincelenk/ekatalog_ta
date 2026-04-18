@@ -7,17 +7,18 @@ export const PRICING_PHRASES = [
   "aylık bi bardak kahve fiyatına"
 ];
 
-export function usePricingRotation() {
+export function usePricingRotation(phrases: string[] = PRICING_PHRASES) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
+    if (!phrases || phrases.length === 0) return;
     const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % PRICING_PHRASES.length);
+      setIndex((prev) => (prev + 1) % phrases.length);
     }, 2000);
     return () => clearInterval(interval);
-  }, []);
+  }, [phrases]);
 
   return {
-    currentPhrase: PRICING_PHRASES[index]
+    currentPhrase: phrases[index] || ''
   };
 }

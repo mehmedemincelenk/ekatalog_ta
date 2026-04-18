@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { calculatePromotionalPrice } from '../../utils/formatters/price';
+import { calculatePromotionalPrice, formatNumberToCurrency, transformCurrencyStringToNumber } from '../../utils/formatters/price';
 import { Product } from '../../types';
 import { ActiveDiscount } from './useDiscount';
 
@@ -12,14 +12,11 @@ export function useProductPricing(product: Product, activeDiscount?: ActiveDisco
   return useMemo(() => {
     const isPromotionActive = !!(activeDiscount && (!activeDiscount.category || activeDiscount.category === product.category));
     
-    const originalPriceLabel = product.price.includes('₺') ? product.price : `${product.price} ₺`;
+    // Standardize original price display
+    const originalPriceLabel = formatNumberToCurrency(transformCurrencyStringToNumber(product.price));
     
-    const discountedPriceValue = isPromotionActive && activeDiscount 
+    const discountedPriceLabel = isPromotionActive && activeDiscount 
       ? calculatePromotionalPrice(product.price, activeDiscount.rate) 
-      : null;
-      
-    const discountedPriceLabel = discountedPriceValue 
-      ? (discountedPriceValue.includes('₺') ? discountedPriceValue : `${discountedPriceValue} ₺`) 
       : null;
 
     return {

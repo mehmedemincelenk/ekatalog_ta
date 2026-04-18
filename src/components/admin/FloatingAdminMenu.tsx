@@ -5,18 +5,22 @@ import { useFloatingMenu } from '../../hooks/ui/useFloatingMenu';
 /**
  * FLOATING ADMIN MENU COMPONENT
  * -----------------------------------------------------------
- * AssistiveTouch-style management hub. 
- * Logic is encapsulated in the useFloatingMenu hook.
+ * AssistiveTouch-style management hub.
+ * Icons are centrally managed in THEME.icons for better SRP.
  */
 
 interface FloatingAdminMenuProps {
   onProductAddTrigger: () => void;
   onBulkUpdateTrigger?: () => void;
+  editMode: 'modal' | 'inline';
+  onToggleEditMode: () => void;
 }
 
 export default function FloatingAdminMenu({ 
   onProductAddTrigger,
-  onBulkUpdateTrigger
+  onBulkUpdateTrigger,
+  editMode,
+  onToggleEditMode
 }: FloatingAdminMenuProps) {
   const {
     isMenuExpanded,
@@ -25,14 +29,11 @@ export default function FloatingAdminMenu({
     wrapAction
   } = useFloatingMenu();
 
-  // Explicit type cast for div ref
-  const divRef = menuContainerRef as React.RefObject<HTMLDivElement>;
-
   const menuTheme = THEME.floatingAdminMenu;
-  const globalIcons = THEME.icons;
+  const icons = THEME.icons;
 
   return (
-    <div className={menuTheme.wrapper} ref={menuContainerRef}>
+    <div className={menuTheme.wrapper} ref={menuContainerRef as React.RefObject<HTMLDivElement>}>
       <div className={menuTheme.container}>
         
         {/* EXPANDABLE ACTION AREA */}
@@ -40,10 +41,21 @@ export default function FloatingAdminMenu({
           ${menuTheme.innerActions} 
           ${isMenuExpanded ? menuTheme.actionsActive : menuTheme.actionsInactive}
         `}>
+          
+          {/* EDIT MODE TOGGLE */}
+          <Button 
+            onClick={() => wrapAction(onToggleEditMode)}
+            icon={editMode === 'modal' ? icons.editCursor : icons.editWindow}
+            variant="secondary"
+            size="sm"
+            mode="circle"
+          />
+
+          {/* BULK UPDATE TRIGGER */}
           {onBulkUpdateTrigger && (
             <Button 
               onClick={() => wrapAction(onBulkUpdateTrigger)}
-              icon="+-"
+              icon={icons.priceMove}
               variant="secondary"
               size="sm"
               mode="circle"
@@ -51,9 +63,10 @@ export default function FloatingAdminMenu({
             />
           )}
 
+          {/* ADD PRODUCT TRIGGER */}
           <Button 
             onClick={() => wrapAction(onProductAddTrigger)}
-            icon={globalIcons.plus}
+            icon={icons.plus}
             variant="primary"
             size="sm"
             mode="circle"
@@ -64,7 +77,7 @@ export default function FloatingAdminMenu({
         {/* MAIN TOGGLE CONTROL */}
         <Button 
           onClick={toggleMenu}
-          icon={isMenuExpanded ? globalIcons.close : globalIcons.adminLayout}
+          icon={isMenuExpanded ? icons.close : icons.adminLayout}
           variant={isMenuExpanded ? 'ghost' : 'secondary'}
           size="sm"
           mode="circle"

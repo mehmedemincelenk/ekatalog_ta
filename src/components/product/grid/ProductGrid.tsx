@@ -14,7 +14,10 @@ import { ProductCategorySection } from './ProductCategorySection';
 interface ProductGridProps {
   products: Product[];
   categoryOrder: string[];
+  sortedCategories: string[];
   isAdmin: boolean;
+  editMode: 'modal' | 'inline';
+  openEditor: (title: string, value: string, onConfirm: (val: string) => Promise<void> | void) => void;
   onDelete: (id: string) => void;
   onUpdate: (id: string, changes: Partial<Product>) => void;
   onOrderUpdate: (id: string, newPosition: number) => void;
@@ -30,7 +33,10 @@ interface ProductGridProps {
 const ProductGrid = memo(({
   products = [], 
   categoryOrder = [], 
+  sortedCategories = [],
   isAdmin, 
+  editMode,
+  openEditor,
   onDelete, 
   onUpdate, 
   onOrderUpdate, 
@@ -45,7 +51,7 @@ const ProductGrid = memo(({
 
   const { groupedProducts, displayCategories } = useProductGridLogic({
     products,
-    categoryOrder,
+    sortedCategories,
     activeCategories,
     isAdmin
   });
@@ -73,6 +79,8 @@ const ProductGrid = memo(({
           category={category}
           products={groupedProducts[category] || []}
           isAdmin={isAdmin}
+          editMode={editMode}
+          openEditor={openEditor}
           categoryOrder={categoryOrder}
           onDelete={onDelete}
           onUpdate={onUpdate}

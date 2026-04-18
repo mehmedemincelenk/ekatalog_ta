@@ -1,4 +1,4 @@
-import { useState, memo } from 'react';
+import { useState, memo, useEffect } from 'react';
 import { PLACEHOLDER_VISUAL_SYMBOL } from '../../utils/media/image';
 
 interface SmartImageProps {
@@ -28,18 +28,24 @@ const SmartImage = memo(({
 }: SmartImageProps) => {
   const [status, setStatus] = useState<'loading' | 'error' | 'loaded'>(src ? 'loading' : 'error');
 
+  // Unified side-effect for source changes
+  useEffect(() => {
+    if (!src) {
+      setStatus('error');
+    } else {
+      setStatus('loading');
+    }
+  }, [src]);
+
   const containerStyle = `relative overflow-hidden bg-stone-100 flex items-center justify-center ${wrapperClass}`;
   const imageStyle = `w-full h-full transition-all duration-500 ${objectFit === 'cover' ? 'object-cover' : 'object-contain'} ${status === 'loading' ? 'blur-sm scale-105 opacity-50' : 'blur-0 scale-100 opacity-100'} ${className}`;
-
-  // Handle source changes
-  if (src && status === 'error') setStatus('loading');
-  if (!src && status !== 'error') setStatus('error');
 
   return (
     <div className={containerStyle}>
       {src && status !== 'error' ? (
         <>
           <img 
+            key={src} // Force reset if src changes significantly
             src={src} 
             alt={alt} 
             className={imageStyle}

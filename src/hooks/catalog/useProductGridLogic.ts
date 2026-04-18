@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
-import { sortCategories, TECH } from '../../data/config';
+import { TECH } from '../../data/config';
 import { Product } from '../../types';
 
 interface UseProductGridLogicProps {
   products: Product[];
-  categoryOrder: string[];
+  sortedCategories: string[];
   activeCategories: string[];
   isAdmin: boolean;
 }
@@ -12,44 +12,44 @@ interface UseProductGridLogicProps {
 /**
  * HOOK: useProductGridLogic
  * -----------------------------------------------------------
- * Centralizes grouping, filtering, and sorting logic for the product grid.
+ * Centralizes grouping and filtering logic for the product grid.
  */
 export function useProductGridLogic({ 
   products, 
-  categoryOrder, 
+  sortedCategories, 
   activeCategories, 
   isAdmin 
 }: UseProductGridLogicProps) {
   
   // 1. Group products by category
   const groupedProducts = useMemo(() => {
-    return products.reduce((acc, product) => {
+    const acc: Record<string, Product[]> = {};
+    products.forEach(product => {
       const category = product.category || TECH.products.fallbackCategory;
       if (!acc[category]) acc[category] = [];
       acc[category].push(product);
-      return acc;
-    }, {} as Record<string, Product[]>);
+    });
+    return acc;
   }, [products]);
 
-  // 2. Determine display categories based on filters and admin status
+  // 2. Filter categories based on selection and product existence
   const displayCategories = useMemo(() => {
-    const existingInProducts = Object.keys(groupedProducts);
-    const allCategories = [...new Set([...categoryOrder, ...existingInProducts])];
+    // Start with the globally sorted list
+    let filtered = sortedCategories;
 
-    let filtered = allCategories;
+    // Apply Active Category Filter (if any)
     if (activeCategories.length > 0) {
-      filtered = allCategories.filter(cat => activeCategories.includes(cat));
+      filtered = sortedCategories.filter(cat => activeCategories.includes(cat));
     }
 
-    const sorted = sortCategories(filtered, categoryOrder);
+    // Admin mode: Show everything in order
+    if (isAdmin) return filtered;
 
-    if (isAdmin) return sorted;
-
-    // User mode: Show categories with products OR explicitly selected categories
-    return sorted.filter(cat => 
-      (groupedProducts[cat] || []).length > 0 || activeCategories.includes(cat)
+    // User mode: Only show categories that have products
+    return filtered.filter(cat => 
+      (groupedProducts[cat] || []).length > 0
     );
-  }, [groupedProducts, categoryOrder, activeCategories, isAdmin]);
+  }, [sortedCategories, activeCategories, groupedProducts, isAdmin]);
 
   return {
     groupedProducts,

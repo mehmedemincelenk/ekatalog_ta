@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { THEME } from '../../../../data/config';
 import OrderSelector from '../../../ui/OrderSelector';
 
-interface CategoryBadgeProps {
+interface CategoryIndicatorProps {
   isAdminMode: boolean;
   productCount: number;
   currentOrder: number;
@@ -12,19 +12,19 @@ interface CategoryBadgeProps {
 }
 
 /**
- * CATEGORY BADGE
+ * CATEGORY INDICATOR
  * -----------------------------------------------------------
- * Specialized indicator within a CategoryFilterChip.
- * Uses OrderSelector for admin reordering.
+ * Specialized smart indicator within a CategoryFilterChip.
+ * Shows product count for users and OrderSelector for admins.
  */
-const CategoryBadge = memo(({ 
+const CategoryIndicator = memo(({ 
   isAdminMode, 
   productCount, 
   currentOrder, 
   totalCategories, 
   onOrderChange,
   isItemSelected
-}: CategoryBadgeProps) => {
+}: CategoryIndicatorProps) => {
   const { counter } = THEME.searchFilter.categoryList.chip;
 
   if (isAdminMode) {
@@ -49,4 +49,4 @@ const CategoryBadge = memo(({
   );
 });
 
-export default CategoryBadge;
+export default CategoryIndicator;

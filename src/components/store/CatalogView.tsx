@@ -14,78 +14,66 @@ import { UI } from '../../data/config';
  * Now located in src/components/store/
  */
 export default function CatalogView() {
-  const {
-    admin,
-    settings,
-    search,
-    activeCategories,
-    visibleCategoryLimit,
-    isAddModalOpen,
-    isBulkUpdateModalOpen,
-    isLoading,
-    filteredProducts,
-    allProducts,
-    categoryOrder,
-    activeDiscount,
-    discountError,
-    activeReferences,
-    confirmModal,
-    setSearch,
-    setIsAddModalOpen,
-    setIsBulkUpdateModalOpen,
-    actions
-  } = useCatalogLogic();
+  const logic = useCatalogLogic();
 
-  if (isLoading) {
+  if (logic.isLoading) {
     return <LoadingSpinner />;
   }
 
   return (
     <div className={`min-h-screen ${UI.layout.bodyBg} ${UI.layout.selection} font-sans`}>
-      <MetadataSync settings={settings} />
+      <MetadataSync settings={logic.settings} />
       
       <Navbar 
-        logoGestureActions={admin.logoGestureActions} 
-        onLogout={admin.logout} 
-        isAdmin={admin.isAdmin} 
-        settings={settings} 
-        onLogoUpdate={async (file) => { await actions.uploadLogo(file); }}
+        logoGestureActions={logic.admin.logoGestureActions} 
+        isAdmin={logic.admin.isAdmin} 
+        editMode={logic.editMode}
+        settings={logic.settings} 
+        onLogoUpdate={async (file) => { await logic.actions.uploadLogo(file); }}
+        onUpdateSetting={logic.actions.updateSetting}
+        openEditor={logic.stringEditor.openEditor}
       />
 
       <CatalogMain 
-        isAdmin={admin.isAdmin}
-        allProducts={allProducts}
-        filteredProducts={filteredProducts}
-        categoryOrder={categoryOrder}
-        activeCategories={activeCategories}
-        search={search}
-        visibleCategoryLimit={visibleCategoryLimit}
-        actions={actions}
-        setSearch={setSearch}
-        setIsAddModalOpen={setIsAddModalOpen}
-        activeReferences={activeReferences}
-        activeDiscount={activeDiscount}
+        isAdmin={logic.admin.isAdmin}
+        editMode={logic.editMode}
+        openEditor={logic.stringEditor.openEditor}
+        allProducts={logic.allProducts}
+        filteredProducts={logic.filteredProducts}
+        categoryOrder={logic.categoryOrder}
+        sortedCategories={logic.sortedCategories}
+        categoryStats={logic.categoryStats}
+        activeCategories={logic.activeCategories}
+        search={logic.search}
+        visibleCategoryLimit={logic.visibleCategoryLimit}
+        carouselSlides={logic.carouselSlides}
+        actions={logic.actions}
+        setSearch={logic.setSearch}
+        setIsAddModalOpen={logic.setIsAddModalOpen}
+        activeReferences={logic.activeReferences}
+        activeDiscount={logic.activeDiscount}
       />
 
       <Footer 
-        onLogoClick={admin.logoGestureActions.onPointerDown}
-        isAdmin={admin.isAdmin} 
-        activeDiscount={activeDiscount} 
-        onApplyDiscount={actions.applyDiscount} 
-        discountError={discountError} 
-        settings={settings} 
+        onLogoClick={() => logic.admin.logoGestureActions.onPointerDown({} as any)}
+        isAdmin={logic.admin.isAdmin} 
+        activeDiscount={logic.activeDiscount} 
+        onApplyDiscount={logic.actions.applyDiscount} 
+        discountError={logic.discountError} 
+        settings={logic.settings} 
       />
 
       <CatalogOverlayManager 
-        admin={admin}
-        allProducts={allProducts}
-        categoryOrder={categoryOrder}
-        isAddModalOpen={isAddModalOpen}
-        setIsAddModalOpen={setIsAddModalOpen}
-        isBulkUpdateModalOpen={isBulkUpdateModalOpen}
-        setIsBulkUpdateModalOpen={setIsBulkUpdateModalOpen}
-        confirmModal={confirmModal}
-        actions={actions}
+        admin={{ ...logic.admin, editMode: logic.editMode }}
+        allProducts={logic.allProducts}
+        categoryOrder={logic.categoryOrder}
+        isAddModalOpen={logic.isAddModalOpen}
+        setIsAddModalOpen={logic.setIsAddModalOpen}
+        isBulkUpdateModalOpen={logic.isBulkUpdateModalOpen}
+        setIsBulkUpdateModalOpen={logic.setIsBulkUpdateModalOpen}
+        confirmModal={logic.confirmModal}
+        stringEditor={logic.stringEditor}
+        actions={{ ...logic.actions, toggleEditMode: logic.toggleEditMode }}
       />
     </div>
   );

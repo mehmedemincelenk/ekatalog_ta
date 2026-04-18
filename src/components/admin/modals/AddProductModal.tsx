@@ -177,7 +177,7 @@ export default function AddProductModal({
       }, formState.selectedImageFile || undefined);
       handleCloseAndReset();
     } catch (error) {
-      setFormErrorMessage("Ürün eklenirken bir hata oluştu.");
+      setFormErrorMessage(LABELS.form.createError);
     } finally {
       setIsSubmittingData(false);
     }
@@ -281,7 +281,7 @@ export default function AddProductModal({
               className={theme.footerSubmit}
               icon={isSubmittingData ? <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : null}
             >
-              {isSubmittingData ? 'EKLENİYOR...' : LABELS.form.submitBtn}
+              {isSubmittingData ? LABELS.form.addingBtn : LABELS.form.submitBtn}
             </Button>
           </div>
         </form>

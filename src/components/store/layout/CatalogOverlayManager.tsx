@@ -2,23 +2,27 @@ import { memo } from 'react';
 import AdminOverlay from '../../admin/AdminOverlay';
 import PinModal from '../../admin/PinModal';
 import ConfirmModal from '../../ui/ConfirmModal';
+import InputModal from '../../ui/InputModal';
+import { CatalogLogic } from '../../../hooks/useCatalogLogic';
 
 interface CatalogOverlayManagerProps {
-  admin: any;
-  allProducts: any[];
-  categoryOrder: string[];
-  isAddModalOpen: boolean;
-  setIsAddModalOpen: (val: boolean) => void;
-  isBulkUpdateModalOpen: boolean;
-  setIsBulkUpdateModalOpen: (val: boolean) => void;
-  confirmModal: any;
-  actions: any;
+  admin: CatalogLogic['admin'] & { editMode: CatalogLogic['editMode'] };
+  allProducts: CatalogLogic['allProducts'];
+  categoryOrder: CatalogLogic['categoryOrder'];
+  isAddModalOpen: CatalogLogic['isAddModalOpen'];
+  setIsAddModalOpen: CatalogLogic['setIsAddModalOpen'];
+  isBulkUpdateModalOpen: CatalogLogic['isBulkUpdateModalOpen'];
+  setIsBulkUpdateModalOpen: CatalogLogic['setIsBulkUpdateModalOpen'];
+  confirmModal: CatalogLogic['confirmModal'];
+  stringEditor: CatalogLogic['stringEditor'];
+  actions: CatalogLogic['actions'] & { toggleEditMode: CatalogLogic['toggleEditMode'] };
 }
 
 /**
  * CATALOG OVERLAY MANAGER
  * -----------------------------------------------------------
  * Handles all floating layers, modals, and administrative tools.
+ * Now manages the global string editor modal.
  */
 export const CatalogOverlayManager = memo(({
   admin,
@@ -29,6 +33,7 @@ export const CatalogOverlayManager = memo(({
   isBulkUpdateModalOpen,
   setIsBulkUpdateModalOpen,
   confirmModal,
+  stringEditor,
   actions
 }: CatalogOverlayManagerProps) => (
   <>
@@ -42,6 +47,8 @@ export const CatalogOverlayManager = memo(({
         setIsAddModalOpen={setIsAddModalOpen}
         isBulkUpdateModalOpen={isBulkUpdateModalOpen}
         setIsBulkUpdateModalOpen={setIsBulkUpdateModalOpen}
+        editMode={admin.editMode || 'modal'}
+        toggleEditMode={actions.toggleEditMode}
         requestConfirmation={actions.requestConfirmation}
       />
     )}
@@ -60,6 +67,19 @@ export const CatalogOverlayManager = memo(({
         onConfirm={confirmModal.onConfirm}
         onCancel={confirmModal.close}
         variant={confirmModal.variant}
+      />
+    )}
+
+    {/* GLOBAL STRING EDITOR MODAL */}
+    {stringEditor.isOpen && (
+      <InputModal 
+        title={stringEditor.title}
+        initialValue={stringEditor.initialValue}
+        onConfirm={async (val) => {
+          await stringEditor.onConfirm(val);
+          stringEditor.closeEditor();
+        }}
+        onCancel={stringEditor.closeEditor}
       />
     )}
   </>

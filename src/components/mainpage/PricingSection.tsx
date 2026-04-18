@@ -2,15 +2,16 @@ import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface PricingSectionProps {
+  amount: string;
   currentPhrase: string;
 }
 
-export const PricingSection = memo(({ currentPhrase }: PricingSectionProps) => (
+export const PricingSection = memo(({ amount, currentPhrase }: PricingSectionProps) => (
   <section className="pb-20 px-4 flex flex-col items-center space-y-6">
     <div className="text-center flex flex-col items-center">
       <div className="w-fit flex flex-col items-center">
         <p className="text-6xl md:text-8xl font-black text-green-600 tracking-tighter leading-none pr-1">
-          ₺200<span className="text-lg font-bold opacity-70 ml-1">&nbsp;/&nbsp;ay&nbsp;</span>
+          ₺{amount}<span className="text-lg font-bold opacity-70 ml-1">&nbsp;/&nbsp;ay&nbsp;</span>
         </p>
         <div className="relative h-3 md:h-4 w-full -mt-1 md:-mt-2 overflow-visible">
           <AnimatePresence mode="wait">

@@ -1,38 +1,37 @@
 import { memo } from 'react';
 import { THEME, LABELS } from '../../../data/config';
 import { Product } from '../../../types';
+import { EditableField } from '../../ui/EditableField';
 
 interface ProductCardDescriptionProps {
   product: Product;
   isAdmin: boolean;
+  editMode: 'modal' | 'inline';
+  openEditor: (title: string, value: string, onConfirm: (val: string) => Promise<void> | void) => void;
   onUpdate: (field: keyof Product, value: string | boolean | null) => void;
 }
 
 /**
  * ATOM: ProductCardDescription
  * -----------------------------------------------------------
- * Handles description display and admin editing.
+ * Uses global EditableField for long-form product descriptions.
  */
-export const ProductCardDescription = memo(({ product, isAdmin, onUpdate }: ProductCardDescriptionProps) => {
+export const ProductCardDescription = memo(({ product, isAdmin, editMode, openEditor, onUpdate }: ProductCardDescriptionProps) => {
   const theme = THEME.productCard;
-  const adminLabels = LABELS.adminActions;
 
   return (
     <div className={theme.innerLayout.descriptionWrapper}>
-      {isAdmin ? (
-        <textarea 
-          defaultValue={product.description || ''} 
-          onBlur={(e) => onUpdate('description', e.target.value.trim())} 
-          className={`${theme.typography.description} ${theme.adminMenu.editHighlight} border ${theme.adminMenu.editBorder} ${THEME.radius.input} ${theme.adminMenu.editPadding} ${theme.adminMenu.textareaBase}`} 
-          placeholder={adminLabels.addDescription}
-        />
-      ) : (
-        product.description && (
-          <p className={`${theme.typography.description} ${theme.typography.descriptionClamp}`}>
-            {product.description}
-          </p>
-        )
-      )}
+      <EditableField 
+        value={product.description || ''}
+        title="Ürün Açıklaması"
+        isAdmin={isAdmin}
+        editMode={editMode}
+        openModal={openEditor}
+        onConfirm={(val) => onUpdate('description', val)}
+        type="textarea"
+        multiline={true}
+        className={`${theme.typography.description} ${!isAdmin ? theme.typography.descriptionClamp : 'w-full min-h-[40px]'}`}
+      />
     </div>
   );
 });

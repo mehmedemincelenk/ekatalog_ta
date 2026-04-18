@@ -13,10 +13,18 @@ import ImageActionWrapper from '../../../admin/ImageActionWrapper';
  * -----------------------------------------------------------
  * Final Modular State. Minimal logic, maximum composition.
  */
-export default function HeroCarousel({ isAdminModeActive }: { isAdminModeActive: boolean }) {
+export default function HeroCarousel({ 
+  isAdminModeActive, 
+  initialSlides = [],
+  onSync
+}: { 
+  isAdminModeActive: boolean;
+  initialSlides: Slide[];
+  onSync: (slides: Slide[]) => Promise<void> | void;
+}) {
   const { 
-    slides, uploadHeroImage, addSlide, loading, isUploading, activeUploadId 
-  } = useCarousel(isAdminModeActive);
+    slides, uploadHeroImage, addSlide, isUploading, activeUploadId 
+  } = useCarousel(initialSlides, onSync);
 
   const {
     currentlyActiveSlideIndex,
@@ -27,8 +35,6 @@ export default function HeroCarousel({ isAdminModeActive }: { isAdminModeActive:
   } = useHeroCarousel(slides.length, isAdminModeActive || isUploading);
 
   const theme = THEME.heroCarousel;
-
-  if (loading && slides.length === 0) return null;
 
   // --- VIEW 1: Empty State ---
   if (slides.length === 0 && isAdminModeActive) {

@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { Product } from '../../types';
 import { TECH } from '../../data/config';
 import { getActiveStoreSlug } from '../../utils/helpers/store';
+import { sanitizeFileName } from '../../utils/media/image';
 
 const STORE_SLUG = getActiveStoreSlug();
 
@@ -33,14 +34,8 @@ export function useProductStorage() {
         } catch (e) { /* Ignore cleanup errors */ }
       }
 
-      // Name Sanitization
-      const turkishMap: Record<string, string> = { 'ç':'c','ğ':'g','ı':'i','ö':'o','ş':'s','ü':'u','Ç':'C','Ğ':'G','İ':'I','Ö':'O','Ş':'S','Ü':'U' };
-      const safeName = targetProduct.name
-        .replace(/[çğıöşüÇĞİÖŞÜ]/g, (m: string) => turkishMap[m])
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^\w-]+/g, '')
-        .substring(0, TECH.products.maxFileNameLength);
+      // Name Sanitization: Delegated to Utility
+      const safeName = sanitizeFileName(targetProduct.name);
       
       const uniqueSuffix = Math.random().toString(36).substring(2, 6);
       const fileName = `${safeName}-${STORE_SLUG}-${uniqueSuffix}.jpg`;

@@ -25,7 +25,7 @@ export const MarqueeText = memo(({
   const textContainerRef = useRef<HTMLDivElement>(null);
   
   // Logical separation: Only UI concerns remain here
-  const hasTextOverflow = useTextOverflow(textContainerRef, text);
+  const hasTextOverflow = useTextOverflow(textContainerRef as React.RefObject<HTMLElement>, text);
   
   const { className: extraEditableClassName = '', ...remainingEditableProps } = editableProps;
   const marqueeTheme = THEME.typography.marquee;

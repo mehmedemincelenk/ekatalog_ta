@@ -15,8 +15,7 @@ export const getActiveStoreSlug = (): string => {
     hostname === '127.0.0.1' || 
     hostname.startsWith('192.168.')
   ) {
-    const envSlug = import.meta.env.VITE_STORE_SLUG;
-    return (envSlug && envSlug !== 'toptan-ambalajcim') ? envSlug : 'toptanambalajcim';
+    return import.meta.env.VITE_STORE_SLUG || 'demo-store';
   }
 
   // 2. Ana Domain Kontrolü (ekatalog.site veya www.ekatalog.site)

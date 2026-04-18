@@ -34,10 +34,19 @@ export const TECH = {
   adminTriggerClicks: 3,
   adminResetDelay: 2000,
   searchDebounceMs: 300,
+  tables: {
+    products: 'prods',
+    stores: 'stores',
+    siteConfig: 'site_config',
+  },
   auth: {
     sessionActiveValue: 'authorized_admin_active',
     pinLength: 4,
     timeoutMs: 3600000, // 1 hour inactivity timeout
+    lockoutDurationShort: 30, // 30 seconds after 3 failed attempts
+    lockoutDurationLong: 300, // 5 minutes after 5 failed attempts
+    attemptLimitShort: 3,
+    attemptLimitLong: 5,
   },
   carousel: {
     intervalMs: 5000,

@@ -1,12 +1,12 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useCallback } from 'react';
 import { THEME, LABELS } from '../../../../data/config';
 import { motion, AnimatePresence } from 'framer-motion';
 import CategoryFilterChip from './CategoryFilterChip';
 
 interface CategoryListProps {
   isOpen: boolean;
-  categories: string[];
-  visibleCategoriesPC: string[];
+  categories: string[];           // This is the FULL sorted list
+  visibleCategoriesPC: string[];  // This is the sliced list for desktop
   hasMorePC: boolean;
   activeCategories: string[];
   onToggle: (cat: string) => void;
@@ -20,8 +20,8 @@ interface CategoryListProps {
 /**
  * CATEGORY LIST
  * -----------------------------------------------------------
- * Adaptive list that handles both Mobile (expandable) 
- * and Desktop (paginated row) layouts internally.
+ * Standardized list coordinator. 
+ * Correctly maps ordering to the FULL categories list, not just visible ones.
  */
 const CategoryList = memo(({ 
   isOpen, categories, visibleCategoriesPC, hasMorePC, activeCategories, onToggle, 
@@ -29,13 +29,13 @@ const CategoryList = memo(({
 }: CategoryListProps) => {
   const theme = THEME.searchFilter.categoryList;
 
-  // Optimized Chip Rendering (DRY)
-  const renderChips = (list: string[]) => (
+  // Optimized Chip Rendering - Global list awareness is key for ordering!
+  const renderChips = useCallback((listToRender: string[]) => (
     <>
       <CategoryFilterChip 
         categoryName={LABELS.filter.allCategories}
         isItemSelected={activeCategories.length === 0}
-        isAdminMode={false} // "All" doesn't have admin reordering
+        isAdminMode={false}
         showBadge={false}
         onSelect={() => onToggle(LABELS.filter.allCategories)}
         onRename={() => {}}
@@ -44,25 +44,30 @@ const CategoryList = memo(({
         totalCategories={0}
       />
 
-      {list.map((cat: string) => (
-        <CategoryFilterChip 
-          key={cat} 
-          categoryName={cat} 
-          isItemSelected={activeCategories.includes(cat)} 
-          isAdminMode={isAdmin} 
-          productCount={stats[cat] || 0}
-          onSelect={onToggle}
-          onRename={onRename}
-          onOrderChange={onOrderChange}
-          currentOrder={categories.indexOf(cat) + 1}
-          totalCategories={categories.length}
-        />
-      ))}
+      {listToRender.map((cat: string) => {
+        // CRITICAL: We find the order based on the FULL categories list
+        const realOrder = categories.indexOf(cat) + 1;
+        
+        return (
+          <CategoryFilterChip 
+            key={cat} 
+            categoryName={cat} 
+            isItemSelected={activeCategories.includes(cat)} 
+            isAdminMode={isAdmin} 
+            productCount={stats[cat] || 0}
+            onSelect={onToggle}
+            onRename={onRename}
+            onOrderChange={onOrderChange}
+            currentOrder={realOrder}
+            totalCategories={categories.length}
+          />
+        );
+      })}
     </>
-  );
+  ), [categories, activeCategories, isAdmin, stats, onToggle, onRename, onOrderChange]);
 
-  const mobileContent = useMemo(() => renderChips(categories), [categories, activeCategories, isAdmin, stats]);
-  const desktopContent = useMemo(() => renderChips(visibleCategoriesPC), [visibleCategoriesPC, activeCategories, isAdmin, stats]);
+  const mobileContent = useMemo(() => renderChips(categories), [renderChips, categories]);
+  const desktopContent = useMemo(() => renderChips(visibleCategoriesPC), [renderChips, visibleCategoriesPC]);
 
   return (
     <div className="w-full mt-3">

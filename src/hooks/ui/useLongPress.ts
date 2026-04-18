@@ -9,8 +9,7 @@ interface LongPressOptions {
 
 /**
  * useLongPress: Pro-grade gesture hook.
- * Supports standard long press and advanced "Tap-then-Hold" patterns
- * with integrated haptic feedback.
+ * Optimized to use Pointer Events to prevent touch/mouse conflicts.
  */
 export function useLongPress(callback: () => void, options: LongPressOptions = {}) {
   const { 
@@ -26,13 +25,13 @@ export function useLongPress(callback: () => void, options: LongPressOptions = {
 
   const triggerHaptic = useCallback(() => {
     if (haptic && typeof navigator !== 'undefined' && navigator.vibrate) {
-      navigator.vibrate(10); // Apple-style subtle tick
+      navigator.vibrate(10);
     }
   }, [haptic]);
 
   const start = useCallback(() => {
+    // Prevent default only for long press logic, but keep it light
     if (sequenceMode && !isWaitingForHold.current) {
-      // Step 1: Handle first tap
       isWaitingForHold.current = true;
       if (sequenceTimerRef.current) clearTimeout(sequenceTimerRef.current);
       sequenceTimerRef.current = setTimeout(() => {
@@ -41,7 +40,6 @@ export function useLongPress(callback: () => void, options: LongPressOptions = {
       return;
     }
 
-    // Step 2: Handle the actual hold
     if (sequenceTimerRef.current) clearTimeout(sequenceTimerRef.current);
     
     timerRef.current = setTimeout(() => {
@@ -62,7 +60,6 @@ export function useLongPress(callback: () => void, options: LongPressOptions = {
     onPointerDown: start,
     onPointerUp: stop,
     onPointerLeave: stop,
-    onTouchStart: start,
-    onTouchEnd: stop,
+    // Note: Touch events omitted in favor of unified Pointer Events to prevent bubbling conflicts
   };
 }

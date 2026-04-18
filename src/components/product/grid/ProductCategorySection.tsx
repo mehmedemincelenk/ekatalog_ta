@@ -10,6 +10,8 @@ interface ProductCategorySectionProps {
   category: string;
   products: Product[];
   isAdmin: boolean;
+  editMode: 'modal' | 'inline';
+  openEditor: (title: string, value: string, onConfirm: (val: string) => Promise<void> | void) => void;
   categoryOrder: string[];
   onDelete: (id: string) => void;
   onUpdate: (id: string, changes: Partial<Product>) => void;
@@ -22,13 +24,13 @@ interface ProductCategorySectionProps {
 
 /**
  * COMPONENT: ProductCategorySection
- * -----------------------------------------------------------
- * Refactored to modular location: product/grid/
  */
 export const ProductCategorySection = memo(({
   category,
   products,
   isAdmin,
+  editMode,
+  openEditor,
   categoryOrder,
   onDelete,
   onUpdate,
@@ -48,13 +50,15 @@ export const ProductCategorySection = memo(({
         <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-2 gap-y-4 sm:gap-x-6 sm:gap-y-10">
           {products.map((product, index) => {
             const isPriority = isFirstSection && index < 4;
-            
+
             return (
               <ProductCard 
                 key={product.id}
                 product={product}
                 categories={categoryOrder}
                 isAdmin={isAdmin}
+                editMode={editMode}
+                openEditor={openEditor}
                 onDelete={onDelete}
                 onUpdate={onUpdate}
                 onOrderChange={onOrderUpdate}

@@ -14,6 +14,8 @@ import InputModal from '../../../ui/InputModal';
 interface SearchFilterProps {
   products: Product[];
   categoryOrder: string[];
+  sortedCategories: string[];
+  categoryStats: Record<string, number>;
   onCategoryOrderChange: (categoryName: string, newPosition: number) => void;
   search: string;
   onSearchChange: (val: string) => void;
@@ -26,6 +28,8 @@ interface SearchFilterProps {
 export default function SearchFilter({ 
   products = [], 
   categoryOrder = [], 
+  sortedCategories = [],
+  categoryStats = {},
   search, 
   onSearchChange, 
   activeCategories = [], 
@@ -46,7 +50,7 @@ export default function SearchFilter({
     stats,
     loadMorePC,
     renameModal
-  } = useSearchFilterLogic(products, categoryOrder, search, onSearchChange);
+  } = useSearchFilterLogic(sortedCategories, categoryStats, search, onSearchChange);
 
   const theme = THEME.searchFilter;
 

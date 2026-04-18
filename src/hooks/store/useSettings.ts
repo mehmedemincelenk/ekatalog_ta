@@ -58,7 +58,7 @@ export function useSettings(isAdministrativeModeActive: boolean) {
     }
     
     const { data: storeConfig, error: fetchError } = await supabase
-      .from('stores')
+      .from(TECH.tables.stores)
       .select('*')
       .eq('slug', STORE_SLUG)
       .single();
@@ -102,7 +102,7 @@ export function useSettings(isAdministrativeModeActive: boolean) {
       if (settingKey === 'categoryOrder') updatePayload.category_order = newValue;
       if (settingKey === 'referencesData') updatePayload.references_data = newValue;
 
-      await supabase.from('stores').update(updatePayload).eq('slug', STORE_SLUG);
+      await supabase.from(TECH.tables.stores).update(updatePayload).eq('slug', STORE_SLUG);
     }
   }, [isAdministrativeModeActive]);
 

@@ -12,6 +12,8 @@ interface AdminOverlayProps {
   setIsAddModalOpen: (isOpen: boolean) => void;
   isBulkUpdateModalOpen: boolean;
   setIsBulkUpdateModalOpen: (isOpen: boolean) => void;
+  editMode: 'modal' | 'inline';
+  toggleEditMode: () => void;
   requestConfirmation: (options: { title: string, message: string, onConfirm: () => void, variant?: 'danger' | 'primary' }) => void;
 }
 
@@ -19,7 +21,6 @@ interface AdminOverlayProps {
  * ADMIN OVERLAY COMPONENT
  * -----------------------------------------------------------
  * Orchestrates all admin-only modals and floating menus.
- * Moved to components/admin for better feature isolation.
  */
 export default function AdminOverlay({
   allProducts,
@@ -30,6 +31,8 @@ export default function AdminOverlay({
   setIsAddModalOpen,
   isBulkUpdateModalOpen,
   setIsBulkUpdateModalOpen,
+  editMode,
+  toggleEditMode,
   requestConfirmation
 }: AdminOverlayProps) {
   return (
@@ -37,6 +40,8 @@ export default function AdminOverlay({
       <FloatingAdminMenu 
         onProductAddTrigger={() => setIsAddModalOpen(true)} 
         onBulkUpdateTrigger={() => setIsBulkUpdateModalOpen(true)} 
+        editMode={editMode}
+        onToggleEditMode={toggleEditMode}
       />
       
       {isAddModalOpen && (

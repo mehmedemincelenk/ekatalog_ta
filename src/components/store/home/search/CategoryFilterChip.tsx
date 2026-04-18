@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { THEME } from '../../../../data/config';
 import { useLongPress } from '../../../../hooks/ui/useLongPress';
-import CategoryBadge from './CategoryBadge';
+import CategoryIndicator from './CategoryIndicator';
 
 interface CategoryFilterChipProps {
   categoryName: string;
@@ -71,7 +71,7 @@ const CategoryFilterChip = memo(({
     >
       {/* 1. Specialized Counter/Order Indicator (Conditional) */}
       {(showBadge || isAdminMode) && (
-        <CategoryBadge 
+        <CategoryIndicator 
           isAdminMode={isAdminMode}
           productCount={productCount}
           currentOrder={currentOrder}

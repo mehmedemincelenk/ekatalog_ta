@@ -55,6 +55,8 @@ export const LABELS = {
     requiredFieldsError: "Lütfen zorunlu alanları doldurun.",
     cancelBtn: "İptal",
     submitBtn: "Mağazaya Ekle",
+    addingBtn: "EKLENİYOR...",
+    createError: "Ürün eklenirken bir hata oluştu.",
   },
   bulkPriceUpdate: {
     title: "Toplu Fiyat Güncelleme",

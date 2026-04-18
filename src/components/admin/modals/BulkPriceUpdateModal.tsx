@@ -125,18 +125,22 @@ const BulkPriceUpdateModal = memo(({ onClose, onUpdate, categories, allProducts 
                 />
               </div>
               <div className="flex-[1.2] flex gap-2 h-full">
-                <button
+                <Button
                   onClick={() => setIsIncrease(true)}
-                  className={`flex-1 py-2.5 rounded-lg font-black text-[9px] transition-all border-2 ${isIncrease === true ? 'bg-stone-900 text-white border-stone-900 shadow-md' : 'bg-white text-stone-400 border-stone-200 hover:border-stone-400'}`}
+                  variant={isIncrease === true ? 'primary' : 'secondary'}
+                  mode="rectangle"
+                  className={`flex-1 py-3 !text-[9px] ${isIncrease !== true ? '!text-stone-400' : ''}`}
                 >
                   ZAM
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => setIsIncrease(false)}
-                  className={`flex-1 py-2.5 rounded-lg font-black text-[9px] transition-all border-2 ${isIncrease === false ? 'bg-red-600 text-white border-red-600 shadow-md' : 'bg-white text-stone-400 border-stone-200 hover:border-red-400 hover:text-red-500'}`}
+                  variant={isIncrease === false ? 'danger' : 'secondary'}
+                  mode="rectangle"
+                  className={`flex-1 py-3 !text-[9px] ${isIncrease !== false ? '!text-stone-400' : ''}`}
                 >
                   İNDİRİM
-                </button>
+                </Button>
               </div>
             </div>
 

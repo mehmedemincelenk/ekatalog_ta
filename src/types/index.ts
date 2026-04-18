@@ -41,3 +41,14 @@ export interface SearchLog {
   timestamp: string;
   term: string;
 }
+
+/**
+ * LandingConfig: Landing page (ekatalog.site) için dinamik ayarlar.
+ */
+export interface LandingConfig {
+  whatsapp_number: string;
+  pricing_amount: string;
+  pricing_rotation: string[];
+  hero_title: string;
+  hero_subtitle: string;
+}

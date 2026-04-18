@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getActiveStoreSlug } from '../../utils/helpers/store';
 import { verifyStorePin } from '../../utils/helpers/auth';
+import { TECH } from '../../data/config';
 
 /**
  * usePinAuth: Logic hook for PIN-based authentication.
@@ -17,6 +18,7 @@ export function usePinAuth(onSuccess: () => void) {
   const lockoutTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const STORE_SLUG = getActiveStoreSlug();
+  const { auth } = TECH;
 
   // Handle Lockout Countdown
   useEffect(() => {
@@ -45,11 +47,11 @@ export function usePinAuth(onSuccess: () => void) {
       setFailedAttempts(newFailedCount);
       setHasAuthError(true);
 
-      // LOCKOUT LOGIC:
-      if (newFailedCount >= 5) {
-        setLockoutTimeLeft(300); // 5 minutes
-      } else if (newFailedCount >= 3) {
-        setLockoutTimeLeft(30); // 30 seconds
+      // LOCKOUT LOGIC: Using Tech Config
+      if (newFailedCount >= auth.attemptLimitLong) {
+        setLockoutTimeLeft(auth.lockoutDurationLong); 
+      } else if (newFailedCount >= auth.attemptLimitShort) {
+        setLockoutTimeLeft(auth.lockoutDurationShort);
       }
 
       setTimeout(() => {
@@ -58,20 +60,20 @@ export function usePinAuth(onSuccess: () => void) {
       }, 500);
     }
     setIsVerifying(false);
-  }, [STORE_SLUG, onSuccess, failedAttempts]);
+  }, [STORE_SLUG, onSuccess, failedAttempts, auth]);
 
   const enterDigit = useCallback((digit: string) => {
     if (lockoutTimeLeft > 0 || isVerifying) return;
     
-    if (currentPinAttempt.length < 4 && !hasAuthError) {
+    if (currentPinAttempt.length < auth.pinLength && !hasAuthError) {
       const nextPin = currentPinAttempt + digit;
       setCurrentPinAttempt(nextPin);
       
-      if (nextPin.length === 4) {
+      if (nextPin.length === auth.pinLength) {
         verifyPin(nextPin);
       }
     }
-  }, [currentPinAttempt, hasAuthError, lockoutTimeLeft, isVerifying, verifyPin]);
+  }, [currentPinAttempt, hasAuthError, lockoutTimeLeft, isVerifying, verifyPin, auth.pinLength]);
 
   const deleteDigit = useCallback(() => {
     if (lockoutTimeLeft > 0 || isVerifying) return;

@@ -1,6 +1,7 @@
-import { memo } from 'react';
+import { useState, memo } from 'react';
 import { THEME } from '../../../data/config';
 import { Product } from '../../../types';
+import Button from '../../ui/Button';
 import OrderSelector from '../../ui/OrderSelector';
 import { ProductMenu } from '../../admin/ProductMenu';
 
@@ -15,34 +16,58 @@ interface ProductCardAdminLayerProps {
 }
 
 /**
- * SUB-COMPONENT: ProductCardAdminLayer
+ * COMPONENT: ProductCardAdminLayer
+ * -----------------------------------------------------------
+ * Orchestrates administrative actions for a specific product card.
+ * Uses standardized OrderSelector and Button atoms.
  */
-export const ProductCardAdminLayer = memo(({ 
-  product, 
-  categories, 
-  orderIndex, 
-  itemsInCategory, 
-  onOrderChange, 
-  onDelete, 
-  onUpdate 
+export const ProductCardAdminLayer = memo(({
+  product,
+  categories,
+  orderIndex,
+  itemsInCategory,
+  onOrderChange,
+  onDelete,
+  onUpdate
 }: ProductCardAdminLayerProps) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const theme = THEME.productCard;
+  const globalIcons = THEME.icons;
 
   return (
     <>
-      <div className="absolute top-2 left-2 z-30">
+      {/* 1. ORDER SELECTOR (Top Right) */}
+      <div className={theme.orderSelect.container}>
         <OrderSelector 
           currentOrder={orderIndex}
           totalCount={itemsInCategory}
           onChange={onOrderChange}
-          className={`${theme.orderSelect.wrapper} ${THEME.radius.badge} shadow-xl`}
-          selectClass={theme.orderSelect.select}
+          variant="floating"
+          isAdmin={true}
         />
       </div>
-      <div className="absolute top-2 right-2 z-30">
-        <div className="shadow-xl rounded-full bg-white/90 backdrop-blur-md">
-          <ProductMenu product={product} categories={categories} onDelete={onDelete} onUpdate={onUpdate} />
-        </div>
+
+      {/* 2. PRODUCT ACTIONS MENU (Bottom Right) */}
+      <div className={theme.adminMenu.container}>
+        <Button 
+          onClick={() => setIsMenuOpen(true)}
+          icon={globalIcons.dots}
+          variant="secondary"
+          size="xs"
+          mode="circle"
+          className={theme.adminMenu.toggleButton}
+          aria-label="Product Actions"
+        />
+
+        {isMenuOpen && (
+          <ProductMenu 
+            product={product}
+            categories={categories}
+            onClose={() => setIsMenuOpen(false)}
+            onDelete={onDelete}
+            onUpdate={onUpdate}
+          />
+        )}
       </div>
     </>
   );

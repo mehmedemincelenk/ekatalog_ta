@@ -5,11 +5,9 @@ import {
   TECH,
 } from '../../data/config';
 import { Product } from '../../types';
-import { useSettings } from '../store/useSettings';
+import { CompanySettings } from '../store/useSettings';
 import { useProductStorage } from '../storage/useProductStorage';
 import { getActiveStoreSlug } from '../../utils/helpers/store';
-
-const REPOSITORY_TABLE = 'prods';
 
 /**
  * USE PRODUCTS HOOK (INVENTORY & CATALOG ENGINE)
@@ -21,9 +19,9 @@ export function useProducts(
   currentSearchQuery = '',
   activeFilterCategories: string[] = [],
   isAdministrativeModeActive = false,
+  storeSettings: CompanySettings
 ) {
   const [catalogProducts, setCatalogProducts] = useState<Product[]>([]);
-  const { settings: storeSettings, loading: isSettingsLoading } = useSettings(isAdministrativeModeActive);
   const [isInventoryLoading, setIsInventoryLoading] = useState(true);
   
   const { uploadImage: uploadToStorage, deleteImage: removeFromStorage } = useProductStorage();
@@ -38,7 +36,7 @@ export function useProducts(
     if (!isSilent) setIsInventoryLoading(true);
     
     const { data: repositoryData, error: fetchError } = await supabase
-      .from(REPOSITORY_TABLE)
+      .from(TECH.tables.products)
       .select('*')
       .eq('store_id', storeSettings.id)
       .order('sort_order', { ascending: true });
@@ -84,7 +82,7 @@ export function useProducts(
     if (dataChanges.sort_order !== undefined) updatePayload.sort_order = dataChanges.sort_order;
 
     const { error } = await supabase
-      .from(REPOSITORY_TABLE)
+      .from(TECH.tables.products)
       .update(updatePayload)
       .eq('id', productId)
       .eq('store_id', storeSettings.id);
@@ -115,7 +113,7 @@ export function useProducts(
     const peerProducts = catalogProducts.filter(p => p.category === productData.category);
     const maxPos = peerProducts.length > 0 ? Math.max(...peerProducts.map(p => p.sort_order || 0)) : 0;
     
-    const { data: newRecord, error } = await supabase.from(REPOSITORY_TABLE).insert([{
+    const { data: newRecord, error } = await supabase.from(TECH.tables.products).insert([{
       store_id: storeSettings.id,
       name: productData.name,
       category: productData.category,
@@ -139,7 +137,7 @@ export function useProducts(
     setCatalogProducts(prev => prev.filter(p => p.id !== productId));
     
     const { error } = await supabase
-      .from(REPOSITORY_TABLE)
+      .from(TECH.tables.products)
       .delete()
       .eq('id', productId)
       .eq('store_id', storeSettings.id);
@@ -170,7 +168,7 @@ export function useProducts(
     allProducts: catalogProducts,
     totalCount: filteredCatalog.length,
     categoryOrder: storeSettings.categoryOrder,
-    loading: isInventoryLoading || isSettingsLoading,
+    loading: isInventoryLoading,
     updateProduct: modifyProductRecord,
     deleteProduct: deleteProductRecord,
     addProduct: addNewProductRecord,
@@ -198,20 +196,20 @@ export function useProducts(
 
       try {
         await Promise.all(newOrder.map((p, i) => 
-          supabase.from(REPOSITORY_TABLE).update({ sort_order: i + 1 }).eq('id', p.id).eq('store_id', storeSettings.id)
+          supabase.from(TECH.tables.products).update({ sort_order: i + 1 }).eq('id', p.id).eq('store_id', storeSettings.id)
         ));
       } catch (err) { synchronizeInventory(); }
     },
     renameCategory: async (oldName: string, newName: string) => {
       if (!newName || oldName === newName) return;
-      const { error } = await supabase.from(REPOSITORY_TABLE).update({ category: newName }).eq('category', oldName).eq('store_id', storeSettings.id);
+      const { error } = await supabase.from(TECH.tables.products).update({ category: newName }).eq('category', oldName).eq('store_id', storeSettings.id);
       if (!error) {
         // synchronizeInventory(true);
       }
     },
     removeCategoryFromProducts: async (target: string) => {
       const fallback = TECH.products.fallbackCategory;
-      const { error } = await supabase.from(REPOSITORY_TABLE).update({ category: fallback }).eq('category', target).eq('store_id', storeSettings.id);
+      const { error } = await supabase.from(TECH.tables.products).update({ category: fallback }).eq('category', target).eq('store_id', storeSettings.id);
       if (!error) {
         // synchronizeInventory(true);
       }
@@ -231,7 +229,7 @@ export function useProducts(
 
       try {
         setIsInventoryLoading(true);
-        await Promise.all(updates.map(u => supabase.from(REPOSITORY_TABLE).update({ price: u.price }).eq('id', u.id).eq('store_id', storeSettings.id)));
+        await Promise.all(updates.map(u => supabase.from(TECH.tables.products).update({ price: u.price }).eq('id', u.id).eq('store_id', storeSettings.id)));
         await synchronizeInventory(true);
       } catch (err) { synchronizeInventory(); }
       finally { setIsInventoryLoading(false); }

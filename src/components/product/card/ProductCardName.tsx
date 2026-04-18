@@ -1,34 +1,33 @@
 import { memo } from 'react';
 import { THEME } from '../../../data/config';
 import { Product } from '../../../types';
-import { MarqueeText } from '../../ui/MarqueeText';
+import { EditableField } from '../../ui/EditableField';
 
 interface ProductCardNameProps {
   product: Product;
   isAdmin: boolean;
+  editMode: 'modal' | 'inline';
+  openEditor: (title: string, value: string, onConfirm: (val: string) => Promise<void> | void) => void;
   onUpdate: (field: keyof Product, value: string | boolean | null) => void;
 }
 
 /**
  * ATOM: ProductCardName
  * -----------------------------------------------------------
- * Handles product name display with Marquee support and admin editing.
+ * Uses global EditableField to handle both inline and modal editing.
  */
-export const ProductCardName = memo(({ product, isAdmin, onUpdate }: ProductCardNameProps) => {
+export const ProductCardName = memo(({ product, isAdmin, editMode, openEditor, onUpdate }: ProductCardNameProps) => {
   const theme = THEME.productCard;
 
   return (
-    <MarqueeText 
-      text={product.name} 
-      textClass={`${theme.typography.name} ${product.inStock === false ? theme.typography.nameOutOfStock : ''}`} 
-      isAdmin={isAdmin} 
-      editableProps={isAdmin ? { 
-        contentEditable: true, 
-        suppressContentEditableWarning: true, 
-        onBlur: (e: any) => onUpdate('name', e.currentTarget.textContent?.trim() || ''), 
-        onKeyDown: (e: any) => e.key === 'Enter' && (e.preventDefault(), e.currentTarget.blur()), 
-        className: `${theme.typography.editable} ${theme.adminMenu.editHighlight} ${theme.adminMenu.editPadding} ${THEME.radius.input}` 
-      } : {}} 
+    <EditableField 
+      value={product.name}
+      title="Ürün Adı"
+      isAdmin={isAdmin}
+      editMode={editMode}
+      openModal={openEditor}
+      onConfirm={(val) => onUpdate('name', val)}
+      className={`${theme.typography.name} ${product.inStock === false ? theme.typography.nameOutOfStock : ''}`}
     />
   );
 });

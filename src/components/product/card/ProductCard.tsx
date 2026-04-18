@@ -15,15 +15,14 @@ import { ProductCardBadges } from './ProductCardBadges';
 
 /**
  * PRODUCT CARD COMPONENT
- * -----------------------------------------------------------
- * Represents an individual product in the grid.
- * Refactored to modular location: product/card/
  */
 
 interface ProductCardProps {
   product: Product;
   categories: string[];
   isAdmin: boolean;
+  editMode: 'modal' | 'inline';
+  openEditor: (title: string, value: string, onConfirm: (val: string) => Promise<void> | void) => void;
   onDelete: (id: string) => void;
   onUpdate: (id: string, changes: Partial<Product>) => void;
   onOrderChange?: (id: string, newPosition: number) => void;
@@ -61,6 +60,8 @@ const ProductCard = memo((props: ProductCardProps) => {
         <ProductCardInfo 
           product={props.product}
           isAdmin={props.isAdmin}
+          editMode={props.editMode}
+          openEditor={props.openEditor}
           isPromotionActive={isPromotionActive}
           originalPriceLabel={originalPriceLabel}
           discountedPriceLabel={discountedPriceLabel}

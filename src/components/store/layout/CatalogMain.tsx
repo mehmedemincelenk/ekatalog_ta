@@ -3,20 +3,26 @@ import HeroCarousel from '../home/carousel/HeroCarousel';
 import SearchFilter from '../home/search/SearchFilter';
 import ProductGrid from '../../product/grid/ProductGrid';
 import References from '../home/References';
+import { CatalogLogic } from '../../../hooks/useCatalogLogic';
 
 interface CatalogMainProps {
   isAdmin: boolean;
-  allProducts: any[];
-  filteredProducts: any[];
-  categoryOrder: string[];
-  activeCategories: string[];
-  search: string;
-  visibleCategoryLimit: number;
-  actions: any;
-  setSearch: (val: string) => void;
-  setIsAddModalOpen: (val: boolean) => void;
-  activeReferences: any[];
-  activeDiscount: any;
+  editMode: CatalogLogic['editMode'];
+  openEditor: CatalogLogic['stringEditor']['openEditor'];
+  allProducts: CatalogLogic['allProducts'];
+  filteredProducts: CatalogLogic['filteredProducts'];
+  categoryOrder: CatalogLogic['categoryOrder'];
+  sortedCategories: CatalogLogic['sortedCategories'];
+  categoryStats: CatalogLogic['categoryStats'];
+  activeCategories: CatalogLogic['activeCategories'];
+  search: CatalogLogic['search'];
+  visibleCategoryLimit: CatalogLogic['visibleCategoryLimit'];
+  carouselSlides: CatalogLogic['carouselSlides'];
+  actions: CatalogLogic['actions'];
+  setSearch: CatalogLogic['setSearch'];
+  setIsAddModalOpen: CatalogLogic['setIsAddModalOpen'];
+  activeReferences: CatalogLogic['activeReferences'];
+  activeDiscount: CatalogLogic['activeDiscount'];
 }
 
 /**
@@ -24,12 +30,17 @@ interface CatalogMainProps {
  */
 export const CatalogMain = memo(({
   isAdmin,
+  editMode,
+  openEditor,
   allProducts,
   filteredProducts,
   categoryOrder,
+  sortedCategories,
+  categoryStats,
   activeCategories,
   search,
   visibleCategoryLimit,
+  carouselSlides,
   actions,
   setSearch,
   setIsAddModalOpen,
@@ -37,11 +48,17 @@ export const CatalogMain = memo(({
   activeDiscount
 }: CatalogMainProps) => (
   <main>
-    <HeroCarousel isAdminModeActive={isAdmin} />
+    <HeroCarousel 
+      isAdminModeActive={isAdmin} 
+      initialSlides={carouselSlides}
+      onSync={actions.syncCarousel}
+    />
     
     <SearchFilter 
       products={allProducts} 
       categoryOrder={categoryOrder} 
+      sortedCategories={sortedCategories}
+      categoryStats={categoryStats}
       onCategoryOrderChange={actions.reorderCategory}
       search={search} 
       onSearchChange={setSearch} 
@@ -54,7 +71,10 @@ export const CatalogMain = memo(({
     <ProductGrid 
       products={filteredProducts} 
       categoryOrder={categoryOrder} 
+      sortedCategories={sortedCategories}
       isAdmin={isAdmin}
+      editMode={editMode}
+      openEditor={openEditor}
       onDelete={actions.deleteProduct} 
       onUpdate={actions.updateProduct} 
       onOrderUpdate={actions.reorderProducts}

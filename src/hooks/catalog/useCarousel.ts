@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { CAROUSEL, TECH, LABELS } from '../../data/config';
+import { TECH, LABELS } from '../../data/config';
 import { getActiveStoreSlug } from '../../utils/helpers/store';
 
 export interface Slide {
@@ -13,50 +13,25 @@ export interface Slide {
 
 const STORE_SLUG = getActiveStoreSlug();
 
-export function useCarousel(isAdministrativeModeActive: boolean) {
-  const [marketingSlides, setMarketingSlides] = useState<Slide[]>(CAROUSEL.slides);
-  const [isCarouselContentLoading, setIsCarouselContentLoading] = useState(true);
+export function useCarousel(
+  initialSlides: Slide[], 
+  onSync: (updatedSlides: Slide[]) => Promise<void> | void
+) {
+  const [marketingSlides, setMarketingSlides] = useState<Slide[]>(initialSlides);
   
   const [isUploading, setIsUploading] = useState(false);
   const [activeUploadId, setActiveUploadId] = useState<number | null>(null);
 
-  const synchronizeCarouselSlides = useCallback(async () => {
-    if (STORE_SLUG === 'main-site') {
-      setIsCarouselContentLoading(false);
-      return;
-    }
-    
-    setIsCarouselContentLoading(true);
-    const { data: storeData, error: fetchError } = await supabase
-      .from('stores')
-      .select('carousel_data')
-      .eq('slug', STORE_SLUG)
-      .single();
-
-    if (storeData && !fetchError && storeData.carousel_data?.slides) {
-      setMarketingSlides(storeData.carousel_data.slides);
-    }
-    setIsCarouselContentLoading(false);
-  }, []);
-
+  // Keep local state in sync with props
   useEffect(() => {
-    synchronizeCarouselSlides();
-  }, [synchronizeCarouselSlides]);
+    setMarketingSlides(initialSlides);
+  }, [initialSlides]);
 
   const modifySlideContent = useCallback(async (slideId: number, contentChanges: Partial<Slide>) => {
-    setMarketingSlides(prev => {
-      const updated = prev.map(s => s.id === slideId ? { ...s, ...contentChanges } : s);
-      
-      if (isAdministrativeModeActive) {
-        supabase
-          .from('stores')
-          .update({ carousel_data: { slides: updated } })
-          .eq('slug', STORE_SLUG)
-          .then(({ error }) => error && console.error('Carousel sync failed:', error));
-      }
-      return updated;
-    });
-  }, [isAdministrativeModeActive]);
+    const updated = marketingSlides.map(s => s.id === slideId ? { ...s, ...contentChanges } : s);
+    setMarketingSlides(updated);
+    await onSync(updated);
+  }, [marketingSlides, onSync]);
 
   const uploadHeroImage = useCallback(async (slideId: number, visualFile: File) => {
     setActiveUploadId(slideId);
@@ -110,25 +85,18 @@ export function useCarousel(isAdministrativeModeActive: boolean) {
 
     const updatedSlides = [...marketingSlides, newSlide];
     setMarketingSlides(updatedSlides);
+    await onSync(updatedSlides);
 
-    if (isAdministrativeModeActive) {
-      const { error } = await supabase
-        .from('stores')
-        .update({ carousel_data: { slides: updatedSlides } })
-        .eq('slug', STORE_SLUG);
-      
-      if (!error && initialImage) {
-        await uploadHeroImage(nextId, initialImage);
-      }
+    if (initialImage) {
+      await uploadHeroImage(nextId, initialImage);
     }
-  }, [isAdministrativeModeActive, marketingSlides, uploadHeroImage]);
+  }, [marketingSlides, uploadHeroImage, onSync]);
 
   return { 
     slides: marketingSlides, 
     updateSlide: modifySlideContent, 
     uploadHeroImage, 
     addSlide: addNewSlide,
-    loading: isCarouselContentLoading,
     isUploading,
     activeUploadId
   };

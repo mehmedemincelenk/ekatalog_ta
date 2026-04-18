@@ -1,11 +1,14 @@
 import { memo } from 'react';
 import { THEME } from '../../../data/config';
 import { Product } from '../../../types';
+import { EditableField } from '../../ui/EditableField';
 import { ensureCurrencySymbol } from '../../../utils/formatters/price';
 
 interface ProductCardPriceProps {
   product: Product;
   isAdmin: boolean;
+  editMode: 'modal' | 'inline';
+  openEditor: (title: string, value: string, onConfirm: (val: string) => Promise<void> | void) => void;
   isPromotionActive: boolean;
   originalPriceLabel: string;
   discountedPriceLabel: string | null;
@@ -15,11 +18,13 @@ interface ProductCardPriceProps {
 /**
  * ATOM: ProductCardPrice
  * -----------------------------------------------------------
- * Handles all price states: Admin editable, User discount, and Normal.
+ * Uses global EditableField for pricing, with support for promotional displays.
  */
 export const ProductCardPrice = memo(({ 
   product, 
   isAdmin, 
+  editMode,
+  openEditor,
   isPromotionActive, 
   originalPriceLabel, 
   discountedPriceLabel, 
@@ -27,6 +32,7 @@ export const ProductCardPrice = memo(({
 }: ProductCardPriceProps) => {
   const theme = THEME.productCard;
 
+  // USER VIEW (With Promotions)
   if (isPromotionActive && !isAdmin) {
     return (
       <div className={theme.innerLayout.footerWrapper}>
@@ -42,24 +48,23 @@ export const ProductCardPrice = memo(({
     );
   }
 
+  // ADMIN OR REGULAR VIEW
   return (
     <div className={theme.innerLayout.footerWrapper}>
-      <div 
-        contentEditable={isAdmin} 
-        suppressContentEditableWarning 
-        onBlur={(e: any) => { 
-          const rawValue = e.currentTarget.textContent?.trim() || ''; 
-          onUpdate('price', ensureCurrencySymbol(rawValue)); 
-        }} 
+      <EditableField 
+        value={product.price}
+        title="Ürün Fiyatı"
+        isAdmin={isAdmin}
+        editMode={editMode}
+        openModal={openEditor}
+        onConfirm={(val) => onUpdate('price', ensureCurrencySymbol(val))}
+        type="number"
         className={`
           ${theme.typography.price} 
-          ${isAdmin ? `${theme.typography.editable} ${theme.adminMenu.editHighlight} ${theme.adminMenu.editPadding} ${THEME.radius.input}` : 'text-stone-900'} 
+          ${!isAdmin ? 'text-stone-900' : ''}
           ${product.inStock === false && !isAdmin ? theme.typography.priceOutOfStock : ''}
-          min-h-[20px]
         `}
-      >
-        {originalPriceLabel}
-      </div>
+      />
     </div>
   );
 });
