@@ -1,44 +1,44 @@
 ---
 name: code
-description: Senior seviye mühendislik standartları; temiz kod, modüler mimari, A-seviye İngilizce isimlendirme ve Design Token senkronizasyonunu yönetir.
+description: Senior-level engineering standards; manages clean code, modular architecture, A-level English naming, and Design Token synchronization.
 ---
 
-# Code & Architecture Excellence (Teknik Mükemmellik Rehberi)
+# Code & Architecture Excellence
 
-Bu rehber, projenin yapısal bütünlüğünü, profesyonel netliğini ve SaaS (Çoklu Mağaza) uyumluluğunu garanti altına alan en üst düzey teknik direktifleri içerir.
+This guide contains the highest-level technical directives ensuring the project's structural integrity, professional clarity, and SaaS (Multi-Store) compatibility.
 
-## 1. Mimari Bütünlük & SaaS Hazırlığı
-**Felsefe:** Kod "kör" olmalı, tüm görsel ve metinsel irade `config.ts` üzerinden yönetilmelidir.
-- **100% Aktif Design Tokens:** `.tsx` dosyaları içinde Tailwind sınıfları veya ham değerler (renk, boşluk) doğrudan yazılmamalıdır. Her zaman `src/data/config.ts` içindeki `THEME` objesi referans alınmalıdır.
-- **Konfigürasyon Odaklılık:** Mağazanın tüm görünümü ve davranışı sadece `config.ts` değiştirilerek güncellenebilmelidir.
-- **Mantık İzolesi (Hook Pattern):** Bileşenler sadece **GÖRSEL** (stateless/dumb) olmalıdır. Veri manipülasyonu, API çağrıları ve karmaşık mantık `src/hooks` içindeki özel hook'lara taşınmalıdır.
+## 1. Architectural Integrity & SaaS Readiness
+**Philosophy:** Code should be "blind"; all visual and textual intent must be managed via `config.ts`.
+- **100% Active Design Tokens:** Tailwind classes or raw values (colors, spacing) must not be written directly inside `.tsx` files. Always reference the `THEME` object in `src/data/config.ts`.
+- **Configuration-Oriented:** The entire look and behavior of the store must be updatable just by changing `config.ts`.
+- **Logic Isolation (Hook Pattern):** Components should be **VISUAL** only (stateless/dumb). Data manipulation, API calls, and complex logic must be moved to custom hooks in `src/hooks`.
 
-## 2. Mühendislik Standartları (Clean Code)
-**Felsefe:** Sürdürülebilir, okunabilir ve test edilebilir bir kod tabanı.
-- **Tek Sorumluluk Prensibi (SRP):** Her dosya sadece bir işi mükemmel yapmalıdır. Bir bileşen/dosya **150 satırı** aşıyorsa mantıksal alt parçalara bölünmelidir.
-- **Strict Typing (TypeScript):** Tüm proplar ve fonksiyonlar için net `interface` tanımlanmalıdır. `any` kullanımı kesinlikle yasaktır.
-- **Bileşen Hiyerarşisi:**
-  - `src/components/ui`: Her yerde kullanılabilen atomik öğeler (Buton, Modal).
-  - `src/components/[feature]`: Özelliğe özel modüller (Product, Admin).
+## 2. Engineering Standards (Clean Code)
+**Philosophy:** A sustainable, readable, and testable codebase.
+- **Single Responsibility Principle (SRP):** Every file must do only one job perfectly. If a component/file exceeds **150 lines**, it must be divided into logical sub-parts.
+- **Strict Typing (TypeScript):** Clear `interface` definitions must be created for all props and functions. The use of `any` is strictly forbidden.
+- **Component Hierarchy:**
+  - `src/components/ui`: Atomic elements usable everywhere (Button, Modal).
+  - `src/components/[feature]`: Feature-specific modules (Product, Admin).
 
-## 3. İsimlendirme Mükemmelliği (A-Level English)
-**Felsefe:** Kod kendi kendini belgelemelidir (Self-documenting).
-- **Netlik > Kısalık:** Profesyonel İngilizce kullanılmalı, kısaltmalardan kaçınılmalıdır (`prod` -> `product`, `cat` -> `category`).
-- **Standart Kalıplar:**
-  - Bileşenler: `PascalCase` (Örn: `ProductGrid`)
-  - Değişkenler/Fonksiyonlar: `camelCase` (Örn: `isUserAuthenticated`)
-  - Hook'lar: `use` ile başlamalı (Örn: `useDiscount`)
+## 3. Naming Excellence (A-Level English)
+**Philosophy:** Code should be self-documenting.
+- **Clarity > Brevity:** Use professional English; avoid abbreviations (`prod` -> `product`, `cat` -> `category`).
+- **Standard Patterns:**
+  - Components: `PascalCase` (e.g., `ProductGrid`)
+  - Variables/Functions: `camelCase` (e.g., `isUserAuthenticated`)
+  - Hooks: Must start with `use` (e.g., `useSale`)
 
-## 4. Performans & Optimizasyon
-- **Render Kontrolü:** Ağır bileşenlerde `React.memo`, gereksiz render'ları önlemek için `useCallback` ve `useMemo` stratejik olarak kullanılmalıdır.
-- **Asset Yönetimi:** Resimlerde her zaman `loading="lazy"`, `aspect-ratio` ve LQIP (Low-Quality Image Placeholder) stratejisi izlenmelidir.
-- **Smart Refactoring:** Fonksiyonelliği bozmadan kodu sürekli daha modern ve performanslı hale getir.
+## 4. Performance & Optimization
+- **Render Control:** Strategically use `React.memo` for heavy components, and `useCallback`/`useMemo` to prevent unnecessary re-renders.
+- **Asset Management:** Always follow `loading="lazy"`, `aspect-ratio`, and LQIP (Low-Quality Image Placeholder) strategies for images.
+- **Smart Refactoring:** Continuously modernize code and improve performance without breaking functionality.
 
-## 5. Doğrulama İş Akışı (Checklist)
-1. **İsimlendirme:** Değişken ve fonksiyon isimleri profesyonel İngilizce mi?
-2. **Design Tokens:** Tüm UI değerleri `THEME` objesinden mi geliyor?
-3. **Modülerlik:** Dosya 150 satırı geçiyor mu? Mantık hook'a taşındı mı?
-4. **Tip Güvenliği:** TypeScript tanımları eksiksiz ve `any` içermiyor mu?
+## 5. Validation Workflow (Checklist)
+1. **Naming:** Are variable and function names in professional English?
+2. **Design Tokens:** Do all UI values come from the `THEME` object?
+3. **Modularity:** Does the file exceed 150 lines? Has logic been moved to a hook?
+4. **Type Safety:** Are TypeScript definitions complete and free of `any`?
 
 ---
-*Kod bir araçtır, mimari ise vizyonun kalıcılığını sağlar.*
+*Code is a tool, while architecture ensures the permanence of the vision.*

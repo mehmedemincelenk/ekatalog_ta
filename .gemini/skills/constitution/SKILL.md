@@ -1,40 +1,40 @@
 ---
 name: constitution
-description: Projenin vizyonunu, ticari hedeflerini ve asla ödün verilmeyecek temel kurallarını "Benimse/Kaçın" odağında belirleyen en üst düzey rehber.
+description: The supreme guide defining the project's vision, commercial goals, and non-negotiable rules focusing on "Adopt/Avoid".
 ---
 
-# Project Constitution (Proje Anayasası)
+# Project Constitution
 
-Bu belge, "Toptan Ambalajcım" projesinin varlık sebebini ve teknik-tasarım süreçlerindeki en üst hiyerarşik kuralları iki ana sütunda tanımlar.
+This document defines the project's reason for existence and the highest hierarchical rules in technical and design processes across two main columns.
 
-## 1. Bunları Benimse (Adopt These)
+## 1. Adopt These
 
-Bu prensipler, her satır kodda ve her tasarım öğesinde var olmalıdır:
+These principles must exist in every line of code and every design element:
 
-- **Hız ve Basitlik:** Toptan ambalaj ticaretini en hızlı ve en şık şekilde dijitalleştir. Başarı kriteri "hızlı satış kapatma"dır.
-- **Admin Sadeliği:** Paneli 40-50+ yaş grubundaki bir dükkan sahibinin hata yapamayacağı kadar basit tut.
-- **Apple Minimalizmi:** "Premium Minimalist" estetiği koru. Sadece gerekli olanı göster (Signal-to-Noise).
-- **Beyaz Boşluk (Whitespace):** Boşluğu bir lüks olarak kullan; içeriğin nefes almasını sağla.
-- **Sıfır Hardcoding:** Tüm görsel kararları `src/data/config.ts` (`THEME`) üzerinden yönet. Kod "kör" olmalı, irade konfigürasyonda olmalıdır.
-- **Mantık İzolasyonu:** UI her zaman "aptal" (stateless), mantık her zaman "akıllı" (hook/context) olmalıdır.
-- **A-Level English:** Tüm isimlendirmeleri küresel standartlarda, profesyonel ve net İngilizce ile yap.
-- **Mobil Öncelik (Mobile-First):** Her özelliği önce mobilde (başparmak dostu) mükemmel çalıştır, sonra masaüstüne uyarla.
-- **8px Izgara Sistemi:** Tüm boşlukları ve boyutları 8'in katı olacak şekilde matematiksel bir düzende tut.
-- **Güvenlik (Sec-by-Design):** "Sıfır Güven" (Zero Trust) ilkesini benimse; her yeni özelliği önce "Nasıl suistimal edilebilir?" süzgecinden geçir.
+- **Speed and Simplicity:** Digitalize wholesale packaging trade in the fastest and most elegant way. Success criterion is "closing sales fast".
+- **Admin Simplicity:** Keep the panel simple enough that a shop owner in the 40-50+ age group cannot make mistakes.
+- **Apple Minimalism:** Maintain a "Premium Minimalist" aesthetic. Show only what is necessary (Signal-to-Noise).
+- **Whitespace:** Use space as a luxury; let content breathe.
+- **Zero Hardcoding:** Manage all visual decisions via `src/data/config.ts` (`THEME`). Code should be "blind"; intent resides in the configuration.
+- **Logic Isolation:** UI must always be "dumb" (stateless), logic must always be "smart" (hook/context).
+- **A-Level English:** Use global standards, professional and clear English for all naming.
+- **Mobile-First:** Make every feature work perfectly on mobile (thumb-friendly) first, then adapt to desktop.
+- **8px Grid System:** Keep all spacing and dimensions in a mathematical order as multiples of 8.
+- **Security (Sec-by-Design):** Adopt the "Zero Trust" principle; filter every new feature through "How can this be exploited?" first.
 
-## 2. Bunlardan Kaçın (Avoid These)
+## 2. Avoid These
 
-Aşağıdaki "günahlar" ve hatalar projeye dahil edilemez:
+The following "sins" and errors cannot be included in the project:
 
-- **Yasaklı Günahlar:** Complexity (Karmaşıklık), Inconsistency (Tutarsızlık), Hardcoding (Sabit değerler), Fragility (Kırılganlık), Laziness (Üşengeçlik), Clutter (Kirlilik), Ambiguity (Belirsizlik), Bloat (Şişkinlik), Silence (Sessiz hata), Assumption (Varsayım).
-- **Gereksiz Karmaşıklık (Over-engineering):** "Belki ilerde lazım olur" diyerek eklenen her soyutlama katmanından kaçın.
-- **Bağlam Kaybı (Context Loss):** Mevcut yardımcı fonksiyonları (`utils`, `hooks`) görmezden gelip benzerini sıfırdan yazma.
-- **Kütüphane Varsayımı (Hallucination):** `package.json` içinde olmayan bir kütüphaneyi varmış gibi import etme.
-- **Vibe Körlüğü:** Teknik olarak çalışan ama projenin Apple estetiğine uymayan "çirkin" veya "kaba" UI üretme.
-- **Yıkıcı Onarımlar (Regressive Fixes):** Bir bug'ı düzeltirken mobil görünümü veya Design Token yapısını bozma.
-- **Açıklama Kalabalığı (Verbose Output):** Basit bir mantık için yüzlerce satır kod yazma; her zaman en sade yolu bul.
-- **Mobil İhmali:** Sadece masaüstünde güzel görünen, mobilde tıklanması imkansız küçük öğelerden kaçın.
-- **Anlamsız İsimlendirme:** `item`, `data`, `prod` gibi belirsiz kısaltmalar kullanma; her zaman tam ve açıklayıcı ol.
+- **Forbidden Sins:** Complexity, Inconsistency, Hardcoding, Fragility, Laziness, Clutter, Ambiguity, Bloat, Silence, Assumption.
+- **Over-engineering:** Avoid every layer of abstraction added with a "maybe it will be needed later" mindset.
+- **Context Loss:** Do not ignore existing helper functions (`utils`, `hooks`) and write similar ones from scratch.
+- **Library Assumption (Hallucination):** Do not import a library that is not in `package.json` as if it exists.
+- **Vibe Blindness:** Do not produce "ugly" or "crude" UI that technically works but does not fit the Apple aesthetic.
+- **Regressive Fixes:** Do not break the mobile view or Design Token structure while fixing a bug.
+- **Verbose Output:** Do not write hundreds of lines of code for simple logic; always find the simplest way.
+- **Mobile Neglect:** Avoid small elements that look good on desktop but are impossible to click on mobile.
+- **Meaningless Naming:** Do not use vague abbreviations like `item`, `data`, `prod`; always be full and descriptive.
 
 ---
-*Anayasaya aykırı hiçbir kod satırı veya tasarım öğesi sisteme dahil edilemez.*
+*No line of code or design element that violates the constitution can be included in the system.*
