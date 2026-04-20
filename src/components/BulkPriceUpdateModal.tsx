@@ -186,8 +186,8 @@ export default function BulkPriceUpdateModal({ isOpen, onClose, allProducts, cat
       >
         <div className={modalTheme.header}>
           <div className="flex flex-col text-left">
-            <h2 className="text-xl font-black text-stone-900 tracking-tighter">İşlem Paneli</h2>
-            <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest leading-none mt-1">
+            <h2 className="text-xl sm:text-[32px] font-black text-stone-900 tracking-tighter sm:mb-1.5">İşlem Paneli</h2>
+            <p className="text-[10px] sm:text-[16px] font-bold text-stone-400 uppercase tracking-widest leading-none mt-1">
               {currentStep === 1 ? 'EYLEM SEÇİN' : (currentStep === 2 ? 'MİKTAR GİRİN' : 'ONAY MANİFESTOSU')}
             </p>
           </div>
@@ -200,44 +200,44 @@ export default function BulkPriceUpdateModal({ isOpen, onClose, allProducts, cat
           {currentStep === 1 && (
             <div className="space-y-6 fade-in">
               {/* ACTION TYPE SELECTION - GRID */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3 sm:gap-5">
                 <button 
                   onClick={() => setActionType('PRICE')}
-                  className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${actionType === 'PRICE' ? 'border-stone-900 bg-stone-900 text-white shadow-xl scale-105' : 'border-stone-100 bg-stone-50 text-stone-500 hover:border-stone-200'}`}
+                  className={`p-4 sm:p-6 rounded-xl border-2 transition-all flex flex-col items-center gap-2 sm:gap-3 ${actionType === 'PRICE' ? 'border-stone-900 bg-stone-900 text-white shadow-xl scale-105' : 'border-stone-100 bg-stone-50 text-stone-500 hover:border-stone-200'}`}
                 >
-                  <span className="text-2xl">💰</span>
-                  <span className="text-[9px] font-black uppercase tracking-widest text-center">FİYAT AYARI</span>
+                  <span className="text-2xl sm:text-4xl">💰</span>
+                  <span className="text-[9px] sm:text-[14px] font-black uppercase tracking-widest text-center">FİYAT AYARI</span>
                 </button>
                 <button 
                   onClick={() => setActionType('STOCK')}
-                  className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${actionType === 'STOCK' ? 'border-blue-600 bg-blue-600 text-white shadow-xl scale-105' : 'border-stone-100 bg-stone-50 text-stone-500 hover:border-blue-200'}`}
+                  className={`p-4 sm:p-6 rounded-xl border-2 transition-all flex flex-col items-center gap-2 sm:gap-3 ${actionType === 'STOCK' ? 'border-blue-600 bg-blue-600 text-white shadow-xl scale-105' : 'border-stone-100 bg-stone-50 text-stone-500 hover:border-blue-200'}`}
                 >
-                  <span className="text-2xl">📦</span>
-                  <span className="text-[9px] font-black uppercase tracking-widest text-center">STOKTA VAR/YOK</span>
+                  <span className="text-2xl sm:text-4xl">📦</span>
+                  <span className="text-[9px] sm:text-[14px] font-black uppercase tracking-widest text-center">STOKTA VAR/YOK</span>
                 </button>
                 <button 
                   onClick={() => setActionType('ARCHIVE')}
-                  className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${actionType === 'ARCHIVE' ? 'border-amber-600 bg-amber-600 text-white shadow-xl scale-105' : 'border-stone-100 bg-stone-50 text-stone-500 hover:border-amber-200'}`}
+                  className={`p-4 sm:p-6 rounded-xl border-2 transition-all flex flex-col items-center gap-2 sm:gap-3 ${actionType === 'ARCHIVE' ? 'border-amber-600 bg-amber-600 text-white shadow-xl scale-105' : 'border-stone-100 bg-stone-50 text-stone-500 hover:border-amber-200'}`}
                 >
-                  <span className="text-2xl">👁️</span>
-                  <span className="text-[9px] font-black uppercase tracking-widest text-center">GİZLE/GÖSTER</span>
+                  <span className="text-2xl sm:text-4xl">👁️</span>
+                  <span className="text-[9px] sm:text-[14px] font-black uppercase tracking-widest text-center">GİZLE/GÖSTER</span>
                 </button>
                 <button 
                   onClick={() => setActionType('DELETE')}
-                  className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${actionType === 'DELETE' ? 'border-red-600 bg-red-600 text-white shadow-xl scale-105' : 'border-stone-100 bg-stone-50 text-stone-500 hover:border-red-100'}`}
+                  className={`p-4 sm:p-6 rounded-xl border-2 transition-all flex flex-col items-center gap-2 sm:gap-3 ${actionType === 'DELETE' ? 'border-red-600 bg-red-600 text-white shadow-xl scale-105' : 'border-stone-100 bg-stone-50 text-stone-500 hover:border-red-100'}`}
                 >
-                  <span className="text-2xl">🗑️</span>
-                  <span className="text-[9px] font-black uppercase tracking-widest text-center">TOPLU SİLME</span>
+                  <span className="text-2xl sm:text-4xl">🗑️</span>
+                  <span className="text-[9px] sm:text-[14px] font-black uppercase tracking-widest text-center">TOPLU SİLME</span>
                 </button>
               </div>
 
               {/* CATEGORY SELECTION */}
-              <div className="space-y-3 pt-4 border-t border-stone-100">
-                <p className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em] text-center mb-4">İŞLEM YAPILACAK REYONLAR</p>
-                <div className="flex flex-wrap justify-center gap-2">
+              <div className="space-y-3 sm:space-y-5 pt-4 sm:pt-6 border-t border-stone-100">
+                <p className="text-[10px] sm:text-[16px] font-black text-stone-400 uppercase tracking-[0.2em] text-center mb-4 sm:mb-6">İŞLEM YAPILACAK REYONLAR</p>
+                <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
                   <button 
                     onClick={() => toggleCategory('TÜMÜ')}
-                    className={`px-4 py-2 rounded-full text-[9px] font-black transition-all border-2 ${selectedCategories.length === categories.length ? 'bg-stone-900 text-white border-stone-900' : 'bg-white text-stone-400 border-stone-100 shadow-sm'}`}
+                    className={`px-4 sm:px-6 py-2 sm:py-3 rounded-full text-[9px] sm:text-[14px] font-black transition-all border-2 ${selectedCategories.length === categories.length ? 'bg-stone-900 text-white border-stone-900' : 'bg-white text-stone-400 border-stone-100 shadow-sm'}`}
                   >
                     TÜMÜ
                   </button>
@@ -245,7 +245,7 @@ export default function BulkPriceUpdateModal({ isOpen, onClose, allProducts, cat
                     <button 
                       key={cat}
                       onClick={() => toggleCategory(cat)}
-                      className={`px-4 py-2 rounded-full text-[9px] font-black transition-all border-2 ${selectedCategories.includes(cat) ? 'bg-stone-50 text-stone-900 border-stone-900' : 'bg-white text-stone-400 border-stone-100 shadow-sm'}`}
+                      className={`px-4 sm:px-6 py-2 sm:py-3 rounded-full text-[9px] sm:text-[14px] font-black transition-all border-2 ${selectedCategories.includes(cat) ? 'bg-stone-50 text-stone-900 border-stone-900' : 'bg-white text-stone-400 border-stone-100 shadow-sm'}`}
                     >
                       {cat}
                     </button>
@@ -258,7 +258,7 @@ export default function BulkPriceUpdateModal({ isOpen, onClose, allProducts, cat
                   onClick={nextStep} 
                   disabled={!actionType || (selectedCategories.length === 0 && actionType !== 'DELETE')} 
                   variant="primary" 
-                  className="w-full !py-4 shadow-2xl" 
+                  className="w-full !py-4 sm:!py-6 sm:text-[19px] shadow-2xl" 
                   mode="rectangle"
                 >
                   {!actionType ? 'ÖNCE EYLEMİ SEÇİN' : (selectedCategories.length === 0 ? 'REYON SEÇİN' : 'İŞLEM PANELİNE GEÇ')}
@@ -268,10 +268,10 @@ export default function BulkPriceUpdateModal({ isOpen, onClose, allProducts, cat
           )}
 
           {currentStep === 2 && actionType === 'PRICE' && (
-            <div className="space-y-6 fade-in">
-              <div className="text-center space-y-1">
-                <h3 className="font-black text-stone-900 text-[10px] uppercase tracking-widest leading-none">DEĞİŞKENİ BELİRLEYİN</h3>
-                <p className="text-[9px] font-bold text-stone-400 tracking-tighter uppercase italic text-center">Miktar girin, zam mı indirim mi karar verin.</p>
+            <div className="space-y-6 sm:space-y-10 fade-in">
+              <div className="text-center space-y-1 sm:space-y-1.5">
+                <h3 className="font-black text-stone-900 text-[10px] sm:text-[16px] uppercase tracking-widest leading-none">DEĞİŞKENİ BELİRLEYİN</h3>
+                <p className="text-[9px] sm:text-[14px] font-bold text-stone-400 tracking-tighter uppercase italic text-center">Miktar girin, zam mı indirim mi karar verin.</p>
               </div>
 
               <div className="space-y-4">
@@ -297,10 +297,10 @@ export default function BulkPriceUpdateModal({ isOpen, onClose, allProducts, cat
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     placeholder="0"
-                    className={`${modalTheme.inputField} !text-center !text-4xl !font-black !py-8 !pr-10 shadow-inner`}
+                    className={`${modalTheme.inputField} !text-center !text-4xl sm:!text-[58px] !font-black !py-8 sm:!py-12 !pr-10 sm:!pr-16 shadow-inner`}
                     autoFocus
                   />
-                  <span className="absolute right-6 top-1/2 -translate-y-1/2 text-2xl font-black text-stone-300">
+                  <span className="absolute right-6 sm:right-10 top-1/2 -translate-y-1/2 text-2xl sm:text-[38px] font-black text-stone-300">
                     {isPercentage === true ? '%' : (isPercentage === false ? '₺' : '')}
                   </span>
                 </div>
@@ -321,18 +321,18 @@ export default function BulkPriceUpdateModal({ isOpen, onClose, allProducts, cat
                 </div>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-3 sm:gap-5">
                 <button 
                   onClick={prevStep} 
-                  className="w-11 h-11 flex items-center justify-center rounded-xl bg-stone-50 border border-stone-100 text-stone-400 hover:text-stone-900 transition-colors"
+                  className="w-11 h-11 sm:w-[70px] sm:h-[70px] flex items-center justify-center rounded-xl bg-stone-50 border border-stone-100 text-stone-400 hover:text-stone-900 transition-colors sm:px-5"
                 >
-                  {THEME.icons.chevronLeft}
+                  <div className="w-5 h-5 sm:w-8 sm:h-8">{THEME.icons.chevronLeft}</div>
                 </button>
                 <Button 
                    onClick={nextStep} 
                    disabled={inputValue === '' || isIncrease === null || isPercentage === null}
                    variant="primary" 
-                   className="flex-[2] !py-4" 
+                   className="flex-[2] !py-4 sm:!py-6 sm:!text-[19px]" 
                    mode="rectangle"
                 >
                   İŞLEM PANELİNE GEÇ
@@ -418,23 +418,23 @@ export default function BulkPriceUpdateModal({ isOpen, onClose, allProducts, cat
                 })}
               </div>
 
-              <div className="pt-2">
-                <div className="flex justify-between items-center mb-4 px-2">
-                  <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest">Seçili:</span>
-                  <span className="text-xs font-black text-stone-900">{Object.values(deskItems).filter(d => d.included).length} / {initialProductsForDesk.length} ÜRÜN</span>
+              <div className="pt-2 sm:pt-4">
+                <div className="flex justify-between items-center mb-4 sm:mb-6 px-2 sm:px-3">
+                  <span className="text-[10px] sm:text-[16px] font-black text-stone-400 uppercase tracking-widest">Seçili:</span>
+                  <span className="text-xs sm:text-[19px] font-black text-stone-900">{Object.values(deskItems).filter(d => d.included).length} / {initialProductsForDesk.length} ÜRÜN</span>
                 </div>
-                <div className="flex gap-3 px-1 pb-1">
+                <div className="flex gap-3 sm:gap-5 px-1 pb-1">
                   <button 
                     onClick={prevStep} 
-                    className="w-12 h-12 flex items-center justify-center rounded-xl bg-stone-100 text-stone-500 hover:text-stone-900 transition-colors shadow-sm"
+                    className="w-12 h-12 sm:w-[76px] sm:h-[76px] flex items-center justify-center rounded-xl sm:rounded-2xl bg-stone-100 text-stone-500 hover:text-stone-900 transition-colors shadow-sm"
                   >
-                    {THEME.icons.chevronLeft}
+                    <div className="w-5 h-5 sm:w-8 sm:h-8">{THEME.icons.chevronLeft}</div>
                   </button>
                   <Button 
                     onClick={handleApply}
                     disabled={isProcessing || Object.values(deskItems).filter(d => d.included).length === 0}
                     variant={actionType === 'DELETE' ? 'danger' : 'primary'} 
-                    className="flex-[2] !py-4 shadow-2xl" 
+                    className="flex-[2] !py-4 sm:!py-6 sm:!text-[19px] shadow-2xl" 
                     mode="rectangle"
                     loading={isProcessing}
                   >

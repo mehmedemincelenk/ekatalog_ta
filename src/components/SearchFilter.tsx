@@ -129,7 +129,7 @@ export default function SearchFilter({
 
   const [internalSearch, setInternalSearch] = useState(search);
   const [isMobileReyonOpen, setIsMobileReyonOpen] = useState(false);
-  const [visibleLimitPC, setVisibleLimitPC] = useState(6);
+  const [isAllCategoriesVisiblePC, setIsAllCategoriesVisiblePC] = useState(false);
   
   const filterTheme = THEME.searchFilter;
   const globalIcons = THEME.icons;
@@ -139,6 +139,10 @@ export default function SearchFilter({
     return () => clearTimeout(timer);
   }, [internalSearch, onSearchChange]);
 
+  useEffect(() => {
+    setInternalSearch(search);
+  }, [search]);
+
   const { sortedList, stats } = useMemo(() => {
     const foundInProducts = [...new Set(products.map(p => p.category).filter(Boolean))];
     const consolidated = [...new Set([...categoryOrder, ...foundInProducts])];
@@ -147,8 +151,8 @@ export default function SearchFilter({
     return { sortedList: sortCategories(consolidated, categoryOrder), stats: statsObj };
   }, [products, categoryOrder]);
 
-  const pcVisibleCategories = sortedList.slice(0, visibleLimitPC);
-  const hasMorePC = sortedList.length > visibleLimitPC;
+  const pcVisibleCategories = isAllCategoriesVisiblePC ? sortedList : sortedList.slice(0, 6);
+  const hasMorePC = !isAllCategoriesVisiblePC && sortedList.length > 6;
 
   const showAll = displayConfig.showSearch || displayConfig.showCategories;
   if (!showAll && !isAdmin) return null;
@@ -159,7 +163,7 @@ export default function SearchFilter({
         {/* TOP BAR: Search + Mobile Toggle */}
         {displayConfig.showSearch ? (
           <div className={filterTheme.searchArea.wrapper}>
-            <div className={`${filterTheme.searchArea.inputWrapper} ${THEME.radius.input}`}>
+            <div className={`${filterTheme.searchArea.inputWrapper} ${THEME.radius.input} sm:hidden`}>
               <div className={filterTheme.searchArea.iconSize}>{globalIcons.search}</div>
               <input 
                 type="text" value={internalSearch} 
@@ -207,7 +211,7 @@ export default function SearchFilter({
                   <button 
                     onClick={() => { onCategoryToggle(LABELS.filter.allCategories); setIsMobileReyonOpen(false); }}
                     className={`
-                      ${filterTheme.categoryList.chip.container} ${THEME.radius.chip} px-5 py-2.5 ${THEME.font.xs} font-black uppercase tracking-widest transition-all
+                      ${filterTheme.categoryList.chip.container} ${THEME.radius.chip} px-5 py-2.5 sm:px-[19px] sm:py-[10px] ${THEME.font.xs} sm:text-[10px] font-black uppercase tracking-widest transition-all
                       ${activeCategories.length === 0 ? filterTheme.categoryList.chip.active : filterTheme.categoryList.chip.inactive}
                     `}
                   >
@@ -236,13 +240,13 @@ export default function SearchFilter({
         {/* DESKTOP VIEW: Single Row + Pagination */}
         {displayConfig.showCategories && (
           <div className="hidden sm:flex mt-3 items-center w-full">
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 px-1 -mx-1 flex-1">
+            <div className={`flex gap-2 py-1 px-1 -mx-1 flex-1 ${isAllCategoriesVisiblePC ? 'flex-wrap items-start' : 'items-center overflow-x-auto no-scrollbar'}`}>
               <style dangerouslySetInnerHTML={{ __html: `.no-scrollbar::-webkit-scrollbar { display: none; }` }} />
               
               <button 
                 onClick={() => onCategoryToggle(LABELS.filter.allCategories)}
                 className={`
-                  ${filterTheme.categoryList.chip.container} ${THEME.radius.chip} px-5 py-2.5 ${THEME.font.xs} font-black uppercase tracking-widest shrink-0 transition-all active:scale-95
+                  ${filterTheme.categoryList.chip.container} ${THEME.radius.chip} px-5 py-2.5 sm:px-[19px] sm:py-[10px] ${THEME.font.xs} sm:text-[10px] font-black uppercase tracking-widest shrink-0 transition-all active:scale-95
                   ${activeCategories.length === 0 ? filterTheme.categoryList.chip.active : filterTheme.categoryList.chip.inactive}
                 `}
               >
@@ -266,13 +270,24 @@ export default function SearchFilter({
 
               {hasMorePC && (
                 <button 
-                  onClick={() => setVisibleLimitPC(prev => prev + 4)}
+                  onClick={() => setIsAllCategoriesVisiblePC(true)}
                   className={`
                     shrink-0 px-6 py-2.5 border-2 border-dashed border-stone-200 text-stone-400 font-black text-[10px] uppercase tracking-widest rounded-full 
                     hover:border-stone-900 hover:text-stone-900 transition-all active:scale-95
                   `}
                 >
                   + DAHA FAZLA
+                </button>
+              )}
+              {isAllCategoriesVisiblePC && sortedList.length > 6 && (
+                <button 
+                  onClick={() => setIsAllCategoriesVisiblePC(false)}
+                  className={`
+                    shrink-0 px-6 py-2.5 border-2 border-dashed border-stone-200 text-stone-400 font-black text-[10px] uppercase tracking-widest rounded-full 
+                    hover:border-stone-900 hover:text-stone-900 transition-all active:scale-95
+                  `}
+                >
+                  - DAHA AZ
                 </button>
               )}
             </div>

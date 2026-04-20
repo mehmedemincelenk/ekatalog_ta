@@ -317,16 +317,16 @@ const ProductCard = memo(({
             {/* PRODUCT VISUAL */}
             <div className="relative aspect-[4/3] bg-stone-50">
               <img src={highDefinitionImageSource} alt={product.name} className="w-full h-full object-cover" />
-              <div className="absolute top-4 left-4">
-                <span className="bg-black/5 backdrop-blur-md text-stone-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
-                  {product.category}
-                </span>
-              </div>
             </div>
 
             {/* PRODUCT INFO & ACTIONS */}
             <div className="p-8 space-y-6">
               <div className="space-y-2 text-center">
+                <div className="mb-3">
+                  <span className="bg-stone-100 text-stone-500 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest inline-block border border-stone-200">
+                    {product.category}
+                  </span>
+                </div>
                 <h3 className="text-xl sm:text-2xl font-black text-stone-900 tracking-tighter leading-none">
                   {product.name}
                 </h3>
