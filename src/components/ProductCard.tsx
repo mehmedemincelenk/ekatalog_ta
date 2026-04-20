@@ -1,12 +1,24 @@
 import { useRef, useState, useEffect, memo } from 'react';
+<<<<<<< HEAD
 import { LABELS, THEME } from '../data/config';
 import { Product } from '../types';
 import { resolveVisualAssetUrl, PLACEHOLDER_VISUAL_SYMBOL } from '../utils/image';
 import { calculatePromotionalPrice } from '../utils/price';
+=======
+import { motion, AnimatePresence } from 'framer-motion';
+import { LABELS, THEME } from '../data/config';
+import { Product } from '../types';
+import { resolveVisualAssetUrl, PLACEHOLDER_VISUAL_SYMBOL } from '../utils/image';
+import { calculatePromotionalPrice, standardizePriceInput } from '../utils/price';
+>>>>>>> master
 import Button from './Button';
 import { AdminActionMenu } from './AdminActionMenu';
 import { MarqueeText } from './MarqueeText';
 import { ActiveDiscount } from '../hooks/useDiscount';
+<<<<<<< HEAD
+=======
+import OrderSelector from './OrderSelector';
+>>>>>>> master
 
 /**
  * PRODUCT CARD COMPONENT (100% Tokenized & Professional English)
@@ -18,20 +30,37 @@ interface ProductCardProps {
   product: Product;
   categories: string[];
   isAdmin: boolean;
+<<<<<<< HEAD
   onDelete: (id: string) => void;
   onUpdate: (id: string, changes: Partial<Product>) => void;
   onOrderChange?: (id: string, newPosition: number) => void;
   onImageUpload?: (id: string, file: File) => Promise<void>;
+=======
+  isInlineEnabled: boolean;
+  onDelete: (id: string) => void;
+  onUpdate: (id: string, changes: Partial<Product>) => void;
+  onOrderChange?: (id: string, newPosition: number) => void;
+  onImageUpload?: (id: string, file: File) => Promise<string | undefined>;
+>>>>>>> master
   orderIndex?: number;
   itemsInCategory?: number;
   activeDiscount?: ActiveDiscount | null;
   isPriority?: boolean;
+<<<<<<< HEAD
+=======
+  activeAdminProductId?: string | null;
+  setActiveAdminProductId?: (id: string | null) => void;
+>>>>>>> master
 }
 
 const ProductCard = memo(({
   product, 
   categories = [], 
   isAdmin, 
+<<<<<<< HEAD
+=======
+  isInlineEnabled,
+>>>>>>> master
   onDelete, 
   onUpdate, 
   onOrderChange, 
@@ -39,7 +68,13 @@ const ProductCard = memo(({
   orderIndex = 1, 
   itemsInCategory = 1, 
   activeDiscount,
+<<<<<<< HEAD
   isPriority = false
+=======
+  isPriority = false,
+  activeAdminProductId,
+  setActiveAdminProductId
+>>>>>>> master
 }: ProductCardProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cardContainerRef = useRef<HTMLElement>(null);
@@ -49,6 +84,14 @@ const ProductCard = memo(({
   const [optimisticImagePreview, setOptimisticImagePreview] = useState<string | null>(null);
   const [isZoomDetailOpen, setIsZoomDetailOpen] = useState(false);
 
+<<<<<<< HEAD
+=======
+  const isAdminMenuOpen = activeAdminProductId === product.id;
+  const setIsAdminMenuOpen = (isOpen: boolean) => {
+    setActiveAdminProductId?.(isOpen ? product.id : null);
+  };
+
+>>>>>>> master
   const theme = THEME.productCard;
   const adminLabels = LABELS.adminActions;
 
@@ -60,9 +103,22 @@ const ProductCard = memo(({
     return () => window.removeEventListener('scroll', handleScrollClose);
   }, [isZoomDetailOpen]);
 
+<<<<<<< HEAD
   // Reset optimistic preview when real image arrives
   useEffect(() => {
     if (product.image && optimisticImagePreview) setOptimisticImagePreview(null);
+=======
+  // Reset optimistic preview when real image arrives & CLEANUP memory
+  useEffect(() => {
+    if (product.image && optimisticImagePreview) {
+      URL.revokeObjectURL(optimisticImagePreview);
+      setOptimisticImagePreview(null);
+    }
+    // Cleanup on unmount
+    return () => {
+      if (optimisticImagePreview) URL.revokeObjectURL(optimisticImagePreview);
+    };
+>>>>>>> master
   }, [product.image, optimisticImagePreview]);
 
   const handleImageFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,6 +147,18 @@ const ProductCard = memo(({
     }
   };
 
+<<<<<<< HEAD
+=======
+  const handlePromptEdit = (field: keyof Product, label: string) => {
+    if (!isAdmin || isInlineEnabled) return;
+    const currentVal = (product[field] as string) || '';
+    const newVal = window.prompt(`${label} düzenle:`, currentVal);
+    if (newVal !== null) {
+      handleDataFieldUpdate(field, field === 'price' ? standardizePriceInput(newVal) : newVal);
+    }
+  };
+
+>>>>>>> master
   // DISCOUNT CALCULATION
   const isPromotionActive = activeDiscount && (!activeDiscount.category || activeDiscount.category === product.category);
   const originalPriceLabel = product.price.includes('₺') ? product.price : `${product.price} ₺`;
@@ -111,7 +179,11 @@ const ProductCard = memo(({
         <div 
           className={`${theme.image.wrapper} ${theme.image.aspect} ${theme.image.bg} ${THEME.radius.image} ${!isAdmin ? theme.image.cursorUser : theme.image.cursorAdmin}`} 
           onClick={() => { 
+<<<<<<< HEAD
             if (isAdmin && !isUploadingImage) fileInputRef.current?.click(); 
+=======
+            if (isAdmin && !isUploadingImage) setIsAdminMenuOpen(true); 
+>>>>>>> master
             else if (!isAdmin && primaryImageSource) setIsZoomDetailOpen(true); 
           }}
         >
@@ -131,9 +203,55 @@ const ProductCard = memo(({
             </div>
           )}
           
+<<<<<<< HEAD
           {isAdmin && primaryImageSource && !isUploadingImage && (
             <div className={theme.image.overlay} />
           )}
+=======
+          <AnimatePresence>
+            {isAdmin && primaryImageSource && !isUploadingImage && (
+              <motion.div 
+                initial={false} 
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, filter: 'blur(10px)' }}
+                className={theme.image.overlay} 
+              />
+            )}
+          </AnimatePresence>
+
+          {/* ADMIN TOOLS: Repositioned logic */}
+          <AnimatePresence>
+            {isAdmin && (
+              <motion.div
+                initial={false}
+                animate={{ opacity: 1, scale: 1, transform: 'translateZ(0)' }}
+                exit={{ opacity: 0, filter: 'blur(12px)', scale: 0.9 }}
+                transition={{ duration: 0.3 }}
+                className="absolute inset-0 z-[30] pointer-events-none"
+              >
+                <div className="absolute top-2 right-2 z-[30] pointer-events-auto">
+                  <OrderSelector 
+                    currentOrder={orderIndex}
+                    totalCount={itemsInCategory}
+                    onChange={(newPos) => onOrderChange?.(product.id, newPos)}
+                    className="shadow-xl"
+                  />
+                </div>
+                <div className="pointer-events-auto">
+                  <AdminActionMenu 
+                    product={product} 
+                    categories={categories} 
+                    onDelete={onDelete} 
+                    onUpdate={onUpdate} 
+                    isOpen={isAdminMenuOpen}
+                    setIsOpen={setIsAdminMenuOpen}
+                    onImageChangeClick={() => fileInputRef.current?.click()}
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+>>>>>>> master
 
           {isUploadingImage && (
             <div className={theme.uploadOverlay.wrapper}>
@@ -150,27 +268,65 @@ const ProductCard = memo(({
             text={product.name} 
             textClass={`${theme.typography.name} ${theme.typography.nameTransition} ${product.inStock === false ? theme.typography.nameOutOfStock : ''}`} 
             isAdmin={isAdmin} 
+<<<<<<< HEAD
             editableProps={isAdmin ? { 
+=======
+            onClick={() => handlePromptEdit('name', 'Ürün Adı')}
+            editableProps={isAdmin && isInlineEnabled ? { 
+>>>>>>> master
               contentEditable: true, 
               suppressContentEditableWarning: true, 
               onBlur: (event: React.FocusEvent<HTMLDivElement>) => handleDataFieldUpdate('name', event.currentTarget.textContent?.trim() || ''), 
               onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => event.key === 'Enter' && (event.preventDefault(), event.currentTarget.blur()), 
+<<<<<<< HEAD
               className: `${theme.typography.editable} ${theme.adminMenu.editHighlight} ${theme.adminMenu.editPadding} ${THEME.radius.input}` 
+=======
+              className: `outline-none focus:ring-2 focus:ring-stone-900/10 rounded px-1 -mx-1 transition-all hover:bg-stone-100 focus:bg-stone-100 cursor-text` 
+>>>>>>> master
             } : {}} 
           />
           
           <div className={theme.innerLayout.descriptionWrapper}>
+<<<<<<< HEAD
             {isAdmin ? (
+=======
+            {isAdmin && isInlineEnabled ? (
+>>>>>>> master
               <div onClick={(event) => event.stopPropagation()} className={theme.adminMenu.textareaBase}>
                 <textarea 
                   defaultValue={product.description || ''} 
                   onBlur={(event) => handleDataFieldUpdate('description', event.target.value.trim())} 
+<<<<<<< HEAD
                   className={`${theme.typography.description} ${theme.adminMenu.editHighlight} border ${theme.adminMenu.editBorder} ${THEME.radius.input} ${theme.adminMenu.editPadding} ${theme.adminMenu.textareaBase}`} 
                   placeholder={adminLabels.addDescription}
                 />
               </div>
             ) : (
               product.description && <p className={`${theme.typography.description} ${theme.typography.descriptionClamp}`}>{product.description}</p>
+=======
+                  onChange={(e) => {
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                  }}
+                  className={`${theme.typography.description} outline-none w-full px-1 -mx-1 rounded transition-all hover:bg-stone-100 focus:bg-stone-100 focus:ring-2 focus:ring-stone-900/10 border-transparent bg-transparent resize-none overflow-hidden`} 
+                  placeholder={adminLabels.addDescription}
+                  rows={1}
+                />
+              </div>
+            ) : (
+              (product.description || isAdmin) && (
+                <p 
+                  onClick={() => handlePromptEdit('description', 'Ürün Açıklaması')}
+                  className={`${theme.typography.description} ${theme.typography.descriptionClamp} ${isAdmin ? `outline-none focus:ring-2 focus:ring-stone-900/10 rounded px-1 -mx-1 transition-all hover:bg-stone-100 focus:bg-stone-100 cursor-text` : ''}`}
+                >
+                  {product.description || (isAdmin ? adminLabels.addDescription : '')}
+                </p>
+              )
+>>>>>>> master
             )}
           </div>
 
@@ -188,6 +344,7 @@ const ProductCard = memo(({
                 </>
               ) : (
                 <div 
+<<<<<<< HEAD
                   contentEditable={isAdmin} 
                   suppressContentEditableWarning 
                   onBlur={(event: React.FocusEvent<HTMLDivElement>) => { 
@@ -197,6 +354,17 @@ const ProductCard = memo(({
                   }} 
                   onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => event.key === 'Enter' && (event.preventDefault(), event.currentTarget.blur())} 
                   className={`${theme.typography.price} ${isAdmin ? `${theme.typography.editable} ${theme.adminMenu.editHighlight} ${theme.adminMenu.editPadding} ${THEME.radius.input}` : 'text-stone-900'} ${product.inStock === false && !isAdmin ? theme.typography.priceOutOfStock : ''}`}
+=======
+                  contentEditable={isAdmin && isInlineEnabled} 
+                  suppressContentEditableWarning 
+                  onBlur={(event: React.FocusEvent<HTMLDivElement>) => { 
+                    const inputPrice = event.currentTarget.textContent?.trim() || ''; 
+                    handleDataFieldUpdate('price', standardizePriceInput(inputPrice)); 
+                  }} 
+                  onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => event.key === 'Enter' && (event.preventDefault(), event.currentTarget.blur())} 
+                  onClick={() => handlePromptEdit('price', 'Ürün Fiyatı')}
+                  className={`${theme.typography.price} ${isAdmin ? `outline-none focus:ring-2 focus:ring-stone-900/10 rounded px-1 -mx-1 transition-all hover:bg-stone-100 focus:bg-stone-100 cursor-text` : 'text-stone-900'} ${product.inStock === false && !isAdmin ? theme.typography.priceOutOfStock : ''}`}
+>>>>>>> master
                 >
                   {originalPriceLabel}
                 </div>
@@ -205,6 +373,7 @@ const ProductCard = memo(({
           </div>
         </div>
 
+<<<<<<< HEAD
         {/* ADMIN TOOLS */}
         {isAdmin && (
           <>
@@ -229,6 +398,8 @@ const ProductCard = memo(({
           </>
         )}
 
+=======
+>>>>>>> master
         {/* STATUS BADGES */}
         <div className={theme.status.wrapper}>
           {!product.inStock && (

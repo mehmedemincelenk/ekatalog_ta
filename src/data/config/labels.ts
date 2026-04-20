@@ -35,10 +35,17 @@ export const LABELS = {
   filter: {
     allCategories: "Tüm Ürünler",
     searchPlaceholder: "Ürün veya reyon ara...",
+<<<<<<< HEAD
     categoryBtn: "Reyonlar ☰",
     showLess: "Daha Az Göster",
     showMore: (count: number) => `+${count} Daha`,
     newCategoryPrompt: "Yeni reyon adını girin:",
+=======
+    categoryBtn: "KATEGORİLER",
+    showLess: "Daha Az Göster",
+    showMore: (count: number) => `+${count} Daha`,
+    newCategoryPrompt: "Yeni kategori adını girin:",
+>>>>>>> master
   },
   form: {
     productName: "Ürün Adı",

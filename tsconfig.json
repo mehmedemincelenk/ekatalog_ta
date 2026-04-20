@@ -20,11 +20,14 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
+<<<<<<< HEAD
     "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
     },
+=======
+>>>>>>> master
     "types": ["vite/client", "node", "vite-plugin-pwa/client"]
   },
   "include": ["src"],

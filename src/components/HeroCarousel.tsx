@@ -1,7 +1,15 @@
+<<<<<<< HEAD
 import React, { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { THEME, LABELS, TECH } from '../data/config';
 import { useCarousel, Slide } from '../hooks/useCarousel';
 import Button from './Button';
+=======
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { THEME, LABELS, TECH } from '../data/config';
+import { useCarousel } from '../hooks/useCarousel';
+import Button from './Button';
+import CarouselSlideUnit from './CarouselSlideUnit';
+>>>>>>> master
 
 /**
  * HERO CAROUSEL COMPONENT (100% Tokenized & Professional English)
@@ -13,6 +21,7 @@ interface HeroCarouselProps {
   isAdminModeActive: boolean; 
 }
 
+<<<<<<< HEAD
 const CarouselSlideUnit = memo(({ 
   slideData, isCurrentlyActive, isAdmin, isCurrentlyUploading, editingTargetSlideId, onImageUpdateTrigger
 }: { 
@@ -61,6 +70,10 @@ const CarouselSlideUnit = memo(({
 
 export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
   const { slides, uploadHeroImage, addSlide, loading } = useCarousel(isAdminModeActive);
+=======
+export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
+  const { slides, uploadHeroImage, addSlide, deleteSlide, reorderSlides, loading } = useCarousel(isAdminModeActive);
+>>>>>>> master
   const fileUploadInputRef = useRef<HTMLInputElement>(null);
   const [activeEditingSlideId, setActiveEditingSlideId] = useState<number | null>(null);
   const [isAssetUploading, setIsAssetUploading] = useState(false);
@@ -129,6 +142,7 @@ export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
       ${carouselTheme.layout} 
       ${carouselTheme.container}
     `}>
+<<<<<<< HEAD
       {/* ADMIN: ADD SLIDE BUTTON (Top Left Overlay) */}
       {isAdminModeActive && (
         <Button 
@@ -140,6 +154,10 @@ export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
         />
       )}
 
+=======
+      {/* ADMIN: ADD SLIDE FUNCTIONALITY (Görsel buton kaldırıldı, işlevsellik mevcut görsellere tıklanarak veya boş durumda sağlanıyor) */}
+      
+>>>>>>> master
       <div 
         className={`relative w-full h-full overflow-hidden ${THEME.radius.carousel}`} 
         onTouchStart={handleTouchStart} 
@@ -156,6 +174,14 @@ export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
             isCurrentlyUploading={isAssetUploading} 
             editingTargetSlideId={activeEditingSlideId} 
             onImageUpdateTrigger={(id) => { setActiveEditingSlideId(id); fileUploadInputRef.current?.click(); }} 
+<<<<<<< HEAD
+=======
+            onDeleteSlide={deleteSlide}
+            onAddSlide={addSlide}
+            onReorderSlide={reorderSlides}
+            currentIndex={index + 1}
+            totalSlides={slides.length}
+>>>>>>> master
           />
         ))}
 
@@ -193,8 +219,13 @@ export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
             setIsAssetUploading(true);
             try {
               await uploadHeroImage(activeEditingSlideId, selectedFile);
+<<<<<<< HEAD
             } catch (error) { 
               alert(LABELS.saveError); 
+=======
+            } catch {
+              console.error("Resim yükleme hatası");
+>>>>>>> master
             } finally { 
               setIsAssetUploading(false); 
               setActiveEditingSlideId(null); 

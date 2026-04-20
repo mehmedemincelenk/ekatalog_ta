@@ -12,6 +12,7 @@ export interface Slide {
 
 import { getActiveStoreSlug } from '../utils/store';
 
+<<<<<<< HEAD
 export interface Slide {
   id: number;
   src: string;
@@ -20,6 +21,8 @@ export interface Slide {
   sub: string;
 }
 
+=======
+>>>>>>> master
 const STORE_SLUG = getActiveStoreSlug();
 
 /**
@@ -150,13 +153,68 @@ export function useCarousel(isAdministrativeModeActive: boolean) {
       
       if (error) console.error('Failed to save new slide:', error);
     }
+<<<<<<< HEAD
   }, [isAdministrativeModeActive, marketingSlides, STORE_SLUG]);
+=======
+  }, [isAdministrativeModeActive, marketingSlides]);
+
+  /**
+   * removeSlide: Deletes a specific slide from the carousel.
+   */
+  const removeSlide = useCallback(async (slideId: number) => {
+    if (!window.confirm('Bu görseli silmek istediğinize emin misiniz?')) return;
+    
+    const updatedSlides = marketingSlides.filter(s => s.id !== slideId);
+    setMarketingSlides(updatedSlides);
+
+    if (isAdministrativeModeActive) {
+      const { error } = await supabase
+        .from('stores')
+        .update({ carousel_data: { slides: updatedSlides } })
+        .eq('slug', STORE_SLUG);
+      
+      if (error) console.error('Failed to delete slide:', error);
+    }
+  }, [isAdministrativeModeActive, marketingSlides]);
+
+  /**
+   * reorderSlides: Moves a slide to a specific index within the sequence.
+   */
+  const reorderSlides = useCallback(async (slideId: number, newDisplayIndex: number) => {
+    const currentIndex = marketingSlides.findIndex(s => s.id === slideId);
+    if (currentIndex === -1) return;
+
+    // Convert 1-based display index to 0-based array index
+    const targetedIndex = Math.max(0, Math.min(newDisplayIndex - 1, marketingSlides.length - 1));
+    if (currentIndex === targetedIndex) return;
+
+    const updatedSlides = [...marketingSlides];
+    const [capturedSlide] = updatedSlides.splice(currentIndex, 1);
+    updatedSlides.splice(targetedIndex, 0, capturedSlide);
+
+    setMarketingSlides(updatedSlides);
+
+    if (isAdministrativeModeActive) {
+      const { error } = await supabase
+        .from('stores')
+        .update({ carousel_data: { slides: updatedSlides } })
+        .eq('slug', STORE_SLUG);
+      
+      if (error) console.error('Failed to reorder slides:', error);
+    }
+  }, [isAdministrativeModeActive, marketingSlides]);
+>>>>>>> master
 
   return { 
     slides: marketingSlides, 
     updateSlide: modifySlideContent, 
     uploadHeroImage: uploadHeroVisualAsset, 
     addSlide: addNewSlide,
+<<<<<<< HEAD
+=======
+    deleteSlide: removeSlide,
+    reorderSlides,
+>>>>>>> master
     loading: isCarouselContentLoading 
   };
 }

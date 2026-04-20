@@ -1,4 +1,5 @@
 /**
+<<<<<<< HEAD
  * DEFAULT COMPANY SETTINGS
  */
 export const DEFAULT_COMPANY = {
@@ -28,6 +29,47 @@ export const REFERENCES = [
   { id: 2, name: 'TRENDYOL', logo: '🧡' },
   { id: 3, name: 'HEPSİBURADA', logo: '💙' },
   { id: 4, name: 'YURTİÇİ KARGO', logo: '🚛' },
+=======
+ * DEFAULT COMPANY SETTINGS (Premium Global Template)
+ */
+export const DEFAULT_COMPANY = {
+  name: "Yeni Mağazanız",
+  tagline: "Dijital Katalog ve Sipariş Platformu",
+  phone: "05XX XXX XX XX",
+  address: "Mağaza Adresiniz Buraya Gelecek",
+  instagramUrl: "https://instagram.com/katalogunuz",
+  logoUrl: "/default-logo.png",
+  displayConfig: {
+    showLogo: true,
+    showAddress: true,
+    showInstagram: true,
+    showCategories: true,
+    showSearch: true,
+    showWhatsapp: true,
+    showSubtitle: true,
+    showReferences: true
+  }
+};
+
+/**
+ * DEFAULT CAROUSEL DATA (Neutral Sample Slides)
+ */
+export const CAROUSEL = {
+  slides: [
+    { id: 1, src: "", bg: "bg-stone-50", label: "Yeni Sezon", sub: "Mağazanızın en yeni ürünlerini burada sergileyin." },
+    { id: 2, src: "", bg: "bg-stone-100", label: "Hızlı Sipariş", sub: "Müşterileriniz WhatsApp üzerinden size anında ulaşsın." },
+    { id: 3, src: "", bg: "bg-stone-200", label: "7/24 Açık", sub: "Dijital vitrininiz her an yayında." },
+  ]
+};
+
+export const CATEGORY_ORDER = ["Yeni Ürünler", "Popüler", "Kampanyalı", "Kategorisiz"];
+
+export const REFERENCES = [
+  { id: 1, name: 'Lider İş Ortakları', logo: '🤝' },
+  { id: 2, name: 'Güvenli Ödeme', logo: '🛡️' },
+  { id: 3, name: 'Hızlı Kargo', logo: '🚀' },
+  { id: 4, name: 'Müşteri Memnuniyeti', logo: '⭐' },
+>>>>>>> master
 ];
 
 export const TECH = {
@@ -40,7 +82,11 @@ export const TECH = {
     timeoutMs: 3600000, // 1 hour inactivity timeout
   },
   carousel: {
+<<<<<<< HEAD
     intervalMs: 5000,
+=======
+    intervalMs: 8000, // Slightly slower for better readability
+>>>>>>> master
     swipeThreshold: 50,
   },
   category: {
@@ -52,11 +98,19 @@ export const TECH = {
     errorResetMs: 3000,
   },
   products: {
+<<<<<<< HEAD
     defaultCategory: 'Diğer',
     defaultPrice: '0',
     fallbackCategory: 'KATEGORİSİZ / DİĞER',
     maxFileNameLength: 30,
     uniqueIdSuffixLength: 5,
+=======
+    defaultCategory: 'DİĞER',
+    defaultPrice: '0,00',
+    fallbackCategory: 'DÜZENLENMEMİŞ KATEGORİ',
+    maxFileNameLength: 40,
+    uniqueIdSuffixLength: 6,
+>>>>>>> master
   },
   storage: {
     bucket: 'product-images',
@@ -64,7 +118,11 @@ export const TECH = {
     lqFolder: 'lq',
     hqFolder: 'hq',
     cacheControl: '0',
+<<<<<<< HEAD
     heroWidth: 1600,
+=======
+    heroWidth: 1920,
+>>>>>>> master
     productHqWidth: 1200,
     productLqWidth: 400,
     hqQuality: 0.85,
@@ -79,8 +137,15 @@ export const TECH = {
 };
 
 export const STORAGE = {
+<<<<<<< HEAD
   productsCache: 'toptanambalaj_products_v13_final',
   categoryOrder: 'toptanambalaj_order_v13',
   carouselSlides: 'toptanambalaj_carousel_v13',
   adminSession: 'admin_session_v13',
+=======
+  productsCache: 'ekatalog_inventory_persistence',
+  categoryOrder: 'ekatalog_category_meta',
+  carouselSlides: 'ekatalog_branding_assets',
+  adminSession: 'ekatalog_secure_session_lock',
+>>>>>>> master
 };

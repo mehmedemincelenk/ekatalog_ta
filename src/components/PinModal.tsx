@@ -1,160 +1,175 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { THEME, LABELS } from '../data/config';
-
-/**
- * PIN MODAL COMPONENT (Brute-Force Protected)
- * -----------------------------------------------------------
- * Apple-style secure entry interface with progressive lockout logic.
- */
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { THEME } from '../data/config';
+import Turnstile from './Turnstile';
+import { Check } from 'lucide-react';
 
 interface PinModalProps {
   isModalOpen: boolean;
-  authorizedPinCode: string;
+  onVerify: (pin: string) => Promise<boolean>;
   onAuthenticationSuccess: () => void;
   onModalClose: () => void;
+  isLockedOut?: boolean;
+  failedAttempts?: number;
 }
+
+const PIN_LENGTH = 4;
 
 export default function PinModal({ 
   isModalOpen, 
-  authorizedPinCode, 
+  onVerify, 
   onAuthenticationSuccess, 
-  onModalClose 
+  onModalClose,
+  isLockedOut,
+  failedAttempts = 0
 }: PinModalProps) {
   const [currentPinAttempt, setCurrentPinAttempt] = useState('');
   const [hasAuthError, setHasAuthError] = useState(false);
-  
-  // SECURITY STATE
-  const [failedAttempts, setFailedAttempts] = useState(0);
-  const [lockoutTimeLeft, setLockoutTimeLeft] = useState(0);
-  const lockoutTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isRobotVerified, setIsRobotVerified] = useState(false);
+
+  const requiresCaptcha = failedAttempts >= 2;
+  const isInputDisabled = isLockedOut || isVerifying || (requiresCaptcha && !isRobotVerified);
 
   const theme = THEME.pinModal;
   const globalIcons = THEME.icons;
 
-  // Handle Lockout Countdown
+  // Cleanup on close
   useEffect(() => {
-    if (lockoutTimeLeft > 0) {
-      lockoutTimerRef.current = setInterval(() => {
-        setLockoutTimeLeft(prev => prev - 1);
-      }, 1000);
-    } else {
-      if (lockoutTimerRef.current) clearInterval(lockoutTimerRef.current);
-    }
-    return () => { if (lockoutTimerRef.current) clearInterval(lockoutTimerRef.current); };
-  }, [lockoutTimeLeft]);
-
-  // Process PIN Verification
-  const processPinEntry = useCallback((pin: string) => {
-    if (pin === authorizedPinCode) {
-      onAuthenticationSuccess();
+    if (!isModalOpen) {
       setCurrentPinAttempt('');
-      setFailedAttempts(0);
-    } else {
-      const newFailedCount = failedAttempts + 1;
-      setFailedAttempts(newFailedCount);
-      setHasAuthError(true);
-
-      // LOCKOUT LOGIC:
-      // 3 failed tries = 30s lockout
-      // 5+ failed tries = 5min lockout
-      if (newFailedCount >= 5) {
-        setLockoutTimeLeft(300); // 5 minutes
-      } else if (newFailedCount >= 3) {
-        setLockoutTimeLeft(30); // 30 seconds
-      }
-
-      setTimeout(() => {
-        setHasAuthError(false);
-        setCurrentPinAttempt('');
-      }, 500);
+      setHasAuthError(false);
     }
-  }, [authorizedPinCode, onAuthenticationSuccess, failedAttempts]);
+  }, [isModalOpen]);
 
-  const handleDigitEntry = useCallback((digit: string) => {
-    if (lockoutTimeLeft > 0) return;
-    if (currentPinAttempt.length < 4 && !hasAuthError) {
-      const nextPin = currentPinAttempt + digit;
-      setCurrentPinAttempt(nextPin);
+  const handleDigitEntry = async (digit: string) => {
+    if (isInputDisabled || currentPinAttempt.length >= PIN_LENGTH) return;
+    
+    const newAttempt = currentPinAttempt + digit;
+    setCurrentPinAttempt(newAttempt);
+    setHasAuthError(false);
+
+    if (newAttempt.length === PIN_LENGTH) {
+      setIsVerifying(true);
+      const isValid = await onVerify(newAttempt);
       
-      if (nextPin.length === 4) {
-        processPinEntry(nextPin);
+      if (isValid) {
+        onAuthenticationSuccess();
+      } else {
+        setHasAuthError(true);
+        setTimeout(() => {
+          setCurrentPinAttempt('');
+          setHasAuthError(false);
+        }, 600);
       }
+      setIsVerifying(false);
     }
-  }, [currentPinAttempt, hasAuthError, lockoutTimeLeft, processPinEntry]);
+  };
 
-  const handleDeleteDigit = useCallback(() => {
-    if (lockoutTimeLeft > 0) return;
-    if (!hasAuthError) {
-      setCurrentPinAttempt(previousPin => previousPin.slice(0, -1));
-    }
-  }, [hasAuthError, lockoutTimeLeft]);
-
-  if (!isModalOpen) return null;
+  const handleDeleteDigit = () => {
+    if (isInputDisabled) return;
+    setCurrentPinAttempt(prev => prev.slice(0, -1));
+  };
 
   return (
-    <div className={theme.overlay} role="dialog">
-      <div className="absolute inset-0" onClick={onModalClose} />
-
-      <div 
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className={theme.overlay}
+    >
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95, filter: 'blur(15px)' }}
+        transition={{ duration: 0.3, ease: 'easeOut' }}
         className={`${theme.container} ${hasAuthError ? theme.animations.shake : ''}`}
-        onClick={(event) => event.stopPropagation()}
       >
         
         {/* HEADER SECTION */}
         <div className={theme.headerWrapper}>
           <div className={theme.headerIconWrapper}>
             <div className={theme.headerIconSize}>
-              {lockoutTimeLeft > 0 ? '⏳' : globalIcons.lock}
+              {isVerifying ? (
+                <div className={THEME.loading.spinner + " w-5 h-5"} />
+              ) : (
+                isLockedOut ? '⏳' : globalIcons.lock
+              )}
             </div>
           </div>
-          <h2 className={theme.typography.title}>
-            {lockoutTimeLeft > 0 ? 'Güvenlik Kilidi' : 'Giriş Yapın'}
-          </h2>
+          <h2 className={theme.typography.title}>{isLockedOut ? 'GÜVENLİK KİLİDİ' : 'ADMİN PANELİ'}</h2>
           <p className={theme.typography.subtitle}>
-            {lockoutTimeLeft > 0 
-              ? `${lockoutTimeLeft} saniye sonra tekrar deneyin` 
-              : 'Mağaza yönetim şifrenizi girin'}
+            {isLockedOut 
+              ? 'Çok fazla yanlış deneme. Lütfen 1 dakika bekleyin.' 
+              : 'Giriş yapmak için 4 haneli PIN kodunuzu girin.'}
           </p>
         </div>
 
-        {/* PIN STATUS INDICATORS */}
-        <div className={theme.dotsWrapper}>
-          {[0, 1, 2, 3].map(index => (
+        {/* DOTS INDICATOR */}
+        <div className={`${theme.dotsWrapper} ${isInputDisabled ? 'opacity-20' : ''} mb-4`}>
+          {[...Array(PIN_LENGTH)].map((_, i) => (
             <div 
-              key={index}
+              key={i} 
               className={`
                 ${theme.dotBase} 
-                ${currentPinAttempt.length > index ? theme.dotActive : theme.dotInactive} 
-                ${hasAuthError || lockoutTimeLeft > 0 ? theme.dotError : ''}
-              `}
+                ${i < currentPinAttempt.length ? theme.dotActive : theme.dotInactive}
+                ${hasAuthError ? theme.dotError : ''}
+              `} 
             />
           ))}
         </div>
 
-        {/* SECURE NUMBER PAD */}
-        <div className={`transition-opacity duration-300 ${lockoutTimeLeft > 0 ? 'opacity-20 pointer-events-none' : 'opacity-100'}`}>
-          <div className={theme.keyboardGrid}>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(number => (
-              <button key={number} onClick={() => handleDigitEntry(String(number))} className={theme.keyButton}>
-                <span className={theme.typography.keyText}>{number}</span>
-              </button>
-            ))}
-            
-            <button onClick={onModalClose} className={theme.cancelButton}>
-              {LABELS.pinModal.cancelLabel}
-            </button>
-
-            <button onClick={() => handleDigitEntry('0')} className={theme.keyButton}>
-              <span className={theme.typography.keyText}>0</span>
-            </button>
-
-            <button onClick={handleDeleteDigit} className={theme.deleteButton}>
-              <div className={theme.deleteIconSize}>{globalIcons.backspace}</div>
-            </button>
+        {/* CAPTCHA & FEEDBACK AREA (Diamond UX) */}
+        {requiresCaptcha && (
+          <div className="flex flex-col items-center justify-center min-h-[100px] mb-2 px-6">
+            {!isRobotVerified ? (
+              <div className="flex flex-col items-center animate-in fade-in zoom-in duration-700">
+                <span className="text-[9px] font-black tracking-[0.2em] text-stone-400 uppercase mb-3 animate-pulse">
+                  GÜVENLİK DOĞRULAMASI YAPILIYOR...
+                </span>
+                <Turnstile onVerify={() => setIsRobotVerified(true)} options={{ theme: 'light', size: 'normal' }} />
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-3 animate-in fade-in zoom-in duration-500 py-4">
+                <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center border border-emerald-100 shadow-sm shadow-emerald-100/50">
+                  <Check className="w-6 h-6 stroke-[3]" />
+                </div>
+                <span className="text-[10px] font-black tracking-[0.2em] text-emerald-600 uppercase">
+                  GÜVENLİK DOĞRULANDI
+                </span>
+              </div>
+            )}
           </div>
+        )}
+
+        {/* KEYBOARD GRID */}
+        <div className={`${theme.keyboardGrid} ${isInputDisabled ? 'opacity-30 pointer-events-none grayscale scale-[0.98]' : 'transition-all duration-500'}`}>
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+            <button 
+              key={num} 
+              disabled={isInputDisabled}
+              onClick={() => handleDigitEntry(String(num))} 
+              className={theme.keyButton}
+            >
+              <span className={theme.typography.keyText}>{num}</span>
+            </button>
+          ))}
+          
+          {/* BOTTOM ROW */}
+          <button onClick={onModalClose} className={theme.cancelButton}>İPTAL</button>
+          <button 
+            disabled={isInputDisabled}
+            onClick={() => handleDigitEntry('0')} 
+            className={theme.keyButton}
+          >
+            <span className={theme.typography.keyText}>0</span>
+          </button>
+          <button disabled={isInputDisabled} onClick={handleDeleteDigit} className={theme.deleteButton}>
+             <div className={theme.deleteIconSize}>{globalIcons.backspace}</div>
+          </button>
         </div>
 
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

@@ -69,3 +69,19 @@ export const calculatePromotionalPrice = (originalPriceString: string, discountR
   const finalizedDiscountedPrice = mathematicalBasePrice * (1 - discountRate);
   return formatNumberToCurrency(finalizedDiscountedPrice);
 };
+<<<<<<< HEAD
+=======
+
+/**
+ * standardizePriceInput: Ensures the price follows the standard "₺1.250" format
+ */
+export const standardizePriceInput = (input: string): string => {
+  let cleanValue = input.trim();
+  if (!cleanValue) return '';
+  // Only add currency symbol if it's a numeric-like value and doesn't have it
+  if (!cleanValue.startsWith('₺') && !isNaN(transformCurrencyStringToNumber(cleanValue))) {
+    cleanValue = '₺' + cleanValue;
+  }
+  return cleanValue;
+};
+>>>>>>> master
