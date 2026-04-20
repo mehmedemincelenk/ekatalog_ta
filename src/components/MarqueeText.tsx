@@ -6,10 +6,7 @@ interface MarqueeTextProps {
   textClass: string;
   isAdmin: boolean;
   editableProps?: React.HTMLAttributes<HTMLDivElement>;
-<<<<<<< HEAD
-=======
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
->>>>>>> master
 }
 
 /**
@@ -22,20 +19,12 @@ export const MarqueeText = memo(({
   text, 
   textClass, 
   isAdmin, 
-<<<<<<< HEAD
-  editableProps = {} 
-}: MarqueeTextProps) => {
-  const textContainerRef = useRef<HTMLDivElement>(null);
-  const [hasTextOverflow, setHasTextOverflow] = useState(false);
-  const { className: extraEditableClassName = '', ...remainingEditableProps } = editableProps;
-=======
   editableProps = {},
   onClick
 }: MarqueeTextProps) => {
   const textContainerRef = useRef<HTMLDivElement>(null);
   const [hasTextOverflow, setHasTextOverflow] = useState(false);
   const { className: extraEditableClassName = '', onClick: internalOnClick, ...remainingEditableProps } = editableProps;
->>>>>>> master
 
   const marqueeTheme = THEME.typography.marquee;
 
@@ -58,13 +47,10 @@ export const MarqueeText = memo(({
   return (
     <div 
       ref={textContainerRef} 
-<<<<<<< HEAD
-=======
       onClick={(e) => {
         if (internalOnClick) (internalOnClick as React.MouseEventHandler<HTMLDivElement>)(e);
         if (onClick) onClick(e);
       }}
->>>>>>> master
       className={`
         ${isAdmin ? marqueeTheme.adminMode : marqueeTheme.container} 
         ${textClass} 

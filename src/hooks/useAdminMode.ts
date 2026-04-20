@@ -5,54 +5,25 @@ import { getActiveStoreSlug } from '../utils/store';
 
 const STORE_SLUG = getActiveStoreSlug();
 
-<<<<<<< HEAD
-=======
 /**
- * ADMIN SESSION & GESTURE ENGINE (useAdminMode)
+ * ADMIN SESSION & GESTURE ENGINE (Diamond Standard)
  * -----------------------------------------------------------
- * Bu hook mağazanın kapı görevlisidir:
- * 1. Admin oturum yönetimi (sessionStorage).
- * 2. Gesture Algılama: Logoya uzun basış (1.5s) ile giriş/çıkış.
- * 3. Güvenlik: PIN doğrulama ve hatalı deneme kilidi.
- * 4. UX Tercihleri: 'Vibe Coding' için inline düzenleme modu kontrolü.
+ * Güvenlik ve gizli geçitlerin yönetim merkezi.
+ * - Admin oturumu yönetimi.
+ * - Akıllı Gesture Algılama (PIN vs QR Ayrımı).
+ * - Sunucu taraflı PIN doğrulama (RPC).
  */
->>>>>>> master
 export function useAdminMode() {
   const [isAdmin, setIsAdmin] = useState(() => {
     return sessionStorage.getItem(STORAGE.adminSession) === TECH.auth.sessionActiveValue;
   });
 
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
-<<<<<<< HEAD
-  const [correctPin, setCorrectPin] = useState('');
+  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   
-  const hasFirstClicked = useRef(false);
-  const firstClickTimer = useRef<NodeJS.Timeout | null>(null);
-  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
-  const timeoutTimer = useRef<NodeJS.Timeout | null>(null);
-
-  // 1. PIN PRELOAD
-  useEffect(() => {
-    if (STORE_SLUG === 'main-site') return;
-    
-    let isMounted = true;
-    async function preload() {
-      try {
-        const { data } = await supabase.from('stores').select('admin_pin').eq('slug', STORE_SLUG).single();
-        if (isMounted && data?.admin_pin) setCorrectPin(data.admin_pin);
-      } catch (e) {
-        console.error("PIN preload error:", e);
-      }
-    }
-    preload();
-    return () => { isMounted = false; };
-  }, []);
-=======
-  
-  // UX PREFERENCE: Local state for editing mode (Inline vs Modal)
+  // UX PREFERENCE: Local state for editing mode
   const [isInlineEnabled, setIsInlineEnabled] = useState(() => {
     const saved = localStorage.getItem('ekatalog_inline_edit_v1');
-    // Default to true (it's the signature 'vibe coding' experience)
     return saved !== null ? saved === 'true' : true;
   });
 
@@ -95,12 +66,8 @@ export function useAdminMode() {
   const verifyPinWithServer = useCallback(async (pin: string) => {
     if (STORE_SLUG === 'main-site') return false;
     
-    if (isLockedOut) {
-      console.warn('Security Shield: Rate limited. Please wait.');
-      return false;
-    }
+    if (isLockedOut) return false;
     
-    // SECURE SERVER-SIDE VERIFICATION: Doğrudan tabloyu okumuyoruz, gizli fonksiyonu çağırıyoruz.
     const { data: isSuccess, error } = await supabase
       .rpc('verify_admin_access', { 
         target_slug: STORE_SLUG, 
@@ -108,7 +75,7 @@ export function useAdminMode() {
       });
     
     if (error) {
-      console.error('❌ PIN doğrulama sırasında teknik hata:', error);
+      console.error('❌ PIN doğrulama hatası:', error);
       return false;
     }
 
@@ -128,29 +95,23 @@ export function useAdminMode() {
     }
     
     return isSuccess;
-  }, [failedAttempts, isLockedOut]);
+  }, [failedAttempts, isLockedOut, STORE_SLUG]);
 
+  // GESTURE ENGINE REFS
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const clickCountTimer = useRef<NodeJS.Timeout | null>(null);
   const clickCount = useRef(0);
+  const pointerDownTime = useRef(0);
   const timeoutTimer = useRef<NodeJS.Timeout | null>(null);
 
-  // 1. QR TRIGGER (1 Click + 1 Long Press)
-  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
->>>>>>> master
-
-  // 2. LOGOUT
+  // LOGOUT
   const logout = useCallback(() => {
     setIsAdmin(false);
     sessionStorage.removeItem(STORAGE.adminSession);
     if (timeoutTimer.current) clearTimeout(timeoutTimer.current);
   }, []);
 
-<<<<<<< HEAD
-  // 3. TIMEOUT
-=======
-  // 3. TIMEOUT (Session Security)
->>>>>>> master
+  // SESSION TIMEOUT
   const resetTimeout = useCallback(() => {
     if (!isAdmin) return;
     if (timeoutTimer.current) clearTimeout(timeoutTimer.current);
@@ -169,80 +130,56 @@ export function useAdminMode() {
     };
   }, [isAdmin, resetTimeout]);
 
-<<<<<<< HEAD
-  // 4. TRIGGER: 1 Click -> Release -> Press and Hold
-  const handleLogoPointerDown = useCallback(() => {
-    if (isAdmin) return;
-
-    if (!hasFirstClicked.current) {
-      // First click start
-      hasFirstClicked.current = true;
-      if (firstClickTimer.current) clearTimeout(firstClickTimer.current);
-      
-      // If no second press within 1s, reset
-      firstClickTimer.current = setTimeout(() => {
-        hasFirstClicked.current = false;
-      }, 1000);
-    } else {
-      // This is the second press (the hold phase)
-      if (firstClickTimer.current) clearTimeout(firstClickTimer.current);
-      
-      longPressTimer.current = setTimeout(() => {
-        setIsPinModalOpen(true);
-        hasFirstClicked.current = false;
-      }, 1000); // 1 second hold is enough for professional feel
-    }
-  }, [isAdmin]);
-=======
-  // 4. TRIGGER LOGIC: 
-  // - 2 Seconds Hold -> Admin (PIN Modal or Logout)
-  // - 1 Click + 1 Second Hold -> QR Modal (Easter Egg)
+  // SMART TRIGGER LOGIC: 
+  // 1. Long Press (1.5s) -> Admin PIN / Logout
+  // 2. Click then within 1s Long Press (0.8s) -> QR Modal
   const handleLogoPointerDown = useCallback(() => {
     if (longPressTimer.current) clearTimeout(longPressTimer.current);
+    pointerDownTime.current = Date.now();
     
-    // Check if we are in the middle of a gesture
-    const isGestureAction = clickCount.current === 1;
+    const isComboAttempt = clickCount.current === 1;
 
     longPressTimer.current = setTimeout(() => {
-      if (isGestureAction) {
-        // 1 Click + 0.8 Second Hold -> Open QR
+      if (isComboAttempt) {
         setIsQRModalOpen(true);
-        clickCount.current = 0; // Reset
+        clickCount.current = 0; // Combo consumed
       } else {
-        // 1.5 Seconds Hold -> Admin Login/Logout
-        if (isAdmin) {
-          logout();
-        } else {
-          setIsPinModalOpen(true);
-        }
+        if (isAdmin) logout();
+        else setIsPinModalOpen(true);
       }
-    }, isGestureAction ? 800 : 1500); 
+    }, isComboAttempt ? 800 : 1500); 
   }, [isAdmin, logout]);
->>>>>>> master
 
   const handleLogoPointerUp = useCallback(() => {
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
     }
-<<<<<<< HEAD
-=======
 
-    // Handle "Click" detection for the next gesture
-    clickCount.current += 1;
-    if (clickCountTimer.current) clearTimeout(clickCountTimer.current);
-    
-    // Give more time for the follow-up long press (increased to 800ms)
-    clickCountTimer.current = setTimeout(() => {
+    const holdDuration = Date.now() - pointerDownTime.current;
+
+    // RULE: Only increment click context if it was a quick "short" press (Diamond UI Standard)
+    // If user held for Logout (1.5s), it clearly shouldn't count as first half of QR combo.
+    if (holdDuration < 300) {
+      clickCount.current += 1;
+      if (clickCountTimer.current) clearTimeout(clickCountTimer.current);
+      
+      clickCountTimer.current = setTimeout(() => {
+        clickCount.current = 0;
+      }, 1000); // 1 second window for the combo
+    } else {
+      // Long hold happened (Admin entry/exit), reset any ongoing combo context for hygiene
       clickCount.current = 0;
-    }, 800); 
->>>>>>> master
+      if (clickCountTimer.current) clearTimeout(clickCountTimer.current);
+    }
   }, []);
 
   const onPinSuccess = useCallback(() => {
     setIsAdmin(true);
     sessionStorage.setItem(STORAGE.adminSession, TECH.auth.sessionActiveValue);
     setIsPinModalOpen(false);
+    // Reset click counts for hygiene
+    clickCount.current = 0;
   }, []);
 
   return { 
@@ -252,10 +189,6 @@ export function useAdminMode() {
     logout, 
     isPinModalOpen, 
     setIsPinModalOpen, 
-<<<<<<< HEAD
-    correctPin, 
-    onPinSuccess 
-=======
     isQRModalOpen,
     setIsQRModalOpen,
     verifyPinWithServer, 
@@ -264,6 +197,5 @@ export function useAdminMode() {
     toggleInlineEdit,
     isLockedOut,
     failedAttempts
->>>>>>> master
   };
 }

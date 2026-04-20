@@ -12,10 +12,7 @@
  * 3. Görünmez Kahraman: Bu dosya projenin çalışmasına doğrudan katılmaz, sadece geliştirme 
  *    aşamasında kodun daha güvenli ve hatasız yazılmasını sağlar.
  */
-<<<<<<< HEAD
-=======
 
 interface Window {
   showQR?: () => void;
 }
->>>>>>> master

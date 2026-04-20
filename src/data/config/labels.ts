@@ -33,19 +33,12 @@ export const LABELS = {
     quotaAlert: "Depolama kotası aşıldı. Yaptığınız değişiklikler yerel olarak kaydedilemeyebilir.",
   },
   filter: {
-    allCategories: "Tüm Ürünler",
-    searchPlaceholder: "Ürün veya reyon ara...",
-<<<<<<< HEAD
-    categoryBtn: "Reyonlar ☰",
-    showLess: "Daha Az Göster",
-    showMore: (count: number) => `+${count} Daha`,
-    newCategoryPrompt: "Yeni reyon adını girin:",
-=======
     categoryBtn: "KATEGORİLER",
     showLess: "Daha Az Göster",
     showMore: (count: number) => `+${count} Daha`,
     newCategoryPrompt: "Yeni kategori adını girin:",
->>>>>>> master
+    searchPlaceholder: "Ürün veya reyon ara...",
+    allCategories: "Tüm Ürünler",
   },
   form: {
     productName: "Ürün Adı",

@@ -5,10 +5,7 @@ import { CompanySettings } from '../hooks/useSettings';
 
 interface FooterProps {
   onLogoClick: () => void;
-<<<<<<< HEAD
-=======
   onQRClick?: () => void;
->>>>>>> master
   isAdmin: boolean;
   activeDiscount?: ActiveDiscount | null;
   onApplyDiscount?: (code: string) => void;
@@ -17,11 +14,7 @@ interface FooterProps {
   settings: CompanySettings;
 }
 
-<<<<<<< HEAD
-export default function Footer({ isAdmin, activeDiscount, onApplyDiscount, discountError, settings }: FooterProps) {
-=======
 export default function Footer({ isAdmin, activeDiscount, onApplyDiscount, discountError, onQRClick, settings }: FooterProps) {
->>>>>>> master
   const [couponCodeInput, setCouponCodeInput] = useState('');
 
   const footerTheme = THEME.footer;
@@ -52,12 +45,8 @@ export default function Footer({ isAdmin, activeDiscount, onApplyDiscount, disco
           {/* COUPON SECTION */}
           {!isAdmin && (
             <div className={footerTheme.coupons.wrapper}>
-<<<<<<< HEAD
-              <div className="w-full">
-=======
               <div className="w-full max-w-sm">
                 <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest mb-3 px-1">İndirim Kuponu</p>
->>>>>>> master
                 <div className={footerTheme.coupons.inputWrapper}>
                   <input 
                     type="text" 
@@ -71,11 +60,7 @@ export default function Footer({ isAdmin, activeDiscount, onApplyDiscount, disco
                     onClick={handlePromotionApply} 
                     className={`
                       ${footerTheme.coupons.button} ${THEME.radius.input}
-<<<<<<< HEAD
-                      ${isInputEmpty ? '!bg-stone-200' : '!bg-green-600 shadow-lg shadow-green-600/20 scale-105'}
-=======
                       ${isInputEmpty ? '!bg-stone-200' : '!bg-stone-900 shadow-xl scale-105'}
->>>>>>> master
                     `}
                   >
                     {globalIcons.check}
@@ -85,23 +70,13 @@ export default function Footer({ isAdmin, activeDiscount, onApplyDiscount, disco
                 {/* STATUS FEEDBACK */}
                 <div className={footerTheme.coupons.statusWrapper}>
                   {couponStatus === 'success' && (
-<<<<<<< HEAD
-                    <span className={`${footerTheme.coupons.statusText} ${footerTheme.coupons.successText}`}>
-                      ✓ %{(activeDiscount?.rate || 0) * 100} İndirim Uygulandı
-                    </span>
-                  )}
-                  {couponStatus === 'error' && (
-                    <span className={`${footerTheme.coupons.statusText} ${footerTheme.coupons.errorText}`}>
-                      ⚠ {discountError}
-=======
                     <span className={`${footerTheme.coupons.statusText} ${footerTheme.coupons.successText} flex items-center gap-1`}>
-                      <span className="text-lg">✓</span> %{(activeDiscount?.rate || 0) * 100} İletme Uygulandı
+                      <span className="text-lg">✓</span> %{(activeDiscount?.rate || 0) * 100} İndirim Uygulandı
                     </span>
                   )}
                   {couponStatus === 'error' && (
                     <span className={`${footerTheme.coupons.statusText} ${footerTheme.coupons.errorText} flex items-center gap-1 font-bold`}>
                       <span className="text-lg">⚠</span> {discountError}
->>>>>>> master
                     </span>
                   )}
                 </div>
@@ -111,11 +86,6 @@ export default function Footer({ isAdmin, activeDiscount, onApplyDiscount, disco
         </div>
 
         {/* MIDDLE BRANDING SECTION */}
-<<<<<<< HEAD
-        <div className="mt-8 flex justify-center">
-          <p className="text-[10px] font-light text-black uppercase tracking-[0.2em] select-none opacity-90">
-            ekatalog | {settings?.title}
-=======
         <div className="mt-12 flex flex-col items-center gap-2">
           <div className="h-[1px] w-12 bg-stone-200 mb-2"></div>
           <p className="text-[10px] font-black text-stone-900 uppercase tracking-[0.3em] select-none">
@@ -123,22 +93,10 @@ export default function Footer({ isAdmin, activeDiscount, onApplyDiscount, disco
           </p>
           <p className="text-[9px] font-bold text-stone-400 tracking-tighter uppercase">
             Tüm hakları saklıdır. &copy; {new Date().getFullYear()}
->>>>>>> master
           </p>
         </div>
       </div>
 
-<<<<<<< HEAD
-      {/* BOTTOM THIN BAR - Hidden for now */}
-      {false && (
-        <div className={footerTheme.bottomBar.layout} onClick={() => window.open('https://wa.me/905550000000?text=E-Katalog%20bilgisi%20almak%20istiyorum', '_blank')}>
-          <p className={footerTheme.bottomBar.text}>
-            <span className="text-amber-400">e-katalog</span> 200₺/ay • 
-            <span className="ml-2 inline-flex items-center group-hover:scale-105 transition-transform">
-              Hemen Al <span className="inline-block animate-bounce ml-1.5">👆</span>
-            </span>
-          </p>
-=======
       {/* STICKY-LIKE QR BUTTON BAR */}
       {onQRClick && (
         <div className="mt-12 border-t border-stone-100 bg-stone-50/50">
@@ -156,7 +114,6 @@ export default function Footer({ isAdmin, activeDiscount, onApplyDiscount, disco
               <span className="text-[9px] font-bold text-stone-400 group-hover:text-stone-300 transition-colors uppercase tracking-tight italic">Müşterilerinize okutmak için tıklayın</span>
             </div>
           </button>
->>>>>>> master
         </div>
       )}
     </footer>

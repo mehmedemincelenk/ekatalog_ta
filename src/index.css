@@ -25,13 +25,6 @@ body {
     transition: opacity 0.8s ease-in-out;
   }
 
-<<<<<<< HEAD
-  /* ADMİN EDİTÖRÜ: Yazıların etrafındaki o çirkin mavi çerçeveyi kaldırır. */
-  [contenteditable='true'],
-  .admin-textarea {
-    outline: none !important;
-    cursor: text;
-=======
   /* ADMİN EDİTÖRÜ: Yazıların etrafındaki o çirkin mavi çerçeveyi kaldırır ve render hatalarını engeller. */
   [contenteditable='true'],
   .admin-textarea {
@@ -48,7 +41,6 @@ body {
     backface-visibility: hidden;
     transform: translateZ(0);
     -webkit-font-smoothing: antialiased;
->>>>>>> master
   }
 
   /* HATA TİTREŞİMİ: Apple tarzı PIN hata efekti */
@@ -79,23 +71,16 @@ body {
     100% { transform: translateX(-50%); }
   }
   .marquee-track {
-<<<<<<< HEAD
-    animation: marquee-scroll 6s linear infinite;
-    white-space: nowrap;
-=======
     animation: marquee-scroll 10s linear infinite;
     display: inline-flex;
     white-space: nowrap;
     will-change: transform;
->>>>>>> master
   }
 
   /* ÖZEL SCROLLBAR: Modern ve zarif kaydırma çubukları. */
   .custom-scrollbar::-webkit-scrollbar { width: 4px; }
   .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
   .custom-scrollbar::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
-<<<<<<< HEAD
-=======
 
   /* HAFİF GEÇİŞLER: Sistemin "yaşadığını" hissettiren premium efektler */
   .fade-in {
@@ -110,5 +95,4 @@ body {
   .transition-standard {
     transition: all 0.2s ease-in-out;
   }
->>>>>>> master
 }

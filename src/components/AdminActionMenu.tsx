@@ -1,20 +1,17 @@
 import { memo } from 'react';
-<<<<<<< HEAD
-import { LABELS, THEME } from '../data/config';
-import { Product } from '../types';
-=======
 import { createPortal } from 'react-dom';
 import { LABELS, THEME } from '../data/config';
 import { Product } from '../types';
 import Button from './Button';
->>>>>>> master
 
 interface AdminActionMenuProps {
   product: Product;
   categories: string[];
   onDelete: (id: string) => void;
   onUpdate: (id: string, changes: Partial<Product>) => void;
-<<<<<<< HEAD
+  onImageChangeClick?: () => void;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
 }
 
 /**
@@ -23,23 +20,11 @@ interface AdminActionMenuProps {
  * Product management interface. Fully managed via THEME tokens.
  */
 export const AdminActionMenu = memo(({ 
-  product, categories, onDelete, onUpdate 
-}: AdminActionMenuProps) => {
-  const adminLabels = LABELS.adminActions;
-  const theme = THEME.productCard;
-=======
-  onImageChangeClick?: () => void;
-  isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
-}
-
-export const AdminActionMenu = memo(({ 
   product, categories, onDelete, onUpdate, onImageChangeClick, isOpen, setIsOpen
 }: AdminActionMenuProps) => {
   const adminLabels = LABELS.adminActions;
   const modalTheme = THEME.addProductModal; // Reuse overlay/container styles
   const globalIcons = THEME.icons;
->>>>>>> master
 
   const downloadHighQualityImage = async () => {
     if (!product.image) return;
@@ -55,52 +40,6 @@ export const AdminActionMenu = memo(({
       downloadLink.click();
       window.URL.revokeObjectURL(localUrl);
       document.body.removeChild(downloadLink);
-<<<<<<< HEAD
-    } catch (error) {
-      alert('Resim indirilemedi.');
-    }
-  };
-
-  const handleNativeSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedValue = event.target.value;
-    if (!selectedValue) return;
-    
-    if (selectedValue === 'DELETE') { 
-      if (window.confirm(adminLabels.confirmDelete)) onDelete(product.id); 
-    }
-    else if (selectedValue === 'ARCHIVE') onUpdate(product.id, { is_archived: !product.is_archived });
-    else if (selectedValue === 'STOCK') onUpdate(product.id, { inStock: !product.inStock });
-    else if (selectedValue === 'DOWNLOAD') downloadHighQualityImage();
-    else if (selectedValue.startsWith('CAT:')) onUpdate(product.id, { category: selectedValue.replace('CAT:', '') });
-    
-    event.target.value = "";
-  };
-
-  return (
-    <div className="relative">
-      <div className={`${theme.adminMenu.mobileToggle} ${THEME.radius.badge}`}>
-        <div className={`absolute inset-0 flex items-center justify-center pointer-events-none ${theme.adminMenu.mobileIconColor} scale-75`}>
-          {THEME.icons.dots}
-        </div>
-        <select 
-          onChange={handleNativeSelectChange} 
-          value="" 
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-        >
-          <option value="" disabled></option>
-          <optgroup label="--- İŞLEMLER ---">
-            <option value="STOCK">{product.inStock ? '❌ ' + adminLabels.outOfStock : '✅ ' + adminLabels.inStock}</option>
-            {product.image && <option value="DOWNLOAD">🖼️ HQ RESMİ İNDİR</option>}
-            <option value="ARCHIVE">{product.is_archived ? '📤 ' + adminLabels.publish : '📦 ' + adminLabels.archive}</option>
-            <option value="DELETE">🗑️ {adminLabels.delete}</option>
-          </optgroup>
-          <optgroup label="--- REYON DEĞİŞTİR ---">
-            {categories.map(categoryName => (<option key={categoryName} value={`CAT:${categoryName}`} disabled={product.category === categoryName}>{categoryName}</option>))}
-          </optgroup>
-        </select>
-      </div>
-    </div>
-=======
     } catch {
       alert(LABELS.saveError);
     }
@@ -130,7 +69,7 @@ export const AdminActionMenu = memo(({
           >
             {/* HEADER */}
             <div className="bg-stone-50 border-b border-stone-100 px-5 py-4 flex items-center justify-between">
-              <div className="flex flex-col">
+              <div className="flex flex-col text-left">
                 <h3 className="text-xs font-black uppercase tracking-widest text-stone-900 leading-none">Ürünü Yönet</h3>
                 <span className="text-[10px] font-bold text-stone-400 mt-1 truncate max-w-[180px]">{product.name}</span>
               </div>
@@ -250,6 +189,5 @@ export const AdminActionMenu = memo(({
       )}
     </>,
     document.body
->>>>>>> master
   );
 });

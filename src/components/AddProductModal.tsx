@@ -49,12 +49,6 @@ const ProductImagePicker = memo(({ imagePreviewUrl, onFileSelectionChange }: { i
           <span className="text-3xl text-stone-300">📷</span>
         )}
       </div>
-<<<<<<< HEAD
-      <label className={theme.button}>
-        {LABELS.form.selectImage}
-        <input type="file" accept="image/*" className="hidden" onChange={onFileSelectionChange} />
-      </label>
-=======
       <Button 
         onClick={() => (document.querySelector('input[type="file"]') as HTMLInputElement)?.click()}
         variant="secondary"
@@ -66,7 +60,6 @@ const ProductImagePicker = memo(({ imagePreviewUrl, onFileSelectionChange }: { i
         {LABELS.form.selectImage}
         <input type="file" accept="image/*" className="hidden" onChange={onFileSelectionChange} />
       </Button>
->>>>>>> master
     </div>
   );
 });
@@ -88,25 +81,6 @@ const ProductCategorySelector = memo(({ categories, currentSelection, customCate
       {categories.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-3">
           {visibleCategories.map((category) => (
-<<<<<<< HEAD
-            <button 
-              key={category} 
-              type="button" 
-              onClick={() => onCategorySelect(category)} 
-              className={currentSelection === category && !customCategory ? theme.categoryChipActive : theme.categoryChipInactive}
-            >
-              {category}
-            </button>
-          ))}
-          {categories.length > 4 && !isExpanded && (
-            <button 
-              type="button" 
-              onClick={() => setIsExpanded(true)} 
-              className={theme.categoryShowMore}
-            >
-              +{categories.length - 4} Daha
-            </button>
-=======
             <Button 
               key={category} 
               onClick={() => onCategorySelect(category)} 
@@ -128,7 +102,6 @@ const ProductCategorySelector = memo(({ categories, currentSelection, customCate
             >
               +{categories.length - 4} Daha
             </Button>
->>>>>>> master
           )}
         </div>
       )}
@@ -150,10 +123,7 @@ export default function AddProductModal({
   onProductAddition,
   onModalClose,
 }: AddProductModalProps) {
-<<<<<<< HEAD
-=======
   const [currentStep, setCurrentStep] = useState(1);
->>>>>>> master
   const [formState, setFormState] = useState(INITIAL_FORM_STATE);
   const [temporaryImagePreviewUrl, setTemporaryImagePreviewUrl] = useState<string | null>(null);
   const [formErrorMessage, setFormErrorMessage] = useState('');
@@ -166,10 +136,7 @@ export default function AddProductModal({
     setFormState(INITIAL_FORM_STATE);
     setTemporaryImagePreviewUrl(null);
     setFormErrorMessage('');
-<<<<<<< HEAD
-=======
     setCurrentStep(1);
->>>>>>> master
     onModalClose();
   }, [isSubmittingData, onModalClose]);
 
@@ -196,24 +163,10 @@ export default function AddProductModal({
     setTemporaryImagePreviewUrl(localUrl);
   }, []);
 
-<<<<<<< HEAD
-  const handleProductSubmission = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (isSubmittingData) return;
-
-    const finalizedCategory = formState.customCategoryName.trim() || formState.selectedCategory.trim();
-    
-    if (!formState.productName.trim() || !finalizedCategory || !formState.productPrice.trim()) {
-      setFormErrorMessage(LABELS.form.requiredFieldsError);
-      return;
-    }
-
-=======
   const handleProductSubmission = async () => {
     if (isSubmittingData) return;
     const finalizedCategory = formState.customCategoryName.trim() || formState.selectedCategory.trim();
     
->>>>>>> master
     setIsSubmittingData(true);
     try {
       const { transformCurrencyStringToNumber, formatNumberToCurrency } = await import('../utils/price');
@@ -229,20 +182,13 @@ export default function AddProductModal({
         inStock: formState.isProductInStock,
       }, formState.selectedImageFile || undefined);
       handleCloseAndReset();
-<<<<<<< HEAD
-    } catch (error) {
-      setFormErrorMessage("Ürün eklenirken bir hata oluştu.");
-=======
     } catch {
       setFormErrorMessage(LABELS.saveError);
->>>>>>> master
     } finally {
       setIsSubmittingData(false);
     }
   };
 
-<<<<<<< HEAD
-=======
   const nextStep = () => setCurrentStep(prev => prev + 1);
   const prevStep = () => setCurrentStep(prev => prev - 1);
 
@@ -252,7 +198,6 @@ export default function AddProductModal({
     return true;
   };
 
->>>>>>> master
   if (!isModalOpen) return null;
 
   return (
@@ -260,9 +205,6 @@ export default function AddProductModal({
       <div className={theme.container} onClick={event => event.stopPropagation()}>
         
         <div className={theme.header}>
-<<<<<<< HEAD
-          <h2 className="text-sm font-black text-stone-900 uppercase tracking-widest">{LABELS.newProductBtn}</h2>
-=======
           <div className="flex flex-col">
             <h2 className="text-sm font-black text-stone-900 uppercase tracking-widest">{LABELS.newProductBtn}</h2>
             <div className={theme.wizard.progressWrapper}>
@@ -271,7 +213,6 @@ export default function AddProductModal({
               ))}
             </div>
           </div>
->>>>>>> master
           <Button 
             onClick={handleCloseAndReset} 
             disabled={isSubmittingData} 
@@ -282,96 +223,6 @@ export default function AddProductModal({
           />
         </div>
 
-<<<<<<< HEAD
-        <form onSubmit={handleProductSubmission} className={theme.body}>
-          <ProductImagePicker imagePreviewUrl={temporaryImagePreviewUrl} onFileSelectionChange={handleImageFileSelection} />
-
-          <div className={theme.formGap}>
-            <div className={theme.stockToggle}>
-              <label className="text-xs font-bold text-stone-700 uppercase tracking-wide" htmlFor="product-stock-checkbox">
-                {LABELS.form.stockStatus}
-              </label>
-              <input 
-                id="product-stock-checkbox" 
-                type="checkbox" 
-                checked={formState.isProductInStock} 
-                onChange={(e) => setFormState(p => ({ ...p, isProductInStock: e.target.checked }))} 
-                className={theme.checkbox} 
-              />
-            </div>
-
-            <FormInput 
-              labelText={LABELS.form.productName} 
-              name="productName" 
-              value={formState.productName} 
-              onChange={handleFormInputChange} 
-              placeholder={LABELS.form.productNamePlaceholder} 
-              required 
-              disabled={isSubmittingData} 
-            />
-            
-            <ProductCategorySelector 
-              categories={availableCategories} 
-              currentSelection={formState.selectedCategory} 
-              customCategory={formState.customCategoryName} 
-              onCategorySelect={handleCategorySelection} 
-              onCustomCategoryChange={handleFormInputChange} 
-            />
-
-            <FormInput 
-              labelText={LABELS.form.price} 
-              name="productPrice" 
-              value={formState.productPrice} 
-              onChange={handleFormInputChange} 
-              placeholder={LABELS.form.pricePlaceholder} 
-              required 
-              disabled={isSubmittingData} 
-            />
-            
-            <div>
-              <label className={theme.typography.label}>{LABELS.form.description}</label>
-              <textarea 
-                name="productDescription" 
-                value={formState.productDescription} 
-                onChange={handleFormInputChange} 
-                rows={3} 
-                disabled={isSubmittingData} 
-                className={`${theme.inputField} resize-none overflow-hidden block`} 
-                placeholder={LABELS.form.descriptionPlaceholder} 
-              />
-            </div>
-          </div>
-
-          {formErrorMessage && (
-            <div className={theme.typography.errorBadge}>
-              {formErrorMessage}
-            </div>
-          )}
-
-          <div className={theme.footer}>
-            <Button 
-              onClick={handleCloseAndReset} 
-              disabled={isSubmittingData}
-              mode="rectangle"
-              variant="secondary"
-              className={theme.footerCancel}
-            >
-              {LABELS.form.cancelBtn}
-            </Button>
-            
-            <Button 
-              type="submit"
-              disabled={isSubmittingData}
-              mode="rectangle"
-              variant="primary"
-              className={theme.footerSubmit}
-              icon={isSubmittingData ? <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : null}
-            >
-              {isSubmittingData ? 'EKLENİYOR...' : LABELS.form.submitBtn}
-            </Button>
-          </div>
-        </form>
-=======
         <div className={theme.body}>
           {/* STEP 1: PHOTO */}
           {currentStep === 1 && (
@@ -482,7 +333,7 @@ export default function AddProductModal({
               <div className="bg-stone-50 rounded-2xl p-4 border border-stone-200">
                 <div className="flex gap-4">
                   <div className="w-20 h-20 bg-stone-200 rounded-xl overflow-hidden shrink-0 flex items-center justify-center">
-                    {temporaryImagePreviewUrl ? <img src={temporaryImagePreviewUrl} className="w-full h-full object-cover" /> : <span className="text-2xl text-stone-400">📷</span>}
+                    {temporaryImagePreviewUrl ? <img src={temporaryImagePreviewUrl} className="w-full h-full object-cover" alt="preview" /> : <span className="text-2xl text-stone-400">📷</span>}
                   </div>
                   <div className="flex-1 min-w-0 py-1">
                     <h4 className="font-bold text-stone-900 truncate">{formState.productName || 'İsimsiz Ürün'}</h4>
@@ -515,7 +366,6 @@ export default function AddProductModal({
             </div>
           )}
         </div>
->>>>>>> master
       </div>
     </div>
   );

@@ -1,8 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-<<<<<<< HEAD
-=======
 import { motion, AnimatePresence } from 'framer-motion';
->>>>>>> master
 import { THEME } from '../data/config';
 import Button from './Button';
 
@@ -15,24 +12,13 @@ import Button from './Button';
 interface FloatingAdminMenuProps {
   onProductAddTrigger: () => void;
   onBulkUpdateTrigger?: () => void;
-<<<<<<< HEAD
-=======
-  isInlineEnabled: boolean;
-  onToggleInline: () => void;
   onSettingsTrigger: () => void;
->>>>>>> master
 }
 
 export default function FloatingAdminMenu({ 
   onProductAddTrigger,
-<<<<<<< HEAD
-  onBulkUpdateTrigger
-=======
   onBulkUpdateTrigger,
-  isInlineEnabled,
-  onToggleInline,
   onSettingsTrigger
->>>>>>> master
 }: FloatingAdminMenuProps) {
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
   const menuContainerRef = useRef<HTMLDivElement>(null);
@@ -78,48 +64,7 @@ export default function FloatingAdminMenu({
   };
 
   return (
-<<<<<<< HEAD
-    <div className={menuTheme.wrapper} ref={menuContainerRef}>
-      <div className={menuTheme.container}>
-        
-        {/* EXPANDABLE ACTION AREA */}
-        <div className={`
-          ${menuTheme.innerActions} 
-          ${isMenuExpanded ? menuTheme.actionsActive : menuTheme.actionsInactive}
-        `}>
-          {onBulkUpdateTrigger && (
-            <Button 
-              onClick={() => handleManagementAction(onBulkUpdateTrigger)}
-              icon="🏷️"
-              variant="secondary"
-              size="sm"
-              mode="circle"
-              aria-label="Bulk Update Prices"
-            />
-          )}
-
-          <Button 
-            onClick={() => handleManagementAction(onProductAddTrigger)}
-            icon={globalIcons.plus}
-            variant="primary"
-            size="sm"
-            mode="circle"
-            aria-label="Add New Product"
-          />
-        </div>
-
-        {/* MAIN TOGGLE CONTROL */}
-        <Button 
-          onClick={() => { clearAutoCloseTimer(); setIsMenuExpanded(previousState => !previousState); }}
-          icon={isMenuExpanded ? globalIcons.close : globalIcons.adminLayout}
-          variant={isMenuExpanded ? 'ghost' : 'secondary'}
-          size="sm"
-          mode="circle"
-          className={isMenuExpanded ? menuTheme.toggleActive : menuTheme.toggleInactive}
-          aria-label={isMenuExpanded ? "Close Admin Menu" : "Open Admin Menu"}
-        />
-=======
-    <div ref={menuContainerRef} className="relative">
+    <div ref={menuContainerRef}>
       <div className={`${menuTheme.container} overflow-hidden w-[46px] flex flex-col items-center justify-end`}>
         
         {/* EXPANDABLE ACTION AREA */}
@@ -158,24 +103,17 @@ export default function FloatingAdminMenu({
               {(
                 [
                   { 
-                    id: 'inline', 
-                    icon: isInlineEnabled ? "✍️" : "🧩", 
-                    action: onToggleInline,
-                    label: "Düzenleme Modu",
-                    className: isInlineEnabled ? "!bg-stone-900 !text-white" : ""
-                  },
-                  onBulkUpdateTrigger && { 
-                    id: 'bulk', 
-                    icon: "🏷️", 
-                    action: onBulkUpdateTrigger,
-                    label: "Toplu Güncelle" 
-                  },
-                  { 
                     id: 'add', 
                     icon: globalIcons.plus, 
                     action: onProductAddTrigger,
                     label: "Ürün Ekle",
                     primary: true
+                  },
+                  onBulkUpdateTrigger && { 
+                    id: 'bulk', 
+                    icon: globalIcons.bulkPrice, 
+                    action: onBulkUpdateTrigger,
+                    label: "Toplu Fiyat" 
                   },
                   { 
                     id: 'settings', 
@@ -220,7 +158,6 @@ export default function FloatingAdminMenu({
             aria-label={isMenuExpanded ? "Close Admin Menu" : "Open Admin Menu"}
           />
         </div>
->>>>>>> master
       </div>
     </div>
   );

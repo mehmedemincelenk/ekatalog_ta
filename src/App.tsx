@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-import { useState, useEffect, useCallback, useMemo } from 'react';
-=======
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
->>>>>>> master
 import Navbar from './components/Navbar';
 import HeroCarousel from './components/HeroCarousel';
 import SearchFilter from './components/SearchFilter';
@@ -13,15 +9,10 @@ import FloatingAdminMenu from './components/FloatingAdminMenu';
 import AddProductModal from './components/AddProductModal';
 import BulkPriceUpdateModal from './components/BulkPriceUpdateModal';
 import PinModal from './components/PinModal';
-<<<<<<< HEAD
-import References from './components/References';
-import LandingPage from './components/LandingPage';
-=======
 import QRModal from './components/QRModal';
 import References from './components/References';
 import LandingPage from './components/LandingPage';
 import DisplaySettingsModal from './components/DisplaySettingsModal';
->>>>>>> master
 import { useProducts } from './hooks/useProducts';
 import { useAdminMode } from './hooks/useAdminMode';
 import { useDiscount } from './hooks/useDiscount';
@@ -33,10 +24,6 @@ import { getActiveStoreSlug } from './utils/store';
  * CATALOG VIEW: Sadece dükkanlar için çalışan ana bileşen.
  */
 function CatalogView() {
-<<<<<<< HEAD
-  const { isAdmin, handleLogoPointerDown, handleLogoPointerUp, logout, isPinModalOpen, setIsPinModalOpen, correctPin, onPinSuccess } = useAdminMode();
-  const { settings, loading: settingsLoading } = useSettings(isAdmin);
-=======
   const { 
     isAdmin, 
     handleLogoPointerDown, 
@@ -53,7 +40,6 @@ function CatalogView() {
     failedAttempts
   } = useAdminMode();
   const { settings, updateSetting, loading: settingsLoading, notFound, isError, retry } = useSettings(isAdmin);
->>>>>>> master
   const [search, setSearch] = useState('');
   const [activeCategories, setActiveCategories] = useState<string[]>([]);
 
@@ -67,40 +53,15 @@ function CatalogView() {
     reorderCategory: updateCategoryOrder, 
     reorderProductsInCategory,
     renameCategory, 
-<<<<<<< HEAD
-    removeCategoryFromProducts, 
-    addCategory, 
-    bulkUpdatePrices,
-    uploadImage,
-    loading: productsLoading 
-  } = useProducts(search, activeCategories, isAdmin);
-=======
     executeGranularBulkActions,
     uploadImage,
     loading: productsLoading 
   } = useProducts(search, activeCategories, isAdmin, settings, updateSetting);
->>>>>>> master
   
   const { activeDiscount, applyCode, error: discountError } = useDiscount();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isBulkUpdateModalOpen, setIsBulkUpdateModalOpen] = useState(false);
-<<<<<<< HEAD
-  const [visibleCategoryLimit, setVisibleCategoryLimit] = useState(2);
-
-  // FAVICON & TITLE SYNC
-  useEffect(() => {
-    if (!settings.id) return;
-    document.title = settings.title || 'E-Katalog';
-    if (settings.logoEmoji && (settings.logoEmoji.startsWith('data:image') || settings.logoEmoji.startsWith('http'))) {
-      const link: HTMLLinkElement = document.querySelector("link[rel*='icon']") || document.createElement('link');
-      link.type = 'image/x-icon';
-      link.rel = 'shortcut icon';
-      link.href = settings.logoEmoji;
-      document.getElementsByTagName('head')[0].appendChild(link);
-    }
-  }, [settings.logoEmoji, settings.title, settings.id]);
-=======
   const [isDisplaySettingsOpen, setIsDisplaySettingsOpen] = useState(false);
   const [activeAdminProductId, setActiveAdminProductId] = useState<string | null>(null);
   const [visibleCategoryLimit, setVisibleCategoryLimit] = useState(2);
@@ -123,7 +84,6 @@ function CatalogView() {
       document.getElementsByTagName('head')[0].appendChild(link);
     }
   }, [settings.logoUrl, settings.title, settings.id, isAdmin]);
->>>>>>> master
 
   if (settingsLoading || productsLoading) {
     return (
@@ -133,19 +93,6 @@ function CatalogView() {
     );
   }
 
-<<<<<<< HEAD
-  const filteredProducts = products.filter((p) => {
-    const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) || 
-                         (p.description?.toLowerCase().includes(search.toLowerCase()));
-    const matchesCategory = activeCategories.length === 0 || activeCategories.includes(p.category);
-    const isVisible = !p.is_archived || isAdmin;
-    return matchesSearch && matchesCategory && isVisible;
-  });
-
-  return (
-    <div className={`min-h-screen ${UI.layout.bodyBg} ${UI.layout.selection} font-sans`}>
-      <Navbar onLogoPointerDown={handleLogoPointerDown} onLogoPointerUp={handleLogoPointerUp} onLogout={logout} isAdmin={isAdmin} settings={settings} />
-=======
   if (isError) {
     return (
       <div className={UI.errorState.overlay}>
@@ -163,11 +110,9 @@ function CatalogView() {
     return <LandingPage />;
   }
 
-
   return (
     <div className={`min-h-screen ${UI.layout.bodyBg} ${UI.layout.selection} font-sans fade-in`}>
       <Navbar onLogoPointerDown={handleLogoPointerDown} onLogoPointerUp={handleLogoPointerUp} isAdmin={isAdmin} isInlineEnabled={isInlineEnabled} settings={settings} updateSetting={updateSetting} />
->>>>>>> master
       <main>
         <HeroCarousel isAdminModeActive={isAdmin} />
         <SearchFilter 
@@ -176,42 +121,20 @@ function CatalogView() {
             if (cat === 'Tüm Ürünler') setActiveCategories([]);
             else setActiveCategories((prev) => prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]);
           }}
-<<<<<<< HEAD
-          isAdmin={isAdmin} renameCategory={renameCategory} removeCategoryFromProducts={removeCategoryFromProducts}
-        />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <ProductGrid 
-            products={filteredProducts} categoryOrder={categoryOrder} isAdmin={isAdmin}
-=======
           isAdmin={isAdmin} renameCategory={renameCategory}
           displayConfig={settings.displayConfig}
         />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <ProductGrid 
             products={products} categoryOrder={categoryOrder} isAdmin={isAdmin} isInlineEnabled={isInlineEnabled}
->>>>>>> master
             onDelete={deleteProduct} onUpdate={updateProduct} onOrderUpdate={reorderProductsInCategory}
             onImageUpload={uploadImage}
             activeDiscount={activeDiscount} visibleCategoryLimit={visibleCategoryLimit}
             onLoadMore={() => setVisibleCategoryLimit(prev => prev + 3)}
             activeCategories={activeCategories} onAddClick={() => setIsAddModalOpen(true)}
-<<<<<<< HEAD
-          />
-        </div>
-        {!isAdmin && <References />}
-      </main>
-      <Footer onLogoClick={() => {}} isAdmin={isAdmin} activeDiscount={activeDiscount} onApplyDiscount={applyCode} discountError={discountError} settings={settings} />
-      {isAdmin && (
-        <>
-          <FloatingAdminMenu onProductAddTrigger={() => setIsAddModalOpen(true)} onBulkUpdateTrigger={() => setIsBulkUpdateModalOpen(true)} />
-          <AddProductModal isModalOpen={isAddModalOpen} onModalClose={() => setIsAddModalOpen(false)} onProductAddition={addProduct} availableCategories={categoryOrder} />
-          <BulkPriceUpdateModal isOpen={isBulkUpdateModalOpen} onClose={() => setIsBulkUpdateModalOpen(false)} allProducts={allProducts} categories={categoryOrder} onUpdate={bulkUpdatePrices} />
-        </>
-      )}
-      <PinModal isModalOpen={isPinModalOpen} authorizedPinCode={correctPin} onAuthenticationSuccess={onPinSuccess} onModalClose={() => setIsPinModalOpen(false)} />
-=======
             activeAdminProductId={activeAdminProductId}
             setActiveAdminProductId={setActiveAdminProductId}
+            showPrice={settings.displayConfig.showPrice ?? true}
           />
         </div>
         {settings.displayConfig.showReferences && (
@@ -233,7 +156,7 @@ function CatalogView() {
       
       <QRModal isOpen={isQRModalOpen} onClose={() => setIsQRModalOpen(false)} />
 
-      <AnimatePresence mode="popLayout">
+      <AnimatePresence>
         {isAdmin && (
           <>
             <motion.div
@@ -247,8 +170,6 @@ function CatalogView() {
               <FloatingAdminMenu 
                 onProductAddTrigger={() => setIsAddModalOpen(true)} 
                 onBulkUpdateTrigger={() => setIsBulkUpdateModalOpen(true)} 
-                isInlineEnabled={isInlineEnabled} 
-                onToggleInline={toggleInlineEdit} 
                 onSettingsTrigger={() => setIsDisplaySettingsOpen(true)}
               />
             </motion.div>
@@ -262,7 +183,14 @@ function CatalogView() {
               categories={categoryOrder} 
               onGranularUpdate={executeGranularBulkActions}
             />
-            <DisplaySettingsModal isOpen={isDisplaySettingsOpen} onClose={() => setIsDisplaySettingsOpen(false)} settings={settings} updateSetting={updateSetting} />
+            <DisplaySettingsModal 
+              isOpen={isDisplaySettingsOpen} 
+              onClose={() => setIsDisplaySettingsOpen(false)} 
+              settings={settings} 
+              updateSetting={updateSetting}
+              isInlineEnabled={isInlineEnabled}
+              onToggleInline={toggleInlineEdit}
+            />
           </>
         )}
       </AnimatePresence>
@@ -278,7 +206,6 @@ function CatalogView() {
           />
         )}
       </AnimatePresence>
->>>>>>> master
     </div>
   );
 }

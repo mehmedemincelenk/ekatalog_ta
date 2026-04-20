@@ -1,35 +1,4 @@
 /**
-<<<<<<< HEAD
- * DEFAULT COMPANY SETTINGS
- */
-export const DEFAULT_COMPANY = {
-  name: "Toptan Ambalajcım",
-  tagline: "Ambalajda Güvenilir Çözüm Ortağınız",
-  phone: "0555 000 00 00",
-  address: "İstoç Ticaret Merkezi, Bağcılar/İstanbul",
-  instagramUrl: "https://instagram.com/toptanambalajcim",
-  logoEmoji: "📦",
-};
-
-/**
- * DEFAULT CAROUSEL DATA
- */
-export const CAROUSEL = {
-  slides: [
-    { id: 1, src: "", bg: "bg-stone-100", label: "Hoş Geldiniz", sub: "En kaliteli ambalaj ürünleri burada." },
-    { id: 2, src: "", bg: "bg-stone-200", label: "Hızlı Teslimat", sub: "Siparişleriniz aynı gün kargoda." },
-    { id: 3, src: "", bg: "bg-stone-300", label: "Toptan Fiyatlar", sub: "En uygun fiyat garantisiyle." },
-  ]
-};
-
-export const CATEGORY_ORDER = ["Kargo Kutusu", "Balonlu Naylon", "Bant", "Poşet", "Diğer"];
-
-export const REFERENCES = [
-  { id: 1, name: 'PTT KARGO', logo: '📮' },
-  { id: 2, name: 'TRENDYOL', logo: '🧡' },
-  { id: 3, name: 'HEPSİBURADA', logo: '💙' },
-  { id: 4, name: 'YURTİÇİ KARGO', logo: '🚛' },
-=======
  * DEFAULT COMPANY SETTINGS (Premium Global Template)
  */
 export const DEFAULT_COMPANY = {
@@ -47,7 +16,8 @@ export const DEFAULT_COMPANY = {
     showSearch: true,
     showWhatsapp: true,
     showSubtitle: true,
-    showReferences: true
+    showReferences: true,
+    showPrice: true
   }
 };
 
@@ -69,7 +39,6 @@ export const REFERENCES = [
   { id: 2, name: 'Güvenli Ödeme', logo: '🛡️' },
   { id: 3, name: 'Hızlı Kargo', logo: '🚀' },
   { id: 4, name: 'Müşteri Memnuniyeti', logo: '⭐' },
->>>>>>> master
 ];
 
 export const TECH = {
@@ -82,11 +51,7 @@ export const TECH = {
     timeoutMs: 3600000, // 1 hour inactivity timeout
   },
   carousel: {
-<<<<<<< HEAD
-    intervalMs: 5000,
-=======
     intervalMs: 8000, // Slightly slower for better readability
->>>>>>> master
     swipeThreshold: 50,
   },
   category: {
@@ -98,19 +63,11 @@ export const TECH = {
     errorResetMs: 3000,
   },
   products: {
-<<<<<<< HEAD
-    defaultCategory: 'Diğer',
-    defaultPrice: '0',
-    fallbackCategory: 'KATEGORİSİZ / DİĞER',
-    maxFileNameLength: 30,
-    uniqueIdSuffixLength: 5,
-=======
     defaultCategory: 'DİĞER',
     defaultPrice: '0,00',
     fallbackCategory: 'DÜZENLENMEMİŞ KATEGORİ',
     maxFileNameLength: 40,
     uniqueIdSuffixLength: 6,
->>>>>>> master
   },
   storage: {
     bucket: 'product-images',
@@ -118,11 +75,7 @@ export const TECH = {
     lqFolder: 'lq',
     hqFolder: 'hq',
     cacheControl: '0',
-<<<<<<< HEAD
-    heroWidth: 1600,
-=======
     heroWidth: 1920,
->>>>>>> master
     productHqWidth: 1200,
     productLqWidth: 400,
     hqQuality: 0.85,
@@ -137,15 +90,8 @@ export const TECH = {
 };
 
 export const STORAGE = {
-<<<<<<< HEAD
-  productsCache: 'toptanambalaj_products_v13_final',
-  categoryOrder: 'toptanambalaj_order_v13',
-  carouselSlides: 'toptanambalaj_carousel_v13',
-  adminSession: 'admin_session_v13',
-=======
   productsCache: 'ekatalog_inventory_persistence',
   categoryOrder: 'ekatalog_category_meta',
   carouselSlides: 'ekatalog_branding_assets',
   adminSession: 'ekatalog_secure_session_lock',
->>>>>>> master
 };

@@ -4,12 +4,9 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-<<<<<<< HEAD
-=======
   future: {
     hoverOnlyWhenSupported: true,
   },
->>>>>>> master
   theme: {
     extend: {
       colors: {

@@ -69,8 +69,6 @@ export const calculatePromotionalPrice = (originalPriceString: string, discountR
   const finalizedDiscountedPrice = mathematicalBasePrice * (1 - discountRate);
   return formatNumberToCurrency(finalizedDiscountedPrice);
 };
-<<<<<<< HEAD
-=======
 
 /**
  * standardizePriceInput: Ensures the price follows the standard "₺1.250" format
@@ -84,4 +82,3 @@ export const standardizePriceInput = (input: string): string => {
   }
   return cleanValue;
 };
->>>>>>> master

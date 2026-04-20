@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-import { useState, memo } from 'react';
-import { THEME, LABELS } from '../data/config';
-import Button from './Button';
-import { Product } from '../types';
-=======
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { THEME } from '../data/config';
@@ -12,69 +6,10 @@ import Button from './Button';
 import { transformCurrencyStringToNumber } from '../utils/price';
 
 type ActionType = 'PRICE' | 'DELETE' | 'ARCHIVE' | 'STOCK' | null;
->>>>>>> master
 
 interface BulkPriceUpdateModalProps {
   isOpen: boolean;
   onClose: () => void;
-<<<<<<< HEAD
-  onUpdate: (categories: string[], amount: number, isPercentage: boolean, isIncrease: boolean) => Promise<void>;
-  categories: string[];
-  allProducts: Product[];
-}
-
-const BulkPriceUpdateModal = memo(({ isOpen, onClose, onUpdate, categories, allProducts = [] }: BulkPriceUpdateModalProps) => {
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [inputValue, setInputValue] = useState('');
-  const [isIncrease, setIsIncrease] = useState<boolean | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  if (!isOpen) return null;
-
-  const modalTheme = THEME.addProductModal;
-  const globalTheme = THEME;
-  const labels = LABELS.bulkPriceUpdate;
-
-  const toggleCategory = (cat: string) => {
-    setSelectedCategories(prev => 
-      prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
-    );
-  };
-
-  const handleApply = async () => {
-    if (isIncrease === null) {
-      alert('Lütfen yapılacak işlemi seçiniz (ZAM veya İNDİRİM).');
-      return;
-    }
-
-    const isPercentage = inputValue.includes('%');
-    const amount = parseFloat(inputValue.replace('%', '').replace(',', '.')) || 0;
-
-    if (amount <= 0) {
-      alert(labels.invalidValue);
-      return;
-    }
-
-    const productsToUpdate = allProducts.filter(p => selectedCategories.length === 0 || selectedCategories.includes(p.category));
-    const affectedCount = productsToUpdate.length;
-    
-    if (affectedCount === 0) {
-      alert(labels.noProducts);
-      return;
-    }
-
-    const confirmMsg = labels.confirm(selectedCategories.length, affectedCount, isIncrease);
-    
-    if (!window.confirm(confirmMsg)) return;
-
-    setIsProcessing(true);
-    try {
-      await onUpdate(selectedCategories, amount, isPercentage, isIncrease);
-      alert('Uygulandı');
-      onClose();
-    } catch (err) {
-      console.error(err);
-=======
   allProducts: Product[];
   categories: string[];
   onGranularUpdate: (actions: { productId: string; newPrice?: number; delete?: boolean; inStock?: boolean; is_archived?: boolean }[]) => Promise<void>;
@@ -235,110 +170,11 @@ export default function BulkPriceUpdateModal({ isOpen, onClose, allProducts, cat
       resetAll();
     } catch (err) {
       console.error('Bulk action failed', err);
->>>>>>> master
     } finally {
       setIsProcessing(false);
     }
   };
 
-<<<<<<< HEAD
-  return (
-    <div className={modalTheme.overlay}>
-      <div className={`${modalTheme.container} max-w-[340px]`}>
-        {/* HEADER */}
-        <div className={`${modalTheme.header} flex-col items-start gap-1`}>
-          <div className="flex items-center justify-between w-full">
-            <h2 className="text-lg sm:text-xl font-black text-stone-900 tracking-tighter uppercase">{labels.title}</h2>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              mode="circle" 
-              onClick={onClose} 
-              icon={globalTheme.icons.close} 
-            />
-          </div>
-          <p className="text-[10px] leading-tight text-stone-500 font-medium lowercase first-letter:uppercase">
-            {labels.description}
-          </p>
-        </div>
-
-        {/* BODY */}
-        <div className={modalTheme.body}>
-          <div className={modalTheme.formGap}>
-            
-            {/* CATEGORY SELECTION */}
-            <div className="space-y-3">
-              <label className={modalTheme.typography.label}>{labels.categoryLabel}</label>
-              <div className="flex flex-wrap gap-1.5">
-                {categories.map(cat => (
-                  <button
-                    key={cat}
-                    onClick={() => toggleCategory(cat)}
-                    className={selectedCategories.includes(cat) ? modalTheme.categoryChipActive : modalTheme.categoryChipInactive}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* INPUT & DIRECTION ROW */}
-            <div className="flex items-end gap-3">
-              <div className="flex-[0.8] space-y-2">
-                <label className={modalTheme.typography.label}>MİKTAR</label>
-                <input
-                  type="text"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="5 veya %5"
-                  className={modalTheme.inputField}
-                />
-              </div>
-              <div className="flex-[1.2] flex gap-2 h-full">
-                <button
-                  onClick={() => setIsIncrease(true)}
-                  className={`flex-1 py-2.5 rounded-lg font-black text-[9px] transition-all border-2 ${isIncrease === true ? 'bg-stone-900 text-white border-stone-900 shadow-md' : 'bg-white text-stone-400 border-stone-200 hover:border-stone-400'}`}
-                >
-                  ZAM
-                </button>
-                <button
-                  onClick={() => setIsIncrease(false)}
-                  className={`flex-1 py-2.5 rounded-lg font-black text-[9px] transition-all border-2 ${isIncrease === false ? 'bg-red-600 text-white border-red-600 shadow-md' : 'bg-white text-stone-400 border-stone-200 hover:border-red-400 hover:text-red-500'}`}
-                >
-                  İNDİRİM
-                </button>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        {/* FOOTER */}
-        <div className="p-4 border-t border-stone-100 flex gap-2">
-          <Button
-            variant="secondary"
-            onClick={onClose}
-            disabled={isProcessing}
-            className="flex-1 py-3 rounded-xl border-2 border-stone-100 shadow-sm"
-          >
-            İptal
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handleApply}
-            disabled={isProcessing}
-            className="flex-[1.5] py-3 rounded-xl shadow-xl"
-          >
-            {isProcessing ? labels.processingBtn : labels.submitBtn}
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-});
-
-export default BulkPriceUpdateModal;
-=======
   if (!isOpen) return null;
 
   return (
@@ -349,7 +185,7 @@ export default BulkPriceUpdateModal;
         className={`${modalTheme.container} !max-w-md h-[90vh] sm:h-auto overflow-hidden flex flex-col`}
       >
         <div className={modalTheme.header}>
-          <div className="flex flex-col">
+          <div className="flex flex-col text-left">
             <h2 className="text-xl font-black text-stone-900 tracking-tighter">İşlem Paneli</h2>
             <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest leading-none mt-1">
               {currentStep === 1 ? 'EYLEM SEÇİN' : (currentStep === 2 ? 'MİKTAR GİRİN' : 'ONAY MANİFESTOSU')}
@@ -370,28 +206,28 @@ export default BulkPriceUpdateModal;
                   className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${actionType === 'PRICE' ? 'border-stone-900 bg-stone-900 text-white shadow-xl scale-105' : 'border-stone-100 bg-stone-50 text-stone-500 hover:border-stone-200'}`}
                 >
                   <span className="text-2xl">💰</span>
-                  <span className="text-[9px] font-black uppercase tracking-widest">FİYAT AYARI</span>
+                  <span className="text-[9px] font-black uppercase tracking-widest text-center">FİYAT AYARI</span>
                 </button>
                 <button 
                   onClick={() => setActionType('STOCK')}
                   className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${actionType === 'STOCK' ? 'border-blue-600 bg-blue-600 text-white shadow-xl scale-105' : 'border-stone-100 bg-stone-50 text-stone-500 hover:border-blue-200'}`}
                 >
                   <span className="text-2xl">📦</span>
-                  <span className="text-[9px] font-black uppercase tracking-widest">STOKTA VAR/YOK</span>
+                  <span className="text-[9px] font-black uppercase tracking-widest text-center">STOKTA VAR/YOK</span>
                 </button>
                 <button 
                   onClick={() => setActionType('ARCHIVE')}
                   className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${actionType === 'ARCHIVE' ? 'border-amber-600 bg-amber-600 text-white shadow-xl scale-105' : 'border-stone-100 bg-stone-50 text-stone-500 hover:border-amber-200'}`}
                 >
                   <span className="text-2xl">👁️</span>
-                  <span className="text-[9px] font-black uppercase tracking-widest">GİZLE/GÖSTER</span>
+                  <span className="text-[9px] font-black uppercase tracking-widest text-center">GİZLE/GÖSTER</span>
                 </button>
                 <button 
                   onClick={() => setActionType('DELETE')}
                   className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${actionType === 'DELETE' ? 'border-red-600 bg-red-600 text-white shadow-xl scale-105' : 'border-stone-100 bg-stone-50 text-stone-500 hover:border-red-100'}`}
                 >
                   <span className="text-2xl">🗑️</span>
-                  <span className="text-[9px] font-black uppercase tracking-widest">TOPLU SİLME</span>
+                  <span className="text-[9px] font-black uppercase tracking-widest text-center">TOPLU SİLME</span>
                 </button>
               </div>
 
@@ -435,7 +271,7 @@ export default BulkPriceUpdateModal;
             <div className="space-y-6 fade-in">
               <div className="text-center space-y-1">
                 <h3 className="font-black text-stone-900 text-[10px] uppercase tracking-widest leading-none">DEĞİŞKENİ BELİRLEYİN</h3>
-                <p className="text-[9px] font-bold text-stone-400 tracking-tighter uppercase italic">Miktar girin, zam mı indirim mi karar verin.</p>
+                <p className="text-[9px] font-bold text-stone-400 tracking-tighter uppercase italic text-center">Miktar girin, zam mı indirim mi karar verin.</p>
               </div>
 
               <div className="space-y-4">
@@ -509,7 +345,7 @@ export default BulkPriceUpdateModal;
             <div className="space-y-4 fade-in flex flex-col h-full">
               <div className="text-center space-y-1">
                 <h3 className="font-black text-stone-900 text-[10px] uppercase tracking-widest leading-none">İŞLEM PANELİ (ACTION DESK)</h3>
-                <p className="text-[9px] font-bold text-stone-400 uppercase tracking-tighter">
+                <p className="text-[9px] font-bold text-stone-400 uppercase tracking-tighter text-center">
                   {actionType === 'PRICE' ? 'Yeni fiyatları mühürleyin.' : 'Ürün verilerini denetleyin.'}
                 </p>
               </div>
@@ -538,7 +374,7 @@ export default BulkPriceUpdateModal;
                           {state.included ? '✓' : '×'}
                         </button>
 
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 flex flex-col text-left">
                           <p className="text-[10px] font-black text-stone-800 truncate leading-none mb-1 uppercase tracking-tight">{p.name}</p>
                         </div>
 
@@ -613,4 +449,3 @@ export default BulkPriceUpdateModal;
     </div>
   );
 }
->>>>>>> master

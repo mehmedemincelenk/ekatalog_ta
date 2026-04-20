@@ -3,10 +3,7 @@ import { THEME, LABELS, sortCategories, TECH } from '../data/config';
 import { Product } from '../types';
 import ProductCard from './ProductCard';
 import { ActiveDiscount } from '../hooks/useDiscount';
-<<<<<<< HEAD
-=======
 import { Plus } from 'lucide-react';
->>>>>>> master
 
 /**
  * PRODUCT GRID COMPONENT (100% Tokenized & Professional English)
@@ -18,39 +15,27 @@ interface ProductGridProps {
   products: Product[];
   categoryOrder: string[];
   isAdmin: boolean;
-<<<<<<< HEAD
-=======
   isInlineEnabled: boolean;
->>>>>>> master
   onDelete: (id: string) => void;
   onUpdate: (id: string, changes: Partial<Product>) => void;
   onOrderUpdate: (id: string, newPosition: number) => void;
   onOrderChange?: (id: string, newPosition: number) => void;
-<<<<<<< HEAD
-  onImageUpload?: (id: string, file: File) => Promise<void>;
-=======
   onImageUpload?: (id: string, file: File) => Promise<string | undefined>;
->>>>>>> master
   activeDiscount?: ActiveDiscount | null;
   visibleCategoryLimit: number;
   onLoadMore?: () => void;
   activeCategories: string[];
   onAddClick?: () => void;
-<<<<<<< HEAD
-=======
   activeAdminProductId?: string | null;
   setActiveAdminProductId?: (id: string | null) => void;
->>>>>>> master
+  showPrice?: boolean;
 }
 
 const ProductGrid = memo(({
   products = [], 
   categoryOrder = [], 
   isAdmin, 
-<<<<<<< HEAD
-=======
   isInlineEnabled,
->>>>>>> master
   onDelete, 
   onUpdate, 
   onOrderUpdate, 
@@ -59,13 +44,10 @@ const ProductGrid = memo(({
   visibleCategoryLimit,
   onLoadMore,
   activeCategories,
-<<<<<<< HEAD
-  onAddClick
-=======
   onAddClick,
   activeAdminProductId,
-  setActiveAdminProductId
->>>>>>> master
+  setActiveAdminProductId,
+  showPrice = true
 }: ProductGridProps) => {
   const theme = THEME.productGrid;
 
@@ -147,10 +129,8 @@ const ProductGrid = memo(({
                       product={product}
                       categories={categoryOrder}
                       isAdmin={isAdmin}
-<<<<<<< HEAD
-=======
                       isInlineEnabled={isInlineEnabled}
->>>>>>> master
+                      showPrice={showPrice}
                       onDelete={onDelete}
                       onUpdate={onUpdate}
                       onOrderChange={onOrderUpdate}
@@ -159,11 +139,8 @@ const ProductGrid = memo(({
                       itemsInCategory={categoryProducts.length}
                       activeDiscount={activeDiscount}
                       isPriority={isPriority}
-<<<<<<< HEAD
-=======
                       activeAdminProductId={activeAdminProductId}
                       setActiveAdminProductId={setActiveAdminProductId}
->>>>>>> master
                     />
                   );
                 })}
@@ -177,11 +154,7 @@ const ProductGrid = memo(({
                 {isAdmin && (
                   <button 
                     onClick={onAddClick}
-<<<<<<< HEAD
-                    className="bg-stone-900/5 text-stone-900 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-stone-900 hover:text-white transition-all border border-stone-200"
-=======
                     className="bg-stone-900/5 text-stone-900 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-stone-900 hover:text-white transition-all border border-stone-200 admin-fab"
->>>>>>> master
                   >
                     + BU REYONA ÜRÜN EKLE
                   </button>
@@ -192,16 +165,6 @@ const ProductGrid = memo(({
         );
       })}
 
-<<<<<<< HEAD
-      {/* LOAD MORE BUTTON */}
-      {displayCategories.length > visibleCategoryLimit && (
-        <div className="flex justify-center pt-12 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <button 
-            onClick={onLoadMore}
-            className="px-12 py-4 bg-white border-2 border-stone-200 text-stone-900 font-black text-[11px] uppercase tracking-[0.2em] rounded-full hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all active:scale-95 shadow-lg"
-          >
-            DAHA FAZLASI
-=======
       {/* DIAMOND LOAD MORE BUTTON */}
       {onLoadMore && displayCategories.length > visibleCategoryLimit && (
         <div className="flex flex-col items-center justify-center pt-8 pb-16 animate-in fade-in slide-in-from-bottom-4 duration-1000">
@@ -215,7 +178,6 @@ const ProductGrid = memo(({
             <span className="text-[10px] font-black tracking-[0.3em] text-stone-400 uppercase group-hover:text-stone-900 transition-colors">
               {LABELS.loadMoreBtn}
             </span>
->>>>>>> master
           </button>
         </div>
       )}

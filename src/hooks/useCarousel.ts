@@ -1,18 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { CAROUSEL, TECH } from '../data/config';
-
-export interface Slide {
-  id: number;
-  src: string;
-  bg: string;
-  label: string;
-  sub: string;
-}
-
 import { getActiveStoreSlug } from '../utils/store';
 
-<<<<<<< HEAD
 export interface Slide {
   id: number;
   src: string;
@@ -21,8 +11,6 @@ export interface Slide {
   sub: string;
 }
 
-=======
->>>>>>> master
 const STORE_SLUG = getActiveStoreSlug();
 
 /**
@@ -75,8 +63,6 @@ export function useCarousel(isAdministrativeModeActive: boolean) {
 
     // Persistent update for administrative actions
     if (isAdministrativeModeActive) {
-      // Small timeout to ensure finalizedSlides is populated from the functional update if needed, 
-      // but in this case we can compute it directly to be safe.
       const currentSlides = marketingSlides.map(slide => 
         slide.id === slideId ? { ...slide, ...contentChanges } : slide
       );
@@ -153,9 +139,6 @@ export function useCarousel(isAdministrativeModeActive: boolean) {
       
       if (error) console.error('Failed to save new slide:', error);
     }
-<<<<<<< HEAD
-  }, [isAdministrativeModeActive, marketingSlides, STORE_SLUG]);
-=======
   }, [isAdministrativeModeActive, marketingSlides]);
 
   /**
@@ -203,18 +186,14 @@ export function useCarousel(isAdministrativeModeActive: boolean) {
       if (error) console.error('Failed to reorder slides:', error);
     }
   }, [isAdministrativeModeActive, marketingSlides]);
->>>>>>> master
 
   return { 
     slides: marketingSlides, 
     updateSlide: modifySlideContent, 
     uploadHeroImage: uploadHeroVisualAsset, 
     addSlide: addNewSlide,
-<<<<<<< HEAD
-=======
     deleteSlide: removeSlide,
     reorderSlides,
->>>>>>> master
     loading: isCarouselContentLoading 
   };
 }
