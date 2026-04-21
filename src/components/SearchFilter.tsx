@@ -165,22 +165,22 @@ export default function SearchFilter({
       <div className={filterTheme.container}>
         {/* TOP BAR: Search + Mobile Toggle */}
         {displayConfig.showSearch ? (
-          <div className={filterTheme.searchArea.wrapper}>
-            <div className={`${filterTheme.searchArea.inputWrapper} ${THEME.radius.input} sm:hidden`}>
+          <div className={`${filterTheme.searchArea.wrapper} items-stretch`}>
+            <div className={`${filterTheme.searchArea.inputWrapper} ${THEME.radius.input} sm:hidden !flex-1 h-11`}>
               <div className={filterTheme.searchArea.iconSize}>{globalIcons.search}</div>
               <input 
                 type="text" value={internalSearch} 
                 onChange={(e) => setInternalSearch(e.target.value)}
                 placeholder={LABELS.filter.searchPlaceholder}
-                className={`${filterTheme.searchArea.input} ${THEME.radius.input}`}
+                className={`${filterTheme.searchArea.input} ${THEME.radius.input} h-full`}
               />
             </div>
             
-            {/* MOBILE ONLY: Categories Toggle Button */}
+            {/* MOBILE ONLY: Categories Toggle Button - Standardized Height and Width */}
             {displayConfig.showCategories && (
               <button 
                 onClick={() => setIsMobileReyonOpen(!isMobileReyonOpen)} 
-                className={`${filterTheme.searchArea.mobileToggle} ${THEME.radius.button} sm:hidden flex items-center justify-center gap-2`}
+                className={`${filterTheme.searchArea.mobileToggle} ${THEME.radius.button} sm:hidden flex items-center justify-center gap-2 h-11 px-6 min-w-[120px] font-black !bg-stone-900 !text-white`}
               >
                 {LABELS.filter.categoryBtn}
               </button>
@@ -192,7 +192,7 @@ export default function SearchFilter({
             <div className="sm:hidden flex justify-end">
               <button 
                 onClick={() => setIsMobileReyonOpen(!isMobileReyonOpen)} 
-                className={`${filterTheme.searchArea.mobileToggle} ${THEME.radius.button} flex items-center justify-center gap-2`}
+                className={`${filterTheme.searchArea.mobileToggle} ${THEME.radius.button} flex items-center justify-center gap-2 h-11 px-8 !bg-stone-900 !text-white font-black`}
               >
                 {LABELS.filter.categoryBtn}
               </button>

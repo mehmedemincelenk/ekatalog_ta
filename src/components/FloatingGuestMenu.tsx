@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { THEME } from '../data/config';
 import Button from './Button';
-import { Phone, FileSpreadsheet, Ticket, Menu, X, Search } from 'lucide-react';
+import { Phone, FileSpreadsheet, Ticket, Menu, X, Search, QrCode } from 'lucide-react';
 
 /**
  * FLOATING GUEST MENU COMPONENT
@@ -20,6 +20,7 @@ interface FloatingGuestMenuProps {
   onCouponClick: () => void;
   onExcelClick: () => void;
   onSearchClick: () => void;
+  onQRClick: () => void;
 }
 
 export default function FloatingGuestMenu({ 
@@ -28,7 +29,8 @@ export default function FloatingGuestMenu({
   whatsappNumber,
   onCouponClick,
   onExcelClick,
-  onSearchClick
+  onSearchClick,
+  onQRClick
 }: FloatingGuestMenuProps) {
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
   const menuContainerRef = useRef<HTMLDivElement>(null);
@@ -132,6 +134,13 @@ export default function FloatingGuestMenu({
                     action: onCurrencyToggle,
                     label: "Para Birimi",
                     className: "border-2 border-stone-900 text-stone-900 bg-white" 
+                  },
+                  { 
+                    id: 'qr', 
+                    icon: <QrCode className="w-5 h-5" />, 
+                    action: onQRClick,
+                    label: "Dükkan QR",
+                    className: "bg-stone-900 text-white border-none hover:bg-black" 
                   },
                   { 
                     id: 'call', 

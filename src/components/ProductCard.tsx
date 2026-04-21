@@ -28,6 +28,7 @@ interface ProductCardProps {
   onDelete: (id: string) => void;
   onUpdate: (id: string, changes: Partial<Product>) => void;
   onOrderChange?: (id: string, newPosition: number) => void;
+  onOrderIndexChange?: (id: string, newIndex: number) => void;
   onImageUpload?: (id: string, file: File) => Promise<string | undefined>;
   orderIndex?: number;
   itemsInCategory?: number;
@@ -48,6 +49,7 @@ const ProductCard = memo(({
   onDelete, 
   onUpdate, 
   onOrderChange, 
+  onOrderIndexChange,
   onImageUpload, 
   orderIndex = 1, 
   itemsInCategory = 1, 
@@ -149,9 +151,9 @@ const ProductCard = memo(({
         data-product-id={product.id} 
         className={`${theme.container} ${THEME.radius.card} ${product.inStock === false ? theme.outOfStockBorder : theme.activeBorder} ${theme.shadow}`}
       >
-        {/* IMAGE VISUAL SECTION */}
+        {/* IMAGE VISUAL SECTION - SHARP CORNERS */}
         <div 
-          className={`${theme.image.wrapper} ${theme.image.aspect} ${theme.image.bg} ${THEME.radius.image} ${!isAdmin ? theme.image.cursorUser : theme.image.cursorAdmin}`} 
+          className={`${theme.image.wrapper} ${theme.image.aspect} ${theme.image.bg} rounded-none ${!isAdmin ? theme.image.cursorUser : theme.image.cursorAdmin}`} 
           onClick={() => { 
             if (isAdmin && !isUploadingImage) setIsAdminMenuOpen(true); 
             else if (!isAdmin && primaryImageSource) setIsZoomDetailOpen(true); 
@@ -162,7 +164,7 @@ const ProductCard = memo(({
               src={primaryImageSource} 
               alt={product.name} 
               onError={() => setHasImageError(true)} 
-              className={`w-full h-full ${theme.image.fit} ${THEME.radius.image} ${theme.image.transition} ${product.inStock === false ? theme.image.outOfStock : ''} ${isUploadingImage ? theme.image.uploading : ''}`} 
+              className={`w-full h-full ${theme.image.fit} rounded-none ${theme.image.transition} ${product.inStock === false ? theme.image.outOfStock : ''} ${isUploadingImage ? theme.image.uploading : ''}`} 
               draggable={false} 
               loading={isPriority || isZoomDetailOpen ? "eager" : "lazy"} 
               {...(isPriority ? { fetchpriority: "high" } : {})}
@@ -199,6 +201,7 @@ const ProductCard = memo(({
                     currentOrder={orderIndex}
                     totalCount={itemsInCategory}
                     onChange={(newPos) => onOrderChange?.(product.id, newPos)}
+                    onIndexChange={(newIdx) => onOrderIndexChange?.(product.id, newIdx)}
                     className="shadow-xl"
                   />
                 </div>
@@ -317,7 +320,7 @@ const ProductCard = memo(({
         </div>
       </article>
 
-      {/* QUICK VIEW MODAL (Apple-Style Minimalism) */}
+      {/* QUICK VIEW MODAL (LEFT ALIGNED CONTENT) */}
       {isZoomDetailOpen && highDefinitionImageSource && (
         <div className={THEME.modal.overlay} onClick={() => setIsZoomDetailOpen(false)}>
           <div className="absolute top-4 right-4 z-[210]">
@@ -330,9 +333,9 @@ const ProductCard = memo(({
               <img src={highDefinitionImageSource} alt={product.name} className="w-full h-full object-cover" />
             </div>
 
-            {/* PRODUCT INFO & ACTIONS */}
+            {/* PRODUCT INFO & ACTIONS - LEFT ALIGNED */}
             <div className="p-8 space-y-6">
-              <div className="space-y-2 text-center">
+              <div className="space-y-2 text-left">
                 <div className="mb-3">
                   <span className="bg-stone-100 text-stone-500 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest inline-block border border-stone-200">
                     {product.category}
@@ -342,14 +345,14 @@ const ProductCard = memo(({
                   {product.name}
                 </h3>
                 {product.description && (
-                  <p className="text-stone-500 text-xs sm:text-sm font-medium leading-relaxed max-w-[90%] mx-auto">
+                  <p className="text-stone-500 text-xs sm:text-sm font-medium leading-relaxed max-w-full">
                     {product.description}
                   </p>
                 )}
               </div>
 
-              <div className="pt-4 flex flex-col items-center gap-2">
-                <div className="flex flex-col items-center">
+              <div className="pt-4 flex flex-col items-start gap-2">
+                <div className="flex flex-col items-start">
                   {isPromotionActive ? (
                     <div className="flex items-center gap-3">
                       <span className="text-stone-300 line-through text-sm font-bold">{originalPriceLabel}</span>

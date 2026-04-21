@@ -51,15 +51,20 @@ export default function References({ isAdmin = false, isInlineEnabled = true }: 
   };
 
   return (
-    <section className={referencesTheme.layout}>
+    <section className={`${referencesTheme.layout} !py-8`}>
       <div className={referencesTheme.container}>
         
-        <div className="flex items-center justify-between mb-8 border-b border-stone-100 pb-4">
-          <h2 className={referencesTheme.headerTitle}>REFERANSLARIMIZ</h2>
+        {/* CENTERED HEADER SECTION */}
+        <div className="flex flex-col items-center justify-center mb-10 text-center">
+          <h2 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tighter uppercase leading-none">
+            REFERANSLARIMIZ
+          </h2>
+          <div className="w-12 h-1 bg-stone-900 mt-4 mb-2 rounded-full opacity-10"></div>
+          
           {isAdmin && activeReferences.length > 0 && (
             <button 
               onClick={handleAdd}
-              className="text-[10px] font-black uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-colors flex items-center gap-1"
+              className="mt-2 text-[10px] font-black uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-colors flex items-center gap-1"
             >
               <span className="w-4 h-4">{globalIcons.plus}</span> EKLE
             </button>

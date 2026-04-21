@@ -229,6 +229,7 @@ function CatalogView() {
                 if (searchInput) searchInput.focus();
               }, 600);
             }}
+            onQRClick={() => setIsQRModalOpen(true)}
           />
         </div>
       )}

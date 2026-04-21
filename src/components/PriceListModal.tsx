@@ -93,11 +93,17 @@ export default function PriceListModal({
     setIsExporting(true);
     
     try {
+      // Scale optimized for mobile fitting and clarity
       const canvas = await html2canvas(listContainerRef.current, {
-        scale: 2, 
+        scale: 1.5, 
         useCORS: true,
         backgroundColor: '#ffffff',
-        logging: false
+        logging: false,
+        onclone: (clonedDoc) => {
+           // Ensure cloned element is visible for capture
+           const el = clonedDoc.querySelector('[data-capture-area="true"]');
+           if (el) (el as HTMLElement).style.display = 'block';
+        }
       });
       
       const image = canvas.toDataURL("image/jpeg", 0.9);
@@ -121,14 +127,14 @@ export default function PriceListModal({
       {step === 0 ? (
          <div className="flex flex-col gap-2 w-full">
             <div className="grid grid-cols-2 gap-3 w-full">
-               <Button variant="ghost" size="md" onClick={onClose} className="!w-full h-14" mode="rectangle">
+               <Button variant="ghost" size="md" onClick={onClose} className="!w-full h-12" mode="rectangle">
                  GERİ GİT
                </Button>
                <Button 
                  variant="primary" 
                  size="md" 
                  onClick={() => setStep(1)} 
-                 className="!w-full h-14 !bg-stone-900 !text-white text-xs font-black uppercase shadow-xl shadow-stone-200"
+                 className="!w-full h-12 !bg-stone-900 !text-white text-xs font-black uppercase shadow-xl shadow-stone-200"
                  mode="rectangle"
                >
                  BAŞLA
@@ -149,7 +155,7 @@ export default function PriceListModal({
          </div>
       ) : step === 1 ? (
          <div className="grid grid-cols-2 gap-3">
-            <Button variant="ghost" size="md" onClick={() => setStep(0)} className="!w-full h-14" mode="rectangle" icon={<ArrowLeft size={16}/>}>
+            <Button variant="ghost" size="md" onClick={() => setStep(0)} className="!w-full h-12" mode="rectangle" icon={<ArrowLeft size={16}/>}>
               GERİ
             </Button>
             <Button 
@@ -157,7 +163,7 @@ export default function PriceListModal({
               size="md" 
               onClick={() => setStep(2)} 
               disabled={selectedCategories.length === 0} 
-              className="!w-full h-14 shadow-lg shadow-stone-200"
+              className="!w-full h-12 shadow-lg shadow-stone-200"
               mode="rectangle"
             >
               LİSTEYİ GÖR
@@ -165,14 +171,14 @@ export default function PriceListModal({
          </div>
       ) : (
          <div className="grid grid-cols-2 gap-3">
-            <Button variant="ghost" size="md" icon={<ArrowLeft size={16}/>} onClick={() => setStep(1)} className="w-full h-14" mode="rectangle">
+            <Button variant="ghost" size="md" icon={<ArrowLeft size={16}/>} onClick={() => setStep(1)} className="w-full h-12" mode="rectangle">
               GERİ GİT
             </Button>
             <div className="flex gap-2 w-full">
-              <Button variant="primary" size="md" icon={<Download size={18}/>} onClick={downloadAsImage} loading={isExporting} className="flex-1 h-14 shadow-lg" mode="rectangle">
+              <Button variant="primary" size="md" icon={<Download size={18}/>} onClick={downloadAsImage} loading={isExporting} className="flex-1 h-12 shadow-lg" mode="rectangle">
                 KAYDET
               </Button>
-              <Button variant="secondary" size="md" icon={<Printer size={18}/>} onClick={printAsPDF} className="w-14 shrink-0 h-14 flex items-center justify-center p-0" mode="rectangle">
+              <Button variant="secondary" size="md" icon={<Printer size={18}/>} onClick={printAsPDF} className="w-12 shrink-0 h-12 flex items-center justify-center p-0" mode="rectangle">
               </Button>
             </div>
          </div>
@@ -191,13 +197,17 @@ export default function PriceListModal({
     >
       <div className="print:p-0 min-h-[300px]">
           {step === 0 ? (
-            <div className="py-6 px-4 flex flex-col items-center text-center">
-              <div className="w-24 h-24 bg-stone-50 rounded-3xl flex items-center justify-center mb-8 shadow-sm border border-stone-100 rotate-3 text-stone-900">
-                <Layers3 size={40} />
+            <div className="py-2 px-1 flex flex-col items-center">
+              <div className="flex items-center gap-5 mb-8 w-full px-4">
+                <div className="w-16 h-16 bg-stone-50 rounded-2xl flex items-center justify-center shadow-sm border border-stone-100 rotate-2 text-stone-900 shrink-0">
+                  <Layers3 size={32} />
+                </div>
+                <h4 className="text-xl sm:text-2xl font-black text-stone-900 tracking-tighter text-left leading-tight">
+                  Fiyat Listemizi Galerinize İndirin
+                </h4>
               </div>
-              <h4 className="text-2xl font-black text-stone-900 mb-4 tracking-tight">Fiyat Listemizi Galerinize İndirin</h4>
               
-              <div className="w-full text-left bg-stone-50 p-6 rounded-3xl border border-stone-100 space-y-4 mb-4">
+              <div className="w-full text-left bg-stone-50 p-4 sm:p-6 rounded-3xl border border-stone-100 space-y-4 mb-4">
                 <div className="flex gap-4 items-center">
                   <div className="w-8 h-8 bg-white text-stone-900 rounded-xl flex items-center justify-center shrink-0 font-black text-xs shadow-sm border border-stone-100">1</div>
                   <p className="text-xs font-bold text-stone-600">İndirmek istediğiniz ürün kategorilerimizi seçin.</p>
@@ -211,18 +221,18 @@ export default function PriceListModal({
                   <p className="text-xs font-bold text-stone-600">Galerinize bakın.</p>
                 </div>
               </div>
-              <p className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em] mb-4 italic">İşte bu kadar kolay!</p>
+              <p className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em] mb-2 italic">İşte bu kadar kolay!</p>
             </div>
           ) : step === 1 ? (
             <div className="p-2">
               <div className="mb-6 px-2 flex items-end justify-between">
                 <div>
-                  <h5 className="text-xs font-black text-stone-900 uppercase tracking-[0.2em] mb-1">REYON SEÇİMİ</h5>
-                  <p className="text-[11px] text-stone-400 font-medium italic">Hangi kategoriler listelensin?</p>
+                  <h5 className="text-xs font-black text-stone-900 uppercase tracking-[0.2em] mb-1">KATEGORİ SEÇİMİ</h5>
+                  <p className="text-[11px] text-stone-400 font-medium italic">Seçmek istediğiniz kategorilerin üzerine tıklayınız</p>
                 </div>
                 <button 
                   onClick={selectAllCategories}
-                  className="flex items-center gap-1.5 text-[10px] font-black text-stone-900 hover:text-stone-600 transition-colors bg-stone-100 px-3 py-1.5 rounded-lg active:scale-95"
+                  className="flex items-center gap-1.5 text-[9px] font-black text-stone-900 hover:text-stone-600 transition-colors bg-stone-100 px-3 py-1.5 rounded-lg active:scale-95"
                 >
                   {selectedCategories.length === populatedCategories.length ? <CheckSquare size={14} /> : <Square size={14} />}
                   HEPSİNİ SEÇ
@@ -257,7 +267,8 @@ export default function PriceListModal({
             <div className="py-4 bg-stone-50/30 print:bg-white print:p-0">
               <div 
                 ref={listContainerRef} 
-                className="bg-white p-8 rounded-[40px] shadow-sm border border-stone-100 print:shadow-none print:border-none print:p-0 overflow-hidden"
+                data-capture-area="true"
+                className="bg-white p-4 sm:p-8 rounded-[40px] shadow-sm border border-stone-100 print:shadow-none print:border-none print:p-0 overflow-hidden"
               >
                 {/* LIST HEADER */}
                 <div className="flex flex-col mb-10 border-b-8 border-stone-900 pb-8 relative pt-4 text-center items-center">
@@ -269,27 +280,27 @@ export default function PriceListModal({
                       </span>
                    </div>
                    
-                   <h1 className="text-4xl font-black text-stone-900 tracking-tighter mt-10 uppercase px-4">{storeName}</h1>
+                   <h1 className="text-3xl sm:text-4xl font-black text-stone-900 tracking-tighter mt-10 uppercase px-4">{storeName}</h1>
                    <div className="flex items-center gap-2 mt-2">
-                      <div className="w-8 h-[2px] bg-stone-200"></div>
-                      <p className="text-[10px] font-black text-stone-400 uppercase tracking-[0.4em]">FİYAT LİSTESİ</p>
-                      <div className="w-8 h-[2px] bg-stone-200"></div>
+                       <div className="w-8 h-[2px] bg-stone-200"></div>
+                       <p className="text-[10px] font-black text-stone-400 uppercase tracking-[0.4em]">FİYAT LİSTESİ</p>
+                       <div className="w-8 h-[2px] bg-stone-200"></div>
                    </div>
 
-                   <div className="mt-8 flex gap-6 text-center">
+                   <div className="mt-8 flex gap-4 sm:gap-6 text-center">
                       <div>
-                        <p className="text-[9px] font-black text-stone-300 uppercase tracking-widest">GÜNCELLEME</p>
-                        <p className="text-xs font-black text-stone-900">{new Date().toLocaleDateString('tr-TR')}</p>
+                        <p className="text-[8px] sm:text-[9px] font-black text-stone-300 uppercase tracking-widest">GÜNCELLEME</p>
+                        <p className="text-[11px] sm:text-xs font-black text-stone-900">{new Date().toLocaleDateString('tr-TR')}</p>
                       </div>
-                      <div className="w-[1px] h-8 bg-stone-100"></div>
+                      <div className="w-[1px] h-6 sm:h-8 bg-stone-100"></div>
                       <div>
-                        <p className="text-[9px] font-black text-stone-300 uppercase tracking-widest">KATEGORİ</p>
-                        <p className="text-xs font-black text-stone-900">{selectedCategories.length} REYON</p>
+                        <p className="text-[8px] sm:text-[9px] font-black text-stone-300 uppercase tracking-widest">KATEGORİ</p>
+                        <p className="text-[11px] sm:text-xs font-black text-stone-900">{selectedCategories.length} REYON</p>
                       </div>
-                      <div className="w-[1px] h-8 bg-stone-100"></div>
+                      <div className="w-[1px] h-6 sm:h-8 bg-stone-100"></div>
                       <div>
-                        <p className="text-[9px] font-black text-stone-300 uppercase tracking-widest">TOPLAM</p>
-                        <p className="text-xs font-black text-stone-900">{filteredProductsCount} ÜRÜN</p>
+                        <p className="text-[8px] sm:text-[9px] font-black text-stone-300 uppercase tracking-widest">TOPLAM</p>
+                        <p className="text-[11px] sm:text-xs font-black text-stone-900">{filteredProductsCount} ÜRÜN</p>
                       </div>
                    </div>
 
@@ -309,35 +320,35 @@ export default function PriceListModal({
                     return (
                       <div key={cat} className="break-inside-avoid">
                         <div className="flex items-center gap-4 mb-6">
-                           <h2 className="text-xl font-black text-stone-900 uppercase tracking-tight shrink-0">{cat}</h2>
+                           <h2 className="text-lg sm:text-xl font-black text-stone-900 uppercase tracking-tight shrink-0">{cat}</h2>
                            <div className="h-[2px] flex-1 bg-stone-100"></div>
                         </div>
 
-                        <div className="space-y-3">
+                        <div className="space-y-2 sm:space-y-3">
                           {categoryProducts.map(product => (
-                            <div key={product.id} className="flex items-start justify-between gap-4 p-4 rounded-[32px] border border-stone-50 bg-white hover:bg-stone-50 transition-colors">
-                              <div className="flex gap-4 flex-1 min-w-0">
+                            <div key={product.id} className="flex items-start justify-between gap-3 sm:gap-4 p-3 sm:p-4 rounded-[24px] sm:rounded-[32px] border border-stone-50 bg-white hover:bg-stone-50 transition-colors">
+                              <div className="flex gap-3 sm:gap-4 flex-1 min-w-0">
                                 {product.image ? (
                                   <img 
                                     src={product.image} 
                                     alt={product.name} 
-                                    className="w-14 h-14 object-cover rounded-xl border border-stone-100 shadow-sm shrink-0 bg-white"
+                                    className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-lg sm:rounded-xl border border-stone-100 shadow-sm shrink-0 bg-white"
                                     crossOrigin="anonymous" 
                                   />
                                 ) : (
-                                  <div className="w-14 h-14 rounded-xl border border-stone-100 bg-stone-50 shrink-0 flex items-center justify-center">
-                                    <Layers3 size={24} className="opacity-20 text-stone-900" />
+                                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl border border-stone-100 bg-stone-50 shrink-0 flex items-center justify-center">
+                                    <Layers3 size={20} className="opacity-20 text-stone-900" />
                                   </div>
                                 )}
-                                <div className="flex flex-col min-w-0 py-1">
-                                  <h4 className="font-black text-stone-900 text-sm leading-tight uppercase tracking-tight">{product.name}</h4>
-                                  <p className="text-[10px] text-stone-400 font-bold mt-1 line-clamp-2 leading-relaxed">
+                                <div className="flex flex-col min-w-0 py-0.5 sm:py-1">
+                                  <h4 className="font-black text-stone-900 text-[13px] sm:text-sm leading-tight uppercase tracking-tight">{product.name}</h4>
+                                  <p className="text-[9px] sm:text-[10px] text-stone-400 font-bold mt-0.5 sm:mt-1 line-clamp-1 sm:line-clamp-2 leading-relaxed">
                                     {product.shortDescription || product.description || 'Standart Ürün'}
                                   </p>
                                 </div>
                               </div>
-                              <div className="text-right shrink-0 pt-1">
-                                <span className="text-base font-black text-stone-900 tracking-tighter">
+                              <div className="text-right shrink-0 pt-0.5 sm:pt-1">
+                                <span className="text-[14px] sm:text-base font-black text-stone-900 tracking-tighter">
                                   {calculateFinalPrice(product)}
                                 </span>
                               </div>
@@ -350,8 +361,8 @@ export default function PriceListModal({
                 </div>
 
                 <div className="mt-4 pt-10 border-t-2 border-stone-100 text-center flex flex-col items-center">
-                   <p className="text-[9px] font-black text-stone-300 uppercase tracking-[0.4em] mb-4">WWW.EKATALOG.SITE</p>
-                   <div className="px-6 py-2 bg-stone-50 rounded-full text-[9px] font-black text-stone-400 border border-stone-100 lowercase">
+                   <p className="text-[8px] sm:text-[9px] font-black text-stone-300 uppercase tracking-[0.4em] mb-4">WWW.EKATALOG.SITE</p>
+                   <div className="px-5 py-1.5 bg-stone-50 rounded-full text-[8px] sm:text-[9px] font-black text-stone-400 border border-stone-100 lowercase">
                      {storeName.toLowerCase().replace(/\s+/g, '')}@ekatalog.site
                    </div>
                 </div>

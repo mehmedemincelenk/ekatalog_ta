@@ -7,7 +7,7 @@ import { Product } from '../types';
 import ProductCard from './ProductCard';
 import SocialProofCard from './SocialProofCard';
 import { ActiveDiscount } from '../hooks/useDiscount';
-import { Plus } from 'lucide-react';
+import Button from './Button';
 
 /**
  * PRODUCT GRID COMPONENT (100% Tokenized & Professional English)
@@ -24,6 +24,7 @@ interface ProductGridProps {
   onUpdate: (id: string, changes: Partial<Product>) => void;
   onOrderUpdate: (id: string, newPosition: number) => void;
   onOrderChange?: (id: string, newPosition: number) => void;
+  onOrderIndexChange?: (id: string, newIndex: number) => void;
   onImageUpload?: (id: string, file: File) => Promise<string | undefined>;
   activeDiscount?: ActiveDiscount | null;
   visibleCategoryLimit: number;
@@ -46,6 +47,7 @@ const ProductGrid = memo(({
   onDelete, 
   onUpdate, 
   onOrderUpdate, 
+  onOrderIndexChange,
   onImageUpload,
   activeDiscount, 
   visibleCategoryLimit,
@@ -151,6 +153,7 @@ const ProductGrid = memo(({
                         onDelete={onDelete}
                         onUpdate={onUpdate}
                         onOrderChange={onOrderUpdate}
+                        onOrderIndexChange={onOrderIndexChange}
                         onImageUpload={onImageUpload}
                         orderIndex={index + 1}
                         itemsInCategory={categoryProducts.length}
@@ -188,20 +191,20 @@ const ProductGrid = memo(({
         );
       })}
 
-      {/* DIAMOND LOAD MORE BUTTON */}
+      {/* DIAMOND LOAD MORE BUTTON - Standardized */}
       {onLoadMore && displayCategories.length > visibleCategoryLimit && (
         <div className="flex flex-col items-center justify-center pt-8 pb-16 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-          <button 
+           <Button 
             onClick={onLoadMore}
-            className="group relative flex flex-col items-center gap-3 transition-all active:scale-95"
+            variant="secondary"
+            size="md"
+            mode="rectangle"
+            className="group !py-4 !px-8 border shadow-sm hover:shadow-md transition-all active:scale-95"
           >
-            <div className="w-12 h-12 rounded-full border border-stone-200 flex items-center justify-center group-hover:bg-stone-900 group-hover:border-stone-900 transition-all duration-300">
-              <Plus className="w-5 h-5 text-stone-400 group-hover:text-white transition-colors" />
-            </div>
-            <span className="text-[10px] font-black tracking-[0.3em] text-stone-400 uppercase group-hover:text-stone-900 transition-colors">
-              {LABELS.loadMoreBtn}
+            <span className="text-[10px] font-black tracking-[0.3em] text-stone-900 uppercase">
+              DAHA FAZLA ÜRÜN GÖSTER
             </span>
-          </button>
+          </Button>
         </div>
       )}
     </div>
