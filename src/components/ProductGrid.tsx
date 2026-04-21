@@ -29,6 +29,8 @@ interface ProductGridProps {
   activeAdminProductId?: string | null;
   setActiveAdminProductId?: (id: string | null) => void;
   showPrice?: boolean;
+  displayCurrency?: 'TRY' | 'USD' | 'EUR';
+  exchangeRates?: { usd: number; eur: number };
 }
 
 const ProductGrid = memo(({
@@ -47,7 +49,9 @@ const ProductGrid = memo(({
   onAddClick,
   activeAdminProductId,
   setActiveAdminProductId,
-  showPrice = true
+  showPrice = true,
+  displayCurrency = 'TRY',
+  exchangeRates
 }: ProductGridProps) => {
   const theme = THEME.productGrid;
 
@@ -141,6 +145,8 @@ const ProductGrid = memo(({
                       isPriority={isPriority}
                       activeAdminProductId={activeAdminProductId}
                       setActiveAdminProductId={setActiveAdminProductId}
+                      displayCurrency={displayCurrency}
+                      exchangeRates={exchangeRates}
                     />
                   );
                 })}

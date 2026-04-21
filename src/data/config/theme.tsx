@@ -60,6 +60,13 @@ export const THEME = {
     visualFallback: '#FFFFFF',
   },
 
+  announcementBar: {
+    wrapper: 'w-full bg-stone-900 text-white py-1.5 sm:py-2 px-4 text-center relative',
+    text: 'text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.15em] leading-tight',
+    closeButton: 'absolute right-2 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors cursor-pointer p-1',
+    adminEditStyle: 'outline-none focus:ring-0 cursor-text hover:bg-white/10 rounded px-1 transition-colors',
+  },
+
   typography: {
     marquee: {
       container: 'overflow-hidden whitespace-nowrap',

@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { DEFAULT_COMPANY, CATEGORY_ORDER as DEFAULT_ORDER } from '../data/config';
 import { getActiveStoreSlug } from '../utils/store';
+import { fetchCurrentRates } from '../utils/currency';
 
 export interface CompanySettings {
   id: string; // Store UUID
@@ -38,6 +39,19 @@ export interface CompanySettings {
     showReferences: boolean;
     showPrice: boolean;
   };
+  announcementBar: {
+    enabled: boolean;
+    text: string;
+  };
+  maintenanceMode: {
+    enabled: boolean;
+    message: string;
+  };
+  exchangeRates: {
+    usd: number;
+    eur: number;
+  };
+  activeCurrency: 'TRY' | 'USD' | 'EUR';
 }
 
 const STORE_SLUG = getActiveStoreSlug();
@@ -65,6 +79,10 @@ export function useSettings(isAdministrativeModeActive: boolean) {
     carouselData: { slides: [] },
     referencesData: [],
     displayConfig: DEFAULT_COMPANY.displayConfig,
+    announcementBar: DEFAULT_COMPANY.announcementBar,
+    maintenanceMode: DEFAULT_COMPANY.maintenanceMode,
+    exchangeRates: { usd: 35, eur: 38 },
+    activeCurrency: 'TRY',
   });
 
   const [isSettingsDataLoading, setIsSettingsDataLoading] = useState(true);
@@ -118,6 +136,10 @@ export function useSettings(isAdministrativeModeActive: boolean) {
         carouselData: storeConfig.carousel_data || { slides: [] },
         referencesData: storeConfig.references_data || [],
         displayConfig: { ...DEFAULT_COMPANY.displayConfig, ...(storeConfig.display_config || {}) },
+        announcementBar: storeConfig.announcement_bar || DEFAULT_COMPANY.announcementBar,
+        maintenanceMode: storeConfig.maintenance_mode || DEFAULT_COMPANY.maintenanceMode,
+        exchangeRates: storeConfig.exchange_rates || { usd: 35, eur: 38 },
+        activeCurrency: storeConfig.active_currency || 'TRY',
       });
     }
     setIsSettingsDataLoading(false);
@@ -126,6 +148,19 @@ export function useSettings(isAdministrativeModeActive: boolean) {
   useEffect(() => {
     const init = async () => {
       await synchronizeStoreSettings();
+      
+      // Auto-fetch fresh rates from internet
+      const freshRates = await fetchCurrentRates();
+      if (freshRates) {
+        // Update local state immediately
+        setActiveStoreSettings(prev => ({
+          ...prev,
+          exchangeRates: { usd: freshRates.usd, eur: freshRates.eur }
+        }));
+        
+        // If in admin mode, we could also persist them, 
+        // but for now, keeping them in memory for the session is enough and 'painless'
+      }
     };
     init();
   }, [synchronizeStoreSettings]);
@@ -154,6 +189,10 @@ export function useSettings(isAdministrativeModeActive: boolean) {
       if (settingKey === 'categoryOrder') updatePayload.category_order = newValue;
       if (settingKey === 'referencesData') updatePayload.references_data = newValue;
       if (settingKey === 'displayConfig') updatePayload.display_config = newValue;
+      if (settingKey === 'announcementBar') updatePayload.announcement_bar = newValue;
+      if (settingKey === 'maintenanceMode') updatePayload.maintenance_mode = newValue;
+      if (settingKey === 'exchangeRates') updatePayload.exchange_rates = newValue;
+      if (settingKey === 'activeCurrency') updatePayload.active_currency = newValue;
 
       const { error: persistenceError } = await supabase
         .from('stores')

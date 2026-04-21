@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LABELS, THEME } from '../data/config';
 import { Product } from '../types';
 import { resolveVisualAssetUrl, PLACEHOLDER_VISUAL_SYMBOL } from '../utils/image';
-import { calculatePromotionalPrice, standardizePriceInput } from '../utils/price';
+import { calculatePromotionalPrice, standardizePriceInput, transformCurrencyStringToNumber, formatNumberToCurrency } from '../utils/price';
 import Button from './Button';
 import { AdminActionMenu } from './AdminActionMenu';
 import { MarqueeText } from './MarqueeText';
@@ -32,6 +32,8 @@ interface ProductCardProps {
   isPriority?: boolean;
   activeAdminProductId?: string | null;
   setActiveAdminProductId?: (id: string | null) => void;
+  displayCurrency?: 'TRY' | 'USD' | 'EUR';
+  exchangeRates?: { usd: number; eur: number };
 }
 
 const ProductCard = memo(({
@@ -49,7 +51,9 @@ const ProductCard = memo(({
   activeDiscount,
   isPriority = false,
   activeAdminProductId,
-  setActiveAdminProductId
+  setActiveAdminProductId,
+  displayCurrency = 'TRY',
+  exchangeRates
 }: ProductCardProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cardContainerRef = useRef<HTMLElement>(null);
@@ -122,11 +126,15 @@ const ProductCard = memo(({
     }
   };
 
-  // DISCOUNT CALCULATION
+  // DISCOUNT & CURRENCY CALCULATION
   const isPromotionActive = activeDiscount && (!activeDiscount.category || activeDiscount.category === product.category);
-  const originalPriceLabel = product.price.includes('₺') ? product.price : `${product.price} ₺`;
-  const discountedPriceValue = isPromotionActive ? calculatePromotionalPrice(product.price, activeDiscount.rate) : null;
-  const discountedPriceLabel = discountedPriceValue ? (discountedPriceValue.includes('₺') ? discountedPriceValue : `${discountedPriceValue} ₺`) : null;
+  const baseMathematicalPrice = transformCurrencyStringToNumber(product.price);
+  
+  const originalPriceLabel = formatNumberToCurrency(baseMathematicalPrice, displayCurrency, exchangeRates);
+  
+  const discountedPriceLabel = isPromotionActive && baseMathematicalPrice > 0 
+    ? formatNumberToCurrency(baseMathematicalPrice * (1 - activeDiscount.rate), displayCurrency, exchangeRates) 
+    : null;
 
   const primaryImageSource = optimisticImagePreview || (product.image ? resolveVisualAssetUrl(product.image) : null);
   const highDefinitionImageSource = product.image ? resolveVisualAssetUrl(product.image.replace('/lq/', '/hq/').split('?')[0]) : null;

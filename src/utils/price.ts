@@ -45,15 +45,35 @@ export const transformCurrencyStringToNumber = (localizedPrice: string | number)
 
 /**
  * formatNumberToCurrency: Converts pure numbers back into localized currency strings.
- * Uses TECH.commerce for internationalization.
- * @param numericalAmount - The mathematical value to be formatted.
+ * Uses TECH.commerce for internationalization, and auto-converts based on exchange rates.
+ * @param numericalAmount - The mathematical value to be formatted (Always in TRY originally).
+ * @param targetCurrency - The requested display currency ('TRY', 'USD', 'EUR').
+ * @param exchangeRates - Current exchange rates from settings.
  */
-export const formatNumberToCurrency = (numericalAmount: number): string => {
+export const formatNumberToCurrency = (
+  numericalAmount: number,
+  targetCurrency: 'TRY' | 'USD' | 'EUR' = 'TRY',
+  exchangeRates?: { usd: number; eur: number }
+): string => {
+  let convertedAmount = numericalAmount;
+  let activeCurrencyCode = commerce.currency;
+
+  if (targetCurrency !== 'TRY' && exchangeRates) {
+    if (targetCurrency === 'USD' && exchangeRates.usd > 0) {
+      convertedAmount = numericalAmount / exchangeRates.usd;
+      activeCurrencyCode = 'USD';
+    } else if (targetCurrency === 'EUR' && exchangeRates.eur > 0) {
+      convertedAmount = numericalAmount / exchangeRates.eur;
+      activeCurrencyCode = 'EUR';
+    }
+  }
+
   return new Intl.NumberFormat(commerce.locale, {
     style: 'currency',
-    currency: commerce.currency,
+    currency: activeCurrencyCode,
     minimumFractionDigits: 2,
-  }).format(numericalAmount);
+    maximumFractionDigits: 2,
+  }).format(convertedAmount);
 };
 
 /**

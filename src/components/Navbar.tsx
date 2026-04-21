@@ -3,6 +3,7 @@ import { THEME, DEFAULT_COMPANY } from '../data/config';
 import { CompanySettings } from '../hooks/useSettings';
 import { generateWhatsAppLink } from '../utils/contact';
 import { resolveVisualAssetUrl, compressVisualToDataUri } from '../utils/image';
+import { X } from 'lucide-react';
 
 /**
  * NAVBAR COMPONENT (Layout Correction)
@@ -17,7 +18,7 @@ interface NavbarProps {
   isAdmin: boolean;
   isInlineEnabled: boolean;
   settings: CompanySettings;
-  updateSetting: (key: keyof CompanySettings, value: string) => void;
+  updateSetting: (key: keyof CompanySettings, value: CompanySettings[keyof CompanySettings]) => void;
   search?: string;
   onSearchChange?: (val: string) => void;
 }
@@ -106,10 +107,48 @@ const Navbar = memo(({ onLogoPointerDown, onLogoPointerUp, isAdmin, isInlineEnab
   const isRightSideVisible = config.showInstagram || config.showAddress || config.showWhatsapp;
   const isTitleOnly = !isRightSideVisible && !config.showLogo && !config.showSubtitle;
 
+  const announcementBarTheme = THEME.announcementBar;
+  const announcementConfig = settings.announcementBar ?? { enabled: false, text: '' };
+  const [isBarDismissed, setIsBarDismissed] = useState(() => sessionStorage.getItem('ekatalog_banner_dismissed') === 'true');
+
+  const showAnnouncementBar = announcementConfig.enabled && announcementConfig.text && !isBarDismissed;
+
+  const handleDismiss = () => {
+    setIsBarDismissed(true);
+    sessionStorage.setItem('ekatalog_banner_dismissed', 'true');
+  };
+
+  const handleAnnouncementBlur = (e: React.FocusEvent<HTMLSpanElement>) => {
+    const newText = e.currentTarget.textContent?.trim() || '';
+    if (newText !== announcementConfig.text) {
+      updateSetting('announcementBar', { ...announcementConfig, text: newText });
+    }
+  };
+
   return (
-    <nav className={theme.layout}>
-      <div className={theme.container}>
-        <div className={`${theme.innerWrapper} ${isTitleOnly ? 'justify-center' : 'justify-between'}`}>
+    <>
+      {/* ANNOUNCEMENT BAR: Admin-editable, customer-dismissable top banner */}
+      {(showAnnouncementBar || (isAdmin && announcementConfig.enabled)) && (
+        <div className={announcementBarTheme.wrapper}>
+          <span
+            className={`${announcementBarTheme.text} ${isAdmin && isInlineEnabled ? announcementBarTheme.adminEditStyle : ''}`}
+            contentEditable={isAdmin && isInlineEnabled}
+            suppressContentEditableWarning
+            onBlur={handleAnnouncementBlur}
+          >
+            {announcementConfig.text || (isAdmin ? 'Duyuru metnini buraya yazın...' : '')}
+          </span>
+          {!isAdmin && (
+            <button onClick={handleDismiss} className={announcementBarTheme.closeButton} aria-label="Duyuruyu kapat">
+              <X className="w-3 h-3" />
+            </button>
+          )}
+        </div>
+      )}
+
+      <nav className={theme.layout}>
+        <div className={theme.container}>
+          <div className={`${theme.innerWrapper} ${isTitleOnly ? 'justify-center' : 'justify-between'}`}>
           
           {/* LEFT SIDE: Brand & Search Grouped */}
           <div className="flex items-center flex-1 gap-2 sm:gap-8 min-w-0">
@@ -268,6 +307,7 @@ const Navbar = memo(({ onLogoPointerDown, onLogoPointerUp, isAdmin, isInlineEnab
         </div>
       </div>
     </nav>
+    </>
   );
 });
 

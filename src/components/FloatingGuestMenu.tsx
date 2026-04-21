@@ -2,34 +2,34 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { THEME } from '../data/config';
 import Button from './Button';
+import { Phone, FileSpreadsheet, Ticket, Menu, X } from 'lucide-react';
 
 /**
- * FLOATING ADMIN MENU COMPONENT (100% Tokenized & Professional English)
+ * FLOATING GUEST MENU COMPONENT
  * -----------------------------------------------------------
- * AssistiveTouch-style management hub. Fully managed via central THEME.
+ * Replaces simple currency switcher with a fully animated AssistiveTouch hub for guests.
  */
 
-interface FloatingAdminMenuProps {
-  onProductAddTrigger: () => void;
-  onBulkUpdateTrigger?: () => void;
-  onSettingsTrigger: () => void;
+interface FloatingGuestMenuProps {
   activeCurrency: 'TRY' | 'USD' | 'EUR';
   onCurrencyToggle: () => void;
+  whatsappNumber: string;
+  onCouponClick: () => void;
+  onExcelClick: () => void;
 }
 
-export default function FloatingAdminMenu({ 
-  onProductAddTrigger,
-  onBulkUpdateTrigger,
-  onSettingsTrigger,
+export default function FloatingGuestMenu({ 
   activeCurrency,
-  onCurrencyToggle
-}: FloatingAdminMenuProps) {
+  onCurrencyToggle,
+  whatsappNumber,
+  onCouponClick,
+  onExcelClick
+}: FloatingGuestMenuProps) {
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
   const menuContainerRef = useRef<HTMLDivElement>(null);
   const autoCloseTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const menuTheme = THEME.floatingAdminMenu;
-  const globalIcons = THEME.icons;
 
   const clearAutoCloseTimer = useCallback(() => {
     if (autoCloseTimerRef.current) {
@@ -48,8 +48,8 @@ export default function FloatingAdminMenu({
     if (isMenuExpanded) {
       document.addEventListener('pointerdown', handlePointerDownOutside);
       clearAutoCloseTimer();
-      // Auto-close after 3 seconds of inactivity
-      autoCloseTimerRef.current = setTimeout(() => setIsMenuExpanded(false), 3000);
+      // Auto-close after 5 seconds of inactivity
+      autoCloseTimerRef.current = setTimeout(() => setIsMenuExpanded(false), 5000);
     } else {
       document.removeEventListener('pointerdown', handlePointerDownOutside);
       clearAutoCloseTimer();
@@ -61,15 +61,21 @@ export default function FloatingAdminMenu({
     };
   }, [isMenuExpanded, clearAutoCloseTimer]);
 
-  const handleManagementAction = (actionCallback: () => void) => {
+  const handleAction = (actionCallback: () => void) => {
     clearAutoCloseTimer();
     actionCallback();
     setIsMenuExpanded(false);
   };
 
+  const handleCall = () => {
+    // Normal phone call trigger using "tel:" protocol
+    const cleanNumber = whatsappNumber.replace(/[^\d+]/g, '');
+    window.location.href = `tel:${cleanNumber}`;
+  };
+
   return (
     <div ref={menuContainerRef}>
-      <div className={`${menuTheme.container} overflow-hidden w-[46px] flex flex-col items-center justify-end`}>
+      <div className={`${menuTheme.container} overflow-hidden w-[46px] flex flex-col items-center justify-end shadow-2xl`}>
         
         {/* EXPANDABLE ACTION AREA */}
         <AnimatePresence>
@@ -83,7 +89,7 @@ export default function FloatingAdminMenu({
                 open: {
                   height: "auto",
                   opacity: 1,
-                  marginBottom: 8, // Spacing only when open
+                  marginBottom: 8,
                   transition: {
                     height: { type: "spring", stiffness: 300, damping: 30 },
                     staggerChildren: 0.05,
@@ -123,23 +129,23 @@ export default function FloatingAdminMenu({
                     className: "border-2 border-stone-900 text-stone-900 bg-white" 
                   },
                   { 
-                    id: 'add', 
-                    icon: globalIcons.plus, 
-                    action: onProductAddTrigger,
-                    label: "Ürün Ekle",
-                    primary: true
-                  },
-                  onBulkUpdateTrigger && { 
-                    id: 'bulk', 
-                    icon: globalIcons.bulkPrice, 
-                    action: onBulkUpdateTrigger,
-                    label: "Toplu Fiyat" 
+                    id: 'call', 
+                    icon: <span className="text-[19px] leading-none">📞</span>, 
+                    action: handleCall,
+                    label: "Bizi Arayın",
+                    className: "bg-emerald-500 text-white border-none hover:bg-emerald-600" 
                   },
                   { 
-                    id: 'settings', 
-                    icon: globalIcons.settings, 
-                    action: onSettingsTrigger,
-                    label: "Ayarlar" 
+                    id: 'excel', 
+                    icon: <FileSpreadsheet className="w-5 h-5" />, 
+                    action: onExcelClick,
+                    label: "Fiyat Listesi",
+                  },
+                  { 
+                    id: 'coupon', 
+                    icon: <Ticket className="w-5 h-5" />, 
+                    action: onCouponClick,
+                    label: "Kupon Gir",
                   }
                 ].filter(Boolean) as { id: string; icon: React.ReactNode; action: () => void; label: string; primary?: boolean; className?: string }[]
               ).map((btn) => (
@@ -152,12 +158,12 @@ export default function FloatingAdminMenu({
                   className="w-full flex justify-center"
                 >
                   <Button 
-                    onClick={() => handleManagementAction(btn.action)}
+                    onClick={() => handleAction(btn.action)}
                     icon={btn.icon}
-                    variant={btn.primary ? "primary" : "secondary"}
+                    variant="secondary"
                     size="sm"
                     mode="circle"
-                    className={`shrink-0 ${btn.className || ''}`}
+                    className={`shrink-0 shadow-md ${btn.className || ''}`}
                     aria-label={btn.label}
                   />
                 </motion.div>
@@ -170,12 +176,12 @@ export default function FloatingAdminMenu({
         <div className="flex items-center justify-center p-0.5">
           <Button 
             onClick={() => { clearAutoCloseTimer(); setIsMenuExpanded(previousState => !previousState); }}
-            icon={globalIcons.adminLayout}
-            variant={isMenuExpanded ? 'ghost' : 'secondary'}
+            icon={isMenuExpanded ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            variant="primary"
             size="sm"
             mode="circle"
-            className={isMenuExpanded ? menuTheme.toggleActive : menuTheme.toggleInactive}
-            aria-label={isMenuExpanded ? "Close Admin Menu" : "Open Admin Menu"}
+            className="!bg-stone-900 !text-white hover:scale-105 active:scale-95 transition-all w-10 h-10 shadow-lg"
+            aria-label={isMenuExpanded ? "Menüyü Kapat" : "Menüyü Aç"}
           />
         </div>
       </div>

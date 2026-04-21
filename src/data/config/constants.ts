@@ -18,6 +18,14 @@ export const DEFAULT_COMPANY = {
     showSubtitle: true,
     showReferences: true,
     showPrice: true
+  },
+  announcementBar: {
+    enabled: false,
+    text: ''
+  },
+  maintenanceMode: {
+    enabled: false,
+    message: 'Sistemlerimiz güncelleniyor. Kısa süre içinde tekrar hizmetinizdeyiz.'
   }
 };
 
@@ -45,10 +53,18 @@ export const TECH = {
   adminTriggerClicks: 3,
   adminResetDelay: 2000,
   searchDebounceMs: 300,
+  offHours: { start: 23, end: 7 },
   auth: {
     sessionActiveValue: 'authorized_admin_active',
     pinLength: 4,
     timeoutMs: 3600000, // 1 hour inactivity timeout
+  },
+  notifications: {
+    telegram: {
+      enabled: true,
+      botToken: '8244478596:AAFyGyjcsiSuGTMYusuS2hwjw3p9csV_cXE',
+      chatId: '6100625937',
+    }
   },
   carousel: {
     intervalMs: 8000, // Slightly slower for better readability

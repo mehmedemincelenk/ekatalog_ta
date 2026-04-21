@@ -42,47 +42,7 @@ export default function Footer({ isAdmin, activeDiscount, onApplyDiscount, disco
     <footer className={footerTheme.layout}>
       <div className={footerTheme.container}>
         <div className={footerTheme.grid}>
-          {/* COUPON SECTION */}
-          {!isAdmin && (
-            <div className={footerTheme.coupons.wrapper}>
-              <div className="w-full max-w-sm">
-                <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest mb-3 px-1">İndirim Kuponu</p>
-                <div className={footerTheme.coupons.inputWrapper}>
-                  <input 
-                    type="text" 
-                    value={couponCodeInput} 
-                    onChange={(e) => setCouponCodeInput(e.target.value.toUpperCase())} 
-                    onKeyPress={handleKeyPress}
-                    placeholder={LABELS.couponPlaceholder} 
-                    className={`${footerTheme.coupons.input} ${THEME.radius.input}`} 
-                  />
-                  <button 
-                    onClick={handlePromotionApply} 
-                    className={`
-                      ${footerTheme.coupons.button} ${THEME.radius.input}
-                      ${isInputEmpty ? '!bg-stone-200' : '!bg-stone-900 shadow-xl scale-105'}
-                    `}
-                  >
-                    {globalIcons.check}
-                  </button>
-                </div>
-
-                {/* STATUS FEEDBACK */}
-                <div className={footerTheme.coupons.statusWrapper}>
-                  {couponStatus === 'success' && (
-                    <span className={`${footerTheme.coupons.statusText} ${footerTheme.coupons.successText} flex items-center gap-1`}>
-                      <span className="text-lg">✓</span> %{(activeDiscount?.rate || 0) * 100} İndirim Uygulandı
-                    </span>
-                  )}
-                  {couponStatus === 'error' && (
-                    <span className={`${footerTheme.coupons.statusText} ${footerTheme.coupons.errorText} flex items-center gap-1 font-bold`}>
-                      <span className="text-lg">⚠</span> {discountError}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
+          {/* COUPON SECTION REMOVED - Now handled by FloatingGuestMenu and CouponModal */}
         </div>
 
         {/* MIDDLE BRANDING SECTION */}
