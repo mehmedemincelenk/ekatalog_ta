@@ -155,7 +155,7 @@ const ProductCard = memo(({
       >
         {/* IMAGE VISUAL SECTION - SHARP CORNERS */}
         <div 
-          className={`${theme.image.wrapper} ${theme.image.aspect} ${theme.image.bg} rounded-none ${!isAdmin ? theme.image.cursorUser : theme.image.cursorAdmin}`} 
+          className={`${theme.image.wrapper} ${theme.image.aspect} ${theme.image.bg} rounded-t-[inherit] rounded-b-none ${!isAdmin ? theme.image.cursorUser : theme.image.cursorAdmin}`} 
           onClick={() => { 
             if (isAdmin && !isUploadingImage) setIsAdminMenuOpen(true); 
             else if (!isAdmin && primaryImageSource) setIsZoomDetailOpen(true); 

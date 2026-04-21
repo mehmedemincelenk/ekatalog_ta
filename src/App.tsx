@@ -80,6 +80,7 @@ function CatalogView() {
     reorderCategory: updateCategoryOrder, 
     reorderProductsInCategory,
     renameCategory, 
+    addCategory, 
     executeGranularBulkActions,
     uploadImage,
     loading: productsLoading 
@@ -101,8 +102,6 @@ function CatalogView() {
     else if (type === 'CATEGORY') {
       const name = window.prompt('Yeni Reyon/Kategori Adı:');
       if (name) {
-        // useProducts hook should expose addCategory
-        // (Checking line 85 of App.tsx, I need to add it to the destructuring)
         const addCategoryFn = (window as any).__ekatalog_addCategory;
         if (addCategoryFn) addCategoryFn(name);
       }
@@ -115,39 +114,19 @@ function CatalogView() {
       }
     }
     else if (type === 'CAROUSEL') {
-      // Trigger Hero Carousel's plus button logic
       const heroPlusBtn = document.querySelector('button[title="Yeni Slide Ekle"]') as HTMLButtonElement;
       if (heroPlusBtn) heroPlusBtn.click();
       else {
-        // Fallback: If no slide exists yet, look for the big empty state plus
         const emptyPlus = document.querySelector('span.w-6.h-6') as HTMLElement;
         emptyPlus?.parentElement?.click();
       }
     }
   };
 
-  const { 
-    products, 
-    allProducts,
-    categoryOrder, 
-    addProduct, 
-    updateProduct, 
-    deleteProduct, 
-    reorderCategory: updateCategoryOrder, 
-    reorderProductsInCategory,
-    renameCategory, 
-    addCategory, 
-    executeGranularBulkActions,
-    uploadImage,
-    loading: productsLoading 
-  } = useProducts(search, activeCategories, isAdmin, settings, updateSetting);
-
   // Sync addCategory to window for the modal to call (simple way to bridge hooks without over-engineering)
   useEffect(() => {
     (window as any).__ekatalog_addCategory = addCategory;
   }, [addCategory]);
-
-  const { activeDiscount, applyCode, error: discountError } = useDiscount();
 
   // FAVICON & TITLE SYNC (With Fallback Protection)
   useEffect(() => {
