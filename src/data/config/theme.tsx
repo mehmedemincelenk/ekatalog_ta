@@ -32,7 +32,8 @@ import {
   Settings,
   Settings2,
   Tags,
-  Trash2
+  Trash2,
+  Diamond
 } from 'lucide-react';
 
 export const THEME = {
@@ -97,6 +98,7 @@ export const THEME = {
     settings: <Settings2 className="w-full h-full p-0.5" strokeWidth={2.5} />,
     bulkPrice: <Tags className="w-full h-full p-0.5" strokeWidth={2.5} />,
     trash: <Trash2 className="w-full h-full p-0.5" strokeWidth={2.5} />,
+    diamond: <Diamond className="w-full h-full p-0.5" fill="currentColor" strokeWidth={2} />,
   },
 
   button: {

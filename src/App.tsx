@@ -22,6 +22,7 @@ import FloatingGuestMenu from './components/FloatingGuestMenu';
 import CouponModal from './components/CouponModal';
 import PriceListModal from './components/PriceListModal';
 import GlobalAddMenuModal from './components/GlobalAddMenuModal';
+import AIStudioCompareModal from './components/AIStudioCompareModal';
 import { useProducts } from './hooks/useProducts';
 import { useAdminMode } from './hooks/useAdminMode';
 import { useDiscount } from './hooks/useDiscount';
@@ -96,6 +97,7 @@ function CatalogView() {
   const [isGlobalAddMenuOpen, setIsGlobalAddMenuOpen] = useState(false);
   const [activeAdminProductId, setActiveAdminProductId] = useState<string | null>(null);
   const [visibleCategoryLimit, setVisibleCategoryLimit] = useState(2);
+  const [aiStudioProduct, setAiStudioProduct] = useState<Product | null>(null);
 
   const handleGlobalAddAction = (type: 'PRODUCT' | 'CATEGORY' | 'REFERENCE' | 'CAROUSEL') => {
     if (type === 'PRODUCT') setIsAddModalOpen(true);
@@ -123,9 +125,10 @@ function CatalogView() {
     }
   };
 
-  // Sync addCategory to window for the modal to call (simple way to bridge hooks without over-engineering)
+  // Bridge for Diamond Studio Compare (Called from ProductCard)
   useEffect(() => {
     (window as any).__ekatalog_addCategory = addCategory;
+    (window as any).__ekatalog_openAIStudioCompare = (product: Product) => setAiStudioProduct(product);
   }, [addCategory]);
 
   // FAVICON & TITLE SYNC (With Fallback Protection)
@@ -346,6 +349,24 @@ function CatalogView() {
         exchangeRates={settings.exchangeRates}
         activeDiscount={activeDiscount}
         storeName={settings.title || 'Katalog'}
+      />
+
+      {/* DIAMOND STUDIO LABORATORY */}
+      <AIStudioCompareModal 
+        isOpen={!!aiStudioProduct}
+        product={aiStudioProduct}
+        onClose={() => setAiStudioProduct(null)}
+        onApply={(productId, polishedUrl) => {
+          updateProduct(productId, { 
+            image: polishedUrl, 
+            polishedReadyDismissed: true 
+          });
+          setAiStudioProduct(null);
+        }}
+        onDismiss={(productId) => {
+          updateProduct(productId, { polishedReadyDismissed: true });
+          setAiStudioProduct(null);
+        }}
       />
     </div>
   );

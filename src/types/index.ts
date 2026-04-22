@@ -19,7 +19,11 @@ export interface Product {
   name: string;         // Ürün adı
   category: string;     // Reyon adı
   price: string;        // Satış fiyatı
-  image: string | null; // Fotoğraf (Base64 formatında veya yok)
+  image: string | null; // Aktif görünen fotoğraf
+  originalImage?: string | null; // AI sonrası geri dönüş için saklanan orijinal kopya
+  polishedImage?: string | null; // Photoroom'dan gelen stüdyo kalitesindeki görsel
+  isPolishedPending?: boolean;   // AI işleminin sürdüğünü belirten bayrak
+  polishedReadyDismissed?: boolean; // Kullanıcının bildirimi kapatıp kapatmadığı bilgisi
   description: string;  // Ürün açıklaması
   inStock: boolean;     // Stokta var mı? (Evet/Hayır)
   is_archived: boolean; // Mağazadan gizli mi? (Evet/Hayır)

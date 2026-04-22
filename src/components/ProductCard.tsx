@@ -178,8 +178,49 @@ const ProductCard = memo(({
           )}
           
           <AnimatePresence>
+            {isAdmin && !isUploadingImage && (
+              <div className="absolute top-2 left-2 z-[35] flex flex-col gap-1.5">
+                {/* PENDING INDICATOR */}
+                {product.isPolishedPending && (
+                  <motion.div 
+                    key="studio-pending"
+                    initial={{ scale: 0, rotate: -20 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    className="w-7 h-7 bg-white/90 backdrop-blur shadow-lg border border-stone-100 flex items-center justify-center rounded-full"
+                  >
+                    <div className="w-4 h-4 border-2 border-stone-200 border-t-stone-600 rounded-full animate-spin"></div>
+                  </motion.div>
+                )}
+
+                {/* READY BADGE (DIAMOND) */}
+                {product.polishedImage && !product.polishedReadyDismissed && !product.isPolishedPending && (
+                  <motion.button 
+                    key="studio-ready"
+                    whileHover={{ scale: 1.15 }}
+                    whileTap={{ scale: 0.9 }}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ 
+                      scale: [1, 1.1, 1],
+                      opacity: 1,
+                      boxShadow: ["0 0 0px rgba(0,0,0,0)", "0 0 20px rgba(139,184,255,0.4)", "0 0 0px rgba(0,0,0,0)"]
+                    }}
+                    transition={{ repeat: Infinity, duration: 2.5 }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      (window as any).__ekatalog_openAIStudioCompare?.(product);
+                    }}
+                    className="w-8 h-8 bg-blue-50 text-blue-600 border border-blue-100 shadow-xl flex items-center justify-center rounded-full pointer-events-auto"
+                    title="Stüdyo Kalitesi Hazır!"
+                  >
+                    <div className="w-5 h-5">{THEME.icons.diamond}</div>
+                  </motion.button>
+                )}
+              </div>
+            )}
+
             {isAdmin && primaryImageSource && !isUploadingImage && (
               <motion.div 
+                key="admin-overlay"
                 initial={false} 
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0, filter: 'blur(10px)' }}
@@ -192,6 +233,7 @@ const ProductCard = memo(({
           <AnimatePresence>
             {isAdmin && (
               <motion.div
+                key="admin-actions"
                 initial={false}
                 animate={{ opacity: 1, scale: 1, transform: 'translateZ(0)' }}
                 exit={{ opacity: 0, filter: 'blur(12px)', scale: 0.9 }}

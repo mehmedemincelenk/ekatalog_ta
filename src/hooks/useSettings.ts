@@ -56,6 +56,7 @@ export interface CompanySettings {
     eur: number;
   };
   activeCurrency: 'TRY' | 'USD' | 'EUR';
+  photoroomApiKey?: string; // Diamond Studio integration key
 }
 
 const STORE_SLUG = getActiveStoreSlug();
@@ -144,6 +145,7 @@ export function useSettings(isAdministrativeModeActive: boolean) {
         maintenanceMode: storeConfig.maintenance_mode || DEFAULT_COMPANY.maintenanceMode,
         exchangeRates: storeConfig.exchange_rates || { usd: 35, eur: 38 },
         activeCurrency: storeConfig.active_currency || 'TRY',
+        photoroomApiKey: storeConfig.photoroom_api_key,
       });
     }
     setIsSettingsDataLoading(false);
@@ -197,6 +199,7 @@ export function useSettings(isAdministrativeModeActive: boolean) {
       if (settingKey === 'maintenanceMode') updatePayload.maintenance_mode = newValue;
       if (settingKey === 'exchangeRates') updatePayload.exchange_rates = newValue;
       if (settingKey === 'activeCurrency') updatePayload.active_currency = newValue;
+      if (settingKey === 'photoroomApiKey') updatePayload.photoroom_api_key = newValue;
 
       const { error: persistenceError } = await supabase
         .from('stores')

@@ -64,6 +64,10 @@ export function useProducts(
         category: record.category,
         price: record.price,
         image: record.image_url,
+        originalImage: record.original_image_url,
+        polishedImage: record.polished_image_url,
+        isPolishedPending: record.is_polished_pending,
+        polishedReadyDismissed: record.polished_ready_dismissed,
         description: record.description || '',
         inStock: !record.out_of_stock,
         is_archived: record.is_archived,
@@ -80,22 +84,24 @@ export function useProducts(
    * modifyProductRecord: Updates specific product data with optimistic UI feedback.
    */
   const modifyProductRecord = useCallback(async (productId: string, dataChanges: Partial<Product>) => {
-    // Optimistic UI Update (Skip for images as they involve storage latency)
-    if (!dataChanges.image) {
-      setCatalogProducts(previous => {
-        const updated = previous.map(p => p.id === productId ? { ...p, ...dataChanges } : p);
-        if (dataChanges.sort_order !== undefined) {
-          return [...updated].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
-        }
-        return updated;
-      });
-    }
+    // Optimistic UI Update: Reflected immediately for a "Diamond" experience
+    setCatalogProducts(previous => {
+      const updated = previous.map(p => p.id === productId ? { ...p, ...dataChanges } : p);
+      if (dataChanges.sort_order !== undefined) {
+        return [...updated].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+      }
+      return updated;
+    });
 
-    const updatePayload: Record<string, string | number | boolean | undefined> = {};
+    const updatePayload: Record<string, any> = {};
     if (dataChanges.name !== undefined) updatePayload.name = dataChanges.name;
     if (dataChanges.category !== undefined) updatePayload.category = dataChanges.category;
     if (dataChanges.price !== undefined) updatePayload.price = dataChanges.price;
-    if (dataChanges.image !== undefined) updatePayload.image_url = dataChanges.image || undefined;
+    if (dataChanges.image !== undefined) updatePayload.image_url = dataChanges.image || null;
+    if (dataChanges.originalImage !== undefined) updatePayload.original_image_url = dataChanges.originalImage || null;
+    if (dataChanges.polishedImage !== undefined) updatePayload.polished_image_url = dataChanges.polishedImage || null;
+    if (dataChanges.isPolishedPending !== undefined) updatePayload.is_polished_pending = dataChanges.isPolishedPending;
+    if (dataChanges.polishedReadyDismissed !== undefined) updatePayload.polished_ready_dismissed = dataChanges.polishedReadyDismissed;
     if (dataChanges.description !== undefined) updatePayload.description = dataChanges.description;
     if (dataChanges.inStock !== undefined) updatePayload.out_of_stock = !dataChanges.inStock;
     if (dataChanges.is_archived !== undefined) updatePayload.is_archived = dataChanges.is_archived;
@@ -110,7 +116,7 @@ export function useProducts(
     if (updateError) {
       console.error('❌ Ürün güncelleme hatası:', updateError);
       synchronizeInventory(true); // Rollback
-    } else if (dataChanges.sort_order !== undefined || dataChanges.image) {
+    } else if (dataChanges.sort_order !== undefined || dataChanges.image || dataChanges.polishedImage) {
       synchronizeInventory(true);
     }
   }, [synchronizeInventory, storeSettings.id]);
@@ -132,6 +138,52 @@ export function useProducts(
       console.error('Visual asset decommission failed:', cleanupError);
     }
   }, []);
+
+  /**
+   * triggerAIStudioUpgrade: Asynchronously initiates the Photoroom polishing cycle.
+   */
+  const triggerAIStudioUpgrade = useCallback(async (productId: string, visualFile: File) => {
+    const apiKey = storeSettings.photoroomApiKey || import.meta.env.VITE_PHOTOROOM_API_KEY;
+    if (!apiKey) return;
+
+    try {
+      // 1. Mark as pending and save original
+      await modifyProductRecord(productId, { isPolishedPending: true });
+
+      // 2. Call AI Studio (Server-side heavy lift)
+      const { processProductInDiamondStudio } = await import('../utils/aiStudio');
+      const polishedBlob = await processProductInDiamondStudio(visualFile, apiKey);
+
+      // 3. Prepare for storage
+      const polishedFile = new File([polishedBlob], 'polished.jpg', { type: 'image/jpeg' });
+      const turkishCharMap: Record<string, string> = { 'ç':'c','ğ':'g','ı':'i','ö':'o','ş':'s','ü':'u','Ç':'C','Ğ':'G','İ':'I','Ö':'O','Ş':'S','Ü':'U' };
+      const nanoId = Math.random().toString(36).substring(2, 7);
+      const fileName = `polished-${productId.substring(0, 4)}-${nanoId}.jpg`;
+      const lqPath = `${TECH.storage.lqFolder}/${fileName}`;
+      const hqPath = `${TECH.storage.hqFolder}/${fileName}`;
+
+      // 4. Process and upload polished version
+      const { hq: polishedHq, lq: polishedLq } = await processDualQualityVisuals(polishedFile);
+      await Promise.all([
+        supabase.storage.from(TECH.storage.bucket).upload(lqPath, polishedLq, { upsert: true, cacheControl: TECH.storage.cacheControl }),
+        supabase.storage.from(TECH.storage.bucket).upload(hqPath, polishedHq, { upsert: true, cacheControl: TECH.storage.cacheControl })
+      ]);
+
+      const { data: { publicUrl } } = supabase.storage.from(TECH.storage.bucket).getPublicUrl(lqPath);
+      const finalizedPolishedUrl = `${publicUrl}?t=${Date.now()}`;
+
+      // 5. Update product with the polished version ready to review
+      await modifyProductRecord(productId, { 
+        polishedImage: finalizedPolishedUrl, 
+        isPolishedPending: false,
+        polishedReadyDismissed: false 
+      });
+
+    } catch (err) {
+      console.error('Diamond Studio Processing Failed:', err);
+      await modifyProductRecord(productId, { isPolishedPending: false });
+    }
+  }, [storeSettings.photoroomApiKey, modifyProductRecord]);
 
   /**
    * uploadProductVisualAsset: Direct storage deployment with dual-quality processing.
@@ -166,10 +218,13 @@ export function useProducts(
       const targetProduct = catalogProducts.find(p => p.id === productId);
       const oldImageUrl = targetProduct?.image;
 
-      // 4. Veritabanını güncelle
-      await modifyProductRecord(productId, { image: finalizedUrl });
+      // 4. Veritabanını güncelle (Orijinal görseli de yedekliyoruz)
+      await modifyProductRecord(productId, { image: finalizedUrl, originalImage: finalizedUrl });
       
-      // 5. Veritabanı başarılıysa eski görseli temizle (Eğer varsa)
+      // 5. Trigger AI Studio (ASYNCHRONOUS) - Don't wait for it
+      triggerAIStudioUpgrade(productId, visualFile);
+
+      // 6. Veritabanı başarılıysa eski görseli temizle (Eğer varsa)
       if (oldImageUrl) {
         await removeProductVisual(oldImageUrl);
       }
@@ -178,7 +233,6 @@ export function useProducts(
     } catch (error) {
       console.error('❌ Görsel yükleme veya senkronizasyon hatası:', error);
       
-      // TRANSACTION ROLLBACK: Eğer yükleme yapıldı ama DB güncellenemediyle dosyaları sil
       if (isUploadSuccessful) {
         console.warn('⚠️ Veritabanı güncellemesi başarısız, yüklenen dosyalar temizleniyor...');
         await supabase.storage.from(TECH.storage.bucket).remove([lqPath, hqPath]);
@@ -187,7 +241,7 @@ export function useProducts(
       alert(LABELS.saveError);
       throw error;
     }
-  }, [modifyProductRecord, removeProductVisual, catalogProducts]);
+  }, [modifyProductRecord, removeProductVisual, catalogProducts, triggerAIStudioUpgrade]);
 
   /**
    * addNewProductRecord: Initializes a new product in the catalog.
