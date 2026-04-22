@@ -209,7 +209,7 @@ const ProductCard = memo(({
                     animate={{ 
                       scale: [1, 1.2, 1],
                       opacity: 1,
-                      boxShadow: ["0 0 0px rgba(59,130,246,0)", "0 0 25px rgba(59,130,246,0.5)", "0 0 0px rgba(59,130,246,0)"]
+                      boxShadow: ["0 0 0px rgba(59,130,246,0)", "0 0 1.5rem rgba(59,130,246,0.5)", "0 0 0px rgba(59,130,246,0)"]
                     }}
                     transition={{ repeat: Infinity, duration: 2 }}
                     onClick={(e) => {
@@ -231,7 +231,7 @@ const ProductCard = memo(({
                 key="admin-overlay"
                 initial={false} 
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0, filter: 'blur(10px)' }}
+                exit={{ opacity: 0, filter: 'blur(4px)' }}
                 className={theme.image.overlay} 
               />
             )}
@@ -244,7 +244,7 @@ const ProductCard = memo(({
                 key="admin-actions"
                 initial={false}
                 animate={{ opacity: 1, scale: 1, transform: 'translateZ(0)' }}
-                exit={{ opacity: 0, filter: 'blur(12px)', scale: 0.9 }}
+                exit={{ opacity: 0, filter: 'blur(8px)', scale: 0.9 }}
                 transition={{ duration: 0.3 }}
                 className="absolute inset-0 z-[30] pointer-events-none"
               >
@@ -339,7 +339,7 @@ const ProductCard = memo(({
               <div className="flex flex-wrap items-center gap-1.5 min-h-[20px]">
                 {isPromotionActive && !isAdmin ? (
                   <>
-                    <span className={`${theme.typography.price} text-stone-400 line-through text-[10px] sm:text-[11px]`}>
+                    <span className={`${theme.typography.price} text-stone-400 line-through text-[0.625rem] sm:text-[0.6875rem]`}>
                       {originalPriceLabel}
                     </span>
                     <span className={`${theme.typography.price} text-green-600`}>
@@ -385,7 +385,6 @@ const ProductCard = memo(({
         hideCloseButton={false}
       >
         <div className="-m-6 flex flex-col">
-          {/* PRODUCT VISUAL */}
           {highDefinitionImageSource && (
             <div className="relative aspect-[4/3] bg-stone-50 overflow-hidden">
               <img 
@@ -400,7 +399,7 @@ const ProductCard = memo(({
           <div className="p-8 space-y-6">
             <div className="space-y-2 text-left">
               <div className="mb-3">
-                <span className="bg-stone-100 text-stone-500 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest inline-block border border-stone-200">
+                <span className="bg-stone-100 text-stone-500 px-3 py-1.5 rounded-full text-[0.625rem] font-black uppercase tracking-widest inline-block border border-stone-200">
                   {product.category}
                 </span>
               </div>

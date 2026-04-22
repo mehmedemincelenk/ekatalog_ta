@@ -137,38 +137,38 @@ export default function FloatingGuestMenu({
                   },
                   { 
                     id: 'qr', 
-                    icon: <QrCode className="w-5 h-5" />, 
+                    icon: <QrCode className="w-full h-full p-1" strokeWidth={2.5} />, 
                     action: onQRClick,
                     label: "Dükkan QR",
-                    className: "bg-purple-600 text-white border-none hover:bg-purple-700" 
+                    className: "bg-white text-stone-900 border-2 border-stone-100 hover:bg-stone-50" 
                   },
                   { 
                     id: 'call', 
-                    icon: <Phone className="w-5 h-5" />, 
+                    icon: <Phone className="w-full h-full p-1" strokeWidth={2.5} />, 
                     action: handleCall,
                     label: "Bizi Arayın",
-                    className: "bg-emerald-500 text-white border-none hover:bg-emerald-600" 
+                    className: "bg-white text-stone-900 border-2 border-stone-100 hover:bg-stone-50" 
                   },
                   { 
                     id: 'excel', 
-                    icon: <FileSpreadsheet className="w-5 h-5" />, 
+                    icon: <FileSpreadsheet className="w-full h-full p-1" strokeWidth={2.5} />, 
                     action: onExcelClick,
                     label: "Fiyat Listesi",
-                    className: "bg-blue-600 text-white border-none hover:bg-blue-700"
+                    className: "bg-white text-stone-900 border-2 border-stone-100 hover:bg-stone-50"
                   },
                   { 
                     id: 'coupon', 
-                    icon: <Ticket className="w-5 h-5" />, 
+                    icon: <Ticket className="w-full h-full p-0.5" strokeWidth={2.5} />, 
                     action: onCouponClick,
                     label: "Kupon Gir",
-                    className: "bg-rose-500 text-white border-none hover:bg-rose-600"
+                    className: "bg-white text-stone-900 border-2 border-stone-100 hover:bg-stone-50"
                   },
                   { 
                     id: 'search', 
-                    icon: <Search className="w-5 h-5" />, 
+                    icon: <Search className="w-full h-full p-1" strokeWidth={2.5} />, 
                     action: onSearchClick,
                     label: "Ürün Ara",
-                    className: "bg-stone-900 text-white border-none hover:bg-black" 
+                    className: "bg-white text-stone-900 border-2 border-stone-100 hover:bg-stone-50" 
                   }
                 ].filter(Boolean) as { id: string; icon: React.ReactNode; action: () => void; label: string; primary?: boolean; className?: string }[]
               ).map((btn) => (
@@ -199,7 +199,7 @@ export default function FloatingGuestMenu({
         <div className="flex items-center justify-center p-0.5">
           <Button 
             onClick={() => { clearAutoCloseTimer(); setIsMenuExpanded(previousState => !previousState); }}
-            icon={isMenuExpanded ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            icon={isMenuExpanded ? <X className="w-full h-full p-0.5" strokeWidth={2.5} /> : <Menu className="w-full h-full p-0.5" strokeWidth={2.5} />}
             variant="primary"
             size="sm"
             mode="circle"

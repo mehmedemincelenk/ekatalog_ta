@@ -162,31 +162,22 @@ const Navbar = memo(({ onLogoPointerDown, onLogoPointerUp, isAdmin, isInlineEnab
       <nav className={theme.layout}>
         <div className={theme.container}>
           <div className={`${theme.innerWrapper} ${isTitleOnly ? 'justify-center' : 'justify-between'}`}>
+            <div className="flex items-center flex-1 gap-0.5 sm:gap-1.5 min-w-0">
           
-          {/* LEFT SIDE: Brand & Search Grouped */}
-          <div className="flex items-center flex-1 gap-2 sm:gap-8 min-w-0">
-            {/* BRAND SECTION (Logo & Identity) - GESTURE AREA */}
+            {/* BRAND SECTION (Logo & Identity) */}
             <div 
-              className={`${theme.brand.wrapper} relative transition-all duration-200 ${isLogoPressed ? 'scale-95 opacity-80' : 'scale-100'}`}
+              className={`${theme.brand.wrapper} relative flex items-center transition-all duration-200 ${isLogoPressed ? 'scale-95 opacity-80' : 'scale-100'}`}
               onPointerDown={handlePressStart}
               onPointerUp={handlePressEnd}
               onPointerLeave={handlePressEnd}
               onContextMenu={(e) => e.preventDefault()}
-              style={{ 
-                userSelect: 'none', 
-                WebkitUserSelect: 'none', 
-                WebkitTouchCallout: 'none',
-                touchAction: 'none'
-              }}
+              style={{ userSelect: 'none', WebkitUserSelect: 'none', touchAction: 'none' }}
             >
-              {/* INVISIBLE SHIELD: Explicitly handles gestures when NOT admin to avoid bubbling issues */}
               {!isAdmin && (
                 <div 
                   className="absolute inset-0 z-[40] cursor-pointer touch-none" 
                   onPointerDown={handlePressStart}
                   onPointerUp={handlePressEnd}
-                  onPointerLeave={handlePressEnd}
-                  onPointerCancel={handlePressEnd}
                 />
               )}
 
@@ -205,7 +196,7 @@ const Navbar = memo(({ onLogoPointerDown, onLogoPointerUp, isAdmin, isInlineEnab
                   <img 
                     src={resolveVisualAssetUrl(settings.logoUrl) || DEFAULT_COMPANY.logoUrl} 
                     alt="Store Logo" 
-                    className={`${theme.brand.logoImg} object-contain`} 
+                    className="w-9 h-9 sm:w-[3rem] sm:h-[3rem] object-contain rounded-[0.25rem]"
                   />
                 </div>
               )}
@@ -218,7 +209,7 @@ const Navbar = memo(({ onLogoPointerDown, onLogoPointerUp, isAdmin, isInlineEnab
                     onBlur={(e) => updateSetting('title', e.currentTarget.textContent || '')}
                     onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), e.currentTarget.blur())}
                     onClick={(e) => { e.stopPropagation(); handleTextEdit('title', settings.title, 'Mağaza Adı'); }}
-                    className={`${theme.brand.name} ${editStyle}`}
+                    className={`!text-[0.75rem] sm:!text-[0.9rem] font-black tracking-tighter text-stone-900 ${editStyle}`}
                   >
                     {settings.title}
                   </span>
@@ -230,7 +221,7 @@ const Navbar = memo(({ onLogoPointerDown, onLogoPointerUp, isAdmin, isInlineEnab
                     onBlur={(e) => updateSetting('subtitle', e.currentTarget.textContent || '')}
                     onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), e.currentTarget.blur())}
                     onClick={(e) => { e.stopPropagation(); handleTextEdit('subtitle', settings.subtitle, 'Slogan/Açıklama'); }}
-                    className={`${theme.brand.tagline} ${editStyle}`}
+                    className={`!text-[0.45rem] sm:!text-[0.55rem] text-stone-400 font-medium ${editStyle}`}
                   >
                     {settings.subtitle}
                   </span>
@@ -238,27 +229,27 @@ const Navbar = memo(({ onLogoPointerDown, onLogoPointerUp, isAdmin, isInlineEnab
               </div>
             </div>
 
-            {/* SEARCH BOX FOR DESKTOP */}
-            {settings.displayConfig.showSearch && onSearchChange && (
-              <div className="hidden sm:flex items-center flex-1 max-w-md mr-4">
-                <div className="relative w-full">
-                  <div className="absolute left-3 sm:left-[18px] top-1/2 -translate-y-1/2 w-4 h-4 sm:w-[24px] sm:h-[24px] text-stone-400">{globalIcons.search}</div>
-                  <input 
-                    type="text" 
-                    value={internalSearch} 
-                    onChange={(e) => setInternalSearch(e.target.value)}
-                    placeholder="Ara..."
-                    className="w-full pl-9 sm:pl-[60px] pr-4 sm:pr-[24px] py-1.5 sm:py-[12px] border border-stone-200 text-xs sm:text-[18px] font-semibold text-stone-900 focus:ring-2 focus:ring-stone-900 outline-none transition-colors duration-200 bg-stone-50/50 rounded-md sm:rounded-xl"
-                  />
+              {/* SEARCH BOX: Rasyonele Sola Yaslı & Dikey Merkezli */}
+              {settings.displayConfig.showSearch && onSearchChange && (
+                <div className="hidden sm:flex items-center w-full max-w-[7rem] lg:max-w-[9rem] ml-1 sm:ml-2">
+                  <div className="relative w-full">
+                    <div className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-stone-400">{globalIcons.search}</div>
+                    <input 
+                      type="text" 
+                      value={internalSearch} 
+                      onChange={(e) => setInternalSearch(e.target.value)}
+                      placeholder="Ara..."
+                      className="w-full pl-7 pr-3 py-1.5 sm:py-2 border border-stone-200 text-[0.55rem] sm:text-[0.6rem] font-semibold text-stone-900 focus:ring-1 focus:ring-stone-900 outline-none transition-all duration-200 bg-stone-50/50 rounded-lg"
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
 
-          {/* CONTACT & ADDRESS SECTION (Stacked Layout on Mobile, Inline on Desktop) */}
+          {/* CONTACT & ADDRESS SECTION: Akıllı İstifleme Nizamı */}
           {isRightSideVisible && (
-            <div className="flex flex-col sm:flex-row items-end sm:items-center gap-1 sm:gap-4 shrink-0">
-              {/* Desktop Address (Left of Insta) */}
+            <div className="flex flex-col items-end lg:flex-row lg:items-center gap-1.5 lg:gap-3 shrink-0">
+              {/* Desktop Address */}
               {settings.displayConfig.showAddress && (
                 <div 
                   contentEditable={isAdmin && isInlineEnabled}
@@ -266,22 +257,21 @@ const Navbar = memo(({ onLogoPointerDown, onLogoPointerUp, isAdmin, isInlineEnab
                   onBlur={(e) => updateSetting('address', e.currentTarget.textContent || '')}
                   onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), e.currentTarget.blur())}
                   onClick={() => handleTextEdit('address', settings.address, 'Adres')}
-                  className={`text-[11px] sm:text-[18px] text-stone-400 hover:text-stone-900 transition-colors font-medium text-left leading-tight hidden sm:block ${editStyle}`}
+                  className={`order-2 lg:order-1 !text-[0.45rem] lg:!text-[0.625rem] text-stone-400 hover:text-stone-900 transition-colors font-medium text-right lg:text-left leading-tight lg:whitespace-nowrap px-1 ${editStyle}`}
                 >
                   {settings.address}
                 </div>
               )}
 
-              {/* Top Row: Actions */}
-              <div className="flex items-center gap-2 shrink-0">
+              {/* Actions Group */}
+              <div className="order-1 lg:order-2 flex items-center gap-1.5 sm:gap-2 shrink-0">
                 {/* Instagram */}
                 {settings.displayConfig.showInstagram && (
                   <div 
                     onClick={handleInstagramAction} 
-                    className={`w-7 h-7 sm:w-[38px] sm:h-[38px] sm:rounded-xl rounded-md bg-white/40 backdrop-blur-md border border-white/20 flex items-center justify-center transition-all active:scale-75 cursor-pointer shadow-xl ${isAdmin ? 'text-pink-600 ring-2 ring-pink-100' : 'text-stone-400 hover:text-pink-600'}`}
-                    title={isAdmin ? 'Instagram Adresini Güncelle' : ''}
+                    className={`!w-5 !h-5 sm:!w-6 sm:!h-6 rounded-lg bg-white/40 backdrop-blur-md border border-white/10 flex items-center justify-center transition-all active:scale-75 cursor-pointer ${isAdmin ? 'text-pink-600 ring-2 ring-pink-100' : 'text-stone-400 hover:text-pink-600'}`}
                   >
-                    <div className="w-4 h-4 sm:w-[26px] sm:h-[26px]">
+                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3">
                       <svg viewBox="0 0 24 24" className="w-full h-full fill-current">
                         <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
                       </svg>
@@ -289,19 +279,19 @@ const Navbar = memo(({ onLogoPointerDown, onLogoPointerUp, isAdmin, isInlineEnab
                   </div>
                 )}
   
-                {/* WhatsApp Button */}
+                {/* WhatsApp */}
                 {settings.displayConfig.showWhatsapp && (
                   <div 
                     onClick={handleWhatsAppAction}
-                    className="flex items-center gap-1 sm:gap-2 px-3 sm:px-[14px] py-1.5 sm:py-[8px] bg-stone-900 text-white rounded-md sm:rounded-xl transition-all active:scale-95 shadow-xl hover:bg-black cursor-pointer border border-white/10"
+                    className="flex items-center gap-1 h-6 sm:h-6.5 px-2 bg-stone-900 text-white rounded-lg transition-all active:scale-95 shadow-lg hover:bg-black cursor-pointer border border-white/10"
                   >
-                    <div className="w-3 h-3 sm:w-[20px] sm:h-[20px]">{globalIcons.whatsapp}</div>
+                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3">{globalIcons.whatsapp}</div>
                     <span 
                       contentEditable={isAdmin && isInlineEnabled}
                       suppressContentEditableWarning
                       onBlur={(e) => updateSetting('whatsapp', e.currentTarget.textContent || '')}
                       onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), e.currentTarget.blur())}
-                      className={`text-[9px] sm:text-[12px] font-bold tracking-tight outline-none ${isAdmin && isInlineEnabled ? 'min-w-[50px] focus:bg-white/10' : ''}`}
+                      className={`!text-[0.55rem] sm:!text-[0.6rem] font-bold tracking-tight outline-none leading-none ${isAdmin && isInlineEnabled ? 'min-w-[40px] focus:bg-white/10' : ''}`}
                     >
                       {settings.whatsapp || 'SİPARİŞ VER'}
                     </span>
@@ -309,34 +299,20 @@ const Navbar = memo(({ onLogoPointerDown, onLogoPointerUp, isAdmin, isInlineEnab
                 )}
               </div>
   
-              {/* Bottom Row / Mobile Address */}
-              {settings.displayConfig.showAddress && (
-                <div 
-                  contentEditable={isAdmin && isInlineEnabled}
-                  suppressContentEditableWarning
-                  onBlur={(e) => updateSetting('address', e.currentTarget.textContent || '')}
-                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), e.currentTarget.blur())}
-                  onClick={() => handleTextEdit('address', settings.address, 'Adres')}
-                  className={`text-[9px] text-stone-400 hover:text-stone-900 transition-colors font-medium text-right leading-tight sm:hidden ${editStyle}`}
-                >
-                  {settings.address}
-                </div>
-              )}
             </div>
           )}
-
+          </div>
         </div>
-      </div>
-    </nav>
-    <QuickEditModal 
-      isOpen={!!quickEdit} 
-      onClose={() => setQuickEdit(null)} 
-      onSave={handleQuickSave} 
-      title={(quickEdit?.title || '') + ' Düzenle'} 
-      subtitle={`Dükkanınızdaki ${quickEdit?.title.toLowerCase()} bilgisini buradan güncelleyebilirsiniz.`}
-      initialValue={quickEdit?.value || ''} 
-      placeholder={`${quickEdit?.title} girin...`}
-    />
+      </nav>
+      <QuickEditModal 
+        isOpen={!!quickEdit} 
+        onClose={() => setQuickEdit(null)} 
+        onSave={handleQuickSave} 
+        title={(quickEdit?.title || '') + ' Düzenle'} 
+        subtitle={`Dükkanınızdaki ${quickEdit?.title.toLowerCase()} bilgisini buradan güncelleyebilirsiniz.`}
+        initialValue={quickEdit?.value || ''} 
+        placeholder={`${quickEdit?.title} girin...`}
+      />
     </>
   );
 });

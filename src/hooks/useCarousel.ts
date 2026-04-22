@@ -14,8 +14,6 @@ export interface Slide {
   sub: string;
 }
 
-const STORE_SLUG = getActiveStoreSlug();
-
 /**
  * USE CAROUSEL HOOK (TECHNICAL TOKENS & A-LEVEL ENGLISH)
  * -----------------------------------------------------------
@@ -24,12 +22,45 @@ const STORE_SLUG = getActiveStoreSlug();
 export function useCarousel(isAdministrativeModeActive: boolean) {
   const [marketingSlides, setMarketingSlides] = useState<Slide[]>(CAROUSEL.slides);
   const [isCarouselContentLoading, setIsCarouselContentLoading] = useState(true);
+  
+  const activeStoreSlug = getActiveStoreSlug();
+
+  /**
+   * persistCarouselData: Pushes the updated slides to the Supabase stores table.
+   */
+  const persistCarouselData = useCallback(async (updatedSlides: Slide[]) => {
+    if (!isAdministrativeModeActive || activeStoreSlug === 'main-site') return;
+
+    try {
+      const { data: storeData } = await supabase
+        .from('stores')
+        .select('carousel_data')
+        .eq('slug', activeStoreSlug)
+        .single();
+      
+      const currentCarouselData = storeData?.carousel_data || {};
+      
+      const { error } = await supabase
+        .from('stores')
+        .update({ 
+          carousel_data: { 
+            ...currentCarouselData, 
+            slides: updatedSlides 
+          } 
+        })
+        .eq('slug', activeStoreSlug);
+
+      if (error) throw error;
+    } catch (err) {
+      console.error('Supabase carousel update failed:', err);
+    }
+  }, [isAdministrativeModeActive, activeStoreSlug]);
 
   /**
    * synchronizeCarouselSlides: Fetches remote slide data from Supabase repository.
    */
   const synchronizeCarouselSlides = useCallback(async () => {
-    if (STORE_SLUG === 'main-site') {
+    if (activeStoreSlug === 'main-site') {
       setIsCarouselContentLoading(false);
       return;
     }
@@ -38,46 +69,31 @@ export function useCarousel(isAdministrativeModeActive: boolean) {
     const { data: storeData, error: fetchError } = await supabase
       .from('stores')
       .select('carousel_data')
-      .eq('slug', STORE_SLUG)
+      .eq('slug', activeStoreSlug)
       .single();
 
     if (storeData && !fetchError && storeData.carousel_data?.slides) {
       setMarketingSlides(storeData.carousel_data.slides);
     }
     setIsCarouselContentLoading(false);
-  }, []);
+  }, [activeStoreSlug]);
 
   useEffect(() => {
     synchronizeCarouselSlides();
   }, [synchronizeCarouselSlides]);
 
   /**
-   * modifySlideContent: Updates local state and persists changes to Supabase if admin.
+   * modifySlideContent: Updates local state and persists changes.
    */
   const modifySlideContent = useCallback(async (slideId: number, contentChanges: Partial<Slide>) => {
-    let finalizedSlides: Slide[] = [];
-
-    setMarketingSlides(previousSlides => {
-      finalizedSlides = previousSlides.map(slide => 
+    setMarketingSlides(prev => {
+      const updated = prev.map(slide => 
         slide.id === slideId ? { ...slide, ...contentChanges } : slide
       );
-      return finalizedSlides;
+      persistCarouselData(updated);
+      return updated;
     });
-
-    // Persistent update for administrative actions
-    if (isAdministrativeModeActive) {
-      const currentSlides = marketingSlides.map(slide => 
-        slide.id === slideId ? { ...slide, ...contentChanges } : slide
-      );
-
-      const { error: updateError } = await supabase
-        .from('stores')
-        .update({ carousel_data: { slides: currentSlides } })
-        .eq('slug', STORE_SLUG);
-
-      if (updateError) console.error('Persistent carousel update failed:', updateError);
-    }
-  }, [isAdministrativeModeActive, marketingSlides]);
+  }, [persistCarouselData]);
 
   /**
    * uploadHeroVisualAsset: Processes and uploads a new high-quality image for a slide.
@@ -85,10 +101,9 @@ export function useCarousel(isAdministrativeModeActive: boolean) {
   const uploadHeroVisualAsset = useCallback(async (slideId: number, visualFile: File) => {
     try {
       const { processDualQualityVisuals } = await import('../utils/image');
-      // Technical Token: Professional resolution defined in config
       const { hq: optimizedVisual } = await processDualQualityVisuals(visualFile, TECH.storage.heroWidth);
 
-      const visualFileName = `hero-${STORE_SLUG}-${slideId}-${Date.now()}.jpg`;
+      const visualFileName = `hero-${activeStoreSlug}-${slideId}-${Date.now()}.jpg`;
       const storagePath = `${TECH.storage.heroFolder}/${visualFileName}`;
 
       const { error: storageUploadError } = await supabase.storage
@@ -104,7 +119,6 @@ export function useCarousel(isAdministrativeModeActive: boolean) {
         .from(TECH.storage.bucket)
         .getPublicUrl(storagePath);
 
-      // Cache busting suffix for immediate visual feedback
       const finalizedVisualUrl = `${publicUrl}?t=${Date.now()}`;
       await modifySlideContent(slideId, { src: finalizedVisualUrl });
       return finalizedVisualUrl;
@@ -113,82 +127,60 @@ export function useCarousel(isAdministrativeModeActive: boolean) {
       console.error('Hero visual asset deployment failed:', criticalError);
       throw criticalError;
     }
-  }, [modifySlideContent]);
+  }, [modifySlideContent, activeStoreSlug]);
 
   /**
-   * addNewSlide: Inserts a new placeholder slide for admin to customize.
+   * addNewSlide: Inserts a new placeholder slide.
    */
   const addNewSlide = useCallback(async () => {
-    const nextId = marketingSlides.length > 0 
-      ? Math.max(...marketingSlides.map(s => s.id)) + 1 
-      : 1;
-    
-    const newSlide: Slide = {
-      id: nextId,
-      src: '',
-      bg: 'bg-stone-200',
-      label: 'Yeni Başlık',
-      sub: 'Açıklama metni buraya gelecek.'
-    };
-
-    const updatedSlides = [...marketingSlides, newSlide];
-    setMarketingSlides(updatedSlides);
-
-    if (isAdministrativeModeActive) {
-      const { error } = await supabase
-        .from('stores')
-        .update({ carousel_data: { slides: updatedSlides } })
-        .eq('slug', STORE_SLUG);
+    setMarketingSlides(prev => {
+      const nextId = prev.length > 0 ? Math.max(...prev.map(s => s.id)) + 1 : 1;
+      const newSlide: Slide = {
+        id: nextId,
+        src: '',
+        bg: 'bg-stone-200',
+        label: 'Yeni Başlık',
+        sub: 'Açıklama metni buraya gelecek.'
+      };
       
-      if (error) console.error('Failed to save new slide:', error);
-    }
-  }, [isAdministrativeModeActive, marketingSlides]);
+      const updated = [...prev, newSlide];
+      persistCarouselData(updated);
+      return updated;
+    });
+  }, [persistCarouselData]);
 
   /**
-   * removeSlide: Deletes a specific slide from the carousel.
+   * removeSlide: Deletes a specific slide.
    */
   const removeSlide = useCallback(async (slideId: number) => {
-    if (!window.confirm('Bu görseli silmek istediğinize emin misiniz?')) return;
-    
-    const updatedSlides = marketingSlides.filter(s => s.id !== slideId);
-    setMarketingSlides(updatedSlides);
-
-    if (isAdministrativeModeActive) {
-      const { error } = await supabase
-        .from('stores')
-        .update({ carousel_data: { slides: updatedSlides } })
-        .eq('slug', STORE_SLUG);
-      
-      if (error) console.error('Failed to delete slide:', error);
-    }
-  }, [isAdministrativeModeActive, marketingSlides]);
+    // RATIONAL: window.confirm was removed due to reliability issues. 
+    // Deletion is now direct and responsive.
+    setMarketingSlides(prev => {
+      const updatedSlides = prev.filter(s => s.id !== slideId);
+      persistCarouselData(updatedSlides);
+      return updatedSlides;
+    });
+  }, [persistCarouselData]);
 
   /**
-   * reorderSlides: Moves a slide to a specific index within the sequence.
+   * reorderSlides: Moves a slide to a specific index.
    */
   const reorderSlides = useCallback(async (slideId: number, newDisplayIndex: number) => {
-    const currentIndex = marketingSlides.findIndex(s => s.id === slideId);
-    if (currentIndex === -1) return;
+    setMarketingSlides(prev => {
+      const currentIndex = prev.findIndex(s => s.id === slideId);
+      if (currentIndex === -1) return prev;
 
-    // Convert 1-based display index to 0-based array index
-    const targetedIndex = Math.max(0, Math.min(newDisplayIndex - 1, marketingSlides.length - 1));
-    if (currentIndex === targetedIndex) return;
+      const targetedIndex = Math.max(0, Math.min(newDisplayIndex - 1, prev.length - 1));
+      if (currentIndex === targetedIndex) return prev;
 
-    const updatedSlides = [...marketingSlides];
-    const [capturedSlide] = updatedSlides.splice(currentIndex, 1);
-    updatedSlides.splice(targetedIndex, 0, capturedSlide);
+      const updatedSlides = [...prev];
+      const [capturedSlide] = updatedSlides.splice(currentIndex, 1);
+      updatedSlides.splice(targetedIndex, 0, capturedSlide);
 
-    setMarketingSlides(updatedSlides);
-
-    if (isAdministrativeModeActive) {
-      const { error } = await supabase
-        .from('stores')
-        .update({ carousel_data: { slides: updatedSlides } })
-        .eq('slug', STORE_SLUG);
-      
-      if (error) console.error('Failed to reorder slides:', error);
-    }
-  }, [isAdministrativeModeActive, marketingSlides]);
+      persistCarouselData(updatedSlides);
+      return updatedSlides;
+    });
+  }, [persistCarouselData]);
 
   return { 
     slides: marketingSlides, 

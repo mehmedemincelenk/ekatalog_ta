@@ -12,9 +12,9 @@ interface CarouselSlideUnitProps {
   isCurrentlyUploading: boolean;
   editingTargetSlideId: number | null;
   onImageUpdateTrigger: (id: number) => void;
-  onDeleteSlide?: (id: number) => void;
-  onAddSlide?: () => void;
-  onReorderSlide?: (id: number, newIndex: number) => void;
+  onDeleteTrigger?: (id: number) => void;
+  onAddTrigger?: () => void;
+  onReorderTrigger?: (id: number, newIndex: number) => void;
   currentIndex: number;
   totalSlides: number;
 }
@@ -26,9 +26,9 @@ const CarouselSlideUnit = memo(({
   isCurrentlyUploading, 
   editingTargetSlideId, 
   onImageUpdateTrigger, 
-  onDeleteSlide, 
-  onAddSlide,
-  onReorderSlide,
+  onDeleteTrigger, 
+  onAddTrigger,
+  onReorderTrigger,
   currentIndex,
   totalSlides
 }: CarouselSlideUnitProps) => {
@@ -38,7 +38,8 @@ const CarouselSlideUnit = memo(({
   return (
     <div className={`
       ${carouselTheme.slide.base} 
-      ${isCurrentlyActive ? 'opacity-100 pointer-events-auto z-10' : 'opacity-0 pointer-events-none z-0'} 
+      rounded-lg overflow-hidden
+      ${isCurrentlyActive ? 'opacity-100 pointer-events-auto z-10' : 'opacity-[0.35] pointer-events-none z-0 scale-95 blur-[1px]'} 
       ${slideData.bg}
     `}>
       {/* BACKGROUND IMAGE OR PLACEHOLDER */}
@@ -69,16 +70,16 @@ const CarouselSlideUnit = memo(({
             initial={false}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, filter: 'blur(12px)', scale: 0.9 }}
-            className="absolute bottom-4 right-4 z-50 flex flex-col gap-2"
+            className="absolute bottom-6 right-6 z-[200] flex flex-col gap-3"
           >
             <OrderSelector 
               currentOrder={currentIndex}
               totalCount={totalSlides}
-              onChange={(newIdx) => onReorderSlide?.(slideData.id, newIdx)}
+              onChange={(newIdx) => onReorderTrigger?.(slideData.id, newIdx)}
             />
 
             <Button 
-              onClick={(e) => { e.stopPropagation(); onAddSlide?.(); }}
+              onClick={(e) => { e.stopPropagation(); onAddTrigger?.(); }}
               variant="glass"
               mode="square"
               size="xs"
@@ -86,12 +87,12 @@ const CarouselSlideUnit = memo(({
               title="Yeni Slide Ekle"
             />
             <Button 
-              onClick={(e) => { e.stopPropagation(); onDeleteSlide?.(slideData.id); }}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDeleteTrigger?.(slideData.id); }}
               variant="danger"
               mode="square"
-              size="xs"
+              size="sm"
               icon={globalIcons.trash}
-              title="Slide Sil"
+              title="AFİŞİ SİL"
             />
           </motion.div>
         )}

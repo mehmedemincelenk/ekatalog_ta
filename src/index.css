@@ -31,11 +31,17 @@
 }
 
 @layer base {
+  html {
+    /* RASYONEL FLUID ROOT: Katsayıyı 1.0vw yaparak dükkanın "büyüme hızını" laptop ekranları için rasyonelleştiriyorum. */
+    font-size: clamp(15px, 1.0vw, 26px);
+    scroll-behavior: smooth;
+  }
+  
   body {
     /* Sitenin genel zemin rengi ve ana yazı tipi */
     background-color: var(--bg-main);
     color: var(--text-main);
-    @apply font-sans selection:bg-stone-900 selection:text-white;
+    @apply font-sans selection:bg-stone-900 selection:text-white antialiased;
   }
 }
 
