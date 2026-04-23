@@ -12,8 +12,12 @@ import { Product, ProductAnalysis } from '../types';
 
 // --- CONFIGURATION & INITIALIZATION ---
 
+// SET THIS TO TRUE once you deploy your Supabase Edge Functions
+// Command: supabase functions deploy ai-orchestrator
+// And set secrets: supabase secrets set GEMINI_API_KEY=... PHOTOROOM_API_KEY=...
+const USE_EDGE_FUNCTIONS = import.meta.env.VITE_USE_EDGE_FUNCTIONS === 'true';
+
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
@@ -29,6 +33,8 @@ const GCP = {
     .trim(),
   LOCATION: import.meta.env.VITE_GCP_LOCATION || 'us-central1',
 };
+
+import { supabase } from '../supabase';
 
 // --- CORE HELPERS ---
 
@@ -81,6 +87,19 @@ export async function processProductInDiamondStudio(
   imageFile: File | Blob,
   apiKey: string,
 ): Promise<Blob> {
+  if (USE_EDGE_FUNCTIONS) {
+    const { data, error } = await supabase.functions.invoke('ai-orchestrator', {
+      body: {
+        action: 'photoroom',
+        payload: {
+          image: await fileToBase64(imageFile),
+        },
+      },
+    });
+    if (error) throw error;
+    return data; // Assuming Edge Function returns the blob directly
+  }
+
   if (!apiKey) throw new Error('Photoroom API anahtarı eksik.');
   const formPayload = new FormData();
   formPayload.append('imageFile', imageFile);
@@ -143,6 +162,20 @@ export async function processInOpenAIStudio(imageFile: File | Blob): Promise<Blo
  * Vertex AI: Imagen 3 professional reconstruction.
  */
 export async function reconstructProductInVertexStudio(imageFile: File | Blob): Promise<Blob> {
+  if (USE_EDGE_FUNCTIONS) {
+    const { data, error } = await supabase.functions.invoke('ai-orchestrator', {
+      body: {
+        action: 'vertex',
+        payload: {
+          image: await fileToBase64(imageFile),
+          prompt: 'Professional catalog product shot, white studio background.',
+        },
+      },
+    });
+    if (error) throw error;
+    return base64ToBlob(data.predictions[0].bytesBase64Encoded, 'image/png');
+  }
+
   if (!GCP.PROJECT_ID || !GCP.PRIVATE_KEY) throw new Error('Vertex AI kimlik bilgileri eksik.');
   
   const privateKey = await jose.importPKCS8(GCP.PRIVATE_KEY, 'RS256');
@@ -233,14 +266,43 @@ export async function refineProductTexts(product: Partial<Product>): Promise<{ n
     return { name: polishedName, description: formatted };
   };
 
+  if (USE_EDGE_FUNCTIONS) {
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-orchestrator', {
+        body: {
+          action: 'refine-text',
+          payload: {
+            prompt: `Senior Copywriter role. JSON output for product: Name: ${product.name}, Desc: ${product.description}`,
+          },
+        },
+      });
+      if (error) throw error;
+      const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const match = raw.match(/\{[\s\S]*\}/);
+      return match ? JSON.parse(match[0]) : localFallback();
+    } catch (e) {
+      console.error('Edge Function Error:', e);
+      return localFallback();
+    }
+  }
+
   if (!GEMINI_API_KEY) return localFallback();
 
   try {
+    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
     const res = await fetch(GEMINI_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: `Senior Copywriter role. JSON output for product: Name: ${product.name}, Desc: ${product.description}` }] }],
+        contents: [
+          {
+            parts: [
+              {
+                text: `Senior Copywriter role. JSON output for product: Name: ${product.name}, Desc: ${product.description}`,
+              },
+            ],
+          },
+        ],
       }),
     });
     const data = await res.json();

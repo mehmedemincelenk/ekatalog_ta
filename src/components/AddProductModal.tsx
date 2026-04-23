@@ -18,7 +18,7 @@ import {
   ProductImagePickerProps,
   ProductCategorySelectorProps,
 } from '../types';
-import { useStore } from '../store/useStore';
+import { useStore } from '../store';
 
 const INITIAL_FORM_STATE = {
   productName: '',

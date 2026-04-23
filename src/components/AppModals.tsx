@@ -10,180 +10,190 @@ import PriceListModal from './PriceListModal';
 import GlobalAddMenuModal from './GlobalAddMenuModal';
 import AIStudioCompareModal from './AIStudioCompareModal';
 
-import { AppModalsProps } from '../types';
+import { useStore } from '../store';
+import { useProducts } from '../hooks/useProductsHub';
+import { useAdminMode } from '../hooks/useAdminMode';
+import { useDiscount } from '../hooks/useDiscount';
 
 /**
  * APP MODALS CONTAINER (DIAMOND EDITION)
  * -----------------------------------------------------------
  * Centralizes all global application modals to keep App.tsx clean.
- * Leverages AnimatePresence for smooth transitions.
+ * Now fully data-driven via useStore (Zustand).
  */
-const AppModals = memo(
-  ({
+const AppModals = memo(() => {
+  const {
+    activeModal,
+    modalData,
+    closeModal,
     isAdmin,
     settings,
-    categoryOrder,
-    allProducts,
-
-    // Modal States
-    isAddModalOpen,
-    setIsAddModalOpen,
-    isBulkUpdateModalOpen,
-    setIsBulkUpdateModalOpen,
-    isDisplaySettingsOpen,
-    setIsDisplaySettingsOpen,
-    isQRModalOpen,
-    setIsQRModalOpen,
-    isPinModalOpen,
-    setIsPinModalOpen,
-    isCouponModalOpen,
-    setIsCouponModalOpen,
-    isPriceListModalOpen,
-    setIsPriceListModalOpen,
-    isGlobalAddMenuOpen,
-    setIsGlobalAddMenuOpen,
-    aiStudioProduct,
-    setAiStudioProduct,
-    pendingAddCategory,
-    setPendingAddCategory,
-
-    // Action Handlers
-    addProduct,
-    uploadImage,
-    updateProduct,
+    searchQuery,
     updateSetting,
-    executeGranularBulkActions,
-    handleGlobalAddAction,
+    activeDiscount,
+    visitorCurrency
+  } = useStore();
 
-    // Admin / Auth Logic
+  const {
+    products,
+    allProducts,
+    categoryOrder,
+    addProduct,
+    updateProduct,
+    uploadImage,
+    executeGranularBulkActions,
+    addCategory
+  } = useProducts(searchQuery, [], isAdmin, settings);
+
+  const {
     verifyPinWithServer,
     onPinSuccess,
     isLockedOut,
     failedAttempts,
     isInlineEnabled,
-    toggleInlineEdit,
+    toggleInlineEdit
+  } = useAdminMode();
 
-    // Marketing / Price Logic
-    applyCode,
-    activeDiscount,
-    discountError,
-    displayCurrency,
-  }: AppModalsProps) => {
-    return (
-      <>
-        <QRModal
-          isOpen={isQRModalOpen}
-          onClose={() => setIsQRModalOpen(false)}
-        />
+  const { applyCode, error: discountError } = useDiscount();
 
-        <AnimatePresence>
-          {isAdmin && (
-            <>
-              <AddProductModal
-                isModalOpen={isAddModalOpen}
-                onModalClose={() => {
-                  setIsAddModalOpen(false);
-                  setPendingAddCategory(undefined);
-                }}
-                onProductAddition={async (data, file) => {
-                  const newId = await addProduct(data);
-                  if (file && newId) {
-                    await uploadImage({ id: newId, file });
-                  }
-                }}
-                availableCategories={categoryOrder}
-                initialCategory={pendingAddCategory}
-              />
+  const displayCurrency = isAdmin
+    ? settings?.activeCurrency || 'TRY'
+    : visitorCurrency;
 
-              <BulkPriceUpdateModal
-                isOpen={isBulkUpdateModalOpen}
-                onClose={() => setIsBulkUpdateModalOpen(false)}
-                allProducts={allProducts}
-                categories={categoryOrder}
-                onGranularUpdate={executeGranularBulkActions}
-              />
+  const handleGlobalAddAction = (
+    type: 'PRODUCT' | 'CATEGORY' | 'REFERENCE' | 'CAROUSEL',
+  ) => {
+    if (type === 'PRODUCT') {
+      // Just switch the active modal
+      useStore.getState().openModal('ADD_PRODUCT');
+    } else if (type === 'CATEGORY') {
+      const name = window.prompt('Yeni Reyon/Kategori Adı:');
+      if (name) addCategory(name);
+    } else if (type === 'REFERENCE') {
+      const name = window.prompt('Yeni Referans/İş Ortağı Adı:');
+      if (name) {
+        const currentRefs = settings?.referencesData || [];
+        updateSetting('referencesData', [
+          ...currentRefs,
+          { id: Date.now(), name, logo: '' },
+        ]);
+      }
+    } else if (type === 'CAROUSEL') {
+      window.dispatchEvent(new CustomEvent('ekatalog:add-carousel-slide'));
+    }
+  };
 
-              {settings && (
-                <DisplaySettingsModal
-                  key={isDisplaySettingsOpen ? 'active' : 'inactive'}
-                  isOpen={isDisplaySettingsOpen}
-                  onClose={() => setIsDisplaySettingsOpen(false)}
-                  settings={settings}
-                  updateSetting={updateSetting}
-                  isInlineEnabled={isInlineEnabled}
-                  onToggleInline={toggleInlineEdit}
-                />
-              )}
+  return (
+    <>
+      <QRModal
+        isOpen={activeModal === 'QR'}
+        onClose={closeModal}
+      />
 
-              <GlobalAddMenuModal
-                isOpen={isGlobalAddMenuOpen}
-                onClose={() => setIsGlobalAddMenuOpen(false)}
-                onAction={handleGlobalAddAction}
-              />
-            </>
-          )}
-        </AnimatePresence>
-
-        <AnimatePresence>
-          {isPinModalOpen && (
-            <PinModal
-              isModalOpen={true}
-              onVerify={verifyPinWithServer}
-              onAuthenticationSuccess={onPinSuccess}
-              onModalClose={() => setIsPinModalOpen(false)}
-              isLockedOut={isLockedOut}
-              failedAttempts={failedAttempts}
+      <AnimatePresence>
+        {isAdmin && (
+          <>
+            <AddProductModal
+              isModalOpen={activeModal === 'ADD_PRODUCT'}
+              onModalClose={closeModal}
+              onProductAddition={async (data, file) => {
+                const newId = await addProduct(data);
+                if (file && newId) {
+                  await uploadImage({ id: newId, file });
+                }
+              }}
+              availableCategories={categoryOrder}
+              initialCategory={modalData?.category}
             />
-          )}
-        </AnimatePresence>
 
-        <CouponModal
-          key={isCouponModalOpen ? 'active' : 'inactive'}
-          isOpen={isCouponModalOpen}
-          onClose={() => setIsCouponModalOpen(false)}
-          onApplyDiscount={applyCode}
-          activeDiscount={activeDiscount}
-          discountError={discountError}
-        />
+            <BulkPriceUpdateModal
+              isOpen={activeModal === 'BULK_UPDATE'}
+              onClose={closeModal}
+              allProducts={allProducts}
+              categories={categoryOrder}
+              onGranularUpdate={executeGranularBulkActions}
+            />
 
-        {settings && (
-          <PriceListModal
-            isOpen={isPriceListModalOpen}
-            onClose={() => setIsPriceListModalOpen(false)}
-            products={allProducts}
-            categories={categoryOrder}
-            displayCurrency={displayCurrency}
-            exchangeRates={settings.exchangeRates}
-            activeDiscount={activeDiscount}
-            storeName={settings.title || 'Katalog'}
+            {settings && (
+              <DisplaySettingsModal
+                key={activeModal === 'DISPLAY_SETTINGS' ? 'active' : 'inactive'}
+                isOpen={activeModal === 'DISPLAY_SETTINGS'}
+                onClose={closeModal}
+                settings={settings}
+                updateSetting={updateSetting}
+                isInlineEnabled={isInlineEnabled}
+                onToggleInline={toggleInlineEdit}
+              />
+            )}
+
+            <GlobalAddMenuModal
+              isOpen={activeModal === 'GLOBAL_ADD_MENU'}
+              onClose={closeModal}
+              onAction={handleGlobalAddAction}
+            />
+          </>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {activeModal === 'PIN' && (
+          <PinModal
+            isModalOpen={true}
+            onVerify={verifyPinWithServer}
+            onAuthenticationSuccess={onPinSuccess}
+            onModalClose={closeModal}
+            isLockedOut={isLockedOut}
+            failedAttempts={failedAttempts}
           />
         )}
+      </AnimatePresence>
 
-        <AIStudioCompareModal
-          isOpen={!!aiStudioProduct}
-          product={aiStudioProduct}
-          onClose={() => setAiStudioProduct(null)}
-          onApply={(productId, polishedUrl) => {
-            updateProduct({
-              id: productId,
-              changes: {
-                image_url: polishedUrl,
-                polished_ready_dismissed: true,
-              },
-            });
-            setAiStudioProduct(null);
-          }}
-          onDismiss={(productId) => {
-            updateProduct({
-              id: productId,
-              changes: { polished_ready_dismissed: true },
-            });
-            setAiStudioProduct(null);
-          }}
+      <CouponModal
+        key={activeModal === 'COUPON' ? 'active' : 'inactive'}
+        isOpen={activeModal === 'COUPON'}
+        onClose={closeModal}
+        onApplyDiscount={applyCode}
+        activeDiscount={activeDiscount}
+        discountError={discountError}
+      />
+
+      {settings && (
+        <PriceListModal
+          isOpen={activeModal === 'PRICE_LIST'}
+          onClose={closeModal}
+          products={allProducts}
+          categories={categoryOrder}
+          displayCurrency={displayCurrency}
+          exchangeRates={settings.exchangeRates}
+          activeDiscount={activeDiscount}
+          storeName={settings.title || 'Katalog'}
         />
-      </>
-    );
-  },
-);
+      )}
+
+      <AIStudioCompareModal
+        isOpen={activeModal === 'AI_STUDIO_COMPARE'}
+        product={modalData?.product}
+        onClose={closeModal}
+        onApply={(productId, polishedUrl) => {
+          updateProduct({
+            id: productId,
+            changes: {
+              image_url: polishedUrl,
+              polished_ready_dismissed: true,
+            },
+          });
+          closeModal();
+        }}
+        onDismiss={(productId) => {
+          updateProduct({
+            id: productId,
+            changes: { polished_ready_dismissed: true },
+          });
+          closeModal();
+        }}
+      />
+    </>
+  );
+});
 
 export default AppModals;

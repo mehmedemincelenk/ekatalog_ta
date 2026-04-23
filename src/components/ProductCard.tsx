@@ -20,6 +20,8 @@ import OrderSelector from './OrderSelector';
 import BaseModal from './BaseModal';
 import InfoHint from './InfoHint';
 import AIStudioTextModal from './AIStudioTextModal';
+import QuickEditModal from './QuickEditModal';
+import { useStore } from '../store';
 
 /**
  * PRODUCT CARD COMPONENT (100% Tokenized & Professional English)
@@ -46,6 +48,7 @@ const ProductCard = memo(
     displayCurrency = 'TRY',
     exchangeRates,
   }: ProductCardProps) => {
+    const { openModal } = useStore();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const cardContainerRef = useRef<HTMLElement>(null);
 
@@ -56,6 +59,11 @@ const ProductCard = memo(
       string | null
     >(null);
     const [isZoomDetailOpen, setIsZoomDetailOpen] = useState(false);
+    const [quickEdit, setQuickEdit] = useState<{
+      field: keyof Product;
+      value: string;
+      title: string;
+    } | null>(null);
 
     const setIsAdminMenuOpen = (isOpen: boolean) => {
       setActiveAdminProductId?.(isOpen ? product.id : null);
@@ -158,14 +166,11 @@ const ProductCard = memo(
 
     const handlePromptEdit = (field: keyof Product, label: string) => {
       if (!isAdmin || isInlineEnabled) return;
-      const currentVal = (product[field] as string) || '';
-      const newVal = window.prompt(`${label} düzenle:`, currentVal);
-      if (newVal !== null) {
-        handleDataFieldUpdate(
-          field,
-          field === 'price' ? standardizePriceInput(newVal) : newVal,
-        );
-      }
+      setQuickEdit({
+        field,
+        value: (product[field] as string) || '',
+        title: label,
+      });
     };
 
     // DISCOUNT & CURRENCY CALCULATION
@@ -284,9 +289,7 @@ const ProductCard = memo(
                             <Button
                               onClick={(e: React.MouseEvent) => {
                                 e.stopPropagation();
-                                window.__ekatalog_openAIStudioCompare?.(
-                                  product.id,
-                                );
+                                openModal('AI_STUDIO_COMPARE', { product });
                               }}
                               variant="primary"
                               mode="circle"
@@ -354,7 +357,14 @@ const ProductCard = memo(
               text={product.name}
               textClass={`${theme.typography.name} ${theme.typography.nameTransition} ${product.out_of_stock ? theme.typography.nameOutOfStock : ''}`}
               isAdmin={isAdmin}
-              onClick={() => handlePromptEdit('name', 'Ürün Adı')}
+              onClick={() => {
+                if (!isAdmin || isInlineEnabled) return;
+                setQuickEdit({
+                  field: 'name',
+                  value: product.name,
+                  title: 'Ürün Adı',
+                });
+              }}
               editableProps={
                 isAdmin && isInlineEnabled
                   ? {
@@ -539,6 +549,26 @@ const ProductCard = memo(
           onDismiss={handleDismissTextSuggestion}
           displayCurrency={displayCurrency}
           exchangeRates={exchangeRates}
+        />
+
+        <QuickEditModal
+          isOpen={!!quickEdit}
+          onClose={() => setQuickEdit(null)}
+          onSave={(newVal) => {
+            if (quickEdit) {
+              handleDataFieldUpdate(
+                quickEdit.field,
+                quickEdit.field === 'price'
+                  ? standardizePriceInput(newVal)
+                  : newVal,
+              );
+            }
+          }}
+          title={quickEdit?.title || ''}
+          subtitle={`Ürünün ${quickEdit?.title.toLowerCase()} bilgisini buradan güncelleyebilirsiniz.`}
+          initialValue={quickEdit?.value || ''}
+          placeholder={`${quickEdit?.title} girin...`}
+          type={quickEdit?.field === 'price' ? 'text' : 'text'}
         />
       </>
     );

@@ -1,25 +1,23 @@
 import { create } from 'zustand';
-import { CompanySettings } from '../types';
+import { CompanySettings, StoreState } from './types';
 
 /**
- * STORE / USESTORE.TS (DÜKKANIN ORTAK AKLI)
- * ---------------------------------------
+ * STORE.TS (DÜKKANIN ORTAK AKLI)
+ * ----------------------------
  * Dükkanın tüm global durumlarını (admin modu, ayarlar vb.)
  * merkezi bir yerden yöneten akıllı pano.
  */
 
-import { StoreState } from '../types';
-
 export const useStore = create<StoreState>((set) => ({
   // Admin Modu (Varsayılan kapalı)
   isAdmin: false,
-  setIsAdmin: (status) => set({ isAdmin: status }),
+  setIsAdmin: (status: boolean) => set({ isAdmin: status }),
 
   // Dükkan Ayarları
   settings: null,
-  setSettings: (settings) => set({ settings }),
-  updateSetting: (key, value) =>
-    set((state) => ({
+  setSettings: (settings: CompanySettings) => set({ settings }),
+  updateSetting: <K extends keyof CompanySettings>(key: K, value: CompanySettings[K]) =>
+    set((state: StoreState) => ({
       settings: state.settings
         ? ({ ...state.settings, [key]: value } as CompanySettings)
         : null,
@@ -27,13 +25,13 @@ export const useStore = create<StoreState>((set) => ({
 
   // Katalog UI Kontrolleri
   searchQuery: '',
-  setSearchQuery: (query) => set({ searchQuery: query }),
+  setSearchQuery: (query: string) => set({ searchQuery: query }),
 
   activeCategories: [],
-  toggleCategory: (category) =>
-    set((state) => ({
+  toggleCategory: (category: string) =>
+    set((state: StoreState) => ({
       activeCategories: state.activeCategories.includes(category)
-        ? state.activeCategories.filter((c) => c !== category)
+        ? state.activeCategories.filter((c: string) => c !== category)
         : [...state.activeCategories, category],
     })),
   clearCategories: () => set({ activeCategories: [] }),
@@ -44,7 +42,7 @@ export const useStore = create<StoreState>((set) => ({
       | 'USD'
       | 'EUR') || 'TRY',
   toggleVisitorCurrency: () =>
-    set((state) => {
+    set((state: StoreState) => {
       const cycle: Record<string, 'TRY' | 'USD' | 'EUR'> = {
         TRY: 'USD',
         USD: 'EUR',
@@ -57,5 +55,12 @@ export const useStore = create<StoreState>((set) => ({
 
   // Promosyonlar
   activeDiscount: null,
-  setActiveDiscount: (discount) => set({ activeDiscount: discount }),
+  setActiveDiscount: (discount: { code: string; rate: number; category?: string } | null) =>
+    set({ activeDiscount: discount }),
+
+  // UI / Modal Management
+  activeModal: null,
+  modalData: null,
+  openModal: (type, data = null) => set({ activeModal: type, modalData: data }),
+  closeModal: () => set({ activeModal: null, modalData: null }),
 }));

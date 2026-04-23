@@ -25,7 +25,7 @@ import { useProducts } from './hooks/useProductsHub';
 import { useAdminMode } from './hooks/useAdminMode';
 import { useDiscount } from './hooks/useDiscount';
 import { useSettings } from './hooks/useSettingsHub';
-import { useStore } from './store/useStore';
+import { useStore } from './store';
 import { getActiveStoreSlug } from './utils/store';
 
 /**
@@ -39,19 +39,17 @@ function CatalogView() {
     visitorCurrency,
     updateSetting,
     activeDiscount,
+    openModal,
+    setIsAdmin,
   } = useStore();
 
   const {
     handleLogoPointerDown,
     handleLogoPointerUp,
-    isPinModalOpen,
     setIsPinModalOpen,
-    isQRModalOpen,
-    setIsQRModalOpen,
     verifyPinWithServer,
     onPinSuccess,
     isInlineEnabled,
-    toggleInlineEdit,
     isLockedOut,
     failedAttempts,
   } = useAdminMode();
@@ -63,85 +61,25 @@ function CatalogView() {
     retry,
   } = useSettings(isAdmin);
 
-  const displayCurrency = isAdmin
-    ? settings?.activeCurrency || 'TRY'
-    : visitorCurrency;
-
   const {
     products,
     allProducts,
     categoryOrder,
-    addProduct,
-    updateProduct,
     deleteProduct,
+    updateProduct,
     reorderCategory: updateCategoryOrder,
     reorderProductsInCategory,
     renameCategory,
     addCategory,
-    executeGranularBulkActions,
     uploadImage,
     loading: productsLoading,
   } = useProducts(search, [], isAdmin, settings);
 
-  const { applyCode, error: discountError } = useDiscount();
-
   // Otopilot: Sync Metadata
   useSyncMetadata(settings, isAdmin);
 
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isBulkUpdateModalOpen, setIsBulkUpdateModalOpen] = useState(false);
-  const [isDisplaySettingsOpen, setIsDisplaySettingsOpen] = useState(false);
-  const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
-  const [isPriceListModalOpen, setIsPriceListModalOpen] = useState(false);
-  const [isGlobalAddMenuOpen, setIsGlobalAddMenuOpen] = useState(false);
-  const [activeAdminProductId, setActiveAdminProductId] = useState<
-    string | null
-  >(null);
   const [visibleCategoryLimit, setVisibleCategoryLimit] = useState(2);
-  const [aiStudioProduct, setAiStudioProduct] = useState<Product | null>(null);
-  const [pendingAddCategory, setPendingAddCategory] = useState<
-    string | undefined
-  >(undefined);
 
-  const handleOpenAddModal = (category?: string) => {
-    setPendingAddCategory(category);
-    setIsAddModalOpen(true);
-  };
-
-  const handleGlobalAddAction = (
-    type: 'PRODUCT' | 'CATEGORY' | 'REFERENCE' | 'CAROUSEL',
-  ) => {
-    if (type === 'PRODUCT') setIsAddModalOpen(true);
-    else if (type === 'CATEGORY') {
-      const name = window.prompt('Yeni Reyon/Kategori Adı:');
-      if (name) {
-        const addCategoryFn = window.__ekatalog_addCategory;
-        if (addCategoryFn) addCategoryFn(name);
-      }
-    } else if (type === 'REFERENCE') {
-      const name = window.prompt('Yeni Referans/İş Ortağı Adı:');
-      if (name) {
-        const currentRefs = settings?.referencesData || [];
-        updateSetting('referencesData', [
-          ...currentRefs,
-          { id: Date.now(), name, logo: '' },
-        ]);
-      }
-    } else if (type === 'CAROUSEL') {
-      window.dispatchEvent(new CustomEvent('ekatalog:add-carousel-slide'));
-    }
-  };
-
-  // Bridge for Global Actions & Diamond Studio
-  useEffect(() => {
-    window.__ekatalog_addCategory = (name: string) => {
-      addCategory(name);
-    };
-    window.__ekatalog_openAIStudioCompare = (productId: string) => {
-      const p = allProducts.find((x) => x.id === productId);
-      if (p) setAiStudioProduct(p);
-    };
-  }, [addCategory, allProducts]);
 
   if (settingsLoading || productsLoading) {
     return (
@@ -186,16 +124,7 @@ function CatalogView() {
           onLogoPointerDown={handleLogoPointerDown}
           onLogoPointerUp={handleLogoPointerUp}
         />
-        {isPinModalOpen && (
-          <PinModal
-            isModalOpen={isPinModalOpen}
-            onModalClose={() => setIsPinModalOpen(false)}
-            onAuthenticationSuccess={onPinSuccess}
-            onVerify={verifyPinWithServer}
-            isLockedOut={isLockedOut}
-            failedAttempts={failedAttempts}
-          />
-        )}
+        <AppModals />
       </>
     );
   }
@@ -232,9 +161,7 @@ function CatalogView() {
               onImageUpload={(id, file) => uploadImage({ id, file })}
               visibleCategoryLimit={visibleCategoryLimit}
               onLoadMore={() => setVisibleCategoryLimit((prev) => prev + 3)}
-              onAddClick={handleOpenAddModal}
-              activeAdminProductId={activeAdminProductId}
-              setActiveAdminProductId={setActiveAdminProductId}
+              onAddClick={(cat) => openModal('ADD_PRODUCT', { category: cat })}
               visitorCurrency={visitorCurrency}
             />
           </div>
@@ -255,8 +182,8 @@ function CatalogView() {
       {!isAdmin && (
         <div className="fixed bottom-2 right-2 z-[90] print:hidden">
           <FloatingGuestMenu
-            onCouponClick={() => setIsCouponModalOpen(true)}
-            onExcelClick={() => setIsPriceListModalOpen(true)}
+            onCouponClick={() => openModal('COUPON')}
+            onExcelClick={() => openModal('PRICE_LIST')}
             onSearchClick={() => {
               window.scrollTo({ top: 0, behavior: 'smooth' });
               setTimeout(() => {
@@ -266,7 +193,7 @@ function CatalogView() {
                 if (searchInput) searchInput.focus({ preventScroll: true });
               }, 800);
             }}
-            onQRClick={() => setIsQRModalOpen(true)}
+            onQRClick={() => openModal('QR')}
           />
         </div>
       )}
@@ -281,56 +208,15 @@ function CatalogView() {
             className="fixed bottom-2 right-2 z-[150] print:hidden"
           >
             <FloatingAdminMenu
-              onProductAddTrigger={() => setIsGlobalAddMenuOpen(true)}
-              onBulkUpdateTrigger={() => setIsBulkUpdateModalOpen(true)}
-              onSettingsTrigger={() => setIsDisplaySettingsOpen(true)}
+              onProductAddTrigger={() => openModal('GLOBAL_ADD_MENU')}
+              onBulkUpdateTrigger={() => openModal('BULK_UPDATE')}
+              onSettingsTrigger={() => openModal('DISPLAY_SETTINGS')}
             />
           </motion.div>
         )}
       </AnimatePresence>
 
-      <AppModals
-        isAdmin={isAdmin}
-        settings={settings}
-        categoryOrder={categoryOrder}
-        allProducts={allProducts}
-        isAddModalOpen={isAddModalOpen}
-        setIsAddModalOpen={setIsAddModalOpen}
-        isBulkUpdateModalOpen={isBulkUpdateModalOpen}
-        setIsBulkUpdateModalOpen={setIsBulkUpdateModalOpen}
-        isDisplaySettingsOpen={isDisplaySettingsOpen}
-        setIsDisplaySettingsOpen={setIsDisplaySettingsOpen}
-        isQRModalOpen={isQRModalOpen}
-        setIsQRModalOpen={setIsQRModalOpen}
-        isPinModalOpen={isPinModalOpen}
-        setIsPinModalOpen={setIsPinModalOpen}
-        isCouponModalOpen={isCouponModalOpen}
-        setIsCouponModalOpen={setIsCouponModalOpen}
-        isPriceListModalOpen={isPriceListModalOpen}
-        setIsPriceListModalOpen={setIsPriceListModalOpen}
-        isGlobalAddMenuOpen={isGlobalAddMenuOpen}
-        setIsGlobalAddMenuOpen={setIsGlobalAddMenuOpen}
-        aiStudioProduct={aiStudioProduct}
-        setAiStudioProduct={setAiStudioProduct}
-        pendingAddCategory={pendingAddCategory}
-        setPendingAddCategory={setPendingAddCategory}
-        addProduct={addProduct}
-        uploadImage={uploadImage}
-        updateProduct={updateProduct}
-        updateSetting={updateSetting}
-        executeGranularBulkActions={executeGranularBulkActions}
-        handleGlobalAddAction={handleGlobalAddAction}
-        verifyPinWithServer={verifyPinWithServer}
-        onPinSuccess={onPinSuccess}
-        isLockedOut={isLockedOut}
-        failedAttempts={failedAttempts}
-        isInlineEnabled={isInlineEnabled}
-        toggleInlineEdit={toggleInlineEdit}
-        applyCode={applyCode}
-        activeDiscount={activeDiscount}
-        discountError={discountError}
-        displayCurrency={displayCurrency}
-      />
+      <AppModals />
     </div>
   );
 }

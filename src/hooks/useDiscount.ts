@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { TECH, LABELS } from '../data/config';
-import { useStore } from '../store/useStore';
+import { useStore } from '../store';
 
 import { ActiveDiscount } from '../types';
 

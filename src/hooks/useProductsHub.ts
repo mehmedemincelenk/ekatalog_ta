@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../supabase';
 import { Product, NewProductPayload, CompanySettings } from '../types';
 import { getActiveStoreSlug } from '../utils/store';
-import { useStore } from '../store/useStore';
+import { useStore } from '../store';
 import { useProductStorage } from './useProductStorage';
 import { smartSearch } from '../utils/ai';
 import { TECH, sortCategories } from '../data/config';
@@ -21,20 +21,22 @@ const STORE_SLUG = getActiveStoreSlug();
 
 // --- 1. QUERY HOOK (Data Layer) ---
 
-export function useProductsQuery() {
+export function useProductsQuery(storeId?: string) {
   return useQuery<Product[]>({
-    queryKey: ['products', STORE_SLUG],
+    queryKey: ['products', storeId],
     queryFn: async () => {
+      if (!storeId) return [];
       const { data, error } = await supabase
         .from('prods')
         .select('*')
-        .eq('store_slug', STORE_SLUG)
+        .eq('store_id', storeId)
         .order('sort_order', { ascending: true })
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       return data || [];
     },
+    enabled: !!storeId,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
@@ -44,7 +46,7 @@ export function useProductsQuery() {
 export function useProductsActions() {
   const queryClient = useQueryClient();
   const { settings } = useStore();
-  const queryKey = ['products', STORE_SLUG];
+  const queryKey = ['products', settings?.id];
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, changes }: { id: string; changes: Partial<Product> }) => {
@@ -75,11 +77,12 @@ export function useProductsActions() {
 
   const renameCategoryMutation = useMutation({
     mutationFn: async ({ oldName, newName }: { oldName: string; newName: string }) => {
+      if (!settings?.id) throw new Error('Mağaza ID bulunamadı');
       const { error } = await supabase
         .from('prods')
         .update({ category: newName })
         .eq('category', oldName)
-        .eq('store_slug', STORE_SLUG);
+        .eq('store_id', settings.id);
       if (error) throw error;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey }),
@@ -143,29 +146,43 @@ export function useProductsActions() {
         is_archived?: boolean;
       }[],
     ) => {
-      for (const action of actions) {
-        if (action.delete) {
-          await supabase.from('prods').delete().eq('id', action.productId);
-        } else {
-          const update: Partial<Product> = {};
-          if (action.newPrice !== undefined) {
-            const { formatNumberToCurrency } = await import('../utils/price');
-            update.price = formatNumberToCurrency(action.newPrice);
-          }
-          if (action.category !== undefined) update.category = action.category;
-          if (action.out_of_stock !== undefined)
-            update.out_of_stock = action.out_of_stock;
-          if (action.is_archived !== undefined)
-            update.is_archived = action.is_archived;
+      if (!actions.length) return;
 
-          if (Object.keys(update).length > 0) {
-            await supabase
-              .from('prods')
-              .update(update)
-              .eq('id', action.productId);
-          }
+      const deleteIds = actions.filter((a) => a.delete).map((a) => a.productId);
+      const updates = actions.filter((a) => !a.delete);
+
+      // 1. ATOMIC DELETE: Tek seferde tüm silmeleri yap
+      const deletePromise = deleteIds.length
+        ? supabase.from('prods').delete().in('id', deleteIds)
+        : Promise.resolve({ error: null });
+
+      // 2. PARALLEL UPDATES: Güncellemeleri paralel koştur (Promise.all)
+      const updatePromises = updates.map(async (action) => {
+        const update: Partial<Product> = {};
+        if (action.newPrice !== undefined) {
+          const { formatNumberToCurrency } = await import('../utils/price');
+          update.price = formatNumberToCurrency(action.newPrice);
         }
-      }
+        if (action.category !== undefined) update.category = action.category;
+        if (action.out_of_stock !== undefined)
+          update.out_of_stock = action.out_of_stock;
+        if (action.is_archived !== undefined)
+          update.is_archived = action.is_archived;
+
+        if (Object.keys(update).length > 0) {
+          return supabase.from('prods').update(update).eq('id', action.productId);
+        }
+        return Promise.resolve({ error: null });
+      });
+
+      const [deleteRes, ...updateResults] = await Promise.all([
+        deletePromise,
+        ...updatePromises,
+      ]);
+
+      if (deleteRes.error) throw deleteRes.error;
+      const firstUpdateError = updateResults.find((r) => r.error);
+      if (firstUpdateError?.error) throw firstUpdateError.error;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey }),
   });
@@ -218,7 +235,7 @@ export function useCatalogEngine(products: Product[], categoryOrder: string[], a
 // --- 4. COORDINATOR HOOK (Main Entry) ---
 
 export function useProducts(searchQuery: string, activeCategories: string[], isAdmin: boolean, settings: CompanySettings | null) {
-  const { data: allProducts = [], isLoading: productsLoading } = useProductsQuery();
+  const { data: allProducts = [], isLoading: productsLoading } = useProductsQuery(settings?.id);
   const actions = useProductsActions();
 
   const filteredProducts = useMemo(() => {

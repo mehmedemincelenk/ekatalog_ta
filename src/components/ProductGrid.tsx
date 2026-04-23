@@ -8,7 +8,7 @@ import PlusPlaceholder from './PlusPlaceholder';
 import SocialProofCard from './SocialProofCard';
 import Button from './Button';
 import { EditProdCard } from './EditProdCard';
-import { useStore } from '../store/useStore';
+import { useStore } from '../store';
 import { useCatalogEngine } from '../hooks/useProductsHub';
 import { ProductGridProps } from '../types';
 

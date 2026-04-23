@@ -1,7 +1,8 @@
-import { memo, useRef, useCallback } from 'react';
+import { memo, useRef, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { THEME } from '../data/config';
 import OrderSelector from './OrderSelector';
+import QuickEditModal from './QuickEditModal';
 import { CategoryFilterChipProps } from '../types';
 
 /**
@@ -24,17 +25,15 @@ const CategoryFilterChip = memo(
   }: CategoryFilterChipProps) => {
     const chipTheme = THEME.searchFilter.categoryList.chip;
     const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+    const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
 
     // LONG PRESS LOGIC: Elegant way to trigger rename for admins
     const handlePointerDown = useCallback(() => {
       if (!isAdminMode) return;
       longPressTimer.current = setTimeout(() => {
-        const newName = window.prompt('Reyon adını değiştir:', categoryName);
-        if (newName && newName.trim() && newName !== categoryName) {
-          onRename(categoryName, newName.trim());
-        }
+        setIsRenameModalOpen(true);
       }, 600); // 600ms is the "Diamond Standard" for long press
-    }, [isAdminMode, categoryName, onRename]);
+    }, [isAdminMode]);
 
     const handlePointerUp = useCallback(() => {
       if (longPressTimer.current) {
@@ -95,6 +94,20 @@ const CategoryFilterChip = memo(
             {categoryName}
           </span>
         </div>
+
+        <QuickEditModal
+          isOpen={isRenameModalOpen}
+          onClose={() => setIsRenameModalOpen(false)}
+          onSave={(newName) => {
+            if (newName && newName.trim() && newName !== categoryName) {
+              onRename(categoryName, newName.trim());
+            }
+          }}
+          title="Reyon Adını Değiştir"
+          subtitle="Bu reyonun adını güncelleyerek dükkan nizamını koruyabilirsiniz."
+          initialValue={categoryName}
+          placeholder="Yeni reyon adı girin..."
+        />
       </div>
     );
   },

@@ -1,5 +1,5 @@
 import { THEME } from '../data/config';
-import { useStore } from '../store/useStore';
+import { useStore } from '../store';
 import { memo } from 'react';
 
 const Footer = memo(function Footer() {

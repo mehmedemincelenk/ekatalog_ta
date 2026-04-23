@@ -6,7 +6,7 @@ import InfoHint from './InfoHint';
 import PlusPlaceholder from './PlusPlaceholder';
 import CategoryFilterChip from './CategoryFilterChip';
 import { useDebounce } from '../hooks/useCommon';
-import { useStore } from '../store/useStore';
+import { useStore } from '../store';
 import { SearchFilterProps } from '../types';
 
 /**

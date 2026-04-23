@@ -3,7 +3,7 @@ import { renderHook, act } from '@testing-library/react';
 import { useAdminMode } from './useAdminMode';
 
 
-vi.mock('../lib/supabase', () => ({
+vi.mock('../supabase', () => ({
   supabase: {
     rpc: vi.fn((fnName: string, args: { target_slug: string; input_pin: string }) => {
       if (fnName === 'verify_admin_access') {

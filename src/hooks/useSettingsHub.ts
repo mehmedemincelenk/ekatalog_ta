@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '../lib/supabase';
-import { useStore } from '../store/useStore';
+import { supabase } from '../supabase';
+import { useStore } from '../store';
 import { getActiveStoreSlug } from '../utils/store';
 import { fetchCurrentRates } from '../utils/price';
 import { CompanySettings } from '../types';

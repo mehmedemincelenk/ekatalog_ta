@@ -2,7 +2,7 @@
 // DEPENDS ON: Supabase, Image Utils, TECH config
 // CONSUMED BY: HeroCarousel.tsx
 import { useState, useCallback, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../supabase';
 import { CAROUSEL, TECH } from '../data/config';
 import { getActiveStoreSlug } from '../utils/store';
 

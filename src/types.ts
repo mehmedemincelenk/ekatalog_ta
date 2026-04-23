@@ -580,6 +580,19 @@ export interface BulkPriceUpdateModalProps {
   ) => Promise<void>;
 }
 
+export type ModalType =
+  | 'ADD_PRODUCT'
+  | 'BULK_UPDATE'
+  | 'DISPLAY_SETTINGS'
+  | 'QR'
+  | 'PIN'
+  | 'COUPON'
+  | 'PRICE_LIST'
+  | 'GLOBAL_ADD_MENU'
+  | 'AI_STUDIO_TEXT'
+  | 'AI_STUDIO_COMPARE'
+  | null;
+
 export interface StoreState {
   isAdmin: boolean;
   setIsAdmin: (status: boolean) => void;
@@ -600,6 +613,12 @@ export interface StoreState {
   setActiveDiscount: (
     discount: { code: string; rate: number; category?: string } | null,
   ) => void;
+
+  // UI / Modal Management
+  activeModal: ModalType;
+  modalData: any;
+  openModal: (type: ModalType, data?: any) => void;
+  closeModal: () => void;
 }
 
 export interface AIStudioTextModalProps {
@@ -622,14 +641,3 @@ export interface AIStudioCompareModalProps {
   onDismiss: (productId: string) => void;
 }
 
-declare global {
-  interface Window {
-    __ekatalog_addCategory: (name: string) => void;
-    __ekatalog_addProduct: (category?: string) => void;
-    __ekatalog_addReference: () => void;
-    __ekatalog_addCarousel: () => void;
-    __ekatalog_openSettings: () => void;
-    __ekatalog_openAIStudio: (productId: string) => void;
-    __ekatalog_openAIStudioCompare: (productId: string) => void;
-  }
-}

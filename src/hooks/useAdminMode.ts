@@ -3,9 +3,9 @@
 // CONSUMED BY: App.tsx, Navbar.tsx, Protected Components
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { TECH, STORAGE } from '../data/config';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../supabase';
 import { getActiveStoreSlug } from '../utils/store';
-import { useStore } from '../store/useStore';
+import { useStore } from '../store';
 
 const STORE_SLUG = getActiveStoreSlug();
 
