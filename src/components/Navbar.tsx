@@ -17,6 +17,7 @@ import QuickEditModal from './QuickEditModal';
  * Fully utilizes atomic Button component for all header interactions.
  */
 
+import { useSettings } from '../hooks/useSettingsHub';
 import { useStore } from '../store';
 
 import { NavbarProps } from '../types';
@@ -26,10 +27,11 @@ const Navbar = memo(
     const {
       isAdmin,
       settings,
-      updateSetting,
       searchQuery: search,
       setSearchQuery: onSearchChange,
     } = useStore();
+
+    const { updateSetting } = useSettings(isAdmin);
 
     const theme = THEME.navbar;
     const globalIcons = THEME.icons;
@@ -63,12 +65,19 @@ const Navbar = memo(
 
     const handlePressStart = () => {
       setIsLogoPressed(true);
+      (window as any)._logoPressStart = Date.now();
       onLogoPointerDown();
     };
 
     const handlePressEnd = () => {
       setIsLogoPressed(false);
+      const holdDuration = Date.now() - (window as any)._logoPressStart;
       onLogoPointerUp();
+      
+      // Short click in Admin Mode -> Trigger Upload
+      if (isAdmin && holdDuration < 300) {
+        document.getElementById('logo-upload-input')?.click();
+      }
     };
 
     const handleWhatsAppAction = () => {
@@ -214,22 +223,28 @@ const Navbar = memo(
                     touchAction: 'none',
                   }}
                 >
-                  {/* UNIFIED LONG-PRESS DETECTOR OVERLAY */}
-                  <div
-                    className="absolute inset-0 z-[40] cursor-pointer touch-none"
-                    onPointerDown={handlePressStart}
-                    onPointerUp={handlePressEnd}
-                    onPointerLeave={handlePressEnd}
-                  />
+                  {/* FALLBACK ADMIN OVERLAY (Only active if logo is hidden) */}
+                  {!settings.displayConfig.showLogo && (
+                    <div
+                      className="absolute inset-0 z-[40] cursor-pointer touch-none"
+                      onPointerDown={handlePressStart}
+                      onPointerUp={handlePressEnd}
+                      onPointerLeave={handlePressEnd}
+                    />
+                  )}
 
                   {settings.displayConfig.showLogo && (
                     <div
-                      onClick={() =>
-                        isAdmin &&
-                        document.getElementById('logo-upload-input')?.click()
-                      }
                       className={`${theme.brand.logoWrapper} select-none touch-none cursor-pointer overflow-hidden flex items-center justify-center relative z-[30]`}
                     >
+                      {/* UNIFIED LONG-PRESS DETECTOR OVERLAY (RESTRICTED TO LOGO) */}
+                      <div
+                        className="absolute inset-0 z-[40] cursor-pointer touch-none"
+                        onPointerDown={handlePressStart}
+                        onPointerUp={handlePressEnd}
+                        onPointerLeave={handlePressEnd}
+                      />
+
                       <input
                         id="logo-upload-input"
                         type="file"
@@ -271,7 +286,7 @@ const Navbar = memo(
                           e.stopPropagation();
                           handleTextEdit('title', settings.title || settings.name || DEFAULT_COMPANY.name, 'Mağaza Adı');
                         }}
-                        className={`!text-[0.75rem] sm:!text-[0.9rem] font-black tracking-tighter text-stone-900 ${editStyle} ${isAdmin ? 'pointer-events-auto' : ''}`}
+                        className={`!text-[0.85rem] sm:!text-[0.9rem] font-black tracking-tighter text-stone-900 ${editStyle} ${isAdmin ? 'pointer-events-auto' : ''}`}
                       >
                         {settings.title || settings.name || DEFAULT_COMPANY.name}
                       </span>
@@ -299,7 +314,7 @@ const Navbar = memo(
                             'Slogan/Açıklama',
                           );
                         }}
-                        className={`!text-[0.45rem] sm:!text-[0.55rem] text-stone-400 font-medium ${editStyle} ${isAdmin ? 'pointer-events-auto' : ''}`}
+                        className={`!text-[0.55rem] sm:!text-[0.65rem] text-stone-400 font-medium ${editStyle} ${isAdmin ? 'pointer-events-auto' : ''}`}
                       >
                         {settings.subtitle || DEFAULT_COMPANY.tagline}
                       </span>
@@ -309,9 +324,9 @@ const Navbar = memo(
 
                 {/* SEARCH BOX */}
                 {settings.displayConfig.showSearch && (
-                  <div className="hidden sm:flex items-center w-full max-w-[7rem] lg:max-w-[9rem] ml-1 sm:ml-2">
+                  <div className="hidden sm:flex items-center w-full max-w-[10rem] lg:max-w-[14rem] ml-1 sm:ml-4">
                     <div className="relative w-full">
-                      <div className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-stone-400">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400">
                         {globalIcons.search}
                       </div>
                       <input
@@ -319,7 +334,7 @@ const Navbar = memo(
                         value={internalSearch}
                         onChange={(e) => setInternalSearch(e.target.value)}
                         placeholder="Ara..."
-                        className="w-full pl-7 pr-3 py-1.5 sm:py-2 border border-stone-200 text-[0.55rem] sm:text-[0.6rem] font-semibold text-stone-900 focus:ring-1 focus:ring-stone-900 outline-none transition-all duration-200 bg-stone-50/50 rounded-lg"
+                        className="w-full pl-9 pr-3 py-1.5 sm:py-2.5 border border-stone-200 text-[0.65rem] sm:text-[0.85rem] font-semibold text-stone-900 focus:ring-1 focus:ring-stone-900 outline-none transition-all duration-200 bg-stone-50/50 rounded-lg"
                       />
                     </div>
                   </div>
@@ -347,26 +362,26 @@ const Navbar = memo(
                       onClick={() =>
                         handleTextEdit('address', settings.address, 'Adres')
                       }
-                      className={`order-2 lg:order-1 !text-[0.45rem] lg:!text-[0.625rem] text-stone-400 hover:text-stone-900 transition-colors font-medium text-right lg:text-left leading-tight lg:whitespace-nowrap px-1 ${editStyle}`}
+                      className={`order-2 lg:order-1 !text-[0.45rem] lg:!text-[0.8rem] text-stone-400 hover:text-stone-900 transition-colors font-medium text-right lg:text-left leading-tight lg:whitespace-nowrap px-1 ${editStyle}`}
                     >
                       {settings.address}
                     </div>
                   )}
 
                   {/* Actions Group */}
-                  <div className="order-1 lg:order-2 flex items-center gap-1.5 sm:gap-2 shrink-0">
+                  <div className="order-1 lg:order-2 flex items-center gap-1 sm:gap-1.5 shrink-0">
                     {/* Instagram Button */}
                     {settings.displayConfig.showInstagram && (
                       <Button
                         onClick={handleInstagramAction}
-                        variant="secondary"
+                        variant="ghost"
                         mode="square"
                         size="sm"
-                        className={`!w-5 !h-5 sm:!w-6 sm:!h-6 !p-0 !bg-white/40 !backdrop-blur-md !border-white/10 ${isAdmin ? 'text-pink-600 ring-2 ring-pink-100' : 'text-stone-400 hover:text-pink-600 shadow-none'}`}
+                        className={`!w-6 !h-6 sm:!w-8 sm:!h-8 !p-0 !bg-transparent !border-none flex items-center justify-center ${isAdmin ? 'text-pink-600' : 'text-stone-400 hover:text-pink-600 shadow-none'}`}
                         icon={
                           <svg
                             viewBox="0 0 24 24"
-                            className="w-4 h-4 fill-current"
+                            className="w-4 h-4 sm:w-5 sm:h-5 fill-current"
                           >
                             <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
                           </svg>
@@ -380,9 +395,9 @@ const Navbar = memo(
                         onClick={handleWhatsAppAction}
                         variant="primary"
                         mode="rectangle"
-                        className="!bg-stone-900 !text-white !h-6 sm:!h-7 !px-2.5 !rounded-lg hover:!bg-black !shadow-lg border-white/10"
+                        className="!bg-stone-900 !text-white !px-2.5 !py-1 sm:!p-2.5 !rounded-lg hover:!bg-black !shadow-lg border-white/10"
                         icon={
-                          <div className="w-2.5 h-2.5 sm:w-3 sm:h-3">
+                          <div className="flex items-center justify-center w-2.5 h-2.5 sm:w-[1.05rem] sm:h-[1.05rem]">
                             {globalIcons.whatsapp}
                           </div>
                         }
@@ -400,7 +415,7 @@ const Navbar = memo(
                             e.key === 'Enter' &&
                             (e.preventDefault(), e.currentTarget.blur())
                           }
-                          className={`!text-[0.45rem] sm:!text-[0.55rem] font-black tracking-tight leading-none ${isAdmin && isInlineEnabled ? 'min-w-[40px] focus:bg-white/10' : ''}`}
+                          className={`!text-[0.6rem] sm:!text-[0.8rem] font-black tracking-tight leading-normal flex items-center ${isAdmin && isInlineEnabled ? 'min-w-[40px] focus:bg-white/10' : ''}`}
                         >
                           {settings.whatsapp || 'SİPARİŞ VER'}
                         </span>

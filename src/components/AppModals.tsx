@@ -13,6 +13,7 @@ import AIStudioCompareModal from './AIStudioCompareModal';
 import { useStore } from '../store';
 import { useProducts } from '../hooks/useProductsHub';
 import { useAdminMode } from '../hooks/useAdminMode';
+import { useSettings } from '../hooks/useSettingsHub';
 import { Product } from '../types';
 
 /**
@@ -29,12 +30,13 @@ const AppModals = memo(() => {
     isAdmin,
     settings,
     searchQuery,
-    updateSetting,
     activeDiscount,
     visitorCurrency,
     applyDiscountCode,
     discountError
   } = useStore();
+
+  const { updateSetting } = useSettings(isAdmin);
 
   const {
     allProducts,

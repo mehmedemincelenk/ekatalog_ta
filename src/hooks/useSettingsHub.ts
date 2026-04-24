@@ -33,7 +33,7 @@ export function useSettingsQuery() {
       const raw = settingsRes.data;
       const settings: CompanySettings = {
         id: raw.id,
-        title: raw.title,
+        title: raw.name || '',
         logoUrl: raw.logo_url,
         activeCurrency: raw.active_currency || 'TRY',
         categoryOrder: raw.category_order || DEFAULT_ORDER,
@@ -42,10 +42,10 @@ export function useSettingsQuery() {
         socialProofCards: raw.social_proof_cards || [],
         maintenanceMode: raw.maintenance_mode || { enabled: false, message: '' },
         exchangeRates: rates || { usd: 0, eur: 0 },
-        whatsapp: raw.whatsapp || '',
+        whatsapp: raw.phone || '',
         address: raw.address || '',
-        instagram: raw.instagram || '',
-        subtitle: raw.subtitle || '',
+        instagram: raw.instagram_url || '',
+        subtitle: raw.tagline || '',
         name: raw.name || '',
         displayConfig: raw.display_config || {},
         announcementBar: raw.announcement_bar || { enabled: false, text: '' },
@@ -79,7 +79,7 @@ export function useSettings(isAdmin: boolean) {
       if (!settings?.id) throw new Error('Settings not loaded');
 
       const dbMap: Record<string, string> = {
-        title: 'title',
+        title: 'name',
         logoUrl: 'logo_url',
         activeCurrency: 'active_currency',
         categoryOrder: 'category_order',
@@ -87,10 +87,10 @@ export function useSettings(isAdmin: boolean) {
         maintenanceMode: 'maintenance_mode',
         referencesData: 'references_data',
         socialProofCards: 'social_proof_cards',
-        whatsapp: 'whatsapp',
+        whatsapp: 'phone',
         address: 'address',
-        instagram: 'instagram',
-        subtitle: 'subtitle',
+        instagram: 'instagram_url',
+        subtitle: 'tagline',
         name: 'name',
         displayConfig: 'display_config',
         announcementBar: 'announcement_bar',
