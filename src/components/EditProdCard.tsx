@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 import { EditProdCardProps } from '../types';
-import { useScrollLock } from '../hooks/useUI';
+import { useScrollLock } from '../hooks/useCommon';
 import { downloadImage } from '../utils/image';
 
 /**
@@ -223,28 +223,66 @@ export const EditProdCard = memo(
               </div>
             </div>
 
-            {/* CATEGORY SELECTOR */}
-            <div className="space-y-3 border-t border-stone-100/60 pt-4">
-              <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest px-1">
-                Kategori Bilgisi
-              </label>
-              <div className="flex flex-wrap gap-1.5">
-                {(categories || []).map((categoryName) => (
-                  <Button
-                    key={categoryName}
-                    onClick={() => handleAction('CATEGORY', categoryName)}
-                    variant={
-                      product.category === categoryName
-                        ? 'primary'
-                        : 'secondary'
-                    }
-                    mode="rectangle"
-                    size="sm"
-                    className="!text-[10px] !py-1.5 !px-3 font-black"
-                  >
-                    {categoryName}
-                  </Button>
-                ))}
+            {/* TEXTUAL DATA HUB */}
+            <div className="space-y-4 border-t border-stone-100/60 pt-4">
+              <div className="space-y-1.5">
+                <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest px-1">
+                  Ürün Bilgileri
+                </label>
+                <input
+                  type="text"
+                  defaultValue={product.name}
+                  onBlur={(e) => onUpdate(product.id, { name: e.target.value })}
+                  placeholder="Ürün Adı"
+                  className="w-full bg-white border border-stone-100 rounded-2xl px-4 py-3 text-xs font-bold text-stone-900 focus:border-stone-900 transition-all outline-none"
+                />
+                <textarea
+                  defaultValue={product.description || ''}
+                  onBlur={(e) =>
+                    onUpdate(product.id, { description: e.target.value })
+                  }
+                  placeholder="Ürün Açıklaması"
+                  rows={2}
+                  className="w-full bg-white border border-stone-100 rounded-2xl px-4 py-3 text-xs font-bold text-stone-900 focus:border-stone-900 transition-all outline-none resize-none"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest px-1">
+                  Fiyatlandırma
+                </label>
+                <input
+                  type="text"
+                  defaultValue={product.price}
+                  onBlur={(e) => onUpdate(product.id, { price: e.target.value })}
+                  placeholder="Fiyat (Örn: 150,00)"
+                  className="w-full bg-white border border-stone-100 rounded-2xl px-4 py-3 text-xs font-bold text-stone-900 focus:border-stone-900 transition-all outline-none"
+                />
+              </div>
+
+              {/* CATEGORY SELECTOR */}
+              <div className="space-y-3 border-t border-stone-100/60 pt-2">
+                <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest px-1">
+                  Kategori Bilgisi
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {(categories || []).map((categoryName) => (
+                    <Button
+                      key={categoryName}
+                      onClick={() => handleAction('CATEGORY', categoryName)}
+                      variant={
+                        product.category === categoryName
+                          ? 'primary'
+                          : 'secondary'
+                      }
+                      mode="rectangle"
+                      size="sm"
+                      className="!text-[10px] !py-1.5 !px-3 font-black"
+                    >
+                      {categoryName}
+                    </Button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

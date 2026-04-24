@@ -72,7 +72,7 @@ export default function PinModal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className={theme.overlay}
+      className={`${theme.overlay} z-[999]`} // Standardized Top-Level Layer
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
@@ -113,7 +113,7 @@ export default function PinModal({
               key={i}
               className={`
                 ${theme.dotBase} 
-                ${i < currentPinAttempt.length ? theme.dotActive : theme.dotInactive}
+                ${i < currentPinAttempt.length ? (isVerifying && !hasAuthError ? 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]' : theme.dotActive) : theme.dotInactive}
                 ${hasAuthError ? theme.dotError : ''}
               `}
             />
@@ -155,7 +155,7 @@ export default function PinModal({
               key={num}
               disabled={isInputDisabled}
               onClick={() => handleDigitEntry(String(num))}
-              className={theme.keyButton}
+              className={`${theme.keyButton} active:scale-90 transition-transform`} // Haptic Feel
               variant="secondary"
               mode="circle"
             >
@@ -175,7 +175,7 @@ export default function PinModal({
           <Button
             disabled={isInputDisabled}
             onClick={() => handleDigitEntry('0')}
-            className={theme.keyButton}
+            className={`${theme.keyButton} active:scale-90 transition-transform`}
             variant="secondary"
             mode="circle"
           >
@@ -186,7 +186,7 @@ export default function PinModal({
             onClick={handleDeleteDigit}
             variant="ghost"
             mode="circle"
-            className={theme.deleteButton}
+            className={`${theme.deleteButton} active:scale-90 transition-transform`}
             icon={
               <div className={theme.deleteIconSize}>
                 {globalIcons.backspace}

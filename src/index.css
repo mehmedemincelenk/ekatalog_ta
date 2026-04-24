@@ -159,4 +159,15 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  /* SHIMMER EFFECT: Yüklenen görseller için premium parlama efekti */
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  .shimmer-animation {
+    background: linear-gradient(90deg, #f5f5f4 25%, #fafaf9 50%, #f5f5f4 75%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite linear;
+  }
 }

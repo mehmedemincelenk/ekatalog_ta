@@ -4,7 +4,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { TECH, STORAGE } from '../data/config';
 import { supabase } from '../supabase';
-import { getActiveStoreSlug } from '../utils/store';
+import { getActiveStoreSlug } from '../utils/core';
 import { useStore } from '../store';
 
 const STORE_SLUG = getActiveStoreSlug();
@@ -18,35 +18,7 @@ const STORE_SLUG = getActiveStoreSlug();
  * - Sunucu taraflı PIN doğrulama (RPC).
  */
 export function useAdminMode() {
-  const setIsAdminStore = useStore((state) => state.setIsAdmin);
-  const [isAdmin, setIsAdmin] = useState(() => {
-    return (
-      sessionStorage.getItem(STORAGE.adminSession) ===
-      TECH.auth.sessionActiveValue
-    );
-  });
-
-  // Sync with global store for vibe coding efficiency
-  useEffect(() => {
-    setIsAdminStore(isAdmin);
-  }, [isAdmin, setIsAdminStore]);
-
-  const [isPinModalOpen, setIsPinModalOpen] = useState(false);
-  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
-
-  // UX PREFERENCE: Local state for editing mode
-  const [isInlineEnabled, setIsInlineEnabled] = useState(() => {
-    const saved = localStorage.getItem('ekatalog_inline_edit_v1');
-    return saved !== null ? saved === 'true' : true;
-  });
-
-  const toggleInlineEdit = useCallback(() => {
-    setIsInlineEnabled((prev) => {
-      const newVal = !prev;
-      localStorage.setItem('ekatalog_inline_edit_v1', String(newVal));
-      return newVal;
-    });
-  }, []);
+  const { isAdmin, setIsAdmin, isInlineEnabled, toggleInlineEdit } = useStore();
 
   const [lockoutUntil, setLockoutUntil] = useState<number | null>(() => {
     const saved = sessionStorage.getItem('admin_lockout_until');
@@ -115,6 +87,8 @@ export function useAdminMode() {
     [failedAttempts, isLockedOut],
   );
 
+  const openModal = useStore((state) => state.openModal);
+
   // GESTURE ENGINE REFS
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const clickCountTimer = useRef<NodeJS.Timeout | null>(null);
@@ -127,7 +101,7 @@ export function useAdminMode() {
     setIsAdmin(false);
     sessionStorage.removeItem(STORAGE.adminSession);
     if (timeoutTimer.current) clearTimeout(timeoutTimer.current);
-  }, []);
+  }, [setIsAdmin]);
 
   // SESSION TIMEOUT
   const resetTimeout = useCallback(() => {
@@ -157,7 +131,7 @@ export function useAdminMode() {
   }, [isAdmin, resetTimeout]);
 
   // SMART TRIGGER LOGIC:
-  // 1. Long Press (1.5s) -> Admin PIN / Logout
+  // 1. Long Press (1.2s) -> Admin PIN / Logout
   // 2. Click then within 1s Long Press (0.8s) -> QR Modal
   const handleLogoPointerDown = useCallback(() => {
     if (longPressTimer.current) clearTimeout(longPressTimer.current);
@@ -168,16 +142,19 @@ export function useAdminMode() {
     longPressTimer.current = setTimeout(
       () => {
         if (isComboAttempt) {
-          setIsQRModalOpen(true);
+          openModal('QR');
           clickCount.current = 0; // Combo consumed
         } else {
-          if (isAdmin) logout();
-          else setIsPinModalOpen(true);
+          if (isAdmin) {
+            logout();
+          } else {
+            openModal('PIN');
+          }
         }
       },
-      isComboAttempt ? 800 : 1500,
+      isComboAttempt ? 800 : 1200,
     );
-  }, [isAdmin, logout]);
+  }, [isAdmin, logout, openModal]);
 
   const handleLogoPointerUp = useCallback(() => {
     if (longPressTimer.current) {
@@ -203,23 +180,21 @@ export function useAdminMode() {
     }
   }, []);
 
+  const closeModal = useStore((state) => state.closeModal);
+
   const onPinSuccess = useCallback(() => {
     setIsAdmin(true);
     sessionStorage.setItem(STORAGE.adminSession, TECH.auth.sessionActiveValue);
-    setIsPinModalOpen(false);
+    closeModal();
     // Reset click counts for hygiene
     clickCount.current = 0;
-  }, []);
+  }, [closeModal, setIsAdmin]);
 
   return {
     isAdmin,
     handleLogoPointerDown,
     handleLogoPointerUp,
     logout,
-    isPinModalOpen,
-    setIsPinModalOpen,
-    isQRModalOpen,
-    setIsQRModalOpen,
     verifyPinWithServer,
     onPinSuccess,
     isInlineEnabled,

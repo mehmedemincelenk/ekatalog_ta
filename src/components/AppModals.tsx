@@ -13,7 +13,7 @@ import AIStudioCompareModal from './AIStudioCompareModal';
 import { useStore } from '../store';
 import { useProducts } from '../hooks/useProductsHub';
 import { useAdminMode } from '../hooks/useAdminMode';
-import { useDiscount } from '../hooks/useDiscount';
+import { Product } from '../types';
 
 /**
  * APP MODALS CONTAINER (DIAMOND EDITION)
@@ -31,11 +31,12 @@ const AppModals = memo(() => {
     searchQuery,
     updateSetting,
     activeDiscount,
-    visitorCurrency
+    visitorCurrency,
+    applyDiscountCode,
+    discountError
   } = useStore();
 
   const {
-    products,
     allProducts,
     categoryOrder,
     addProduct,
@@ -53,8 +54,6 @@ const AppModals = memo(() => {
     isInlineEnabled,
     toggleInlineEdit
   } = useAdminMode();
-
-  const { applyCode, error: discountError } = useDiscount();
 
   const displayCurrency = isAdmin
     ? settings?.activeCurrency || 'TRY'
@@ -103,7 +102,7 @@ const AppModals = memo(() => {
                 }
               }}
               availableCategories={categoryOrder}
-              initialCategory={modalData?.category}
+              initialCategory={(modalData as { category?: string })?.category}
             />
 
             <BulkPriceUpdateModal
@@ -152,7 +151,7 @@ const AppModals = memo(() => {
         key={activeModal === 'COUPON' ? 'active' : 'inactive'}
         isOpen={activeModal === 'COUPON'}
         onClose={closeModal}
-        onApplyDiscount={applyCode}
+        onApplyDiscount={applyDiscountCode}
         activeDiscount={activeDiscount}
         discountError={discountError}
       />
@@ -172,7 +171,7 @@ const AppModals = memo(() => {
 
       <AIStudioCompareModal
         isOpen={activeModal === 'AI_STUDIO_COMPARE'}
-        product={modalData?.product}
+        product={(modalData as { product?: Product })?.product ?? null}
         onClose={closeModal}
         onApply={(productId, polishedUrl) => {
           updateProduct({

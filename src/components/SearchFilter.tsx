@@ -1,10 +1,10 @@
-import { useState, useMemo, memo, useEffect } from 'react';
-import { THEME, LABELS, sortCategories } from '../data/config';
+import { useState, memo, useEffect } from 'react';
+import { THEME, LABELS } from '../data/config';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from './Button';
-import InfoHint from './InfoHint';
 import PlusPlaceholder from './PlusPlaceholder';
 import CategoryFilterChip from './CategoryFilterChip';
+import QuickEditModal from './QuickEditModal';
 import { useDebounce } from '../hooks/useCommon';
 import { useStore } from '../store';
 import { SearchFilterProps } from '../types';
@@ -12,14 +12,13 @@ import { SearchFilterProps } from '../types';
 /**
  * SEARCH FILTER COMPONENT (DIAMOND EDITION)
  * -----------------------------------------------------------
- * Hybrid interaction engine:
- * - Mobile: Expandable reyon list with toggle.
- * - Desktop: Horizontal scroll/wrap with more/less pagination.
+ * Hybrid interaction engine for category navigation.
+ * Uses centralized analytics from useCatalogEngine.
  */
 const SearchFilter = memo(
   ({
-    products = [],
-    categoryOrder = [],
+    sortedList = [],
+    stats = {},
     renameCategory,
     onCategoryOrderChange,
     onAddCategory,
@@ -34,9 +33,8 @@ const SearchFilter = memo(
     } = useStore();
 
     const [internalSearch, setInternalSearch] = useState(search);
-    const [isMobileReyonOpen, setIsMobileReyonOpen] = useState(false);
-    const [isAllCategoriesVisiblePC, setIsAllCategoriesVisiblePC] =
-      useState(false);
+    const [isReyonOpen, setIsReyonOpen] = useState(false);
+    const [isAddingCategory, setIsAddingCategory] = useState(false);
 
     const displayConfig = settings?.displayConfig || {
       showSearch: true,
@@ -45,51 +43,32 @@ const SearchFilter = memo(
     const filterTheme = THEME.searchFilter;
     const globalIcons = THEME.icons;
 
-    // Diamond Search Sync: Use debounced value to prevent state thrashing
     const debouncedSearch = useDebounce(internalSearch, 400);
 
     useEffect(() => {
       onSearchChange(debouncedSearch);
     }, [debouncedSearch, onSearchChange]);
 
-    // Handle external search updates (e.g. from Floating Guest Menu)
     useEffect(() => {
       setInternalSearch(search);
     }, [search]);
 
-    // CATEGORY ANALYTICS: Group and sort for navigation
-    const { sortedList, stats } = useMemo(() => {
-      const foundInProducts = [
-        ...new Set(products.map((p) => p.category).filter(Boolean)),
-      ];
-      const consolidated = [...new Set([...categoryOrder, ...foundInProducts])];
-      const statsObj: Record<string, number> = {};
-
-      products.forEach((p) => {
-        if (p.category) statsObj[p.category] = (statsObj[p.category] || 0) + 1;
-      });
-
-      return {
-        sortedList: sortCategories(consolidated, categoryOrder),
-        stats: statsObj,
-      };
-    }, [products, categoryOrder]);
-
-    const pcVisibleCategories = isAllCategoriesVisiblePC
-      ? sortedList
-      : sortedList.slice(0, 5);
-    const hasMorePC = !isAllCategoriesVisiblePC && sortedList.length > 5;
-
     const showAll = displayConfig.showSearch || displayConfig.showCategories;
     if (!showAll && !isAdmin) return null;
 
-    // Shared Category List Mapper (Internal Helper)
+    // Diamond Logic: PC shows 5 chips + "More" toggle in single line
+    const pcInitialLimit = 5;
+    const hasMoreThanLimit = sortedList.length > pcInitialLimit;
+    const visibleList = (!isReyonOpen && hasMoreThanLimit) 
+      ? sortedList.slice(0, pcInitialLimit) 
+      : sortedList;
+
     const renderCategoryList = (list: string[]) => (
       <>
         <Button
           onClick={() => {
             onCategoryToggle(LABELS.filter.allCategories);
-            if (isMobileReyonOpen) setIsMobileReyonOpen(false);
+            setIsReyonOpen(false);
           }}
           variant={activeCategories.length === 0 ? 'primary' : 'secondary'}
           mode="rectangle"
@@ -111,13 +90,23 @@ const SearchFilter = memo(
             totalCategories={sortedList.length}
           />
         ))}
+        
+        {/* PC "MORE" CHIP */}
+        {!isReyonOpen && hasMoreThanLimit && (
+          <Button
+            onClick={() => setIsReyonOpen(true)}
+            variant="secondary"
+            mode="rectangle"
+            className="hidden sm:flex px-5 py-2.5 sm:px-[19px] sm:py-[10px] text-[10px] font-black uppercase tracking-widest shrink-0 !rounded-xl border-stone-200 border-dashed border-2 hover:border-stone-900 transition-all text-stone-400 hover:text-stone-900"
+          >
+            + DAHA FAZLA
+          </Button>
+        )}
+
         {isAdmin && (
           <PlusPlaceholder
             type="CATEGORY"
-            onClick={() => {
-              const name = window.prompt(LABELS.filter.newCategoryPrompt);
-              if (name?.trim()) onAddCategory?.(name.trim());
-            }}
+            onClick={() => setIsAddingCategory(true)}
           />
         )}
       </>
@@ -128,11 +117,11 @@ const SearchFilter = memo(
         className={`w-full bg-white border-b border-stone-100 py-3 relative z-40 ${!showAll ? 'opacity-50 grayscale' : ''}`}
       >
         <div className={filterTheme.container}>
-          {/* SEARCH & MOBILE CONTROL BAR */}
-          {displayConfig.showSearch ? (
-            <div className={`${filterTheme.searchArea.wrapper} items-stretch`}>
+          {/* INTERACTION BAR: Universal side-by-side for mobile, unified with PC chips */}
+          <div className="flex items-center gap-2">
+            {displayConfig.showSearch && (
               <div
-                className={`${filterTheme.searchArea.inputWrapper} ${THEME.radius.input} sm:hidden !flex-1 h-11`}
+                className={`${filterTheme.searchArea.inputWrapper} ${THEME.radius.input} flex-1 h-11 sm:hidden`}
               >
                 <div className={filterTheme.searchArea.iconSize}>
                   {globalIcons.search}
@@ -144,86 +133,56 @@ const SearchFilter = memo(
                   placeholder={LABELS.filter.searchPlaceholder}
                   className={`${filterTheme.searchArea.input} ${THEME.radius.input} h-full`}
                 />
-                <InfoHint
-                  message="Akıllı aramamızla hem ürün adlarını hem de reyonları saniyeler içinde bulabilirsiniz."
-                  className="mr-3"
-                />
               </div>
+            )}
 
-              {displayConfig.showCategories && (
+            {displayConfig.showCategories && (
+              <div className="flex-1 sm:flex-none flex items-center gap-2 overflow-hidden">
                 <Button
-                  onClick={() => setIsMobileReyonOpen(!isMobileReyonOpen)}
+                  onClick={() => setIsReyonOpen(!isReyonOpen)}
                   variant="primary"
                   mode="rectangle"
-                  className={`sm:hidden h-11 px-6 min-w-[120px] font-black !bg-stone-900 !text-white !rounded-xl`}
+                  className="sm:hidden h-11 px-6 flex-1 sm:flex-none font-black !bg-stone-900 !text-white !rounded-xl"
                 >
                   {LABELS.filter.categoryBtn}
                 </Button>
-              )}
-            </div>
-          ) : (
-            displayConfig.showCategories && (
-              <div className="sm:hidden flex justify-end">
-                <Button
-                  onClick={() => setIsMobileReyonOpen(!isMobileReyonOpen)}
-                  variant="primary"
-                  mode="rectangle"
-                  className="h-11 px-8 !bg-stone-900 !text-white font-black !rounded-xl"
-                >
-                  {LABELS.filter.categoryBtn}
-                </Button>
+                
+                {/* PC ONLY: Collapsed Single Line View */}
+                {!isReyonOpen && (
+                  <div className="hidden sm:flex flex-nowrap items-center gap-2 overflow-hidden w-full py-1">
+                    {renderCategoryList(visibleList)}
+                  </div>
+                )}
               </div>
-            )
-          )}
+            )}
+          </div>
 
-          {/* MOBILE CATEGORY PANEL */}
+          {/* EXPANDED PANEL (PC & MOBILE) */}
           {displayConfig.showCategories && (
             <AnimatePresence>
-              {isMobileReyonOpen && (
+              {isReyonOpen && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  className="sm:hidden overflow-hidden mt-3"
+                  className="overflow-hidden mt-3"
                 >
                   <div className="flex flex-wrap gap-2 py-1">
                     {renderCategoryList(sortedList)}
+                    
+                    {/* PC "LESS" CHIP */}
+                    <Button
+                      onClick={() => setIsReyonOpen(false)}
+                      variant="secondary"
+                      mode="rectangle"
+                      className="hidden sm:flex px-5 py-2.5 sm:px-[19px] sm:py-[10px] text-[10px] font-black uppercase tracking-widest shrink-0 !rounded-xl border-stone-200 border-dashed border-2 hover:border-stone-900 transition-all text-stone-400 hover:text-stone-900"
+                    >
+                      - DAHA AZ
+                    </Button>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
-          )}
-
-          {/* DESKTOP CATEGORY BAR */}
-          {displayConfig.showCategories && (
-            <div className="hidden sm:flex mt-3 items-center w-full">
-              <div
-                className={`flex gap-2 py-1 px-1 -mx-1 flex-1 no-scrollbar ${isAllCategoriesVisiblePC ? 'flex-wrap items-start' : 'items-center overflow-x-auto'}`}
-              >
-                {renderCategoryList(pcVisibleCategories)}
-
-                {hasMorePC && (
-                  <Button
-                    onClick={() => setIsAllCategoriesVisiblePC(true)}
-                    variant="secondary"
-                    mode="rectangle"
-                    className="shrink-0 px-6 py-2.5 border-2 border-dashed border-stone-200 text-stone-400 font-black text-[10px] uppercase tracking-widest !rounded-full hover:border-stone-900 hover:text-stone-900 shadow-none"
-                  >
-                    + DAHA FAZLA
-                  </Button>
-                )}
-                {isAllCategoriesVisiblePC && sortedList.length > 6 && (
-                  <Button
-                    onClick={() => setIsAllCategoriesVisiblePC(false)}
-                    variant="secondary"
-                    mode="rectangle"
-                    className="shrink-0 px-6 py-2.5 border-2 border-dashed border-stone-200 text-stone-400 font-black text-[10px] uppercase tracking-widest !rounded-full hover:border-stone-900 hover:text-stone-900 shadow-none"
-                  >
-                    - DAHA AZ
-                  </Button>
-                )}
-              </div>
-            </div>
           )}
 
           {!showAll && isAdmin && (
@@ -232,6 +191,18 @@ const SearchFilter = memo(
             </div>
           )}
         </div>
+
+        <QuickEditModal
+          isOpen={isAddingCategory}
+          onClose={() => setIsAddingCategory(false)}
+          onSave={(name) => {
+            if (name.trim()) onAddCategory?.(name.trim());
+          }}
+          title={LABELS.filter.newCategoryPrompt.toUpperCase()}
+          subtitle="Reyonun adı müşterileriniz tarafından görülecektir."
+          placeholder="Reyon adı..."
+          initialValue=""
+        />
       </div>
     );
   },

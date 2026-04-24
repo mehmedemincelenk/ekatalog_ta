@@ -9,6 +9,8 @@
 import * as jose from 'jose';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Product, ProductAnalysis } from '../types';
+import { supabase } from '../supabase';
+import { fileToBase64, base64ToBlob, normalizeText } from './core';
 
 // --- CONFIGURATION & INITIALIZATION ---
 
@@ -32,46 +34,6 @@ const GCP = {
     .replace(/\\n/g, '\n')
     .trim(),
   LOCATION: import.meta.env.VITE_GCP_LOCATION || 'us-central1',
-};
-
-import { supabase } from '../supabase';
-
-// --- CORE HELPERS ---
-
-/**
- * fileToBase64: Universal converter for AI provider payloads.
- */
-async function fileToBase64(file: File | Blob): Promise<string> {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
-    reader.readAsDataURL(file);
-  });
-}
-
-/**
- * base64ToBlob: Reconstructs images from API responses.
- */
-function base64ToBlob(base64: string, mime: string): Blob {
-  const byteCharacters = atob(base64);
-  const byteNumbers = new Array(byteCharacters.length);
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i);
-  }
-  const byteArray = new Uint8Array(byteNumbers);
-  return new Blob([byteArray], { type: mime });
-}
-
-const normalizeText = (text: string): string => {
-  return text
-    .toLowerCase()
-    .replace(/ğ/g, 'g')
-    .replace(/ü/g, 'u')
-    .replace(/ş/g, 's')
-    .replace(/ı/g, 'i')
-    .replace(/ö/g, 'o')
-    .replace(/ç/g, 'c')
-    .trim();
 };
 
 // --- VISUAL STUDIO OPERATIONS (Görsel Zeka) ---
@@ -333,26 +295,3 @@ export async function analyzeProductImage(imageFile: File | Blob): Promise<Produ
   }
 }
 
-/**
- * smartSearch: Fuzzy search logic with Turkish normalization.
- */
-export const smartSearch = (query: string, products: Product[]): Product[] => {
-  if (!query) return products;
-  const q = normalizeText(query);
-  const words = q.split(/\s+/).filter(Boolean);
-
-  return products.map(p => {
-    const name = normalizeText(p.name || '');
-    const desc = normalizeText(p.description || '');
-    const cat = normalizeText(p.category || '');
-    let score = 0;
-    if (name === q) score += 1000;
-    if (name.startsWith(q)) score += 500;
-    words.forEach(w => {
-      if (name.includes(w)) score += 100;
-      if (desc.includes(w)) score += 20;
-      if (cat.includes(w)) score += 50;
-    });
-    return { p, score };
-  }).filter(i => i.score > 0).sort((a, b) => b.score - a.score).map(i => i.p);
-};

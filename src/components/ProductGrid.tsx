@@ -8,6 +8,7 @@ import PlusPlaceholder from './PlusPlaceholder';
 import SocialProofCard from './SocialProofCard';
 import Button from './Button';
 import { EditProdCard } from './EditProdCard';
+import CategoryHeader from './CategoryHeader';
 import { useStore } from '../store';
 import { useCatalogEngine } from '../hooks/useProductsHub';
 import { ProductGridProps } from '../types';
@@ -34,6 +35,7 @@ const ProductGrid = memo(
     activeAdminProductId,
     setActiveAdminProductId,
     visitorCurrency = 'TRY',
+    renameCategory,
   }: ProductGridProps) => {
     const { isAdmin, settings, activeDiscount, activeCategories } = useStore();
 
@@ -78,13 +80,15 @@ const ProductGrid = memo(
 
           return (
             <section key={category} className={theme.sectionSpacing}>
-              <div className={theme.header.wrapper}>
-                <h2 className={theme.header.title}>{category}</h2>
-                <div className={theme.header.line}></div>
-                <span className={theme.header.count}>
-                  {categoryProducts.length} {LABELS.productCountSuffix}
-                </span>
-              </div>
+              <CategoryHeader
+                categoryName={category}
+                productCount={categoryProducts.length}
+                isAdmin={isAdmin}
+                onRename={renameCategory}
+                onOrderChange={onOrderUpdate}
+                currentOrder={categoryOrder.indexOf(category) + 1}
+                totalCategories={categoryOrder.length}
+              />
 
               {categoryProducts.length > 0 || isAdmin ? (
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-x-3 gap-y-6 sm:gap-x-6 sm:gap-y-10">

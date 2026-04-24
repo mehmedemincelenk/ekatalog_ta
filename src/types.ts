@@ -124,6 +124,7 @@ export interface CompanySettings {
   };
   activeCurrency: 'TRY' | 'USD' | 'EUR';
   photoroomApiKey?: string;
+  slug?: string;
 }
 
 /**
@@ -266,11 +267,21 @@ export interface CategoryFilterChipProps {
   totalCategories: number;
 }
 
+export interface CategoryHeaderProps {
+  categoryName: string;
+  productCount: number;
+  isAdmin: boolean;
+  onRename: (oldName: string, newName: string) => void;
+  onOrderChange: (categoryName: string, newPosition: number) => void;
+  currentOrder: number;
+  totalCategories: number;
+}
+
 export interface SearchFilterProps {
-  products: Product[];
-  categoryOrder: string[];
-  onCategoryOrderChange: (categoryName: string, newPosition: number) => void;
-  renameCategory: (oldName: string, newName: string) => void;
+  sortedList: string[];
+  stats: Record<string, number>;
+  onCategoryOrderChange: (categoryName: string, newPosition: number) => Promise<void>;
+  renameCategory: (oldName: string, newName: string) => Promise<void>;
   onAddCategory?: (name: string) => void;
 }
 
@@ -289,6 +300,7 @@ export interface ProductGridProps {
   activeAdminProductId?: string | null;
   setActiveAdminProductId?: (id: string | null) => void;
   visitorCurrency?: 'TRY' | 'USD' | 'EUR';
+  renameCategory: (oldName: string, newName: string) => void;
 }
 
 export interface SearchLog {
@@ -400,6 +412,7 @@ export interface BaseModalProps {
   hideCloseButton?: boolean;
   disableClickOutside?: boolean;
   className?: string;
+  noPadding?: boolean;
 }
 
 export interface PinModalProps {
@@ -470,14 +483,11 @@ export interface AppModalsProps {
   setPendingAddCategory: (category?: string) => void;
 
   // Action Handlers
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  addProduct: (data: any) => Promise<string | undefined>;
+  addProduct: (data: unknown) => Promise<string | undefined>;
   uploadImage: (params: { id: string; file: File }) => Promise<string | void>;
   updateProduct: (params: { id: string; changes: Partial<Product> }) => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  updateSetting: (key: any, value: any) => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  executeGranularBulkActions: (actions: any) => Promise<void>;
+  updateSetting: (key: unknown, value: unknown) => void;
+  executeGranularBulkActions: (actions: unknown) => Promise<void>;
   handleGlobalAddAction: (
     type: 'PRODUCT' | 'CATEGORY' | 'REFERENCE' | 'CAROUSEL',
   ) => void;
@@ -613,11 +623,16 @@ export interface StoreState {
   setActiveDiscount: (
     discount: { code: string; rate: number; category?: string } | null,
   ) => void;
+  discountError: string | null;
+  applyDiscountCode: (code: string) => void;
+
+  isInlineEnabled: boolean;
+  toggleInlineEdit: () => void;
 
   // UI / Modal Management
   activeModal: ModalType;
-  modalData: any;
-  openModal: (type: ModalType, data?: any) => void;
+  modalData: unknown;
+  openModal: (type: ModalType, data?: unknown) => void;
   closeModal: () => void;
 }
 

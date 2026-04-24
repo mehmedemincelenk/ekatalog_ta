@@ -9,7 +9,7 @@ import { createPortal } from 'react-dom';
 import Button from './Button';
 
 import { BaseModalProps } from '../types';
-import { useScrollLock, useKeyboard, useFocusTrap } from '../hooks/useUI';
+import { useModalBehavior } from '../hooks/useCommon';
 
 export default function BaseModal({
   isOpen,
@@ -24,15 +24,14 @@ export default function BaseModal({
   hideCloseButton = false,
   disableClickOutside = false,
   className = '',
+  noPadding = false,
 }: BaseModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const titleId = React.useId();
   const descId = React.useId();
 
   // 1. MODULAR ORCHESTRATION (Diamond UI Hooks)
-  useScrollLock(isOpen);
-  useKeyboard('Escape', onClose, isOpen && !disableClickOutside);
-  useFocusTrap(modalRef as React.RefObject<HTMLElement>, isOpen);
+  useModalBehavior(isOpen, modalRef as React.RefObject<HTMLElement>, onClose, disableClickOutside);
 
   const handleBackdropClick = () => {
     if (!disableClickOutside) {
@@ -145,7 +144,7 @@ export default function BaseModal({
             )}
 
             {/* SCROLLABLE BODY */}
-            <div className="flex-1 overflow-y-auto print:overflow-visible custom-scrollbar print:h-auto px-6 py-6">
+            <div className={`flex-1 overflow-y-auto print:overflow-visible custom-scrollbar print:h-auto ${noPadding ? '' : 'px-6 py-6'}`}>
               {children}
             </div>
 

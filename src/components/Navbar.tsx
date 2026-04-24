@@ -4,7 +4,7 @@
 import { memo, useState, useEffect } from 'react';
 import { THEME, DEFAULT_COMPANY } from '../data/config';
 import { CompanySettings } from '../types';
-import { generateWhatsAppLink } from '../utils/store';
+import { generateWhatsAppLink } from '../utils/core';
 import { compressVisualToDataUri } from '../utils/image';
 import { X } from 'lucide-react';
 import Button from './Button';
@@ -207,9 +207,6 @@ const Navbar = memo(
                 {/* BRAND SECTION */}
                 <div
                   className={`${theme.brand.wrapper} relative flex items-center transition-all duration-200 ${isLogoPressed ? 'scale-95 opacity-80' : 'scale-100'}`}
-                  onPointerDown={handlePressStart}
-                  onPointerUp={handlePressEnd}
-                  onPointerLeave={handlePressEnd}
                   onContextMenu={(e) => e.preventDefault()}
                   style={{
                     userSelect: 'none',
@@ -217,13 +214,13 @@ const Navbar = memo(
                     touchAction: 'none',
                   }}
                 >
-                  {!isAdmin && (
-                    <div
-                      className="absolute inset-0 z-[40] cursor-pointer touch-none"
-                      onPointerDown={handlePressStart}
-                      onPointerUp={handlePressEnd}
-                    />
-                  )}
+                  {/* UNIFIED LONG-PRESS DETECTOR OVERLAY */}
+                  <div
+                    className="absolute inset-0 z-[40] cursor-pointer touch-none"
+                    onPointerDown={handlePressStart}
+                    onPointerUp={handlePressEnd}
+                    onPointerLeave={handlePressEnd}
+                  />
 
                   {settings.displayConfig.showLogo && (
                     <div
@@ -231,7 +228,7 @@ const Navbar = memo(
                         isAdmin &&
                         document.getElementById('logo-upload-input')?.click()
                       }
-                      className={`${theme.brand.logoWrapper} select-none touch-none cursor-pointer overflow-hidden flex items-center justify-center relative z-[30] ${!isAdmin ? 'pointer-events-none' : ''}`}
+                      className={`${theme.brand.logoWrapper} select-none touch-none cursor-pointer overflow-hidden flex items-center justify-center relative z-[30]`}
                     >
                       <input
                         id="logo-upload-input"
@@ -253,7 +250,7 @@ const Navbar = memo(
                   )}
 
                   <div
-                    className={`${theme.brand.textWrapper} cursor-pointer relative z-[30] ${!isAdmin ? 'pointer-events-none' : ''}`}
+                    className={`${theme.brand.textWrapper} relative z-[30] pointer-events-none`}
                   >
                     <div className="flex items-center">
                       <span
@@ -270,12 +267,13 @@ const Navbar = memo(
                           (e.preventDefault(), e.currentTarget.blur())
                         }
                         onClick={(e) => {
+                          if (!isAdmin) return;
                           e.stopPropagation();
-                          handleTextEdit('title', settings.title, 'Mağaza Adı');
+                          handleTextEdit('title', settings.title || settings.name || DEFAULT_COMPANY.name, 'Mağaza Adı');
                         }}
-                        className={`!text-[0.75rem] sm:!text-[0.9rem] font-black tracking-tighter text-stone-900 ${editStyle}`}
+                        className={`!text-[0.75rem] sm:!text-[0.9rem] font-black tracking-tighter text-stone-900 ${editStyle} ${isAdmin ? 'pointer-events-auto' : ''}`}
                       >
-                        {settings.title}
+                        {settings.title || settings.name || DEFAULT_COMPANY.name}
                       </span>
                     </div>
                     {settings.displayConfig.showSubtitle && (
@@ -293,16 +291,17 @@ const Navbar = memo(
                           (e.preventDefault(), e.currentTarget.blur())
                         }
                         onClick={(e) => {
+                          if (!isAdmin) return;
                           e.stopPropagation();
                           handleTextEdit(
                             'subtitle',
-                            settings.subtitle,
+                            settings.subtitle || DEFAULT_COMPANY.tagline,
                             'Slogan/Açıklama',
                           );
                         }}
-                        className={`!text-[0.45rem] sm:!text-[0.55rem] text-stone-400 font-medium ${editStyle}`}
+                        className={`!text-[0.45rem] sm:!text-[0.55rem] text-stone-400 font-medium ${editStyle} ${isAdmin ? 'pointer-events-auto' : ''}`}
                       >
-                        {settings.subtitle}
+                        {settings.subtitle || DEFAULT_COMPANY.tagline}
                       </span>
                     )}
                   </div>

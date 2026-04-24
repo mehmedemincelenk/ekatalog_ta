@@ -71,12 +71,7 @@ export const CAROUSEL = {
   ],
 };
 
-export const CATEGORY_ORDER = [
-  'Yeni Ürünler',
-  'Popüler',
-  'Kampanyalı',
-  'Kategorisiz',
-];
+export const CATEGORY_ORDER: string[] = [];
 
 export const REFERENCES = [
   { id: 1, name: 'Lider İş Ortakları', logo: '🤝' },
@@ -148,13 +143,3 @@ export const STORAGE = {
   adminSession: 'ekatalog_secure_session_lock',
 };
 
-/**
- * SHARED COMPONENT STATES (Diamond Palette)
- */
-export const INITIAL_STATUS_STATE = {
-  success: 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20',
-  danger: 'bg-red-500 text-white shadow-lg shadow-red-500/20',
-  active: 'bg-stone-900 text-white shadow-lg shadow-stone-900/20',
-  inactive: 'bg-stone-100 text-stone-400 hover:text-stone-600',
-  neutral: 'bg-white text-stone-900 shadow-sm border-stone-200',
-};

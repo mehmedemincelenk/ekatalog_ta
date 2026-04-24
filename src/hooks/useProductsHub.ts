@@ -2,11 +2,10 @@ import { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../supabase';
 import { Product, NewProductPayload, CompanySettings } from '../types';
-import { getActiveStoreSlug } from '../utils/store';
+import { getActiveStoreSlug, reorderArray, smartSearch } from '../utils/core';
 import { useStore } from '../store';
-import { useProductStorage } from './useProductStorage';
-import { smartSearch } from '../utils/ai';
 import { TECH, sortCategories } from '../data/config';
+import { compressVisualToDataUri } from '../utils/image';
 
 const STORE_SLUG = getActiveStoreSlug();
 
@@ -17,7 +16,70 @@ const STORE_SLUG = getActiveStoreSlug();
  * 1. Data Fetching (Query)
  * 2. Mutations (Add, Update, Delete, Bulk)
  * 3. Catalog Engine (Grouping, Filtering, Sorting)
+ * 4. Storage Service (Visual Asset Management)
  */
+
+// --- 0. STORAGE SERVICE (Internal Asset Management) ---
+
+async function uploadProductVisual(targetProduct: Product, visualFile: File) {
+  try {
+    const { processDualQualityVisuals } = await import('../utils/image');
+    const { hq: highQualityAsset, lq: previewAsset } =
+      await processDualQualityVisuals(visualFile);
+
+    // Hygiene: Remove legacy assets
+    if (targetProduct.image_url) {
+      try {
+        const assetUrl = new URL(targetProduct.image_url);
+        const legacyFileName = assetUrl.pathname.split('/').pop();
+        if (legacyFileName && !legacyFileName.includes('placeholder')) {
+          await supabase.storage.from(TECH.storage.bucket).remove([
+            `${TECH.storage.lqFolder}/${legacyFileName}`,
+            `${TECH.storage.hqFolder}/${legacyFileName}`,
+          ]);
+        }
+      } catch { /* ignore */ }
+    }
+
+    // SEO Naming
+    const turkishCharMap: Record<string, string> = { ç:'c', ğ:'g', ı:'i', ö:'o', ş:'s', ü:'u', Ç:'C', Ğ:'G', İ:'I', Ö:'O', Ş:'S', Ü:'U' };
+    const sanitizedName = targetProduct.name.replace(/[çğıöşüÇĞİÖŞÜ]/g, (c) => turkishCharMap[c]).toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '').substring(0, TECH.products.maxFileNameLength);
+    const uniqueSuffix = Math.random().toString(36).substring(2, 2 + TECH.products.uniqueIdSuffixLength);
+    const storageFileName = `${sanitizedName}-${targetProduct.id.substring(0, 4)}-${uniqueSuffix}.jpg`;
+
+    const lqPath = `${TECH.storage.lqFolder}/${storageFileName}`;
+    const hqPath = `${TECH.storage.hqFolder}/${storageFileName}`;
+
+    const [lqRes, hqRes] = await Promise.all([
+      supabase.storage.from(TECH.storage.bucket).upload(lqPath, previewAsset, { upsert: true, cacheControl: TECH.storage.cacheControl }),
+      supabase.storage.from(TECH.storage.bucket).upload(hqPath, highQualityAsset, { upsert: true, cacheControl: TECH.storage.cacheControl }),
+    ]);
+
+    if (lqRes.error) throw lqRes.error;
+    if (hqRes.error) throw hqRes.error;
+
+    const { data: { publicUrl } } = supabase.storage.from(TECH.storage.bucket).getPublicUrl(lqPath);
+    return `${publicUrl}?t=${Date.now()}`;
+  } catch (err) {
+    console.error('Storage failed:', err);
+    throw err;
+  }
+}
+
+async function removeProductVisual(visualUrl: string) {
+  try {
+    const assetUrl = new URL(visualUrl);
+    const fileName = assetUrl.pathname.split('/').pop();
+    if (fileName) {
+      await supabase.storage.from(TECH.storage.bucket).remove([
+        `${TECH.storage.lqFolder}/${fileName}`,
+        `${TECH.storage.hqFolder}/${fileName}`,
+      ]);
+    }
+  } catch (err) {
+    console.error('Cleanup failed:', err);
+  }
+}
 
 // --- 1. QUERY HOOK (Data Layer) ---
 
@@ -115,14 +177,13 @@ export function useProductsActions() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey }),
   });
 
-  const { uploadImage: storageUpload } = useProductStorage();
 
   const uploadImageMutation = useMutation({
     mutationFn: async ({ id, file }: { id: string; file: File }) => {
       const cachedProducts = queryClient.getQueryData<Product[]>(queryKey);
       const targetProduct = cachedProducts?.find((p) => p.id === id);
       if (!targetProduct) throw new Error('Ürün bulunamadı');
-      const finalizedUrl = await storageUpload(targetProduct, file);
+      const finalizedUrl = await uploadProductVisual(targetProduct, file);
       if (finalizedUrl) {
         const { error } = await supabase.from('prods').update({
           image_url: finalizedUrl,
@@ -140,6 +201,7 @@ export function useProductsActions() {
       actions: {
         productId: string;
         newPrice?: number;
+        newSortOrder?: number;
         category?: string;
         delete?: boolean;
         out_of_stock?: boolean;
@@ -160,9 +222,10 @@ export function useProductsActions() {
       const updatePromises = updates.map(async (action) => {
         const update: Partial<Product> = {};
         if (action.newPrice !== undefined) {
-          const { formatNumberToCurrency } = await import('../utils/price');
+          const { formatNumberToCurrency } = await import('../utils/core');
           update.price = formatNumberToCurrency(action.newPrice);
         }
+        if (action.newSortOrder !== undefined) update.sort_order = action.newSortOrder;
         if (action.category !== undefined) update.category = action.category;
         if (action.out_of_stock !== undefined)
           update.out_of_stock = action.out_of_stock;
@@ -220,16 +283,32 @@ export function useCatalogEngine(products: Product[], categoryOrder: string[], a
     }, {} as Record<string, Product[]>);
   }, [products]);
 
-  const displayCategories = useMemo(() => {
-    const existingInProducts = Object.keys(groupedProducts);
-    const allCategories = [...new Set([...categoryOrder, ...existingInProducts])];
-    const filtered = activeCategories.length > 0 ? allCategories.filter(cat => activeCategories.includes(cat)) : allCategories;
-    const sorted = sortCategories(filtered, categoryOrder);
-    if (isAdmin) return sorted;
-    return sorted.filter(cat => (groupedProducts[cat] || []).length > 0 || activeCategories.includes(cat));
-  }, [groupedProducts, categoryOrder, activeCategories, isAdmin]);
+  const { sortedList, stats } = useMemo(() => {
+    const foundInProducts = [
+      ...new Set(products.map((p) => p.category).filter(Boolean)),
+    ];
+    const consolidated = [...new Set([...categoryOrder, ...foundInProducts])];
+    const statsObj: Record<string, number> = {};
 
-  return { groupedProducts, displayCategories };
+    products.forEach((p) => {
+      if (p.category) statsObj[p.category] = (statsObj[p.category] || 0) + 1;
+    });
+
+    return {
+      sortedList: sortCategories(consolidated, categoryOrder),
+      stats: statsObj,
+    };
+  }, [products, categoryOrder]);
+
+  const displayCategories = useMemo(() => {
+    const allCategories = sortedList;
+    const filtered = activeCategories.length > 0 ? allCategories.filter(cat => activeCategories.includes(cat)) : allCategories;
+    
+    if (isAdmin) return filtered;
+    return filtered.filter(cat => (groupedProducts[cat] || []).length > 0 || activeCategories.includes(cat));
+  }, [groupedProducts, sortedList, activeCategories, isAdmin]);
+
+  return { groupedProducts, displayCategories, sortedList, stats };
 }
 
 // --- 4. COORDINATOR HOOK (Main Entry) ---
@@ -247,11 +326,14 @@ export function useProducts(searchQuery: string, activeCategories: string[], isA
   }, [allProducts, searchQuery, activeCategories, isAdmin]);
 
   const categoryOrder = useMemo(() => settings?.categoryOrder || [], [settings?.categoryOrder]);
+  const { sortedList, stats } = useCatalogEngine(allProducts, categoryOrder, activeCategories, isAdmin);
 
   return {
     products: filteredProducts,
     allProducts,
     categoryOrder,
+    sortedList,
+    stats,
     loading: productsLoading,
     addProduct: actions.addProduct,
     updateProduct: actions.updateProduct,
@@ -261,15 +343,31 @@ export function useProducts(searchQuery: string, activeCategories: string[], isA
     reorderCategories: actions.reorderCategories,
     executeGranularBulkActions: actions.executeGranularBulkActions,
     reorderCategory: async (categoryName: string, newPosition: number) => {
-      const currentOrder = [...categoryOrder];
-      const oldIndex = currentOrder.indexOf(categoryName);
+      const oldIndex = categoryOrder.indexOf(categoryName);
       if (oldIndex === -1) return;
-      currentOrder.splice(oldIndex, 1);
-      currentOrder.splice(newPosition - 1, 0, categoryName);
-      await actions.reorderCategories(currentOrder);
+      const updatedOrder = reorderArray(categoryOrder, oldIndex, newPosition - 1);
+      await actions.reorderCategories(updatedOrder);
     },
     reorderProductsInCategory: async (id: string, newPosition: number) => {
-      await actions.reorderProduct({ id, newSortOrder: newPosition });
+      const targetProduct = allProducts.find(p => p.id === id);
+      if (!targetProduct) return;
+
+      const categoryProducts = allProducts
+        .filter(p => p.category === targetProduct.category)
+        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+
+      const oldIndex = categoryProducts.findIndex(p => p.id === id);
+      if (oldIndex === -1) return;
+
+      const reordered = reorderArray(categoryProducts, oldIndex, newPosition - 1);
+      
+      const bulkActions = reordered.map((p, idx) => ({
+        productId: p.id,
+        newSortOrder: idx + 1
+      }));
+
+      // Map to executeGranularBulkActions format
+      await actions.executeGranularBulkActions(bulkActions);
     },
     addCategory: async (name: string) => {
       if (!settings?.id) return;

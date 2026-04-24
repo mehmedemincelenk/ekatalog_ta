@@ -1,10 +1,116 @@
+import { useState, memo } from 'react';
 import { THEME, REFERENCES } from '../data/config';
 import { useSettings } from '../hooks/useSettingsHub';
+import { reorderArray } from '../utils/core';
 import OrderSelector from './OrderSelector';
 import Button from './Button';
 import PlusPlaceholder from './PlusPlaceholder';
+import QuickEditModal from './QuickEditModal';
+import { Trash2, Check, X } from 'lucide-react';
 
-import { ReferencesProps } from '../types';
+import { ReferencesProps, Reference } from '../types';
+
+/**
+ * REFERENCE CARD (DIAMOND ATOM)
+ * -----------------------------------------------------------
+ * Internal sub-component to handle card-specific states like delete confirmation.
+ */
+const ReferenceCard = memo(({ 
+  refData, 
+  index, 
+  totalCount, 
+  isAdmin, 
+  isInlineEnabled, 
+  onDelete, 
+  onOrderChange, 
+  onEdit 
+}: { 
+  refData: Reference; 
+  index: number; 
+  totalCount: number; 
+  isAdmin: boolean; 
+  isInlineEnabled: boolean; 
+  onDelete: (id: number) => void; 
+  onOrderChange: (id: number, pos: number) => void; 
+  onEdit: (id: number, name: string) => void;
+}) => {
+  const [isDeleteConfirming, setIsDeleteConfirming] = useState(false);
+  const referencesTheme = THEME.references;
+
+  return (
+    <div
+      className={`${referencesTheme.card.base} relative group flex items-center justify-center p-8 text-center border-stone-100 bg-white shadow-[0_2px_15px_-5px_rgba(0,0,0,0.08)] hover:shadow-xl hover:shadow-stone-200/50 transition-all duration-300 rounded-[32px] overflow-hidden`}
+    >
+      <span
+        contentEditable={isAdmin && isInlineEnabled}
+        suppressContentEditableWarning
+        onBlur={(e) => {
+          const newName = e.currentTarget.textContent || '';
+          onEdit(refData.id, newName);
+        }}
+        onKeyDown={(e) =>
+          e.key === 'Enter' &&
+          (e.preventDefault(), e.currentTarget.blur())
+        }
+        onClick={() => !isInlineEnabled && onEdit(refData.id, refData.name)}
+        className={`text-[12px] font-black uppercase tracking-[0.2em] text-stone-800 leading-tight outline-none ${isAdmin ? 'hover:bg-stone-50 focus:bg-stone-50 focus:ring-2 focus:ring-stone-900/10 px-3 py-1 -mx-3 rounded-xl transition-all cursor-text' : ''}`}
+      >
+        {refData.name}
+      </span>
+
+      {isAdmin && (
+        <>
+          {/* ORDER SELECTOR */}
+          <div className="absolute top-2 left-2 z-10 transition-transform hover:scale-105">
+            <OrderSelector
+              currentOrder={index + 1}
+              totalCount={totalCount}
+              onChange={(newPos) => onOrderChange(refData.id, newPos)}
+              className="shadow-xl"
+            />
+          </div>
+
+          {/* DELETE ACTIONS */}
+          <div className="absolute top-2 right-2 z-20 flex gap-1">
+            {!isDeleteConfirming ? (
+              <Button
+                onClick={() => setIsDeleteConfirming(true)}
+                variant="danger"
+                mode="circle"
+                size="sm"
+                icon={<Trash2 size={14} />}
+                className="!w-7 !h-7 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                title="Referansı Sil"
+              />
+            ) : (
+              <div className="flex gap-1 animate-in slide-in-from-right-2 duration-300">
+                <Button
+                  onClick={() => {
+                    onDelete(refData.id);
+                    setIsDeleteConfirming(false);
+                  }}
+                  variant="danger"
+                  mode="circle"
+                  size="sm"
+                  icon={<Check size={14} />}
+                  className="!w-7 !h-7 shadow-lg"
+                />
+                <Button
+                  onClick={() => setIsDeleteConfirming(false)}
+                  variant="secondary"
+                  mode="circle"
+                  size="sm"
+                  icon={<X size={14} />}
+                  className="!w-7 !h-7 shadow-lg"
+                />
+              </div>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  );
+});
 
 export default function References({
   isAdmin = false,
@@ -12,7 +118,12 @@ export default function References({
 }: ReferencesProps) {
   const { settings, updateSetting } = useSettings(isAdmin);
   const referencesTheme = THEME.references;
-  const globalIcons = THEME.icons;
+
+  const [activeQuickEdit, setActiveQuickEdit] = useState<{
+    id: number;
+    name: string;
+    isNew?: boolean;
+  } | null>(null);
 
   const activeReferences =
     settings.referencesData && settings.referencesData.length > 0
@@ -22,31 +133,35 @@ export default function References({
         : REFERENCES;
 
   const handleDelete = (id: number) => {
-    if (!window.confirm('Bu referansı silmek istediğinize emin misiniz?'))
-      return;
     const updated = activeReferences.filter((r) => r.id !== id);
     updateSetting('referencesData', updated);
   };
 
   const handleOrderChange = (id: number, targetPos: number) => {
-    const items = Array.from(activeReferences);
-    const currentIndex = items.findIndex((r) => r.id === id);
+    const currentIndex = activeReferences.findIndex((r) => r.id === id);
     if (currentIndex === -1) return;
 
-    const [item] = items.splice(currentIndex, 1);
-    items.splice(targetPos - 1, 0, item);
-    updateSetting('referencesData', items);
+    const updated = reorderArray(activeReferences, currentIndex, targetPos - 1);
+    updateSetting('referencesData', updated);
   };
 
-  const handleTextEdit = (id: number, current: string) => {
-    if (!isAdmin || isInlineEnabled) return;
-    const newVal = window.prompt('Referans/Partner Adını düzenle:', current);
-    if (newVal !== null) {
+  const handleSaveEdit = (newName: string) => {
+    if (!activeQuickEdit) return;
+
+    if (activeQuickEdit.isNew) {
+      if (newName.trim()) {
+        updateSetting('referencesData', [
+          ...activeReferences,
+          { id: Date.now(), name: newName.trim(), logo: '' },
+        ]);
+      }
+    } else {
       const updated = activeReferences.map((r) =>
-        r.id === id ? { ...r, name: newVal } : r,
+        r.id === activeQuickEdit.id ? { ...r, name: newName } : r,
       );
       updateSetting('referencesData', updated);
     }
+    setActiveQuickEdit(null);
   };
 
   return (
@@ -62,71 +177,23 @@ export default function References({
 
         <div className={referencesTheme.grid}>
           {activeReferences.map((ref, index) => (
-            <div
+            <ReferenceCard
               key={ref.id}
-              className={`${referencesTheme.card.base} relative group flex items-center justify-center p-8 text-center border-stone-100 bg-white shadow-[0_2px_15px_-5px_rgba(0,0,0,0.08)] hover:shadow-xl hover:shadow-stone-200/50 transition-all rounded-[32px]`}
-            >
-              <span
-                contentEditable={isAdmin && isInlineEnabled}
-                suppressContentEditableWarning
-                onBlur={(e) => {
-                  const newName = e.currentTarget.textContent || '';
-                  const updated = activeReferences.map((r) =>
-                    r.id === ref.id ? { ...r, name: newName } : r,
-                  );
-                  updateSetting('referencesData', updated);
-                }}
-                onKeyDown={(e) =>
-                  e.key === 'Enter' &&
-                  (e.preventDefault(), e.currentTarget.blur())
-                }
-                onClick={() => handleTextEdit(ref.id, ref.name)}
-                className={`text-[12px] font-black uppercase tracking-[0.2em] text-stone-800 leading-tight outline-none ${isAdmin ? 'hover:bg-stone-50 focus:bg-stone-50 focus:ring-2 focus:ring-stone-900/10 px-3 py-1 -mx-3 rounded-xl transition-all cursor-text' : ''}`}
-              >
-                {ref.name}
-              </span>
-
-              {isAdmin && (
-                <>
-                  {/* ORDER SELECTOR - DARK THEME & TOP LEFT */}
-                  <div className="absolute top-2 left-2 z-10 transition-transform hover:scale-105">
-                    <OrderSelector
-                      currentOrder={index + 1}
-                      totalCount={activeReferences.length}
-                      onChange={(newPos) => handleOrderChange(ref.id, newPos)}
-                      className="shadow-xl"
-                    />
-                  </div>
-
-                  {/* DELETE BUTTON - TOP RIGHT */}
-                  <div className="absolute top-2 right-2 z-20 transition-transform hover:scale-105">
-                    <Button
-                      onClick={() => handleDelete(ref.id)}
-                      variant="danger"
-                      mode="circle"
-                      size="sm"
-                      icon={globalIcons.trash}
-                      className="!w-7 !h-7 shadow-lg"
-                      title="Referansı Sil"
-                    />
-                  </div>
-                </>
-              )}
-            </div>
+              refData={ref}
+              index={index}
+              totalCount={activeReferences.length}
+              isAdmin={isAdmin}
+              isInlineEnabled={isInlineEnabled}
+              onDelete={handleDelete}
+              onOrderChange={handleOrderChange}
+              onEdit={(id, name) => setActiveQuickEdit({ id, name })}
+            />
           ))}
 
           {isAdmin && (
             <PlusPlaceholder
               type="REFERENCE"
-              onClick={() => {
-                const name = window.prompt('Yeni Referans/İş Ortağı Adı:');
-                if (name?.trim()) {
-                  updateSetting('referencesData', [
-                    ...activeReferences,
-                    { id: Date.now(), name: name.trim(), logo: '' },
-                  ]);
-                }
-              }}
+              onClick={() => setActiveQuickEdit({ id: 0, name: '', isNew: true })}
             />
           )}
 
@@ -145,6 +212,16 @@ export default function References({
           )}
         </div>
       </div>
+
+      <QuickEditModal
+        isOpen={!!activeQuickEdit}
+        onClose={() => setActiveQuickEdit(null)}
+        onSave={handleSaveEdit}
+        title={activeQuickEdit?.isNew ? 'YENİ REFERANS EKLE' : 'REFERANS DÜZENLE'}
+        subtitle={activeQuickEdit?.isNew ? 'İş ortağınızın veya referansınızın adını girin.' : 'Referans adını buradan güncelleyebilirsiniz.'}
+        initialValue={activeQuickEdit?.name || ''}
+        placeholder="Referans adı..."
+      />
     </section>
   );
 }

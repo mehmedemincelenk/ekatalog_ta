@@ -1,11 +1,10 @@
 // FILE ROLE: Root Application Entry Point & Global State Orchestrator
 // DEPENDS ON: React, Framer Motion, All Feature Modals, useProducts, useAdminMode, useSettings
 // CONSUMED BY: main.tsx
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from './components/Navbar';
 import { LABELS, UI } from './data/config';
-import { Product } from './types';
 import HeroCarousel from './components/HeroCarousel';
 import SearchFilter from './components/SearchFilter';
 import ProductGrid from './components/ProductGrid';
@@ -18,15 +17,13 @@ import LandingPage from './components/LandingPage';
 import OffHoursNotice from './components/OffHoursNotice';
 import MaintenancePage from './components/MaintenancePage';
 import FloatingGuestMenu from './components/FloatingGuestMenu';
-import PinModal from './components/PinModal';
 import AppModals from './components/AppModals';
-import { useSyncMetadata } from './hooks/useUI';
+import { useSyncMetadata } from './hooks/useCommon';
 import { useProducts } from './hooks/useProductsHub';
 import { useAdminMode } from './hooks/useAdminMode';
-import { useDiscount } from './hooks/useDiscount';
 import { useSettings } from './hooks/useSettingsHub';
 import { useStore } from './store';
-import { getActiveStoreSlug } from './utils/store';
+import { getActiveStoreSlug } from './utils/core';
 
 /**
  * CATALOG VIEW: Sadece dükkanlar için çalışan ana bileşen.
@@ -37,21 +34,13 @@ function CatalogView() {
     settings,
     searchQuery: search,
     visitorCurrency,
-    updateSetting,
-    activeDiscount,
     openModal,
-    setIsAdmin,
   } = useStore();
 
   const {
     handleLogoPointerDown,
     handleLogoPointerUp,
-    setIsPinModalOpen,
-    verifyPinWithServer,
-    onPinSuccess,
     isInlineEnabled,
-    isLockedOut,
-    failedAttempts,
   } = useAdminMode();
 
   const {
@@ -63,8 +52,9 @@ function CatalogView() {
 
   const {
     products,
-    allProducts,
     categoryOrder,
+    sortedList,
+    stats,
     deleteProduct,
     updateProduct,
     reorderCategory: updateCategoryOrder,
@@ -79,6 +69,7 @@ function CatalogView() {
   useSyncMetadata(settings, isAdmin);
 
   const [visibleCategoryLimit, setVisibleCategoryLimit] = useState(2);
+  const [activeAdminProductId, setActiveAdminProductId] = useState<string | null>(null);
 
 
   if (settingsLoading || productsLoading) {
@@ -142,7 +133,8 @@ function CatalogView() {
         <main>
           <HeroCarousel isAdminModeActive={isAdmin} />
           <SearchFilter
-            products={products}
+            sortedList={sortedList}
+            stats={stats}
             categoryOrder={categoryOrder}
             onCategoryOrderChange={updateCategoryOrder}
             renameCategory={(oldName, newName) =>
@@ -162,7 +154,12 @@ function CatalogView() {
               visibleCategoryLimit={visibleCategoryLimit}
               onLoadMore={() => setVisibleCategoryLimit((prev) => prev + 3)}
               onAddClick={(cat) => openModal('ADD_PRODUCT', { category: cat })}
+              activeAdminProductId={activeAdminProductId}
+              setActiveAdminProductId={setActiveAdminProductId}
               visitorCurrency={visitorCurrency}
+              renameCategory={(oldName, newName) =>
+                renameCategory({ oldName, newName })
+              }
             />
           </div>
           {settings?.displayConfig?.showReferences && (

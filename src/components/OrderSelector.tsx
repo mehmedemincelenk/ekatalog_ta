@@ -61,7 +61,7 @@ const OrderSelector = memo(
             const val = parseInt(e.target.value, 10);
             if (val !== currentOrder) onChange(val);
           }}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10 appearance-none"
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-[5] appearance-none"
           onClick={(e) => e.stopPropagation()}
         >
           {Array.from({ length: totalCount }, (_, i) => (

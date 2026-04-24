@@ -3,7 +3,7 @@ import { THEME } from '../data/config';
 import {
   formatNumberToCurrency,
   transformCurrencyStringToNumber,
-} from '../utils/price';
+} from '../utils/core';
 import SmartImage from './SmartImage';
 
 import { ProductCardUIProps } from '../types';

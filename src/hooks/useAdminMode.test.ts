@@ -32,10 +32,9 @@ vi.mock('../utils/store', () => ({
 }));
 
 describe('useAdminMode (Security & Workflow Tests)', () => {
-  it('should start with non-admin mode and modal closed', () => {
+  it('should start with non-admin mode', () => {
     const { result } = renderHook(() => useAdminMode());
     expect(result.current.isAdmin).toBe(false);
-    expect(result.current.isPinModalOpen).toBe(false);
   });
 
   it('should successfully verify a correct PIN (mocked success)', async () => {
@@ -52,29 +51,12 @@ describe('useAdminMode (Security & Workflow Tests)', () => {
   it('should fail verification with empty or invalid PIN (mocked scenario)', async () => {
     const { result } = renderHook(() => useAdminMode());
 
-    // We can simulate a failure by changing the mock for this specific test if needed,
-    // but the default logic already handles STORE_SLUG check.
-
     let isSuccess = true;
     await act(async () => {
       isSuccess = await result.current.verifyPinWithServer('');
     });
 
     expect(isSuccess).toBe(false);
-  });
-
-  it('should toggle modal state correctly', () => {
-    const { result } = renderHook(() => useAdminMode());
-
-    act(() => {
-      result.current.setIsPinModalOpen(true);
-    });
-    expect(result.current.isPinModalOpen).toBe(true);
-
-    act(() => {
-      result.current.setIsPinModalOpen(false);
-    });
-    expect(result.current.isPinModalOpen).toBe(false);
   });
 
   it('should confirm admin status after onPinSuccess', () => {
@@ -85,6 +67,5 @@ describe('useAdminMode (Security & Workflow Tests)', () => {
     });
 
     expect(result.current.isAdmin).toBe(true);
-    expect(result.current.isPinModalOpen).toBe(false);
   });
 });

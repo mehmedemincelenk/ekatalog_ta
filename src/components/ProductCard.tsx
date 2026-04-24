@@ -11,7 +11,7 @@ import {
   standardizePriceInput,
   transformCurrencyStringToNumber,
   formatNumberToCurrency,
-} from '../utils/price';
+} from '../utils/core';
 import { refineProductTexts } from '../utils/ai';
 import Button from './Button';
 import SmartImage from './SmartImage';
@@ -325,17 +325,6 @@ const ProductCard = memo(
                     </div>
                   </div>
 
-                  {/* BOTTOM-RIGHT ACTIONS: Info Hint Only */}
-                  <div
-                    className="pointer-events-auto absolute bottom-2 right-2 flex items-center gap-1.5"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <InfoHint
-                      message="Vitrin sırası ve tasarım tavsiyeleri için üst ikonları, ürünü yönetmek için kartın üzerini kullanabilirsiniz."
-                      position="top"
-                      className="mb-0.5 shadow-xl opacity-50 hover:opacity-100 transition-opacity"
-                    />
-                  </div>
                 </motion.div>
               )}
             </AnimatePresence>

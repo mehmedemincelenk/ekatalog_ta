@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion, PanInfo } from 'framer-motion';
-import { THEME } from '../data/config';
-import { useCarousel } from '../hooks/useCarousel';
+import { THEME, CAROUSEL, TECH } from '../data/config';
+import { supabase } from '../supabase';
+import { getActiveStoreSlug, reorderArray } from '../utils/core';
 import CarouselSlideUnit from './CarouselSlideUnit';
 import Button from './Button';
 import PlusPlaceholder from './PlusPlaceholder';
 
-import { HeroCarouselProps } from '../types';
+import { HeroCarouselProps, CarouselSlide } from '../types';
 
 const INTERVAL_MS = 6000;
 const SWIPE_THRESHOLD = 50;
@@ -18,14 +19,89 @@ const SWIPE_THRESHOLD = 50;
  * Features: Infinite loop, Drag/Swipe support, Resize resilience.
  */
 export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
-  const {
-    slides,
-    uploadHeroImage,
-    addSlide,
-    deleteSlide,
-    reorderSlides,
-    loading,
-  } = useCarousel(isAdminModeActive);
+  // --- IN-SITU HOOK: CAROUSEL ENGINE ---
+  const [marketingSlides, setMarketingSlides] = useState<CarouselSlide[]>(CAROUSEL.slides);
+  const [loading, setLoading] = useState(true);
+  const activeStoreSlug = getActiveStoreSlug();
+
+  const persistCarouselData = useCallback(async (updatedSlides: CarouselSlide[]) => {
+    if (!isAdminModeActive || activeStoreSlug === 'main-site') return;
+    try {
+      const { data: storeData } = await supabase.from('stores').select('carousel_data').eq('slug', activeStoreSlug).single();
+      const currentCarouselData = storeData?.carousel_data || {};
+      const { error } = await supabase.from('stores').update({
+        carousel_data: { ...currentCarouselData, slides: updatedSlides },
+      }).eq('slug', activeStoreSlug);
+      if (error) throw error;
+    } catch (err) { console.error('Carousel sync failed:', err); }
+  }, [isAdminModeActive, activeStoreSlug]);
+
+  const synchronizeCarouselSlides = useCallback(async () => {
+    if (activeStoreSlug === 'main-site') { setLoading(false); return; }
+    setLoading(true);
+    const { data: storeData, error: fetchError } = await supabase.from('stores').select('carousel_data').eq('slug', activeStoreSlug).single();
+    if (storeData && !fetchError && storeData.carousel_data?.slides) {
+      setMarketingSlides(storeData.carousel_data.slides);
+    }
+    setLoading(false);
+  }, [activeStoreSlug]);
+
+  useEffect(() => { synchronizeCarouselSlides(); }, [synchronizeCarouselSlides]);
+
+  const modifySlideContent = useCallback(async (slideId: number, contentChanges: Partial<CarouselSlide>) => {
+    setMarketingSlides((prev) => {
+      const updated = prev.map((s) => s.id === slideId ? { ...s, ...contentChanges } : s);
+      persistCarouselData(updated);
+      return updated;
+    });
+  }, [persistCarouselData]);
+
+  const uploadHeroImage = useCallback(async (slideId: number, visualFile: File) => {
+    try {
+      const { processDualQualityVisuals } = await import('../utils/image');
+      const { hq: optimizedVisual } = await processDualQualityVisuals(visualFile, TECH.storage.heroWidth);
+      const visualFileName = `hero-${activeStoreSlug}-${slideId}-${Date.now()}.jpg`;
+      const storagePath = `${TECH.storage.heroFolder}/${visualFileName}`;
+      const { error } = await supabase.storage.from(TECH.storage.bucket).upload(storagePath, optimizedVisual, { upsert: true, cacheControl: TECH.storage.cacheControl });
+      if (error) throw error;
+      const { data: { publicUrl } } = supabase.storage.from(TECH.storage.bucket).getPublicUrl(storagePath);
+      const finalizedUrl = `${publicUrl}?t=${Date.now()}`;
+      await modifySlideContent(slideId, { src: finalizedUrl });
+      return finalizedUrl;
+    } catch (err) { console.error('Hero upload failed:', err); throw err; }
+  }, [activeStoreSlug, modifySlideContent]);
+
+  const addSlide = useCallback(async () => {
+    setMarketingSlides((prev) => {
+      const nextId = prev.length > 0 ? Math.max(...prev.map((s) => s.id)) + 1 : 1;
+      const newSlide: CarouselSlide = { id: nextId, src: '', bg: 'bg-stone-200', label: 'Yeni Başlık', sub: 'Açıklama metni buraya gelecek.' };
+      const updated = [...prev, newSlide];
+      persistCarouselData(updated);
+      return updated;
+    });
+  }, [persistCarouselData]);
+
+  const deleteSlide = useCallback(async (slideId: number) => {
+    setMarketingSlides((prev) => {
+      const updated = prev.filter((s) => s.id !== slideId);
+      persistCarouselData(updated);
+      return updated;
+    });
+  }, [persistCarouselData]);
+
+  const reorderSlides = useCallback(async (slideId: number, newDisplayIndex: number) => {
+    setMarketingSlides((prev) => {
+      const currentIndex = prev.findIndex((s) => s.id === slideId);
+      if (currentIndex === -1) return prev;
+      const targetedIndex = Math.max(0, Math.min(newDisplayIndex - 1, prev.length - 1));
+      if (currentIndex === targetedIndex) return prev;
+      const updated = reorderArray(prev, currentIndex, targetedIndex);
+      persistCarouselData(updated);
+      return updated;
+    });
+  }, [persistCarouselData]);
+
+  const slides = marketingSlides;
 
   const [currentIndex, setCurrentIndex] = useState(1);
   const [isTransitioning, setIsTransitioning] = useState(true);

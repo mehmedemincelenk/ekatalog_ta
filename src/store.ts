@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { CompanySettings, StoreState } from './types';
+import { STORAGE, TECH, LABELS } from './data/config';
 
 /**
  * STORE.TS (DÜKKANIN ORTAK AKLI)
@@ -8,9 +9,12 @@ import { CompanySettings, StoreState } from './types';
  * merkezi bir yerden yöneten akıllı pano.
  */
 
+let errorTimer: NodeJS.Timeout | null = null;
+
 export const useStore = create<StoreState>((set) => ({
-  // Admin Modu (Varsayılan kapalı)
-  isAdmin: false,
+  // Admin Modu (Oturum kontrolü ile başla)
+  isAdmin: typeof window !== 'undefined' ? 
+    sessionStorage.getItem(STORAGE.adminSession) === TECH.auth.sessionActiveValue : false,
   setIsAdmin: (status: boolean) => set({ isAdmin: status }),
 
   // Dükkan Ayarları
@@ -57,6 +61,41 @@ export const useStore = create<StoreState>((set) => ({
   activeDiscount: null,
   setActiveDiscount: (discount: { code: string; rate: number; category?: string } | null) =>
     set({ activeDiscount: discount }),
+  discountError: null,
+  applyDiscountCode: (rawInput: string) => {
+    const sanitizedCode = rawInput.toUpperCase().trim();
+    if (errorTimer) clearTimeout(errorTimer);
+
+    if (!sanitizedCode) {
+      set({ activeDiscount: null, discountError: null });
+      return;
+    }
+
+    const discountMatch = sanitizedCode.match(/(\d+)$/);
+    if (discountMatch && discountMatch[1]) {
+      const parsedRate = parseInt(discountMatch[1], 10);
+      if (parsedRate >= TECH.discount.min && parsedRate <= TECH.discount.max) {
+        set({
+          activeDiscount: { code: sanitizedCode, rate: parsedRate / 100 },
+          discountError: null,
+        });
+      } else {
+        set({ activeDiscount: null, discountError: LABELS.discount.invalidRate });
+        errorTimer = setTimeout(() => set({ discountError: null }), TECH.discount.errorResetMs);
+      }
+    } else {
+      set({ activeDiscount: null, discountError: LABELS.discount.invalidCode });
+      errorTimer = setTimeout(() => set({ discountError: null }), TECH.discount.errorResetMs);
+    }
+  },
+  
+  isInlineEnabled: typeof window !== 'undefined' ? 
+    (localStorage.getItem('ekatalog_inline_edit_v1') !== 'false') : true,
+  toggleInlineEdit: () => set((state) => {
+    const next = !state.isInlineEnabled;
+    localStorage.setItem('ekatalog_inline_edit_v1', String(next));
+    return { isInlineEnabled: next };
+  }),
 
   // UI / Modal Management
   activeModal: null,

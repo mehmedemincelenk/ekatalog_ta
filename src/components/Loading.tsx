@@ -1,7 +1,7 @@
 // FILE ROLE: High-End Minimal Loading Spinner
 // DEPENDS ON: Lucide React (or SVG), Tailwind
 // CONSUMED BY: ProductCard, HeroCarousel, AIStudio
-import React from 'react';
+import { motion } from 'framer-motion';
 
 import { LoadingProps } from '../types';
 
@@ -33,17 +33,33 @@ const Loading: React.FC<LoadingProps> = ({
     <div
       className={`flex flex-col items-center justify-center gap-3 ${className}`}
     >
-      <div
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ 
+          opacity: 1, 
+          scale: 1,
+          rotate: 360 
+        }}
+        transition={{
+          opacity: { duration: 0.3 },
+          scale: { duration: 0.3 },
+          rotate: { repeat: Infinity, duration: 1, ease: "linear" }
+        }}
         className={`
           ${sizeClasses[size]} 
           ${variantClasses[variant]} 
-          rounded-full animate-spin
+          rounded-full
         `}
       />
       {label && (
-        <span className="text-[10px] font-black uppercase tracking-widest text-stone-400">
+        <motion.span 
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="text-[10px] font-black uppercase tracking-widest text-stone-400"
+        >
           {label}
-        </span>
+        </motion.span>
       )}
     </div>
   );

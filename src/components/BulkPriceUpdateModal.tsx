@@ -12,7 +12,7 @@ import {
   LayoutDashboard,
   Terminal,
 } from 'lucide-react';
-import { transformCurrencyStringToNumber } from '../utils/price';
+import { transformCurrencyStringToNumber } from '../utils/core';
 import { BulkPriceUpdateModalProps, Product } from '../types';
 
 type ActionType = 'PRICE' | 'DELETE' | 'ARCHIVE' | 'STOCK' | null;

@@ -51,9 +51,9 @@ export default function SmartImage({
           <motion.div
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-10 flex items-center justify-center"
+            className="absolute inset-0 z-10 flex items-center justify-center bg-stone-50"
           >
-            <div className="absolute inset-0 bg-stone-50 shimmer-animation opacity-50" />
+            <div className="absolute inset-0 shimmer-animation opacity-50" />
             <div className="relative w-12 h-12 border-2 border-stone-200 border-t-stone-900 rounded-full animate-spin opacity-20" />
             {/* Subtle Diamond Grid Pattern */}
             <div
@@ -74,7 +74,6 @@ export default function SmartImage({
           src={resolvedSrc || ''}
           alt={alt}
           loading={priority ? 'eager' : 'lazy'}
-          fetchpriority={priority ? 'high' : 'auto'}
           className={`
             w-full h-full transition-all duration-700 ease-out
             ${objectFit === 'cover' ? 'object-cover' : 'object-contain'}
@@ -100,21 +99,6 @@ export default function SmartImage({
           </span>
         </div>
       )}
-
-      {/* GLOBAL SHIMMER CSS */}
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-        @keyframes shimmer {
-          0% { background-position: -200% 0; }
-          100% { background-position: 200% 0; }
-        }
-        .shimmer-animation {
-          animation: shimmer 2s infinite linear;
-        }
-      `,
-        }}
-      />
     </div>
   );
 }

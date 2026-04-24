@@ -65,6 +65,11 @@ export const THEME = {
     adminEdit: 'bg-amber-50/50 border-amber-200',
     adminHighlight: 'focus:bg-white/20 focus:outline-none',
     visualFallback: '#FFFFFF',
+    marketing: {
+      primary: '#16a34a', // green-600
+      secondary: '#dc2626', // red-600
+      brand: '#000000', // stone-900
+    }
   },
 
   announcementBar: {
@@ -120,6 +125,14 @@ export const THEME = {
       />
     ),
     ai: <Sparkles className="w-full h-full p-1.5" strokeWidth={2.2} />,
+  },
+
+  statusState: {
+    success: 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20',
+    danger: 'bg-red-500 text-white shadow-lg shadow-red-500/20',
+    active: 'bg-stone-900 text-white shadow-lg shadow-stone-900/20',
+    inactive: 'bg-stone-100 text-stone-400 hover:text-stone-600',
+    neutral: 'bg-white text-stone-900 shadow-sm border-stone-200',
   },
 
   button: {
@@ -286,7 +299,7 @@ export const THEME = {
     header: {
       wrapper:
         'flex items-center gap-3 sm:gap-[13px] mb-6 sm:mb-6 px-1 sm:px-1.5',
-      title: `${FS.base} sm:text-base font-black text-stone-900 tracking-tighter`,
+      title: `${FS.base} sm:text-lg font-black text-stone-900 tracking-tighter`,
       line: 'flex-1 h-px bg-stone-200',
       count: `${FS.xs} sm:text-[9px] font-bold text-stone-400`,
     },
@@ -357,13 +370,13 @@ export const THEME = {
       cursorAdmin: 'cursor-pointer',
     },
     typography: {
-      name: `${FS.base} sm:text-[0.9rem] text-stone-900 leading-tight tracking-tight`,
+      name: `${FS.base} sm:text-[1.1rem] text-stone-900 leading-tight tracking-tight`,
       nameOutOfStock: 'opacity-40 text-stone-400',
       nameTransition: 'transition-standard',
-      description: `${FS.xs} sm:text-[0.55rem] text-stone-500 leading-snug font-medium normal-case`,
+      description: `${FS.xs} sm:text-[0.75rem] text-stone-500 leading-snug font-medium normal-case`,
       descriptionClamp: 'line-clamp-2',
       descriptionFull: 'w-full',
-      price: `sm:text-[1.2rem] font-black tracking-tight transition-smooth`,
+      price: `sm:text-[1.4rem] font-black tracking-tight transition-smooth`,
       priceOutOfStock:
         'line-through opacity-30 text-stone-400 scale-95 origin-left',
       discountPrice: 'text-kraft-600',

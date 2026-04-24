@@ -27,9 +27,10 @@ const Turnstile = ({ onVerify, options = {} }: TurnstileProps) => {
     const isLocal =
       window.location.hostname === 'localhost' ||
       window.location.hostname === '127.0.0.1';
+    
     const activeSiteKey = isLocal
-      ? '1x00000000000000000000AA' // Local Test Key
-      : '0x4AAAAAADAJkSXkZ8wkzSTM'; // Your Production Key
+      ? '1x00000000000000000000AA' 
+      : (import.meta.env.VITE_TURNSTILE_SITE_KEY || '0x4AAAAAADAJkSXkZ8wkzSTM');
 
     widgetIdRef.current = window.turnstile.render(containerRef.current!, {
       sitekey: activeSiteKey,

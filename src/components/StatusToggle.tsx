@@ -1,7 +1,9 @@
 import { memo } from 'react';
 import { Check, X } from 'lucide-react';
 import Button from './Button';
-import { INITIAL_STATUS_STATE } from '../data/config';
+import { THEME } from '../data/config';
+
+import { motion } from 'framer-motion';
 
 /**
  * STATUS TOGGLE COMPONENT (Diamond Standard)
@@ -18,8 +20,8 @@ const StatusToggle = memo(
     value,
     onChange,
     disabled = false,
-    activeColor = INITIAL_STATUS_STATE.active,
-    inactiveColor = INITIAL_STATUS_STATE.danger,
+    activeColor = THEME.statusState.active,
+    inactiveColor = THEME.statusState.danger,
   }: StatusToggleProps) => {
     return (
       <div className="flex items-center justify-between bg-white px-2.5 py-2 rounded-xl border border-stone-100/50 shadow-sm">
@@ -27,22 +29,26 @@ const StatusToggle = memo(
           {label}
         </span>
         <div className="flex gap-1.5">
-          <Button
-            onClick={() => onChange(true)}
-            disabled={disabled}
-            mode="square"
-            size="sm"
-            className={`!w-7 !h-7 !p-0 !rounded-lg transition-all ${value ? activeColor : INITIAL_STATUS_STATE.inactive}`}
-            icon={<Check size={14} strokeWidth={4} />}
-          />
-          <Button
-            onClick={() => onChange(false)}
-            disabled={disabled}
-            mode="square"
-            size="sm"
-            className={`!w-7 !h-7 !p-0 !rounded-lg transition-all ${!value ? inactiveColor : INITIAL_STATUS_STATE.inactive}`}
-            icon={<X size={14} strokeWidth={4} />}
-          />
+          <motion.div whileTap={{ scale: 0.9 }} whileHover={{ scale: 1.05 }}>
+            <Button
+              onClick={() => onChange(true)}
+              disabled={disabled}
+              mode="square"
+              size="sm"
+              className={`!w-7 !h-7 !p-0 !rounded-lg transition-all ${value ? activeColor : THEME.statusState.inactive}`}
+              icon={<Check size={14} strokeWidth={4} />}
+            />
+          </motion.div>
+          <motion.div whileTap={{ scale: 0.9 }} whileHover={{ scale: 1.05 }}>
+            <Button
+              onClick={() => onChange(false)}
+              disabled={disabled}
+              mode="square"
+              size="sm"
+              className={`!w-7 !h-7 !p-0 !rounded-lg transition-all ${!value ? inactiveColor : THEME.statusState.inactive}`}
+              icon={<X size={14} strokeWidth={4} />}
+            />
+          </motion.div>
         </div>
       </div>
     );

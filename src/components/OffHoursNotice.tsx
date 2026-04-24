@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TECH } from '../data/config';
 import { X, MessageCircle } from 'lucide-react';
-import { generateWhatsAppLink } from '../utils/store';
+import { generateWhatsAppLink } from '../utils/core';
 import Button from './Button';
 
 import { OffHoursNoticeProps } from '../types';
