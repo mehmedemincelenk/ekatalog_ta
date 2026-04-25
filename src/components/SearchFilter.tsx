@@ -33,7 +33,7 @@ const SearchFilter = memo(
     } = useStore();
 
     const [internalSearch, setInternalSearch] = useState(search);
-    const [isReyonOpen, setIsReyonOpen] = useState(false);
+    const [isPanelOpen, setIsPanelOpen] = useState(false);
     const [isAddingCategory, setIsAddingCategory] = useState(false);
 
     const displayConfig = settings?.displayConfig || {
@@ -56,26 +56,47 @@ const SearchFilter = memo(
     const showAll = displayConfig.showSearch || displayConfig.showCategories;
     if (!showAll && !isAdmin) return null;
 
-    // Diamond Logic: PC shows 5 chips + "More" toggle in single line
+    // Diamond Logic: On PC, always show everything. On Mobile, respect the panel toggle.
     const pcInitialLimit = 5;
+    const isPC = typeof window !== 'undefined' && window.innerWidth >= 640;
     const hasMoreThanLimit = sortedList.length > pcInitialLimit;
-    const visibleList = (!isReyonOpen && hasMoreThanLimit) 
-      ? sortedList.slice(0, pcInitialLimit) 
-      : sortedList;
+    
+    const visibleList = (isPC || isPanelOpen || !hasMoreThanLimit) 
+      ? sortedList 
+      : sortedList.slice(0, pcInitialLimit);
+
+    const totalProductCount = Object.values(stats).reduce((acc, curr) => acc + curr, 0);
+    const isAllSelected = activeCategories.length === 0;
+    const chipTheme = THEME.searchFilter.categoryList.chip;
 
     const renderCategoryList = (list: string[]) => (
       <>
-        <Button
+        {/* ADMIN: KATEGORİ EKLE CHIP (Moved to the very beginning) */}
+        {isAdmin && (
+          <PlusPlaceholder
+            type="CATEGORY"
+            onClick={() => setIsAddingCategory(true)}
+            className="shrink-0 min-h-[28px] sm:min-h-[42px] !py-0"
+          />
+        )}
+
+        <div
           onClick={() => {
-            onCategoryToggle(LABELS.filter.allCategories);
-            setIsReyonOpen(false);
+            // "Tüm Ürünler" should clear active filters
+            onCategoryToggle('ALL_PRODUCTS'); // This special key will be handled by store
           }}
-          variant={activeCategories.length === 0 ? 'primary' : 'secondary'}
-          mode="rectangle"
-          className="px-5 py-2.5 sm:px-[19px] sm:py-[10px] text-[10px] font-black uppercase tracking-widest shrink-0 !rounded-xl"
+          className={`
+            ${chipTheme.container} ${THEME.radius.chip} items-stretch shrink-0 select-none cursor-pointer transition-all active:scale-95 min-h-[28px] sm:min-h-[42px] px-4 sm:px-6 flex
+            ${isAllSelected ? chipTheme.active : chipTheme.inactive}
+          `}
         >
-          {LABELS.filter.allCategories}
-        </Button>
+          <div className={`${chipTheme.textButton} !py-0 w-full flex items-center justify-center pointer-events-none sm:text-[12px] min-w-[60px] sm:min-w-[100px]`}>
+            <span className={isAllSelected ? chipTheme.activeText : chipTheme.inactiveText}>
+              {LABELS.filter.allCategories}
+            </span>
+          </div>
+        </div>
+
         {list.map((cat) => (
           <CategoryFilterChip
             key={cat}
@@ -91,98 +112,79 @@ const SearchFilter = memo(
           />
         ))}
         
-        {/* PC "MORE" CHIP */}
-        {!isReyonOpen && hasMoreThanLimit && (
+        {/* MOBILE ONLY "MORE" CHIP */}
+        {!isPanelOpen && hasMoreThanLimit && !isPC && (
           <Button
-            onClick={() => setIsReyonOpen(true)}
+            onClick={() => setIsPanelOpen(true)}
             variant="secondary"
             mode="rectangle"
-            className="hidden sm:flex px-5 py-2.5 sm:px-[19px] sm:py-[10px] text-[10px] font-black uppercase tracking-widest shrink-0 !rounded-xl border-stone-200 border-dashed border-2 hover:border-stone-900 transition-all text-stone-400 hover:text-stone-900"
+            className="flex sm:hidden px-5 py-2.5 text-[10px] font-black uppercase tracking-widest shrink-0 !rounded-xl border-stone-200 border-dashed border-2 hover:border-stone-900 transition-all text-stone-400 hover:text-stone-900"
           >
             + DAHA FAZLA
           </Button>
         )}
 
-        {isAdmin && (
-          <PlusPlaceholder
-            type="CATEGORY"
-            onClick={() => setIsAddingCategory(true)}
-          />
-        )}
       </>
     );
 
     return (
       <div
-        className={`w-full bg-white border-b border-stone-100 py-3 relative z-40 ${!showAll ? 'opacity-50 grayscale' : ''}`}
+        className={`w-full bg-stone-50 border-b border-stone-200 sm:border-b-0 pt-3 pb-1 relative z-40 ${!showAll ? 'opacity-50 grayscale' : ''}`}
       >
-        <div className={filterTheme.container}>
-          {/* INTERACTION BAR: Universal side-by-side for mobile, unified with PC chips */}
-          <div className="flex items-center gap-2">
+        <div className={`${filterTheme.container} !flex-col !items-stretch`}>
+          {/* TOP BAR: Search (Mobile Only) & Interaction */}
+          <div className="flex flex-row items-center gap-2 w-full">
             {displayConfig.showSearch && (
               <div
-                className={`${filterTheme.searchArea.inputWrapper} ${THEME.radius.input} flex-1 h-11 sm:hidden`}
+                className={`${filterTheme.searchArea.inputWrapper} ${THEME.radius.input} flex-1 h-11 sm:hidden !max-w-none w-full flex items-center`}
               >
                 <div className={filterTheme.searchArea.iconSize}>
                   {globalIcons.search}
                 </div>
                 <input
+                  id="mobile-search-input"
                   type="text"
                   value={internalSearch}
                   onChange={(e) => setInternalSearch(e.target.value)}
                   placeholder={LABELS.filter.searchPlaceholder}
-                  className={`${filterTheme.searchArea.input} ${THEME.radius.input} h-full`}
+                  className={`${filterTheme.searchArea.input} ${THEME.radius.input} h-full w-full flex-1`}
                 />
               </div>
             )}
 
             {displayConfig.showCategories && (
-              <div className="flex-1 sm:flex-none flex items-center gap-2 overflow-hidden">
+              <div className="flex-none flex items-center justify-start gap-2 overflow-hidden sm:hidden">
                 <Button
-                  onClick={() => setIsReyonOpen(!isReyonOpen)}
+                  onClick={() => setIsPanelOpen(!isPanelOpen)}
                   variant="primary"
                   mode="rectangle"
-                  className="sm:hidden h-11 px-6 flex-1 sm:flex-none font-black !bg-stone-900 !text-white !rounded-xl"
+                  className="h-11 px-3 flex-none font-black !text-[10px] !bg-stone-900 !text-white !rounded-lg"
                 >
                   {LABELS.filter.categoryBtn}
                 </Button>
-                
-                {/* PC ONLY: Collapsed Single Line View */}
-                {!isReyonOpen && (
-                  <div className="hidden sm:flex flex-nowrap items-center gap-2 overflow-hidden w-full py-1">
-                    {renderCategoryList(visibleList)}
-                  </div>
-                )}
               </div>
             )}
           </div>
 
           {/* EXPANDED PANEL (PC & MOBILE) */}
           {displayConfig.showCategories && (
-            <AnimatePresence>
-              {isReyonOpen && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden mt-3"
-                >
-                  <div className="flex flex-wrap gap-2 py-1">
-                    {renderCategoryList(sortedList)}
-                    
-                    {/* PC "LESS" CHIP */}
-                    <Button
-                      onClick={() => setIsReyonOpen(false)}
-                      variant="secondary"
-                      mode="rectangle"
-                      className="hidden sm:flex px-5 py-2.5 sm:px-[19px] sm:py-[10px] text-[10px] font-black uppercase tracking-widest shrink-0 !rounded-xl border-stone-200 border-dashed border-2 hover:border-stone-900 transition-all text-stone-400 hover:text-stone-900"
-                    >
-                      - DAHA AZ
-                    </Button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <div className="mt-3 sm:mt-0">
+              <AnimatePresence mode="wait">
+                {(isPanelOpen || (typeof window !== 'undefined' && window.innerWidth >= 640)) ? (
+                  <motion.div
+                    key="expanded-categories"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="flex flex-wrap justify-start items-center gap-2 py-1 w-full">
+                      {renderCategoryList(sortedList)}
+                    </div>
+                  </motion.div>
+                ) : null}
+              </AnimatePresence>
+            </div>
           )}
 
           {!showAll && isAdmin && (
@@ -199,8 +201,8 @@ const SearchFilter = memo(
             if (name.trim()) onAddCategory?.(name.trim());
           }}
           title={LABELS.filter.newCategoryPrompt.toUpperCase()}
-          subtitle="Reyonun adı müşterileriniz tarafından görülecektir."
-          placeholder="Reyon adı..."
+          subtitle="Kategorinin adı müşterileriniz tarafından görülecektir."
+          placeholder="Kategori adı..."
           initialValue=""
         />
       </div>

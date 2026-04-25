@@ -131,7 +131,7 @@ export function useProductsActions() {
       const { error } = await supabase
         .from('stores')
         .update({ category_order: newOrder })
-        .eq('slug', STORE_SLUG);
+        .eq('id', settings?.id);
       if (error) throw error;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['settings'] }),
@@ -371,16 +371,25 @@ export function useProducts(searchQuery: string, activeCategories: string[], isA
     },
     addCategory: async (name: string) => {
       if (!settings?.id) return;
+      
+      // 1. Create a placeholder product
       await actions.addProduct({
-        name: 'Yeni Ürün',
+        name: 'Yeni Kategori Ürünü',
         category: name,
         price: '0',
-        description: '',
+        description: 'Bu ürün kategoriyi oluşturmak için otomatik eklenmiştir.',
         image_url: null,
+        store_id: settings.id,
         out_of_stock: false,
         is_archived: true,
-        store_id: settings.id,
       });
+
+      // 2. Persist to category_order list in DB
+      const currentOrder = settings.categoryOrder || [];
+      if (!currentOrder.includes(name)) {
+        const updatedOrder = [...currentOrder, name];
+        await actions.reorderCategories(updatedOrder);
+      }
     },
   };
 }

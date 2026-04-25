@@ -61,13 +61,14 @@ const CategoryFilterChip = memo(
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -10 }}
-                className="relative group px-1 h-8 flex items-center border-r border-stone-100"
+                className="relative group px-1 h-full flex items-center border-r border-stone-100"
               >
                 <OrderSelector
                   currentOrder={currentOrder}
                   totalCount={totalCategories}
                   onChange={(newPos) => onOrderChange(categoryName, newPos)}
                   className="!shadow-none !bg-transparent !border-none !h-7 !w-7"
+                  isDark={isItemSelected}
                 />
               </motion.div>
             ) : (
@@ -103,10 +104,10 @@ const CategoryFilterChip = memo(
               onRename(categoryName, newName.trim());
             }
           }}
-          title="Reyon Adını Değiştir"
-          subtitle="Bu reyonun adını güncelleyerek dükkan nizamını koruyabilirsiniz."
+          title="Kategori Adını Değiştir"
+          subtitle="Bu kategorinin adını güncelleyerek dükkan nizamını koruyabilirsiniz."
           initialValue={categoryName}
-          placeholder="Yeni reyon adı girin..."
+          placeholder="Yeni kategori adı girin..."
         />
       </div>
     );

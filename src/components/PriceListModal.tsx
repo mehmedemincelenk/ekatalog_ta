@@ -291,7 +291,7 @@ export default function PriceListModal({
   const getStepTitle = () => {
     switch (step) {
       case 0: return "Hoş Geldiniz";
-      case 1: return "Reyon Seçimi";
+      case 1: return "Kategori Seçimi";
       case 2: return "Format Seçimi";
       case 3: return "Görünüm Tarzı";
       case 4: return "Katalog Hazır!";

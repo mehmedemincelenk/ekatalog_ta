@@ -34,49 +34,52 @@ export default function FloatingAdminMenu({
     {
       id: 'currency',
       icon: (
-        <div className="flex flex-col items-center justify-center leading-none">
-          <span className="text-[17px] font-black">
+        <div className="w-6 h-6 sm:w-9 sm:h-9 flex flex-col items-center justify-center leading-none bg-stone-900 text-white rounded-md">
+          <span className="text-[12px] sm:text-[18px] font-black">
             {activeCurrency === 'TRY' ? '₺' : activeCurrency === 'USD' ? '$' : '€'}
           </span>
-          <span className="text-[7px] font-bold uppercase tracking-tighter opacity-50 -mt-0.5">
+          <span className="text-[5px] sm:text-[7px] font-bold uppercase tracking-tighter opacity-70 -mt-0.5">
             {activeCurrency}
           </span>
         </div>
       ),
       action: onCurrencyToggle,
-      label: 'Para Birimi',
-      className: 'border-2 border-stone-900 text-stone-900 bg-white',
-    },
-    {
-      id: 'add',
-      icon: globalIcons.plus,
-      action: onProductAddTrigger,
-      label: 'Ürün Ekle',
-      primary: true,
+      label: 'PARA BİRİMİ',
+      className: 'bg-white text-stone-900 border-2 border-stone-100',
     },
     ...(onBulkUpdateTrigger
       ? [
           {
             id: 'bulk',
-            icon: globalIcons.bulkPrice,
+            icon: <div className="w-6 h-6 sm:w-9 sm:h-9 flex items-center justify-center">{globalIcons.bulkPrice}</div>,
             action: onBulkUpdateTrigger,
-            label: 'Toplu Fiyat',
+            label: 'TOPLU İŞLEM',
+            className: 'bg-white text-stone-900 border-2 border-stone-100',
           },
         ]
       : []),
     {
+      id: 'add',
+      icon: <div className="w-6 h-6 sm:w-9 sm:h-9 flex items-center justify-center">{globalIcons.plus}</div>,
+      action: onProductAddTrigger,
+      label: '', 
+      primary: true,
+    },
+    {
       id: 'settings',
-      icon: globalIcons.settings,
+      icon: <div className="w-6 h-6 sm:w-9 sm:h-9 flex items-center justify-center">{globalIcons.settings}</div>,
       action: onSettingsTrigger,
-      label: 'Ayarlar',
+      label: '', 
+      className: 'bg-white text-stone-900 border-2 border-stone-100',
     },
   ];
 
   return (
     <BaseFloatingMenu 
       actions={adminActions} 
-      autoCloseDelay={3000} // Admin needs shorter delay
-      mainIcon={globalIcons.adminLayout}
+      autoCloseDelay={5000}
+      mainIcon={globalIcons.settings}
+      labelText="AYARLAR"
     />
   );
 }

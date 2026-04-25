@@ -3,7 +3,7 @@ import {
   transformCurrencyStringToNumber,
   formatNumberToCurrency,
   calculatePromotionalPrice,
-} from './core';
+} from './price';
 
 describe('Price Utils (A-Level English Refactor)', () => {
   describe('transformCurrencyStringToNumber', () => {

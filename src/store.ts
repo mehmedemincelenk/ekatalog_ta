@@ -33,11 +33,18 @@ export const useStore = create<StoreState>((set) => ({
 
   activeCategories: [],
   toggleCategory: (category: string) =>
-    set((state: StoreState) => ({
-      activeCategories: state.activeCategories.includes(category)
-        ? state.activeCategories.filter((c: string) => c !== category)
-        : [...state.activeCategories, category],
-    })),
+    set((state: StoreState) => {
+      // "Tüm Ürünler" or special clear signal
+      if (category === 'ALL_PRODUCTS') {
+        return { activeCategories: [] };
+      }
+      
+      return {
+        activeCategories: state.activeCategories.includes(category)
+          ? state.activeCategories.filter((c: string) => c !== category)
+          : [...state.activeCategories, category],
+      };
+    }),
   clearCategories: () => set({ activeCategories: [] }),
 
   visitorCurrency:

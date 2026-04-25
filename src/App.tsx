@@ -177,18 +177,18 @@ function CatalogView() {
       )}
 
       {!isAdmin && (
-        <div className="fixed bottom-2 right-2 z-[90] print:hidden">
+        <div className="fixed bottom-4 right-2 z-[90] print:hidden">
           <FloatingGuestMenu
             onCouponClick={() => openModal('COUPON')}
             onExcelClick={() => openModal('PRICE_LIST')}
             onSearchClick={() => {
               window.scrollTo({ top: 0, behavior: 'smooth' });
               setTimeout(() => {
-                const searchInput = document.querySelector(
-                  'input[placeholder*="ara"]',
-                ) as HTMLInputElement;
-                if (searchInput) searchInput.focus({ preventScroll: true });
-              }, 800);
+                const searchInput = document.getElementById('mobile-search-input') as HTMLInputElement;
+                if (searchInput) {
+                  searchInput.focus({ preventScroll: true });
+                }
+              }, 400);
             }}
             onQRClick={() => openModal('QR')}
           />

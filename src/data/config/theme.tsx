@@ -240,7 +240,7 @@ export const THEME = {
       changeBadge: `absolute top-4 right-4 z-30 pointer-events-none bg-white/90 backdrop-blur px-3 py-1.5 ${BR.full} ${FS.xs} font-black shadow-xl`,
     },
     navigation: {
-      navBtnStyle: 'opacity-0 group-hover/carousel:opacity-100 hidden sm:flex',
+      navBtnStyle: 'opacity-100 flex',
       prevPos: 'left-4',
       nextPos: 'right-4',
       dotsWrapper:

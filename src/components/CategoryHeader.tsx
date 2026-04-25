@@ -89,10 +89,10 @@ const CategoryHeader = memo(
               onRename(categoryName, newName.trim());
             }
           }}
-          title="Reyon Adını Değiştir"
-          subtitle="Bu reyonun adını güncelleyerek dükkan nizamını koruyabilirsiniz."
+          title="Kategori Adını Değiştir"
+          subtitle="Bu kategorinin adını güncelleyerek dükkan nizamını koruyabilirsiniz."
           initialValue={categoryName}
-          placeholder="Yeni reyon adı girin..."
+          placeholder="Yeni kategori adı girin..."
         />
       </div>
     );

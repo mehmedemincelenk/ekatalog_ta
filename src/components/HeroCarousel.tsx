@@ -60,13 +60,18 @@ export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
     try {
       const { processDualQualityVisuals } = await import('../utils/image');
       const { hq: optimizedVisual } = await processDualQualityVisuals(visualFile, TECH.storage.heroWidth);
-      const visualFileName = `hero-${activeStoreSlug}-${slideId}-${Date.now()}.jpg`;
+      const visualFileName = `hero-${activeStoreSlug}-${slideId === -1 ? 'new' : slideId}-${Date.now()}.jpg`;
       const storagePath = `${TECH.storage.heroFolder}/${visualFileName}`;
       const { error } = await supabase.storage.from(TECH.storage.bucket).upload(storagePath, optimizedVisual, { upsert: true, cacheControl: TECH.storage.cacheControl });
       if (error) throw error;
       const { data: { publicUrl } } = supabase.storage.from(TECH.storage.bucket).getPublicUrl(storagePath);
       const finalizedUrl = `${publicUrl}?t=${Date.now()}`;
-      await modifySlideContent(slideId, { src: finalizedUrl });
+      
+      // Only modify existing slide content if it's NOT a new slide creation flow
+      if (slideId !== -1) {
+        await modifySlideContent(slideId, { src: finalizedUrl });
+      }
+      
       return finalizedUrl;
     } catch (err) { console.error('Hero upload failed:', err); throw err; }
   }, [activeStoreSlug, modifySlideContent]);
@@ -103,8 +108,8 @@ export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
 
   const slides = marketingSlides;
 
-  const [currentIndex, setCurrentIndex] = useState(1);
-  const [isTransitioning, setIsTransitioning] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [isAssetUploading, setIsAssetUploading] = useState(false);
   const [activeEditingSlideId, setActiveEditingSlideId] = useState<
     number | null
@@ -125,45 +130,31 @@ export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // RATIONAL CLONING: Buffer for seamless wrap-around (Memoized)
-  const extendedSlides = useMemo(() => {
-    if (slides.length === 0) return [];
-    return [slides[slides.length - 1], ...slides, slides[0]];
-  }, [slides]);
+
 
   const handleNext = useCallback(() => {
     if (slides.length <= 1) return;
     setIsTransitioning(true);
-    setCurrentIndex((prev) => prev + 1);
+    setCurrentIndex((prev) => (prev + 1) % slides.length);
   }, [slides.length]);
 
   const handlePrev = useCallback(() => {
     if (slides.length <= 1) return;
     setIsTransitioning(true);
-    setCurrentIndex((prev) => prev - 1);
+    setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
   }, [slides.length]);
 
-  const handleTransitionEnd = useCallback(() => {
-    if (currentIndex >= slides.length + 1) {
-      setIsTransitioning(false);
-      setCurrentIndex(1);
-    } else if (currentIndex <= 0) {
-      setIsTransitioning(false);
-      setCurrentIndex(slides.length);
-    }
-  }, [currentIndex, slides.length]);
 
   useEffect(() => {
     if (isAdminModeActive || isAssetUploading || slides.length <= 1) return;
     const scrollTimer = setInterval(handleNext, INTERVAL_MS);
     return () => clearInterval(scrollTimer);
-  }, [handleNext, isAdminModeActive, isAssetUploading, slides.length]);
+  }, [handleNext, isAdminModeActive, isAssetUploading, slides.length, currentIndex]);
 
   const handleAddSlideTrigger = useCallback(async () => {
-    await addSlide();
-    setIsAddingNewSlide(true);
-    setCurrentIndex(slides.length + 1);
-  }, [addSlide, slides.length]);
+    setActiveEditingSlideId(-1); // Special ID for new slide
+    fileUploadInputRef.current?.click();
+  }, []);
 
   // GLOBAL SIGNAL LISTENER: Clean way to trigger slide addition from App.tsx
   useEffect(() => {
@@ -178,29 +169,70 @@ export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
   }, [isAdminModeActive, handleAddSlideTrigger]);
 
   // TOUCH/DRIPE LOGIC: Unified swipe handler
-  const handleDragEnd = (
-    _: MouseEvent | TouchEvent | PointerEvent,
-    info: PanInfo,
-  ) => {
+  // GESTURE ENGINE: Drag logic that updates index
+  const handleDragEnd = (_: any, info: PanInfo) => {
     if (isAdminModeActive || slides.length <= 1) return;
-    if (info.offset.x < -SWIPE_THRESHOLD) handleNext();
-    else if (info.offset.x > SWIPE_THRESHOLD) handlePrev();
+    
+    const swipeDistance = info.offset.x;
+    const swipeVelocity = info.velocity.x;
+
+    if (swipeDistance < -SWIPE_THRESHOLD || swipeVelocity < -500) {
+      handleNext();
+    } else if (swipeDistance > SWIPE_THRESHOLD || swipeVelocity > 500) {
+      handlePrev();
+    } else {
+      setIsTransitioning(true);
+      setCurrentIndex((prev) => prev); 
+    }
   };
+
+  const triggerImageUpdate = useCallback((id: number) => {
+    setActiveEditingSlideId(id);
+    fileUploadInputRef.current?.click();
+  }, []);
 
   const handleFileUploadAction = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = event.target.files?.[0];
-    if (!file || !activeEditingSlideId) return;
+    if (!file || activeEditingSlideId === null) return;
+    
     try {
       setIsAssetUploading(true);
-      await uploadHeroImage(activeEditingSlideId, file);
-      if (isAddingNewSlide) setIsAddingNewSlide(false);
+      
+      if (activeEditingSlideId === -1) {
+        // FLOW: NEW SLIDE
+        // 1. Upload first
+        const uploadedUrl = await uploadHeroImage(-1, file); // Temp ID for upload
+        
+        // 2. If upload succeeded (didn't throw), create and persist the slide in ONE shot
+        setMarketingSlides(prev => {
+          const nextId = prev.length > 0 ? Math.max(...prev.map((s) => s.id)) + 1 : 1;
+          const newFullSlide: CarouselSlide = { 
+            id: nextId, 
+            src: uploadedUrl, 
+            bg: 'bg-stone-200', 
+            label: 'Yeni Başlık', 
+            sub: 'Açıklama metni buraya gelecek.' 
+          };
+          const updated = [...prev, newFullSlide];
+          persistCarouselData(updated);
+          return updated;
+        });
+
+        // 3. Move to the end (new slide)
+        setCurrentIndex(slides.length);
+      } else {
+        // FLOW: Update existing slide
+        await uploadHeroImage(activeEditingSlideId, file);
+      }
     } catch (err) {
       console.error('Image deployment error:', err);
     } finally {
       setIsAssetUploading(false);
       setActiveEditingSlideId(null);
+      // Reset input
+      event.target.value = '';
     }
   };
 
@@ -231,41 +263,43 @@ export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
       <div className={carouselTheme.layout}>
         {/* STAGED FILMSTRIP: Rasyonele Kesintisiz Kademeli Odak */}
         <motion.div
-          drag={!isAdminModeActive && slides.length > 1 ? 'x' : false}
+          drag="x"
           dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.2}
           onDragEnd={handleDragEnd}
-          className={`flex w-full h-full gap-4 ${isTransitioning ? 'transition-transform duration-700 ease-in-out' : 'transition-none'}`}
-          onTransitionEnd={handleTransitionEnd}
-          style={{
-            // Layout Engine: Dynamically responsive offset math
-            transform: isMobile
-              ? `translateX(-${currentIndex * 100}%)`
-              : `translateX(calc(20% - ${currentIndex * 60}% - ${currentIndex * 16}px))`,
+          className="flex w-full h-full touch-pan-y"
+          onAnimationComplete={() => setIsTransitioning(false)}
+          animate={{
+            x: isMobile 
+              ? `-${currentIndex * 100}%` 
+              : `${20 - (currentIndex * 60)}%`,
           }}
+          transition={
+            isTransitioning
+              ? { duration: 0.7, ease: [0.22, 1, 0.36, 1] }
+              : { duration: 0 }
+          }
         >
-          {extendedSlides.map((slideItem, index) => {
+          {slides.map((slideItem, index) => {
             const isVisible = index === currentIndex;
 
             return (
               <div
-                key={`${slideItem.id}-${index}`}
-                className="relative w-full sm:w-[60%] h-full shrink-0"
+                key={index}
+                className={`relative w-full sm:w-[60%] h-full shrink-0 ${isMobile ? 'px-0' : 'px-2'}`}
               >
                 <CarouselSlideUnit
                   slideData={slideItem}
-                  isAdmin={isAdminModeActive}
                   isCurrentlyActive={isVisible}
+                  isAdmin={isAdminModeActive}
                   isCurrentlyUploading={isAssetUploading}
+                  isMobileView={isMobile}
                   editingTargetSlideId={activeEditingSlideId}
-                  onImageUpdateTrigger={(id) => {
-                    setIsAddingNewSlide(false);
-                    setActiveEditingSlideId(id);
-                    fileUploadInputRef.current?.click();
-                  }}
+                  onImageUpdateTrigger={triggerImageUpdate}
                   onDeleteTrigger={deleteSlide}
                   onAddTrigger={handleAddSlideTrigger}
                   onReorderTrigger={reorderSlides}
-                  currentIndex={index % (slides.length || 1) || slides.length}
+                  currentIndex={index + 1}
                   totalSlides={slides.length}
                 />
               </div>
@@ -282,8 +316,9 @@ export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
               <Button
                 onClick={handlePrev}
                 variant="glass"
-                size="md"
-                icon={globalIcons.chevronLeft}
+                mode="circle"
+                className="w-8 h-8 sm:w-14 sm:h-14 !p-0 flex items-center justify-center"
+                icon={<div className="w-3 h-3 sm:w-6 sm:h-6">{globalIcons.chevronLeft}</div>}
               />
             </div>
             <div
@@ -292,8 +327,9 @@ export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
               <Button
                 onClick={handleNext}
                 variant="glass"
-                size="md"
-                icon={globalIcons.chevronRight}
+                mode="circle"
+                className="w-8 h-8 sm:w-14 sm:h-14 !p-0 flex items-center justify-center"
+                icon={<div className="w-3 h-3 sm:w-6 sm:h-6">{globalIcons.chevronRight}</div>}
               />
             </div>
           </>
@@ -303,11 +339,14 @@ export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
         {slides.length > 1 && (
           <div className={carouselTheme.navigation.dotsWrapper}>
             {slides.map((_, dotIndex) => {
-              const isActive =
-                (currentIndex - 1 + slides.length) % slides.length === dotIndex;
+              const isActive = currentIndex === dotIndex;
               return (
                 <div
                   key={dotIndex}
+                  onClick={() => {
+                    setIsTransitioning(true);
+                    setCurrentIndex(dotIndex);
+                  }}
                   className={`
                     ${carouselTheme.navigation.dotBase} 
                     ${isActive ? carouselTheme.navigation.dotActive : carouselTheme.navigation.dotInactive}
@@ -315,6 +354,20 @@ export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
                 />
               );
             })}
+          </div>
+        )}
+
+        {/* GLOBAL ADD BUTTON (Admin Only) */}
+        {isAdminModeActive && (
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-[60]">
+            <Button
+              onClick={handleAddSlideTrigger}
+              variant="glass"
+              mode="circle"
+              className="w-11 h-11 sm:w-12 sm:h-12 !bg-stone-900/80 !backdrop-blur-md border-2 border-white/10 shadow-none"
+              icon={<div className="w-5 h-5 sm:w-5 sm:h-5 text-white">{globalIcons.plus}</div>}
+              title="YENİ AFİŞ EKLE"
+            />
           </div>
         )}
 

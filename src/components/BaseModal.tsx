@@ -25,7 +25,8 @@ export default function BaseModal({
   disableClickOutside = false,
   className = '',
   noPadding = false,
-}: BaseModalProps) {
+  isStatic = false,
+}: BaseModalProps & { isStatic?: boolean }) {
   const modalRef = useRef<HTMLDivElement>(null);
   const titleId = React.useId();
   const descId = React.useId();
@@ -41,25 +42,27 @@ export default function BaseModal({
 
   if (typeof document === 'undefined') return null;
 
-  return createPortal(
+  const content = (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6 print:p-0 print:block print:relative print:z-auto">
+        <div className={isStatic ? "relative z-0" : "fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6 print:p-0 print:block print:relative print:z-auto"}>
           {/* BACKDROP */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={handleBackdropClick}
-            className="absolute inset-0 bg-stone-900/60 backdrop-blur-sm print:hidden"
-          />
+          {!isStatic && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={handleBackdropClick}
+              className="absolute inset-0 bg-stone-900/60 backdrop-blur-sm print:hidden"
+            />
+          )}
 
           {/* MODAL CONTAINER */}
           <motion.div
             ref={modalRef}
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            initial={isStatic ? false : { opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            exit={isStatic ? false : { opacity: 0, scale: 0.95, y: 10 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={`
               relative w-full ${maxWidth} bg-white 
@@ -157,7 +160,8 @@ export default function BaseModal({
           </motion.div>
         </div>
       )}
-    </AnimatePresence>,
-    document.body,
+    </AnimatePresence>
   );
+
+  return isStatic ? content : createPortal(content, document.body);
 }

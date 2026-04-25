@@ -128,7 +128,7 @@ export interface CompanySettings {
 }
 
 /**
- * Category: Reyonların temel bilgisi.
+ * Category: Kategorilerin temel bilgisi.
  */
 export interface Category {
   name: string;
@@ -542,14 +542,15 @@ export interface CouponModalProps {
 
 export interface CarouselSlideUnitProps {
   slideData: CarouselSlide;
-  isAdmin: boolean;
   isCurrentlyActive: boolean;
+  isAdmin: boolean;
   isCurrentlyUploading: boolean;
   editingTargetSlideId: number | null;
-  onImageUpdateTrigger: (id: number) => void;
-  onDeleteTrigger?: (id: number) => void;
-  onAddTrigger?: () => void;
-  onReorderTrigger?: (id: number, newIndex: number) => void;
+  isMobileView?: boolean;
+  onImageUpdateTrigger: (slideId: number) => void;
+  onDeleteTrigger: (slideId: number) => void;
+  onAddTrigger: () => void;
+  onReorderTrigger: (slideId: number, newIndex: number) => void;
   currentIndex: number;
   totalSlides: number;
 }
@@ -601,6 +602,8 @@ export type ModalType =
   | 'GLOBAL_ADD_MENU'
   | 'AI_STUDIO_TEXT'
   | 'AI_STUDIO_COMPARE'
+  | 'LOCATION'
+  | 'CONTACT'
   | null;
 
 export interface StoreState {

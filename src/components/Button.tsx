@@ -131,30 +131,32 @@ const Button: React.FC<ButtonProps> = ({
       )}
 
       {/* CONTENT UNIT */}
-      <div className={`
-        ${isCard ? 'flex-1 min-w-0' : ''}
-        ${selected && !isVertical ? 'pr-8' : ''}
-      `}>
-        {isCard ? (
-          <>
-            <div className={`
-              ${description ? 'font-black text-sm mb-0.5 block' : 'flex items-center justify-between w-full'}
-            `}>
-              {children}
-            </div>
-            {description && (
-              <p className={`
-                text-[10px] lowercase leading-relaxed font-bold opacity-70 transition-colors normal-case
-                ${selected ? 'text-stone-300' : 'text-stone-400'}
+      {children && (
+        <div className={`
+          ${isCard ? 'flex-1 min-w-0' : ''}
+          ${selected && !isVertical ? 'pr-8' : ''}
+        `}>
+          {isCard ? (
+            <>
+              <div className={`
+                ${description ? 'font-black text-sm mb-0.5 block' : 'flex items-center justify-between w-full'}
               `}>
-                {description}
-              </p>
-            )}
-          </>
-        ) : (
-          children
-        )}
-      </div>
+                {children}
+              </div>
+              {description && (
+                <p className={`
+                  text-[10px] lowercase leading-relaxed font-bold opacity-70 transition-colors normal-case
+                  ${selected ? 'text-stone-300' : 'text-stone-400'}
+                `}>
+                  {description}
+                </p>
+              )}
+            </>
+          ) : (
+            children
+          )}
+        </div>
+      )}
     </button>
   );
 };

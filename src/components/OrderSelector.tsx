@@ -23,7 +23,7 @@ const OrderSelector = memo(
         : variant === 'medium'
           ? 'w-8 h-8'
           : 'w-10 h-10';
-    const radiusClass = 'rounded-lg'; // Projenin genel yumuşak köşeli nizamına uygun
+    const radiusClass = 'rounded-full'; // Projenin genel yumuşak köşeli nizamına uygun
 
     return (
       <div
@@ -39,18 +39,21 @@ const OrderSelector = memo(
         onClick={(e) => e.stopPropagation()}
       >
         {/* DISPLAY NUMBER */}
-        <div className="flex items-center justify-center overflow-hidden h-4 w-6 pointer-events-none">
+        <div className="flex items-center justify-center overflow-hidden w-6 h-full pointer-events-none relative">
           <AnimatePresence mode="wait">
-            <motion.span
+            <motion.div
               key={currentOrder}
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -5 }}
-              transition={{ duration: 0.2 }}
-              className={`font-black absolute tracking-tighter ${variant === 'large' ? 'text-[14px]' : 'text-[12px]'}`}
+              initial={{ y: 5, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -5, opacity: 0 }}
+              className="flex items-center justify-center h-full"
             >
-              {currentOrder}.
-            </motion.span>
+              <span
+                className={`font-black tracking-tighter flex items-center justify-center ${variant === 'large' ? 'text-[14px]' : 'text-[12px]'}`}
+              >
+                {currentOrder}.
+              </span>
+            </motion.div>
           </AnimatePresence>
         </div>
 
@@ -66,7 +69,7 @@ const OrderSelector = memo(
         >
           {Array.from({ length: totalCount }, (_, i) => (
             <option key={i + 1} value={i + 1}>
-              {i + 1}. Sıra
+              {i + 1}. Sıraya Alalım
             </option>
           ))}
         </select>

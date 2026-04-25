@@ -44,14 +44,14 @@ export const LABELS = {
     showLess: 'Daha Az Göster',
     showMore: (count: number) => `+${count} Daha`,
     newCategoryPrompt: 'Yeni kategori adını girin:',
-    searchPlaceholder: 'Ürün veya reyon ara...',
+    searchPlaceholder: 'Ürün veya kategori ara...',
     allCategories: 'Tüm Ürünler',
   },
   form: {
     productName: 'Ürün Adı',
     productNamePlaceholder: 'Örn: Kargo Kutusu 20x20',
-    category: 'Reyon Seçin',
-    newCategoryPlaceholder: 'Veya yeni reyon adı yazın...',
+    category: 'Kategori Seçin',
+    newCategoryPlaceholder: 'Veya yeni kategori adı yazın...',
     price: 'Fiyat',
     pricePlaceholder: 'Örn: ₺12,50',
     description: 'Short description (Optional)',
@@ -66,7 +66,7 @@ export const LABELS = {
   bulkPriceUpdate: {
     title: 'Toplu Fiyat Güncelleme',
     description:
-      'Reyon seç, miktarı yaz (10 veya %10), zam mı indirim mi karar ver ve onayla. Tüm fiyatlar anında güncellensin!',
+      'Kategori seç, miktarı yaz (10 veya %10), zam mı indirim mi karar ver ve onayla. Tüm fiyatlar anında güncellensin!',
     categoryLabel: 'KATEGORİ SEÇİMİ (Seçilmezse Tümü)',
     valueLabel: 'MİKTAR VEYA YÜZDE (Örn: 10 veya %10)',
     increaseBtn: 'ZAM YAP 📈',
@@ -79,7 +79,7 @@ export const LABELS = {
       `${catCount === 0 ? 'Tüm kategorilerdeki' : `${catCount} kategorideki`} toplam ${productCount} ürünün fiyatı ${isIncrease ? 'artırılacak' : 'azaltılacak'}. Onaylıyor musunuz?`,
   },
   adminActions: {
-    categories: 'Reyon Değiştir',
+    categories: 'Kategori Değiştir',
     inStock: 'Stokta Var',
     outOfStock: 'Stokta Yok',
     archive: 'Arşivle',

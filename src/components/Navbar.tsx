@@ -389,36 +389,36 @@ const Navbar = memo(
                       />
                     )}
 
-                    {/* WhatsApp Button */}
+                    {/* Contact Button */}
                     {settings.displayConfig.showWhatsapp && (
                       <Button
-                        onClick={handleWhatsAppAction}
+                        onClick={() => useStore.getState().openModal('CONTACT')}
                         variant="primary"
                         mode="rectangle"
-                        className="!bg-stone-900 !text-white !px-2.5 !py-1 sm:!p-2.5 !rounded-lg hover:!bg-black !shadow-lg border-white/10"
-                        icon={
-                          <div className="flex items-center justify-center w-2.5 h-2.5 sm:w-[1.05rem] sm:h-[1.05rem]">
-                            {globalIcons.whatsapp}
-                          </div>
-                        }
+                        className="!bg-stone-900 !text-white !px-3 !py-1 sm:!p-2.5 !rounded-lg hover:!bg-black !shadow-lg border-white/10"
                       >
-                        <span
-                          contentEditable={isAdmin && isInlineEnabled}
-                          suppressContentEditableWarning
-                          onBlur={(e) =>
-                            updateSetting(
-                              'whatsapp',
-                              e.currentTarget.textContent || '',
-                            )
-                          }
-                          onKeyDown={(e) =>
-                            e.key === 'Enter' &&
-                            (e.preventDefault(), e.currentTarget.blur())
-                          }
-                          className={`!text-[0.6rem] sm:!text-[0.8rem] font-black tracking-tight leading-normal flex items-center ${isAdmin && isInlineEnabled ? 'min-w-[40px] focus:bg-white/10' : ''}`}
-                        >
-                          {settings.whatsapp || 'SİPARİŞ VER'}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span
+                            contentEditable={isAdmin && isInlineEnabled}
+                            suppressContentEditableWarning
+                            onBlur={(e) =>
+                              updateSetting(
+                                'whatsapp',
+                                e.currentTarget.textContent || '',
+                              )
+                            }
+                            onKeyDown={(e) =>
+                              e.key === 'Enter' &&
+                              (e.preventDefault(), e.currentTarget.blur())
+                            }
+                            className={`!text-[0.6rem] sm:!text-[0.8rem] font-black tracking-tight leading-normal flex items-center ${isAdmin && isInlineEnabled ? 'min-w-[40px] focus:bg-white/10' : ''}`}
+                          >
+                            {settings.whatsapp || 'SİPARİŞ VER'}
+                          </span>
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 sm:w-4 sm:h-4 text-white opacity-60">
+                            <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/>
+                          </svg>
+                        </div>
                       </Button>
                     )}
                   </div>

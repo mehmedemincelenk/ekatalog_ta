@@ -426,7 +426,7 @@ export default function BulkPriceUpdateModal({
             </div>
             <div className="pt-6 border-t border-stone-100">
               <p className="text-[9px] font-black text-stone-400 uppercase tracking-widest text-center mb-4">
-                REYON SEÇİN
+                KATEGORİ SEÇİN
               </p>
               <div className="flex flex-wrap justify-center gap-1.5">
                 <Button

@@ -9,6 +9,8 @@ import CouponModal from './CouponModal';
 import PriceListModal from './PriceListModal';
 import GlobalAddMenuModal from './GlobalAddMenuModal';
 import AIStudioCompareModal from './AIStudioCompareModal';
+import LocationModal from './LocationModal';
+import ContactModal from './ContactModal';
 
 import { useStore } from '../store';
 import { useProducts } from '../hooks/useProductsHub';
@@ -68,7 +70,7 @@ const AppModals = memo(() => {
       // Just switch the active modal
       useStore.getState().openModal('ADD_PRODUCT');
     } else if (type === 'CATEGORY') {
-      const name = window.prompt('Yeni Reyon/Kategori Adı:');
+      const name = window.prompt('Yeni Kategori Adı:');
       if (name) addCategory(name);
     } else if (type === 'REFERENCE') {
       const name = window.prompt('Yeni Referans/İş Ortağı Adı:');
@@ -192,6 +194,19 @@ const AppModals = memo(() => {
           });
           closeModal();
         }}
+      />
+
+      <LocationModal
+        isOpen={activeModal === 'LOCATION'}
+        onClose={closeModal}
+        address={settings?.address || ''}
+      />
+
+      <ContactModal
+        isOpen={activeModal === 'CONTACT'}
+        onClose={closeModal}
+        phone={settings?.whatsapp || ''}
+        storeName={settings?.title || 'Katalog'}
       />
     </>
   );

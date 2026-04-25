@@ -31,7 +31,7 @@ export default function GlobalAddMenuModal({
     },
     {
       id: 'CATEGORY',
-      title: 'YENİ REYON',
+      title: 'YENİ KATEGORİ',
       subtitle: 'Ürünlerinizi gruplayın',
       icon: <Layers className="w-6 h-6" />,
       color: 'bg-amber-500 text-white',

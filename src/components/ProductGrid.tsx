@@ -149,8 +149,8 @@ const ProductGrid = memo(
                 <div className="py-16 border-2 border-dashed border-stone-100 rounded-2xl flex flex-col items-center justify-center bg-stone-50/30">
                   <p className="text-stone-400 text-xs font-medium italic mb-4">
                     {isAdmin
-                      ? 'Bu reyon henüz boş.'
-                      : 'Bu reyonda henüz ürün bulunmuyor.'}
+                      ? 'Bu kategori henüz boş.'
+                      : 'Bu kategoride henüz ürün bulunmuyor.'}
                   </p>
                   {isAdmin && (
                     <Button
@@ -159,7 +159,7 @@ const ProductGrid = memo(
                       mode="rectangle"
                       className="!bg-stone-900/5 !text-stone-900 !px-6 !py-2 !rounded-full font-black text-[10px] uppercase tracking-widest hover:!bg-stone-900 hover:!text-white transition-all border border-stone-200 admin-fab shadow-none"
                     >
-                      + BU REYONA ÜRÜN EKLE
+                      + BU KATEGORİYE ÜRÜN EKLE
                     </Button>
                   )}
                 </div>

@@ -27,7 +27,7 @@ const PlusPlaceholder = memo(
         iconSize: 'w-10 h-10 sm:w-12 sm:h-12',
         label: (
           <span className="mt-4 font-black uppercase text-[0.625rem] sm:text-[0.7rem] tracking-[0.2em] text-stone-400 group-hover/plus:text-stone-900 transition-colors leading-tight">
-            Bu Reyona
+            Bu Kategoriye
             <br />
             Ürün Ekle
           </span>
@@ -36,9 +36,9 @@ const PlusPlaceholder = memo(
       },
       CATEGORY: {
         aria: 'Add category',
-        wrapperClass: `px-6 py-2.5 border-2 border-dashed border-stone-200 text-stone-400 font-black text-[10px] uppercase tracking-widest hover:border-stone-900 hover:text-stone-900 !rounded-xl`,
+        wrapperClass: `px-3 !py-0 !border-2 !border-dashed !border-stone-300 text-stone-400 font-black uppercase tracking-widest hover:!border-stone-900 hover:!text-stone-900 !rounded-full bg-stone-50/30 flex items-center justify-center !min-h-[28px] sm:!min-h-[42px] h-full !shadow-none`,
         iconSize: 'w-4 h-4',
-        label: <span>+ {label || 'REYON EKLE'}</span>,
+        label: <span className="ml-2 text-[0.5rem] sm:text-[12px]">{label || 'KATEGORİ EKLE'}</span>,
         showCorners: false,
       },
       REFERENCE: {
@@ -88,7 +88,7 @@ const PlusPlaceholder = memo(
       `}
       >
         <div
-          className={`flex ${type === 'CAROUSEL' ? 'flex-row' : 'flex-col'} items-center justify-center p-6 text-center transform transition-transform group-hover/plus:scale-110`}
+          className={`flex ${type === 'CAROUSEL' || type === 'CATEGORY' ? 'flex-row' : 'flex-col'} items-center justify-center ${type === 'CATEGORY' ? 'p-0' : 'p-6'} text-center transform transition-transform group-hover/plus:scale-110`}
         >
           <div
             className={`${config.iconSize} flex items-center justify-center text-stone-400 group-hover/plus:text-stone-900 transition-colors`}
