@@ -49,6 +49,7 @@ export function useSettingsQuery() {
         name: raw.name || '',
         displayConfig: raw.display_config || {},
         announcementBar: raw.announcement_bar || { enabled: false, text: '' },
+        visitor_leads: raw.visitor_leads || [],
       };
 
       return settings;
@@ -94,6 +95,7 @@ export function useSettings(isAdmin: boolean) {
         name: 'name',
         displayConfig: 'display_config',
         announcementBar: 'announcement_bar',
+        visitor_leads: 'visitor_leads',
       };
 
       const { error } = await supabase
@@ -118,6 +120,19 @@ export function useSettings(isAdmin: boolean) {
     loading,
     notFound: !loading && !settings,
     isError,
+    addVisitorLead: async (phone: string) => {
+      if (!settings?.id) return;
+      const currentLeads = settings.visitor_leads || [];
+      const newLead = { phone, created_at: new Date().toISOString() };
+      
+      const { error } = await supabase
+        .from('stores')
+        .update({ visitor_leads: [...currentLeads, newLead] })
+        .eq('id', settings.id);
+      
+      if (error) throw error;
+      queryClient.invalidateQueries({ queryKey: ['settings', STORE_SLUG] });
+    },
     retry: () =>
       queryClient.invalidateQueries({ queryKey: ['settings', STORE_SLUG] }),
   };

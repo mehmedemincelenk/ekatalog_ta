@@ -1,5 +1,4 @@
-import React from 'react';
-import { MapPin, Navigation } from 'lucide-react';
+import { MapPin } from 'lucide-react'; // Harita İkonu
 import BaseModal from './BaseModal';
 import Button from './Button';
 
@@ -7,11 +6,12 @@ interface LocationModalProps {
   isOpen: boolean;
   onClose: () => void;
   address: string;
+  isStatic?: boolean;
 }
 
-export default function LocationModal({ isOpen, onClose, address }: LocationModalProps) {
+export default function LocationModal({ isOpen, onClose, address, isStatic = false }: LocationModalProps) {
   const handleOpenMaps = () => {
-    if (!address) return;
+    if (!address || isStatic) return;
     window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`, '_blank');
   };
 
@@ -19,43 +19,25 @@ export default function LocationModal({ isOpen, onClose, address }: LocationModa
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title="MAĞAZA KONUMU"
-      subtitle="Açık Adres Bilgileri"
-      icon={<MapPin className="w-8 h-8" />}
-      maxWidth="max-w-md"
+      isStatic={isStatic}
+      maxWidth="max-w-sm"
+      noPadding
     >
-      <div className="flex flex-col gap-6">
-        {/* ADDRESS CARD */}
-        <div className="bg-stone-50 border border-stone-100 rounded-2xl p-6 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-            <MapPin size={80} />
-          </div>
-          
-          <p className="text-stone-600 text-sm font-medium leading-relaxed relative z-10">
-            {address || 'Adres bilgisi bulunamadı.'}
-          </p>
-        </div>
+      <div className="flex flex-col bg-stone-50 border-b border-stone-100 rounded-[2rem] shadow-sm overflow-hidden p-7 gap-4">
+        <p className="text-[16px] font-black text-stone-900 leading-relaxed text-center px-2">
+          {address || 'Adres bilgisi bulunamadı.'}
+        </p>
 
-        {/* GUIDANCE TEXT */}
-        <div className="flex items-start gap-3 px-2">
-          <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center shrink-0">
-            <Navigation className="w-4 h-4 text-amber-600" />
-          </div>
-          <p className="text-[11px] font-bold text-stone-400 leading-tight">
-            Aşağıdaki butona tıklayarak telefonunuzdaki haritalar uygulamasında dükkanın tam konumuna yol tarifi alabilirsiniz.
-          </p>
-        </div>
-
-        {/* ACTION BUTTON */}
         <Button
           onClick={handleOpenMaps}
-          variant="primary"
+          variant="phone"
           mode="rectangle"
-          className="w-full !py-4 font-black tracking-widest text-sm shadow-xl"
-          icon={<Navigation size={18} strokeWidth={3} />}
+          className="w-full !h-16 !rounded-2xl"
           disabled={!address}
+          showFingerprint={true}
+          icon={<MapPin size={18} strokeWidth={2.5} />}
         >
-          HARİTALARDA GÖR
+          YOL TARİFİ AL
         </Button>
       </div>
     </BaseModal>

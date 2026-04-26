@@ -1,7 +1,8 @@
-import { memo, useState } from 'react';
+import { useState, useEffect } from 'react';
 import Button from './Button';
 import BaseModal from './BaseModal';
-import { HelpCircle, Sparkles, Settings2, ShieldCheck } from 'lucide-react';
+import { motion } from 'framer-motion';
+import * as Lucide from 'lucide-react';
 import { DisplaySettingsModalProps, DisplayConfig } from '../types';
 
 interface HelpInfo {
@@ -39,10 +40,24 @@ const HELP_CONTENTS: Record<string, HelpInfo> = {
 };
 
 /**
- * SETTING CARD (DIAMOND ATOM)
- * Memoized to prevent entire modal re-renders during toggle actions.
+ * SETTING TOGGLE (Local Utility)
  */
-const SettingCard = memo(({ 
+const SettingToggle = ({ value }: { value: boolean }) => (
+  <div className={`w-8 h-4 rounded-full transition-all duration-500 relative flex items-center px-0.5 overflow-hidden ${value ? 'bg-emerald-500/20' : 'bg-stone-200'}`}>
+    <motion.div
+      animate={{ x: value ? 16 : 0 }}
+      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+      className={`relative z-10 w-3 h-3 rounded-full flex items-center justify-center shadow-sm ${value ? 'bg-emerald-500 text-white' : 'bg-white text-stone-400'}`}
+    >
+      {value ? <Lucide.Check size={8} strokeWidth={4} /> : <Lucide.X size={8} strokeWidth={4} />}
+    </motion.div>
+  </div>
+);
+
+/**
+ * SETTING CARD (DIAMOND ATOM)
+ */
+const SettingCard = ({ 
   option, 
   onHelpTrigger, 
   isHiddenHelp 
@@ -54,13 +69,24 @@ const SettingCard = memo(({
   return (
     <div
       onClick={option.onToggle}
-      className={`relative flex items-center justify-between p-3 rounded-2xl border transition-all cursor-pointer group h-12 shadow-sm ${
+      className={`relative flex items-center justify-between p-3 rounded-2xl border transition-all cursor-pointer group h-12 shadow-sm overflow-hidden ${
         option.isOn
           ? 'border-stone-900 bg-stone-900 text-white shadow-stone-200'
           : 'border-stone-100 bg-stone-50 text-stone-400 hover:border-stone-200'
       }`}
     >
-      <div className="flex items-center gap-1.5 overflow-hidden flex-1">
+      {/* Fingerprint Seal Background */}
+      <div className={`absolute -right-4 -bottom-4 opacity-[0.08] pointer-events-none transition-transform duration-500 group-hover:scale-110 ${option.isOn ? 'text-white' : 'text-stone-900'}`}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" viewBox="0 0 16 16" style={{ transform: 'scaleX(-1) rotate(15deg)' }}>
+          <path d="M8.06 6.5a.5.5 0 0 1 .5.5v.776a11.5 11.5 0 0 1-.552 3.519l-1.331 4.14a.5.5 0 0 1-.952-.305l1.33-4.141a10.5 10.5 0 0 0 .504-3.213V7a.5.5 0 0 1 .5-.5Z"/>
+          <path d="M6.06 7a2 2 0 1 1 4 0 .5.5 0 1 1-1 0 1 1 0 1 0-2 0v.332q0 .613-.066 1.221A.5.5 0 0 1 6 8.447q.06-.555.06-1.115zm3.509 1a.5.5 0 0 1 .487.513 11.5 11.5 0 0 1-.587 3.339l-1.266 3.8a.5.5 0 0 1-.949-.317l1.267-3.8a10.5 10.5 0 0 0 .535-3.048A.5.5 0 0 1 9.569 8m-3.356 2.115a.5.5 0 0 1 .33.626L5.24 14.939a.5.5 0 1 1-.955-.296l1.303-4.199a.5.5 0 0 1 .625-.329"/>
+          <path d="M4.759 5.833A3.501 3.501 0 0 1 11.559 7a.5.5 0 0 1-1 0 2.5 2.5 0 0 0-4.857-.833.5.5 0 1 1-.943-.334m.3 1.67a.5.5 0 0 1 .449.546 10.7 10.7 0 0 1-.4 2.031l-1.222 4.072a.5.5 0 1 1-.958-.287L4.15 9.793a9.7 9.7 0 0 0 .363-1.842.5.5 0 0 1 .546-.449Zm6 .647a.5.5 0 0 1 .5.5c0 1.28-.213 2.552-.632 3.762l-1.09 3.145a.5.5 0 0 1-.944-.327l1.089-3.145c.382-1.105.578-2.266.578-3.435a.5.5 0 0 1 .5-.5Z"/>
+          <path d="M3.902 4.222a5 5 0 0 1 5.202-2.113.5.5 0 0 1-.208.979 4 4 0 0 0-4.163 1.69.5.5 0 0 1-.831-.556m6.72-.955a.5.5 0 0 1 .705-.052A4.99 4.99 0 0 1 13.059 7v1.5a.5.5 0 1 1-1 0V7a3.99 3.99 0 0 0-1.386-3.028.5.5 0 0 1-.051-.705M3.68 5.842a.5.5 0 0 1 .422.568q-.044.289-.044.59c0 .71-.1 1.417-.298 2.1l-1.14 3.923a.5.5 0 1 1-.96-.279L2.8 8.821A6.5 6.5 0 0 0 3.058 7q0-.375.054-.736a.5.5 0 0 1 .568-.422m8.882 3.66a.5.5 0 0 1 .456.54c-.084 1-.298 1.986-.64 2.934l-.744 2.068a.5.5 0 0 1-.941-.338l.745-2.07a10.5 10.5 0 0 0 .584-2.678.5.5 0 0 1 .54-.456"/>
+          <path d="M4.81 1.37A6.5 6.5 0 0 1 14.56 7a.5.5 0 1 1-1 0 5.5 5.5 0 0 0-8.25-4.765.5.5 0 0 1-.5-.865m-.89 1.257a.5.5 0 0 1 .04.706A5.48 5.48 0 0 0 2.56 7a.5.5 0 0 1-1 0c0-1.664.626-3.184 1.655-4.333a.5.5 0 0 1 .706-.04ZM1.915 8.02a.5.5 0 0 1 .346.616l-.779 2.767a.5.5 0 1 1-.962-.27l.778-2.767a.5.5 0 0 1 .617-.346m12.15.481a.5.5 0 0 1 .49.51c-.03 1.499-.161 3.025-.727 4.533l-.07.187a.5.5 0 0 1-.936-.351l.07-.187c.506-1.35.634-2.74.663-4.202a.5.5 0 0 1 .51-.49"/>
+        </svg>
+      </div>
+
+      <div className="relative z-10 flex items-center gap-1.5 overflow-hidden flex-1">
         {option.hasHelp && !isHiddenHelp && (
           <Button
             onClick={(e) => {
@@ -71,7 +97,7 @@ const SettingCard = memo(({
             mode="circle"
             size="sm"
             className={`!shrink-0 !p-0 !w-6 !h-6 shadow-none border-none transition-all ${option.isOn ? '!text-emerald-400' : '!text-stone-300 hover:!text-stone-950'}`}
-            icon={<HelpCircle size={14} />}
+            icon={<Lucide.HelpCircle size={14} />}
           />
         )}
         <span className="text-[10px] font-black uppercase tracking-tight leading-none truncate">
@@ -79,71 +105,119 @@ const SettingCard = memo(({
         </span>
       </div>
 
-      <div
-        className={`w-1.5 h-1.5 rounded-full transition-all duration-300 shrink-0 ${
-          option.isOn
-            ? 'bg-emerald-400 shadow-[0_0_8px_#34d399]'
-            : 'bg-stone-200'
-        }`}
-      />
+      <div className="relative z-10 shrink-0 ml-2">
+        <SettingToggle value={option.isOn} />
+      </div>
     </div>
   );
-});
+}
 
 /**
  * DISPLAY SETTINGS MODAL (DIAMOND EDITION)
  * -----------------------------------------------------------
  * The cockpit of the store. Managed with strict key-based lifecycle.
  */
-const DisplaySettingsModal = memo(
-  ({
-    isOpen,
-    onClose,
-    settings,
-    updateSetting,
-    isInlineEnabled,
-    onToggleInline,
-  }: DisplaySettingsModalProps) => {
+export default function DisplaySettingsModal({
+  isOpen,
+  onClose,
+  settings,
+  updateSetting,
+  isInlineEnabled,
+  onToggleInline,
+  isStatic = false,
+  initialStep,
+}: DisplaySettingsModalProps) {
     const [helpId, setHelpId] = useState<string | null>(null);
-    const [isIntroOpen, setIsIntroOpen] = useState(() => {
-      if (typeof window === 'undefined') return false;
-      const skipIntro = localStorage.getItem('ekatalog_skip_settings_intro') === 'true';
-      return !skipIntro;
-    });
+    const isIntroOpen = false;
     const [hiddenHelpIds, setHiddenHelpIds] = useState<string[]>(() => {
-      if (typeof window === 'undefined') return [];
-      const hidden = localStorage.getItem('ekatalog_hidden_help_ids');
-      return hidden ? JSON.parse(hidden) : [];
+      try {
+        if (typeof window === 'undefined') return [];
+        const hidden = localStorage.getItem('ekatalog_hidden_help_ids');
+        return hidden ? JSON.parse(hidden) : [];
+      } catch (e) {
+        return [];
+      }
     });
+
+    // Workspace Step Sync
+    useEffect(() => {
+      if (initialStep !== undefined) {
+        if (initialStep === 1) {
+          setHelpId(null);
+        } else if (initialStep === 2) {
+          setHelpId(null);
+        } else if (initialStep === 3) {
+          setHelpId('inline');
+        } else if (initialStep === 4) {
+          setHelpId('maintenance');
+        }
+      }
+    }, [initialStep]);
 
     if (!settings) return null;
-    const config = settings.displayConfig;
 
-    const toggleOption = (key: string) => {
-      updateSetting('displayConfig', {
-        ...config,
-        [key]: !config[key as keyof DisplayConfig],
-      });
+    // OPTIMISTIC UI: Local state to handle instant toggles
+    const [localConfig, setLocalConfig] = useState(settings.displayConfig || {});
+    const [localAnnouncement, setLocalAnnouncement] = useState(settings.announcementBar?.enabled || false);
+    const [localMaintenance, setLocalMaintenance] = useState(settings.maintenanceMode?.enabled || false);
+    const [localInline, setLocalInline] = useState(isInlineEnabled);
+
+    // Sync local state when props update (server response)
+    useEffect(() => {
+      setLocalConfig(settings.displayConfig || {});
+      setLocalAnnouncement(settings.announcementBar?.enabled || false);
+      setLocalMaintenance(settings.maintenanceMode?.enabled || false);
+      setLocalInline(isInlineEnabled);
+    }, [settings, isInlineEnabled]);
+
+    const toggleOption = async (key: string) => {
+      const newVal = !localConfig[key as keyof DisplayConfig];
+      // 1. Optimistic Update
+      setLocalConfig(prev => ({ ...prev, [key]: newVal }));
+      
+      // 2. Server Update
+      try {
+        await updateSetting('displayConfig', {
+          ...settings.displayConfig,
+          [key]: newVal,
+        });
+      } catch (err) {
+        // Rollback on error
+        setLocalConfig(settings.displayConfig || {});
+      }
     };
 
-    const toggleAnnouncement = () => {
-      updateSetting('announcementBar', {
-        ...settings.announcementBar,
-        enabled: !settings.announcementBar?.enabled,
-      });
+    const toggleAnnouncement = async () => {
+      const newVal = !localAnnouncement;
+      setLocalAnnouncement(newVal);
+      try {
+        await updateSetting('announcementBar', {
+          ...settings.announcementBar,
+          enabled: newVal,
+        });
+      } catch (err) {
+        setLocalAnnouncement(settings.announcementBar?.enabled || false);
+      }
     };
 
-    const toggleMaintenance = () => {
-      updateSetting('maintenanceMode', {
-        ...settings.maintenanceMode,
-        enabled: !settings.maintenanceMode?.enabled,
-      });
+    const toggleMaintenance = async () => {
+      const newVal = !localMaintenance;
+      setLocalMaintenance(newVal);
+      try {
+        await updateSetting('maintenanceMode', {
+          ...settings.maintenanceMode,
+          enabled: newVal,
+        });
+      } catch (err) {
+        setLocalMaintenance(settings.maintenanceMode?.enabled || false);
+      }
     };
 
-    const skipIntroPermanently = () => {
-      localStorage.setItem('ekatalog_skip_settings_intro', 'true');
-      setIsIntroOpen(false);
+    const handleToggleInline = () => {
+      setLocalInline(!localInline);
+      onToggleInline();
     };
+
 
     const hideHelpPermanently = (id: string) => {
       const updated = [...hiddenHelpIds, id];
@@ -152,107 +226,79 @@ const DisplaySettingsModal = memo(
       setHelpId(null);
     };
 
-    const groups = [
-      {
-        title: 'GÖRÜNÜRLÜK',
-        subtitle: 'Bölümleri Aç / Kapat',
-        options: [
-          { key: 'showPrice', label: 'Ürün Fiyatları', isOn: config.showPrice, onToggle: () => toggleOption('showPrice') },
-          { key: 'showWhatsapp', label: 'WhatsApp', isOn: config.showWhatsapp, onToggle: () => toggleOption('showWhatsapp') },
-          { key: 'showInstagram', label: 'Instagram', isOn: config.showInstagram, onToggle: () => toggleOption('showInstagram') },
-          { key: 'showCarousel', label: 'Afişler', isOn: config.showCarousel, onToggle: () => toggleOption('showCarousel') },
-          { key: 'showReferences', label: 'Referanslar', isOn: config.showReferences, onToggle: () => toggleOption('showReferences') },
-          { key: 'announcement', label: 'Duyuru Panosu', isOn: settings.announcementBar?.enabled ?? false, onToggle: toggleAnnouncement },
-        ],
-      },
-      {
-        title: 'FONKSİYONLAR',
-        subtitle: 'Ziyaretçi Yetkileri',
-        options: [
-          { key: 'showCoupons', label: 'Kupon İndirimi', isOn: config.showCoupons, onToggle: () => toggleOption('showCoupons') },
-          { key: 'showCurrency', label: 'Döviz Çevirici', isOn: config.showCurrency, onToggle: () => toggleOption('showCurrency') },
-          { key: 'showPriceList', label: 'Fiyat Listesi', isOn: config.showPriceList, onToggle: () => toggleOption('showPriceList') },
-        ],
-      },
-      {
-        title: 'YÖNETİM',
-        subtitle: 'Dükkan Kontrolleri',
-        options: [
-          { key: 'inline', label: 'Hızlı Düzenleme', isOn: isInlineEnabled, onToggle: onToggleInline, hasHelp: true },
-          { key: 'maintenance', label: 'Bakım Modu', isOn: settings.maintenanceMode?.enabled ?? false, onToggle: toggleMaintenance, hasHelp: true },
-        ],
-      },
+    const allOptions = [
+      { key: 'showPrice', label: 'Ürün Fiyatları', isOn: localConfig.showPrice, onToggle: () => toggleOption('showPrice') },
+      { key: 'showWhatsapp', label: 'WhatsApp', isOn: localConfig.showWhatsapp, onToggle: () => toggleOption('showWhatsapp') },
+      { key: 'showInstagram', label: 'Instagram', isOn: localConfig.showInstagram, onToggle: () => toggleOption('showInstagram') },
+      { key: 'showCarousel', label: 'Afişler', isOn: localConfig.showCarousel, onToggle: () => toggleOption('showCarousel') },
+      { key: 'showReferences', label: 'Referanslar', isOn: localConfig.showReferences, onToggle: () => toggleOption('showReferences') },
+      { key: 'announcement', label: 'Duyuru Panosu', isOn: localAnnouncement, onToggle: toggleAnnouncement },
+      { key: 'showCoupons', label: 'Kupon İndirimi', isOn: localConfig.showCoupons, onToggle: () => toggleOption('showCoupons') },
+      { key: 'showCurrency', label: 'Döviz Çevirici', isOn: localConfig.showCurrency, onToggle: () => toggleOption('showCurrency') },
+      { key: 'showPriceList', label: 'Fiyat Listesi', isOn: localConfig.showPriceList, onToggle: () => toggleOption('showPriceList') },
+      { key: 'inline', label: 'Hızlı Düzenleme', isOn: localInline, onToggle: handleToggleInline, hasHelp: false },
+      { key: 'maintenance', label: 'Bakım Modu', isOn: localMaintenance, onToggle: toggleMaintenance, hasHelp: true },
     ];
+
+    const activeOptions = allOptions.filter(o => o.isOn);
+    const inactiveOptions = allOptions.filter(o => !o.isOn);
 
     return (
       <>
         <BaseModal
           isOpen={isOpen && !isIntroOpen}
           onClose={onClose}
-          maxWidth="max-w-md"
-          title="Mağaza Özellikleri"
-          subtitle="Dükkanınızı isteğinize göre yapılandırın"
+          maxWidth="max-w-lg"
+          isStatic={isStatic}
+          noPadding={true}
           footer={
-            <Button onClick={onClose} variant="primary" size="md" mode="rectangle" className="w-full !rounded-2xl !py-4 font-black">
-              AYARLARI KAYDET VE KAPAT
-            </Button>
+            <div className="flex gap-3 w-full">
+              <Button onClick={onClose} variant="secondary" mode="rectangle" className="w-16 h-16 !bg-stone-50 border-stone-100 shrink-0 shadow-sm" showFingerprint={false}>
+                <Lucide.ChevronLeft size={24} strokeWidth={4} />
+              </Button>
+              <Button onClick={onClose} variant="action" size="md" className="flex-1 h-16 !rounded-[24px]" showFingerprint={true}>
+                <Lucide.Check size={28} strokeWidth={4} />
+              </Button>
+            </div>
           }
         >
-          <div className="space-y-6 pb-2 -mt-2">
-            {groups.map((group) => (
-              <div key={group.title} className="space-y-2">
-                <div className="px-1 flex items-baseline gap-2 mb-1 pl-4 border-l-2 border-stone-900">
-                  <h5 className="text-[9px] font-black text-stone-900 uppercase tracking-[0.2em]">{group.title}</h5>
-                  <span className="text-[10px] text-stone-300 font-bold italic truncate opacity-70">— {group.subtitle}</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {group.options.map((option) => (
-                    <SettingCard 
-                      key={option.key} 
-                      option={option} 
-                      onHelpTrigger={setHelpId}
-                      isHiddenHelp={hiddenHelpIds.includes(option.key)}
-                    />
-                  ))}
-                </div>
-              </div>
+          <div className="p-4 sm:p-6 grid grid-cols-2 gap-x-2 gap-y-2 pb-2">
+            {/* ACTIVE SECTION */}
+            <div className="col-span-2 px-1 flex items-baseline gap-2 mt-1 mb-1 pl-4 border-l-2 border-stone-900">
+              <h5 className="text-[10px] font-black text-stone-900 uppercase tracking-[0.2em]">AÇIK</h5>
+            </div>
+            {activeOptions.map((option) => (
+              <SettingCard 
+                key={option.key} 
+                option={option} 
+                onHelpTrigger={setHelpId}
+                isHiddenHelp={hiddenHelpIds.includes(option.key)}
+              />
             ))}
 
+            {/* INACTIVE SECTION */}
+            <div className="col-span-2 px-1 flex items-baseline gap-2 mt-6 mb-1 pl-4 border-l-2 border-stone-900">
+              <h5 className="text-[10px] font-black text-stone-900 uppercase tracking-[0.2em]">KAPALI</h5>
+            </div>
+            {inactiveOptions.map((option) => (
+              <div key={option.key} className="opacity-50 transition-opacity">
+                <SettingCard 
+                  option={option} 
+                  onHelpTrigger={setHelpId}
+                  isHiddenHelp={hiddenHelpIds.includes(option.key)}
+                />
+              </div>
+            ))}
           </div>
         </BaseModal>
 
-        {/* INTRO ONBOARDING MODAL */}
-        <BaseModal isOpen={isOpen && isIntroOpen} onClose={() => setIsIntroOpen(false)} maxWidth="max-w-sm" title="DÜKKAN KUMANDA MERKEZİ">
-          <div className="flex flex-col items-center text-center space-y-6 py-4">
-            <div className="w-16 h-16 bg-stone-900 rounded-[28px] flex items-center justify-center text-white shadow-2xl rotate-3"><Settings2 size={32} /></div>
-            <div className="space-y-2">
-              <h4 className="text-sm font-black text-stone-900 uppercase tracking-widest">Burada Neler Yapabilirsiniz?</h4>
-              <p className="text-[11px] text-stone-400 font-bold leading-relaxed px-4">
-                Bu panel, dükkanınızın tüm görünümünü ve fonksiyonlarını anlık olarak yönettiğiniz yerdir. 
-                <br /><br />
-                <span className="text-stone-900">İstediğiniz özelliği tek tıkla açabilir, ürün fiyatlarını gizleyebilir veya dükkanınızı bakım moduna alabilirsiniz.</span>
-              </p>
-            </div>
-            <div className="w-full bg-stone-50 p-4 rounded-3xl border border-stone-100 flex items-start gap-4 text-left">
-              <div className="w-8 h-8 bg-white rounded-xl shadow-sm border border-stone-100 flex items-center justify-center shrink-0"><Sparkles size={16} className="text-amber-500" /></div>
-              <div className="flex flex-col">
-                <span className="text-[10px] font-black uppercase text-stone-900 tracking-tighter">İpucu</span>
-                <p className="text-[10px] font-bold text-stone-400 leading-tight mt-1">Değişiklikler anında sunucularımıza kaydedilir ve tüm dünyada yayınlanır.</p>
-              </div>
-            </div>
-            <div className="w-full space-y-2 pt-2">
-              <Button onClick={() => setIsIntroOpen(false)} variant="primary" size="md" mode="rectangle" className="w-full !rounded-2xl !py-4 font-black uppercase tracking-widest">TAMAM, ANLADIM</Button>
-              <Button onClick={skipIntroPermanently} variant="ghost" mode="rectangle" className="w-full !text-[10px] font-black !text-stone-300 hover:!text-stone-900 uppercase tracking-[0.15em] shadow-none">BUNU TEKRAR GÖSTERME</Button>
-            </div>
-          </div>
-        </BaseModal>
 
         {/* REUSABLE HELP MODAL */}
         <BaseModal
           isOpen={!!helpId}
           onClose={() => setHelpId(null)}
           maxWidth="max-w-sm"
-          title={helpId ? HELP_CONTENTS[helpId]?.title : ''}
+          isStatic={isStatic}
           footer={
             <div className="flex flex-col gap-2 w-full">
               <Button onClick={() => setHelpId(null)} variant="primary" size="md" className="w-full !py-4 font-black" mode="rectangle">KAPAT</Button>
@@ -264,7 +310,7 @@ const DisplaySettingsModal = memo(
             <div className="space-y-4 py-2">
               <div className="bg-emerald-50 border border-emerald-100 p-5 rounded-3xl">
                 <div className="flex gap-4">
-                  <div className="w-8 h-8 bg-emerald-500 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"><ShieldCheck size={18} /></div>
+                  <div className="w-8 h-8 bg-emerald-500 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"><Lucide.ShieldCheck size={18} /></div>
                   <p className="text-[11px] text-emerald-800 leading-relaxed font-bold">{HELP_CONTENTS[helpId].onText}</p>
                 </div>
               </div>
@@ -279,7 +325,4 @@ const DisplaySettingsModal = memo(
         </BaseModal>
       </>
     );
-  },
-);
-
-export default DisplaySettingsModal;
+}

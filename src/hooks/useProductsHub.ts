@@ -2,12 +2,10 @@ import { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../supabase';
 import { Product, NewProductPayload, CompanySettings } from '../types';
-import { getActiveStoreSlug, reorderArray, smartSearch } from '../utils/core';
+import { reorderArray, smartSearch } from '../utils/core';
 import { useStore } from '../store';
 import { TECH, sortCategories } from '../data/config';
-import { compressVisualToDataUri } from '../utils/image';
 
-const STORE_SLUG = getActiveStoreSlug();
 
 /**
  * PRODUCTS & CATALOG HUB (DIAMOND EDITION)
@@ -66,20 +64,6 @@ async function uploadProductVisual(targetProduct: Product, visualFile: File) {
   }
 }
 
-async function removeProductVisual(visualUrl: string) {
-  try {
-    const assetUrl = new URL(visualUrl);
-    const fileName = assetUrl.pathname.split('/').pop();
-    if (fileName) {
-      await supabase.storage.from(TECH.storage.bucket).remove([
-        `${TECH.storage.lqFolder}/${fileName}`,
-        `${TECH.storage.hqFolder}/${fileName}`,
-      ]);
-    }
-  } catch (err) {
-    console.error('Cleanup failed:', err);
-  }
-}
 
 // --- 1. QUERY HOOK (Data Layer) ---
 

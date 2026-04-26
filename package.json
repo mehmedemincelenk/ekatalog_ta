@@ -26,6 +26,7 @@
     "qrcode.react": "^4.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-easy-crop": "^5.5.7",
     "react-parallax-tilt": "^1.7.324",
     "tailwind-merge": "^3.5.0",
     "zustand": "^5.0.12"

@@ -24,7 +24,7 @@ describe('Button Atomic UI (Diamond Snapshot)', () => {
   });
 
   it('Loading state snapshotu ile eşleşmeli', () => {
-    const { asFragment } = render(<Button isLoading>Loading</Button>);
+    const { asFragment } = render(<Button loading>Loading</Button>);
     expect(asFragment()).toMatchSnapshot();
   });
 

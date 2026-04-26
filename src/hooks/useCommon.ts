@@ -155,11 +155,12 @@ export function useModalBehavior(
   isOpen: boolean,
   containerRef: React.RefObject<HTMLElement>,
   onClose: () => void,
-  disableEsc: boolean = false
+  disableEsc: boolean = false,
+  isStatic: boolean = false
 ) {
-  useScrollLock(isOpen);
-  useKeyboard('Escape', onClose, isOpen && !disableEsc);
-  useFocusTrap(containerRef, isOpen);
+  useScrollLock(isOpen && !isStatic);
+  useKeyboard('Escape', onClose, isOpen && !disableEsc && !isStatic);
+  useFocusTrap(containerRef, isOpen && !isStatic);
 }
 
 /**

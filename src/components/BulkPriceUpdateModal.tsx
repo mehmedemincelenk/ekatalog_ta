@@ -1,17 +1,11 @@
-import { useState, useMemo, useEffect, memo } from 'react';
+import { useState, useMemo, memo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { THEME } from '../data/config';
 import Button from './Button';
 import BaseModal from './BaseModal';
-import {
-  ArrowLeft,
-  TrendingUp,
-  TrendingDown,
-  Percent,
-  Banknote,
-  Sparkles,
-  LayoutDashboard,
-  Terminal,
-} from 'lucide-react';
+import * as Lucide from 'lucide-react';
+import FormInput from './FormInput';
+import StatusOverlay from './StatusOverlay';
 import { transformCurrencyStringToNumber } from '../utils/core';
 import { BulkPriceUpdateModalProps, Product } from '../types';
 
@@ -23,6 +17,41 @@ interface DeskItemState {
   manualInStock?: boolean;
   manualArchived?: boolean;
 }
+
+const YapYapmaToggle = ({ id, value, onChange }: { id: string; value: boolean; onChange: (val: boolean) => void }) => (
+  <div className="flex bg-stone-100 p-0.5 rounded-[18px] border border-stone-200 shrink-0 relative overflow-hidden pointer-events-auto">
+    <Button
+      type="button"
+      onClick={() => { if (!value) onChange(true); }}
+      variant={value ? 'primary' : 'ghost'}
+      className={`!px-3 sm:!px-6 !py-2 sm:!py-2.5 !rounded-[15px] !text-[10px] sm:!text-[11px] font-black transition-all !h-auto !min-w-[50px] sm:!min-w-[80px] border-none shadow-none ${value ? '!bg-stone-900 !text-white' : '!text-stone-400 hover:!text-stone-600'}`}
+    >
+      {value && (
+        <motion.div
+          layoutId={`toggle-bg-${id}`}
+          className="absolute inset-0 bg-stone-900 rounded-[15px] z-[-1] shadow-md pointer-events-none"
+          transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+        />
+      )}
+      YAP
+    </Button>
+    <Button
+      type="button"
+      onClick={() => { if (value) onChange(false); }}
+      variant={!value ? 'secondary' : 'ghost'}
+      className={`!px-3 sm:!px-6 !py-2 sm:!py-2.5 !rounded-[15px] !text-[10px] sm:!text-[11px] font-black transition-all !h-auto !min-w-[50px] sm:!min-w-[80px] border-none shadow-none ${!value ? '!bg-white !text-stone-900 !shadow-sm' : '!text-stone-400 hover:!text-stone-600'}`}
+    >
+      {!value && (
+        <motion.div
+          layoutId={`toggle-bg-${id}`}
+          className="absolute inset-0 bg-white rounded-[15px] z-[-1] shadow-sm border border-stone-100 pointer-events-none"
+          transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+        />
+      )}
+      YAPMA
+    </Button>
+  </div>
+);
 
 /**
  * DESK ITEM ROW (Local Diamond Utility)
@@ -43,41 +72,63 @@ const DeskItemRow = memo(
     onToggle: (id: string) => void;
   }) => {
     return (
-      <div
-        className={`flex items-center gap-2 p-1.5 px-2.5 rounded-xl border transition-all ${state.included ? 'bg-white border-stone-100 shadow-sm' : 'bg-transparent border-transparent opacity-25 shadow-none'}`}
+      <motion.div
+        layout
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ 
+          opacity: state.included ? 1 : 0.6, 
+          filter: state.included ? 'grayscale(0%) opacity(1)' : 'grayscale(100%) opacity(0.7)'
+        }}
+        className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 p-3.5 sm:p-3 rounded-[28px] sm:rounded-[24px] border transition-all duration-500 ${state.included ? 'bg-white border-stone-100 shadow-sm' : 'bg-stone-50/30 border-transparent'}`}
       >
-        <div className="flex-1 min-w-0">
-          <p className="text-[10px] font-black text-stone-900 truncate uppercase tracking-tighter leading-none">
-            {product.name}
-          </p>
-          <p className="text-[8px] font-bold text-stone-300 uppercase mt-0.5">
-            {product.category}
-          </p>
-        </div>
-
-        {actionType === 'PRICE' && state.included && (
-          <div className="flex flex-col items-end gap-0.5 px-2">
-            <span className="text-[7px] font-black text-stone-300 line-through leading-none">
-              {product.price}
-            </span>
-            <span className="text-[10px] font-black text-stone-900 leading-none">
-              {newPriceValue.toLocaleString('tr-TR')} ₺
-            </span>
+        {/* ROW 1: PRODUCT INFO */}
+        <div className="flex items-center gap-3 sm:gap-4 flex-1">
+          <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl overflow-hidden bg-stone-100 border border-stone-100 shrink-0">
+            {product.image_url ? (
+              <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-stone-300">
+                <Lucide.Sparkles size={18} />
+              </div>
+            )}
           </div>
-        )}
 
-        <div className="flex items-center gap-1">
-          <Button
-            onClick={() => onToggle(product.id)}
-            variant={state.included ? 'primary' : 'secondary'}
-            mode="rectangle"
-            size="sm"
-            className={`!px-2 !py-1 !rounded-lg !text-[8px] font-black transition-all shadow-none ${state.included ? '!bg-stone-900 !text-white shadow-md' : '!text-stone-400 hover:!text-stone-900 border border-stone-100 bg-white'}`}
-          >
-            {state.included ? 'YAP' : 'KALSIN'}
-          </Button>
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] sm:text-[13px] font-black text-stone-900 truncate uppercase tracking-tighter leading-none">
+              {product.name}
+            </p>
+            {product.description && (
+              <p className="text-[9px] sm:text-[11px] font-bold text-stone-400 truncate mt-1">
+                {product.description}
+              </p>
+            )}
+          </div>
         </div>
-      </div>
+
+        {/* ROW 2: PRICE & TOGGLE */}
+        <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 pt-2.5 sm:pt-0 border-t sm:border-t-0 border-stone-100 sm:border-transparent">
+          {actionType === 'PRICE' && state.included && (
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <span className="text-[9px] sm:text-[11px] font-black text-stone-300 line-through">
+                {product.price}
+              </span>
+              <span className="text-[11px] sm:text-[14px] font-black text-emerald-600 bg-emerald-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl">
+                {newPriceValue.toLocaleString('tr-TR')} ₺
+              </span>
+            </div>
+          )}
+
+          <div className="shrink-0 pointer-events-auto">
+            <YapYapmaToggle 
+              id={product.id}
+              value={state.included} 
+              onChange={(val) => {
+                if (val !== state.included) onToggle(product.id);
+              }} 
+            />
+          </div>
+        </div>
+      </motion.div>
     );
   },
 );
@@ -93,29 +144,23 @@ export default function BulkPriceUpdateModal({
   allProducts,
   categories,
   onGranularUpdate,
+  isStatic = false,
+  initialStep,
 }: BulkPriceUpdateModalProps) {
-  const [currentStep, setCurrentStep] = useState<number>(0);
+  const [currentStep, setCurrentStep] = useState<number>(initialStep || 1);
   const [actionType, setActionType] = useState<ActionType>(null);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isPercentage, setIsPercentage] = useState<boolean | null>(null);
   const [isIncrease, setIsIncrease] = useState<boolean | null>(null);
   const [inputValue, setInputValue] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [deskItems, setDeskItems] = useState<Record<string, DeskItemState>>({});
 
   const modalTheme = THEME.addProductModal;
 
-  // Diamond Sync: Standardized way to handle modal initialization
-  useEffect(() => {
-    if (isOpen) {
-      const skipIntro =
-        localStorage.getItem('ekatalog_skip_bulk_intro') === 'true';
-      setCurrentStep(skipIntro ? 1 : 0);
-    }
-  }, [isOpen]);
-
   const resetAll = () => {
-    setCurrentStep(0);
+    setCurrentStep(1);
     setActionType(null);
     setSelectedCategories([]);
     setIsPercentage(null);
@@ -123,32 +168,33 @@ export default function BulkPriceUpdateModal({
     setInputValue('');
     setDeskItems({});
     setIsProcessing(false);
-  };
-
-  const skipIntroPermanently = () => {
-    localStorage.setItem('ekatalog_skip_bulk_intro', 'true');
-    setCurrentStep(1);
+    setSubmitStatus('idle');
   };
 
   const nextStep = () => {
     if (currentStep === 1) {
+      setCurrentStep(2); // Move to Category
+      return;
+    }
+    
+    if (currentStep === 2) {
       if (actionType === 'PRICE') {
-        setCurrentStep(1.1);
+        setCurrentStep(2.1);
         return;
       }
       prepareDeskAndDirectTo(3);
       return;
     }
 
-    if (currentStep === 1.1) {
-      setCurrentStep(1.2);
+    if (currentStep === 2.1) {
+      setCurrentStep(2.2);
       return;
     }
-    if (currentStep === 1.2) {
-      setCurrentStep(1.3);
+    if (currentStep === 2.2) {
+      setCurrentStep(2.3);
       return;
     }
-    if (currentStep === 1.3) {
+    if (currentStep === 2.3) {
       prepareDeskAndDirectTo(3);
       return;
     }
@@ -177,24 +223,28 @@ export default function BulkPriceUpdateModal({
   };
 
   const prevStep = () => {
-    if (currentStep === 1.1) {
+    if (currentStep === 2) {
       setCurrentStep(1);
       return;
     }
-    if (currentStep === 1.2) {
-      setCurrentStep(1.1);
+    if (currentStep === 2.1) {
+      setCurrentStep(2);
       return;
     }
-    if (currentStep === 1.3) {
-      setCurrentStep(1.2);
+    if (currentStep === 2.2) {
+      setCurrentStep(2.1);
+      return;
+    }
+    if (currentStep === 2.3) {
+      setCurrentStep(2.2);
       return;
     }
     if (currentStep === 3 && actionType === 'PRICE') {
-      setCurrentStep(1.3);
+      setCurrentStep(2.3);
       return;
     }
     if (currentStep === 3) {
-      setCurrentStep(1);
+      setCurrentStep(2);
       return;
     }
     setCurrentStep((prev) => prev - 1);
@@ -234,25 +284,6 @@ export default function BulkPriceUpdateModal({
     }));
   };
 
-  const applyBulkStatus = (val: boolean) => {
-    const newDesk = { ...deskItems };
-    initialProductsForDesk.forEach((p) => {
-      if (actionType === 'STOCK') {
-        newDesk[p.id] = {
-          ...newDesk[p.id],
-          manualInStock: val,
-          included: true,
-        };
-      } else if (actionType === 'ARCHIVE') {
-        newDesk[p.id] = {
-          ...newDesk[p.id],
-          manualArchived: val,
-          included: true,
-        };
-      }
-    });
-    setDeskItems(newDesk);
-  };
 
   const calculateNewPrice = (current: number) => {
     if (!inputValue) return current;
@@ -270,37 +301,29 @@ export default function BulkPriceUpdateModal({
   const handleApply = async () => {
     setIsProcessing(true);
     try {
-      const granularActions = Object.entries(deskItems)
-        .filter(([, state]) => state.included)
-        .map(([id, state]) => {
-          const product = allProducts.find((p) => p.id === id)!;
-          const action: {
-            productId: string;
-            newPrice?: number;
-            category?: string;
-            delete?: boolean;
-            out_of_stock?: boolean;
-            is_archived?: boolean;
-          } = { productId: id };
+      const itemsToUpdate = Object.entries(deskItems)
+        .filter(([_, state]) => state.included)
+        .map(([id, state]) => ({
+          id,
+          ...state,
+        }));
 
-          if (actionType === 'PRICE') {
-            const currentP = transformCurrencyStringToNumber(product.price);
-            action.newPrice = calculateNewPrice(currentP);
-          } else if (actionType === 'DELETE') {
-            action.delete = true;
-          } else if (actionType === 'STOCK') {
-            action.out_of_stock = !state.manualInStock;
-          } else if (actionType === 'ARCHIVE') {
-            action.is_archived = state.manualArchived;
-          }
-          return action;
-        });
-
-      await onGranularUpdate(granularActions);
-      onClose();
-      resetAll();
+      await onGranularUpdate(itemsToUpdate.map(item => ({
+        productId: item.id,
+        newPrice: actionType === 'PRICE' ? item.manualPrice : undefined,
+        delete: actionType === 'DELETE',
+        out_of_stock: actionType === 'STOCK' ? (item.manualInStock === false) : undefined,
+        is_archived: actionType === 'ARCHIVE' ? item.manualArchived : undefined,
+      })));
+      setSubmitStatus('success');
+      setTimeout(() => {
+        onClose();
+        resetAll();
+      }, 1500);
     } catch (err) {
       console.error('Bulk action failed', err);
+      setSubmitStatus('error');
+      setTimeout(() => setSubmitStatus('idle'), 2000);
     } finally {
       setIsProcessing(false);
     }
@@ -315,192 +338,128 @@ export default function BulkPriceUpdateModal({
         onClose();
         resetAll();
       }}
-      maxWidth={currentStep === 3 ? 'max-w-xl' : 'max-w-md'}
-      title={currentStep === 0 ? undefined : 'Toplu İşlem Merkezi'}
-      progress={
-        currentStep > 0
-          ? { current: Math.floor(currentStep), total: 3 }
-          : undefined
+      maxWidth="max-w-xl"
+      title={
+        currentStep === 1 ? 'İŞLEM' :
+        currentStep === 2 ? 'KATEGORİ' :
+        currentStep === 2.1 ? 'hangisi?' :
+        currentStep === 2.2 ? 'HESAPLAMA' :
+        currentStep === 2.3 ? 'MİKTAR' :
+        currentStep === 3 ? 'ONAY' : 'TOPLU İŞLEM'
       }
+      progress={(() => {
+        if (currentStep === 0) return undefined;
+        const isPrice = actionType === 'PRICE';
+        const total = isPrice ? 6 : 3;
+        let current = 1;
+        if (currentStep === 1) current = 1;
+        else if (currentStep === 2) current = 2;
+        else if (currentStep === 2.1) current = 3;
+        else if (currentStep === 2.2) current = 4;
+        else if (currentStep === 2.3) current = 5;
+        else if (currentStep === 3) current = isPrice ? 6 : 3;
+        return { current, total };
+      })()}
+      accentColor="bg-emerald-500"
       disableClickOutside={isProcessing}
       hideCloseButton={isProcessing}
+      isStatic={isStatic}
     >
       <div className="space-y-6">
-        {/* STEP 0: INTRO */}
-        {currentStep === 0 && (
-          <div className="flex flex-col items-center text-center space-y-6 py-4 fade-in">
-            <div className="w-20 h-20 bg-stone-900 rounded-[32px] flex items-center justify-center text-white shadow-2xl rotate-3">
-              <LayoutDashboard size={40} />
-            </div>
-            <div className="space-y-2">
-              <h4 className="text-base font-black text-stone-900 uppercase tracking-widest">
-                DÜKKAN EKONOMİSİNİ YÖNETİN
-              </h4>
-              <p className="text-[11px] text-stone-400 font-bold leading-relaxed px-6">
-                Bu sihirbaz, yüzlerce ürünün fiyatını, stok durumunu veya
-                görünürlüğünü tek tıkla güncellemenizi sağlar.
-              </p>
-            </div>
-            <div className="w-full bg-stone-50 p-4 rounded-3xl border border-stone-100 flex items-start gap-4 text-left">
-              <div className="w-10 h-10 bg-white rounded-xl shadow-sm border border-stone-100 flex items-center justify-center shrink-0">
-                <Sparkles size={18} className="text-amber-500" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[10px] font-black uppercase text-stone-900 tracking-tighter">
-                  Diamond Gücü
-                </span>
-                <p className="text-[10px] font-bold text-stone-400 leading-tight mt-1">
-                  Önce ayarları yapın, ardından "Action Desk" üzerinden son
-                  kontrolü mühürleyin.
-                </p>
-              </div>
-            </div>
-            <div className="w-full space-y-2 pt-2">
-              <Button
-                onClick={() => setCurrentStep(1)}
-                variant="primary"
-                size="md"
-                mode="rectangle"
-                className="w-full !rounded-[24px] !py-4 font-black"
-              >
-                SİHİRBAZI BAŞLAT
-              </Button>
-              <Button
-                onClick={skipIntroPermanently}
-                variant="ghost"
-                className="w-full !text-[10px] font-black !text-stone-300 hover:!text-stone-900 uppercase tracking-widest shadow-none"
-              >
-                BUNU TEKRAR GÖSTERME
-              </Button>
-            </div>
-          </div>
-        )}
 
-        {/* STEP 1: CONFIG */}
+        {/* STEP 1: ACTION SELECTION */}
         {currentStep === 1 && (
-          <div className="space-y-6 fade-in">
-            <div className="px-1 border-l-4 border-stone-900 pl-4 py-1 mb-6">
-              <h5 className="text-[10px] font-black text-stone-900 uppercase tracking-widest">
-                EYLEM SEÇİMİ
-              </h5>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-3 fade-in py-2">
+            <div className="flex flex-col gap-3">
               {[
-                {
-                  id: 'PRICE',
-                  label: 'FİYAT AYARI',
-                  icon: '💰',
-                  color: 'bg-stone-900',
-                },
-                {
-                  id: 'STOCK',
-                  label: 'STOK DURUMU',
-                  icon: '📦',
-                  color: 'bg-blue-600',
-                },
-                {
-                  id: 'ARCHIVE',
-                  label: 'YAYIN DURUMU',
-                  icon: '👁️',
-                  color: 'bg-amber-600',
-                },
-                {
-                  id: 'DELETE',
-                  label: 'ÜRÜNLERİ SİL',
-                  icon: '🗑️',
-                  color: 'bg-red-600',
-                },
+                { id: 'PRICE', text: 'FİYAT DURUMU' },
+                { id: 'STOCK', text: 'STOK DURUMU' },
+                { id: 'ARCHIVE', text: 'YAYIN DURUMU' },
+                { id: 'DELETE', text: 'SİL İŞLEMİ' },
               ].map((opt) => (
                 <Button
                   key={opt.id}
-                  onClick={() => setActionType(opt.id as ActionType)}
-                  variant="ghost"
-                  className={`!h-auto !p-4 !rounded-3xl border-2 flex !flex-col !items-center !gap-2 group shadow-none ${actionType === opt.id ? `${opt.color} !text-white !border-transparent shadow-xl scale-105` : 'bg-stone-50 border-stone-100 text-stone-400'}`}
+                  onClick={() => {
+                    setActionType(opt.id as ActionType);
+                    nextStep();
+                  }}
+                  variant="primary"
+                  className="!h-16 !px-6 !rounded-[20px] border-none flex !flex-row !items-center !justify-start group transition-all"
+                  showFingerprint={true}
                 >
-                  <span className="text-3xl mb-1">{opt.icon}</span>
-                  <span className="text-[10px] font-black uppercase tracking-widest">
-                    {opt.label}
+                  <span className="text-[14px] font-black uppercase tracking-widest leading-tight">
+                    {opt.text}
                   </span>
                 </Button>
               ))}
             </div>
-            <div className="pt-6 border-t border-stone-100">
-              <p className="text-[9px] font-black text-stone-400 uppercase tracking-widest text-center mb-4">
-                KATEGORİ SEÇİN
-              </p>
-              <div className="flex flex-wrap justify-center gap-1.5">
-                <Button
-                  onClick={() => toggleCategory('TÜMÜ')}
-                  variant={
-                    selectedCategories.length === categories.length
-                      ? 'primary'
-                      : 'secondary'
-                  }
-                  size="sm"
-                  className={`!px-4 !py-2 !rounded-xl !text-[10px] font-black ${selectedCategories.length === categories.length ? '!bg-stone-900' : 'bg-white !text-stone-300'}`}
-                >
-                  TÜMÜ
-                </Button>
-                {categories.map((cat) => (
-                  <Button
-                    key={cat}
-                    onClick={() => toggleCategory(cat)}
-                    variant="secondary"
-                    size="sm"
-                    className={`!px-4 !py-2 !rounded-xl !text-[10px] font-black ${selectedCategories.includes(cat) ? '!bg-stone-200 !text-stone-900' : 'bg-white !text-stone-300'}`}
-                  >
-                    {cat}
-                  </Button>
-                ))}
-              </div>
-            </div>
-            <Button
-              onClick={nextStep}
-              disabled={
-                !actionType ||
-                (selectedCategories.length === 0 && actionType !== 'DELETE')
-              }
-              variant="primary"
-              className="w-full !py-4 font-black"
-            >
-              DEVAM ET
-            </Button>
           </div>
         )}
 
-        {/* PRICE STEPS 1.1, 1.2, 1.3 */}
-        {currentStep === 1.1 && (
-          <div className="space-y-8 flex flex-col items-center fade-in">
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center text-stone-900 mx-auto">
-                <TrendingUp size={28} />
-              </div>
-              <div>
-                <h4 className="text-base font-black text-stone-900 uppercase tracking-widest mb-1">
-                  NEREYE DOĞRU?
-                </h4>
-                <p className="text-[11px] text-stone-400 font-bold italic">
-                  Fiyatlarımızı artırıyor muyuz yoksa düşürüyor muyuz?
-                </p>
-              </div>
+        {/* STEP 2: CATEGORY SELECTION */}
+        {currentStep === 2 && (
+          <div className="space-y-6 fade-in py-2">
+            <div className="bg-stone-50 p-6 rounded-[32px] border border-stone-100">
+               <div className="flex flex-wrap justify-center gap-2">
+                  <Button
+                    onClick={() => toggleCategory('TÜMÜ')}
+                    variant={selectedCategories.length === categories.length ? 'primary' : 'secondary'}
+                    size="md"
+                    className={`!px-6 !py-3 !rounded-2xl !text-[11px] font-black ${selectedCategories.length === categories.length ? '!bg-stone-900 !text-white' : ''}`}
+                    showFingerprint={true}
+                  >
+                    TÜMÜ
+                  </Button>
+                  {categories.map((cat) => (
+                    <Button
+                      key={cat}
+                      onClick={() => toggleCategory(cat)}
+                      variant={selectedCategories.includes(cat) ? 'primary' : 'secondary'}
+                      size="md"
+                      className={`!px-6 !py-3 !rounded-2xl !text-[11px] font-black ${selectedCategories.includes(cat) ? '!bg-stone-900 !text-white' : ''}`}
+                      showFingerprint={true}
+                    >
+                      {cat}
+                    </Button>
+                  ))}
+               </div>
             </div>
-            <div className="grid grid-cols-1 w-full gap-3">
+
+            <div className="flex gap-3">
+              <Button onClick={prevStep} variant="secondary" mode="rectangle" className="w-20 h-16 shrink-0" showFingerprint={false}>
+                <Lucide.ChevronLeft size={24} strokeWidth={3} />
+              </Button>
+              <Button
+                onClick={nextStep}
+                disabled={selectedCategories.length === 0 && actionType !== 'DELETE'}
+                variant="primary"
+                className="flex-1 h-16 shadow-2xl font-black !rounded-[24px]"
+                showFingerprint={true}
+              >
+                DEVAM ET
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* PRICE STEPS 2.1, 2.2, 2.3 */}
+        {currentStep === 2.1 && (
+          <div className="flex items-center gap-3 fade-in py-4">
+            <Button onClick={prevStep} variant="secondary" mode="rectangle" className="w-16 h-16 shrink-0" showFingerprint={false}>
+              <Lucide.ChevronLeft size={24} strokeWidth={3} />
+            </Button>
+            <div className="flex gap-2 flex-1">
               <Button
                 onClick={() => {
                   setIsIncrease(true);
                   nextStep();
                 }}
                 variant="primary"
-                className="!h-auto !p-6 !rounded-[2rem] !bg-emerald-500 !text-white shadow-xl !justify-between"
-                icon={
-                  <div className="p-3 bg-white/20 rounded-xl">
-                    <TrendingUp size={24} />
-                  </div>
-                }
+                className="flex-1 h-16 !rounded-[20px]"
+                showFingerprint={true}
+                icon={<Lucide.TrendingUp size={18} className="text-emerald-400" />}
               >
-                <span className="font-black tracking-widest text-lg">
-                  ZAM YAP (📈)
-                </span>
+                <span className="font-black tracking-widest text-[11px] uppercase">ZAM</span>
               </Button>
               <Button
                 onClick={() => {
@@ -508,65 +467,38 @@ export default function BulkPriceUpdateModal({
                   nextStep();
                 }}
                 variant="primary"
-                className="!h-auto !p-6 !rounded-[2rem] !bg-red-500 !text-white shadow-xl !justify-between"
-                icon={
-                  <div className="p-3 bg-white/20 rounded-xl">
-                    <TrendingDown size={24} />
-                  </div>
-                }
+                className="flex-1 h-16 !rounded-[20px]"
+                showFingerprint={true}
+                icon={<Lucide.TrendingDown size={18} className="text-red-400" />}
               >
-                <span className="font-black tracking-widest text-lg">
-                  İNDİRİM YAP (📉)
-                </span>
+                <span className="font-black tracking-widest text-[11px] uppercase">İNDİRİM</span>
               </Button>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={prevStep}
-              icon={<ArrowLeft size={16} />}
-              className="!text-stone-400 shadow-none font-black uppercase text-[10px] tracking-widest"
-            >
-              GERİ DÖN
-            </Button>
           </div>
         )}
 
-        {currentStep === 1.2 && (
-          <div className="space-y-8 flex flex-col items-center fade-in">
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center text-stone-900 mx-auto">
-                <Banknote size={28} />
-              </div>
-              <div>
-                <h4 className="text-base font-black text-stone-900 uppercase tracking-widest mb-1">
-                  HESAPLAMA METODU
-                </h4>
-                <p className="text-[11px] text-stone-400 font-bold italic">
-                  Değişim sabit mi olsun yoksa yüzdelik mi?
-                </p>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 w-full gap-3">
+        {currentStep === 2.2 && (
+          <div className="flex items-center gap-2 fade-in py-2">
+            <Button onClick={prevStep} variant="secondary" mode="rectangle" className="w-16 h-16 shrink-0" showFingerprint={false}>
+              <Lucide.ChevronLeft size={24} strokeWidth={3} />
+            </Button>
+
+            <div className="flex gap-2 flex-1">
               <Button
                 onClick={() => {
                   setIsPercentage(false);
                   nextStep();
                 }}
                 variant="primary"
-                className="!h-auto !p-6 !rounded-[2rem] !bg-stone-900 !text-white shadow-xl !justify-between"
-                icon={
-                  <div className="p-3 bg-white/10 rounded-xl">
-                    <Banknote size={24} />
-                  </div>
-                }
+                className="flex-1 h-16 !rounded-[20px]"
+                showFingerprint={true}
               >
-                <div className="flex flex-col text-left">
-                  <span className="font-black tracking-widest">
-                    SABİT TUTAR
+                <div className="flex flex-col items-center">
+                  <span className="font-black tracking-widest text-[10px] uppercase">
+                    SABİT
                   </span>
-                  <span className="text-[10px] opacity-60">
-                    Örn: Tüm fiyatlara 50₺ ekle
+                  <span className="text-[9px] font-bold text-stone-400 lowercase italic">
+                    (örn: {isIncrease ? '+50₺' : '-50₺'})
                   </span>
                 </div>
               </Button>
@@ -576,177 +508,121 @@ export default function BulkPriceUpdateModal({
                   nextStep();
                 }}
                 variant="primary"
-                className="!h-auto !p-6 !rounded-[2rem] !bg-stone-900 !text-white shadow-xl !justify-between"
-                icon={
-                  <div className="p-3 bg-white/10 rounded-xl">
-                    <Percent size={24} />
-                  </div>
-                }
+                className="flex-1 h-16 !rounded-[20px]"
+                showFingerprint={true}
               >
-                <div className="flex flex-col text-left">
-                  <span className="font-black tracking-widest">YÜZDE (%)</span>
-                  <span className="text-[10px] opacity-60">
-                    Örn: Tüm fiyatlara %10 zam yap
+                <div className="flex flex-col items-center">
+                  <span className="font-black tracking-widest text-[10px] uppercase">
+                    YÜZDE
+                  </span>
+                  <span className="text-[9px] font-bold text-stone-400 lowercase italic">
+                    (örn: {isIncrease ? '%5' : '-%5'})
                   </span>
                 </div>
               </Button>
             </div>
+          </div>
+        )}
+
+        {currentStep === 2.3 && (
+          <div className="flex items-center gap-3 fade-in py-2">
+            <Button onClick={prevStep} variant="secondary" mode="rectangle" className="w-16 h-16 shrink-0" showFingerprint={false}>
+              <Lucide.ChevronLeft size={24} strokeWidth={3} />
+            </Button>
+
+            <FormInput
+              id="bulk-price-input"
+              type="text"
+              inputMode="decimal"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder="Miktar"
+              className="!text-center !text-lg !font-black !py-4 shadow-sm rounded-[18px] border-2 border-stone-100"
+              containerClassName="relative flex-1 max-w-[160px] mx-auto"
+              autoFocus
+            />
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-black text-stone-300 pointer-events-none">
+              {isPercentage ? '%' : '₺'}
+            </span>
+
             <Button
-              variant="ghost"
-              size="sm"
-              onClick={prevStep}
-              icon={<ArrowLeft size={16} />}
-              className="!text-stone-400 shadow-none font-black uppercase text-[10px] tracking-widest"
+              onClick={nextStep}
+              disabled={!inputValue}
+              variant="primary"
+              className="w-16 h-16 !rounded-2xl shrink-0 shadow-xl"
+              showFingerprint={true}
             >
-              GERİ DÖN
+              <Lucide.Check size={24} strokeWidth={4} />
             </Button>
           </div>
         )}
 
-        {currentStep === 1.3 && (
-          <div className="space-y-8 flex flex-col items-center fade-in">
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center text-stone-100 mx-auto">
-                <Terminal size={28} className="text-stone-900" />
-              </div>
-              <div>
-                <h4 className="text-base font-black text-stone-900 uppercase tracking-widest mb-1">
-                  MİKTARI BELİRLEYİN
-                </h4>
-                <p className="text-[11px] text-stone-400 font-bold italic">
-                  {isIncrease ? 'Zam' : 'İndirim'} yapılacak tutarı girin.
-                </p>
-              </div>
+        {/* STEP 3: ACTION DESK */}
+        {currentStep === 3 && (
+          <div className="space-y-4 sm:space-y-6 fade-in">
+            <div className="max-h-[45vh] sm:max-h-[50vh] overflow-y-auto pr-1 space-y-5 sm:space-y-8 custom-scrollbar">
+              {categories
+                .filter(cat => initialProductsForDesk.some(p => p.category === cat))
+                .map((cat) => (
+                  <div key={cat} className="space-y-3">
+                    <div className="flex items-center gap-3 px-1">
+                      <div className="h-[2px] flex-1 bg-stone-100" />
+                      <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest">
+                        {cat}
+                      </span>
+                      <div className="h-[2px] flex-1 bg-stone-100" />
+                    </div>
+                    <div className="space-y-2">
+                      {initialProductsForDesk
+                        .filter((p) => p.category === cat)
+                        .map((p) => (
+                          <DeskItemRow
+                            key={p.id}
+                            product={p}
+                            state={deskItems[p.id] || { included: true }}
+                            actionType={actionType}
+                            newPriceValue={calculateNewPrice(
+                              transformCurrencyStringToNumber(p.price),
+                            )}
+                            onToggle={toggleProductInclusion}
+                          />
+                        ))}
+                    </div>
+                  </div>
+                ))}
             </div>
-            <div className="relative w-full">
-              <input
-                type="text"
-                inputMode="decimal"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder="0"
-                className={`${modalTheme.inputField} !text-center !text-[64px] !font-black !py-10 !pr-16 shadow-2xl rounded-[40px]`}
-                autoFocus
-              />
-              <span className="absolute right-10 top-1/2 -translate-y-1/2 text-4xl font-black text-stone-200">
-                {isPercentage ? '%' : '₺'}
-              </span>
-            </div>
-            <div className="w-full flex flex-col gap-2">
+
+            <div className="pt-4 flex gap-3">
               <Button
-                onClick={nextStep}
-                disabled={!inputValue}
-                variant="primary"
-                className="w-full !py-5 font-black"
-              >
-                MANIFESTOYA GEÇ
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
                 onClick={prevStep}
-                icon={<ArrowLeft size={16} />}
-                className="!text-stone-400 shadow-none font-black uppercase text-[10px] tracking-widest"
+                variant="secondary"
+                mode="rectangle"
+                className="w-16 h-16 shrink-0"
               >
-                GERİ DÖN
+                <Lucide.ChevronLeft size={24} strokeWidth={4} />
               </Button>
+              <Button
+                onClick={handleApply}
+                disabled={
+                  isProcessing ||
+                  Object.values(deskItems).filter((d) => d.included).length === 0
+                }
+                variant={actionType === 'DELETE' ? 'danger' : 'action'}
+                className="flex-1 h-16 font-black !rounded-[24px]"
+                loading={isProcessing}
+                showFingerprint={true}
+                fingerprintType="action"
+                icon={<Lucide.Check size={28} className="text-white" strokeWidth={4} />}
+              />
             </div>
           </div>
         )}
 
-        {/* FINAL STEP: ACTION DESK */}
-        {currentStep === 3 && (
-          <div className="space-y-4 fade-in flex flex-col h-full">
-            <div className="text-center space-y-1 mb-2">
-              <h3 className="font-black text-stone-900 text-[10px] uppercase tracking-widest leading-none">
-                ONAY MANİFESTOSU (ACTION DESK)
-              </h3>
-              <p className="text-[9px] font-bold text-stone-400 uppercase tracking-tighter text-center">
-                İnceleyin ve mühürleyin. Geri dönüşü yoktur.
-              </p>
-            </div>
-            <div className="flex-1 overflow-y-auto space-y-1 min-h-[350px] border border-stone-100 rounded-[32px] bg-stone-50/50 p-2 custom-scrollbar">
-              {(actionType === 'STOCK' || actionType === 'ARCHIVE') &&
-                initialProductsForDesk.length > 0 && (
-                  <div className="flex items-center gap-3 p-3 rounded-2xl border border-stone-300 bg-white shadow-xl mb-4 sticky top-0 z-20">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[10px] font-black text-stone-900 uppercase tracking-tight">
-                        TÜMÜNÜ DEĞİŞTİR
-                      </p>
-                    </div>
-                    <div className="flex gap-1 bg-stone-100 p-1 rounded-xl">
-                      <Button
-                        onClick={() =>
-                          applyBulkStatus(actionType === 'STOCK' ? true : false)
-                        }
-                        variant="secondary"
-                        size="sm"
-                        className="!bg-white !text-stone-900 !text-[9px] font-black !rounded-lg shadow-sm border-none"
-                      >
-                        {actionType === 'STOCK' ? '✅ STOKTA' : '👁️ GÖRÜNÜR'}
-                      </Button>
-                      <Button
-                        onClick={() =>
-                          applyBulkStatus(actionType === 'STOCK' ? false : true)
-                        }
-                        variant="primary"
-                        size="sm"
-                        className="!bg-stone-900 !text-white !text-[9px] font-black !rounded-lg shadow-lg"
-                      >
-                        {actionType === 'STOCK' ? '❌ YOK' : '📦 GİZLİ'}
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              {initialProductsForDesk.map((p) => (
-                <DeskItemRow
-                  key={p.id}
-                  product={p}
-                  state={deskItems[p.id] || { included: true }}
-                  actionType={actionType}
-                  newPriceValue={calculateNewPrice(
-                    transformCurrencyStringToNumber(p.price),
-                  )}
-                  onToggle={toggleProductInclusion}
-                />
-              ))}
-            </div>
-            <div className="pt-4 space-y-4">
-              <div className="flex justify-between items-center px-4">
-                <span className="text-[11px] font-black text-stone-400 uppercase tracking-widest">
-                  HEDEF:
-                </span>
-                <span className="text-[13px] font-black text-stone-900">
-                  {Object.values(deskItems).filter((d) => d.included).length}{' '}
-                  ÜRÜN
-                </span>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <Button
-                  onClick={prevStep}
-                  variant="ghost"
-                  className="h-14 font-black shadow-none text-stone-400"
-                  icon={<ArrowLeft size={16} />}
-                >
-                  GERİ DÖN
-                </Button>
-                <Button
-                  onClick={handleApply}
-                  disabled={
-                    isProcessing ||
-                    Object.values(deskItems).filter((d) => d.included)
-                      .length === 0
-                  }
-                  variant={actionType === 'DELETE' ? 'danger' : 'primary'}
-                  className="h-14 font-black !rounded-2xl shadow-xl"
-                  loading={isProcessing}
-                >
-                  {actionType === 'DELETE' ? 'TOPLU SİL' : 'MÜHÜRLE VE UYGULA'}
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* CINEMATIC FEEDBACK OVERLAY */}
+        <StatusOverlay 
+          status={submitStatus} 
+          message="" 
+        />
       </div>
     </BaseModal>
   );

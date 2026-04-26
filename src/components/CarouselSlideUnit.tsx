@@ -24,7 +24,6 @@ const CarouselSlideUnit = memo(
     isMobileView,
     onImageUpdateTrigger,
     onDeleteTrigger,
-    onAddTrigger,
     onReorderTrigger,
     currentIndex,
     totalSlides,

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, PanInfo } from 'framer-motion';
 import { THEME, CAROUSEL, TECH } from '../data/config';
 import { supabase } from '../supabase';
@@ -76,15 +76,6 @@ export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
     } catch (err) { console.error('Hero upload failed:', err); throw err; }
   }, [activeStoreSlug, modifySlideContent]);
 
-  const addSlide = useCallback(async () => {
-    setMarketingSlides((prev) => {
-      const nextId = prev.length > 0 ? Math.max(...prev.map((s) => s.id)) + 1 : 1;
-      const newSlide: CarouselSlide = { id: nextId, src: '', bg: 'bg-stone-200', label: 'Yeni Başlık', sub: 'Açıklama metni buraya gelecek.' };
-      const updated = [...prev, newSlide];
-      persistCarouselData(updated);
-      return updated;
-    });
-  }, [persistCarouselData]);
 
   const deleteSlide = useCallback(async (slideId: number) => {
     setMarketingSlides((prev) => {
@@ -114,7 +105,6 @@ export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
   const [activeEditingSlideId, setActiveEditingSlideId] = useState<
     number | null
   >(null);
-  const [isAddingNewSlide, setIsAddingNewSlide] = useState(false);
   const [isMobile, setIsMobile] = useState(
     typeof window !== 'undefined' ? window.innerWidth < 640 : false,
   );
@@ -297,7 +287,6 @@ export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
                   editingTargetSlideId={activeEditingSlideId}
                   onImageUpdateTrigger={triggerImageUpdate}
                   onDeleteTrigger={deleteSlide}
-                  onAddTrigger={handleAddSlideTrigger}
                   onReorderTrigger={reorderSlides}
                   currentIndex={index + 1}
                   totalSlides={slides.length}

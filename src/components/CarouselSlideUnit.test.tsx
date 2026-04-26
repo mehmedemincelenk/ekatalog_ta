@@ -16,9 +16,17 @@ describe('CarouselSlideUnit (Diamond Snapshot)', () => {
     sub: 'Test Açıklaması',
   };
 
+  const commonProps = {
+    onImageUpdateTrigger: vi.fn(),
+    onDeleteTrigger: vi.fn(),
+    onReorderTrigger: vi.fn(),
+    editingTargetSlideId: null,
+  };
+
   it('Aktif slide görünümü snapshot ile eşleşmeli', () => {
     const { asFragment } = render(
       <CarouselSlideUnit
+        {...commonProps}
         slideData={mockSlide}
         isCurrentlyActive={true}
         isAdmin={false}
@@ -33,6 +41,7 @@ describe('CarouselSlideUnit (Diamond Snapshot)', () => {
   it('Pasif (Ghost) slide görünümü snapshot ile eşleşmeli', () => {
     const { asFragment } = render(
       <CarouselSlideUnit
+        {...commonProps}
         slideData={mockSlide}
         isCurrentlyActive={false}
         isAdmin={false}
@@ -47,6 +56,7 @@ describe('CarouselSlideUnit (Diamond Snapshot)', () => {
   it('Admin modunda aktif slide görünümü snapshot ile eşleşmeli', () => {
     const { asFragment } = render(
       <CarouselSlideUnit
+        {...commonProps}
         slideData={mockSlide}
         isCurrentlyActive={true}
         isAdmin={true}

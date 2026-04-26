@@ -4,12 +4,12 @@
 import { memo, useState, useEffect } from 'react';
 import { THEME, DEFAULT_COMPANY } from '../data/config';
 import { CompanySettings } from '../types';
-import { generateWhatsAppLink } from '../utils/core';
 import { compressVisualToDataUri } from '../utils/image';
 import { X } from 'lucide-react';
 import Button from './Button';
 import SmartImage from './SmartImage';
 import QuickEditModal from './QuickEditModal';
+import FormInput from './FormInput';
 
 /**
  * NAVBAR COMPONENT (Layout Correction)
@@ -80,17 +80,6 @@ const Navbar = memo(
       }
     };
 
-    const handleWhatsAppAction = () => {
-      if (isAdmin && isInlineEnabled) return;
-      if (isAdmin && !isInlineEnabled) {
-        handleTextEdit('whatsapp', settings.whatsapp || '', 'WhatsApp/Telefon');
-        return;
-      }
-      const storeWhatsAppNumber =
-        settings.whatsapp || import.meta.env.VITE_WHATSAPP_NUMBER || '';
-      const message = `Merhaba, ${settings.title} web sitenizden ulaşıyorum.`;
-      window.open(generateWhatsAppLink(storeWhatsAppNumber, message), '_blank');
-    };
 
     const handleLogoUpload = async (file: File) => {
       try {
@@ -329,12 +318,14 @@ const Navbar = memo(
                       <div className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400">
                         {globalIcons.search}
                       </div>
-                      <input
+                      <FormInput
+                        id="desktop-search-input"
                         type="text"
                         value={internalSearch}
                         onChange={(e) => setInternalSearch(e.target.value)}
                         placeholder="Ara..."
-                        className="w-full pl-9 pr-3 py-1.5 sm:py-2.5 border border-stone-200 text-[0.65rem] sm:text-[0.85rem] font-semibold text-stone-900 focus:ring-1 focus:ring-stone-900 outline-none transition-all duration-200 bg-stone-50/50 rounded-lg"
+                        className="!pl-9 !text-[0.65rem] sm:!text-[0.85rem] !py-2 sm:!py-2.5 !bg-stone-50/50"
+                        containerClassName="w-full"
                       />
                     </div>
                   </div>

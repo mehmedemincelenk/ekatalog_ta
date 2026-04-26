@@ -5,6 +5,8 @@ import {
   transformCurrencyStringToNumber,
 } from '../utils/core';
 import SmartImage from './SmartImage';
+import Badge from './Badge';
+import StatusDot from './StatusDot';
 
 import { ProductCardUIProps } from '../types';
 
@@ -69,18 +71,13 @@ export const ProductCardUI = memo(
 
           {/* OVERLAY BADGES */}
           <div className="absolute top-2 left-2 z-10 flex flex-col gap-1">
-            <span
-              className={`
-            px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest border backdrop-blur-sm
-            ${isHighlighted ? 'bg-amber-400 text-white border-amber-500' : 'bg-white/90 text-stone-900 border-stone-200'}
-          `}
-            >
+            <Badge variant={isHighlighted ? 'warning' : 'secondary'}>
               {labelOverride || (isHighlighted ? 'Tavsiye' : 'Orijinal')}
-            </span>
+            </Badge>
             {product.out_of_stock && (
-              <span className="px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest border bg-red-500 text-white border-red-600 shadow-lg shadow-red-500/20">
+              <Badge variant="danger">
                 Stokta Yok
-              </span>
+              </Badge>
             )}
           </div>
         </div>
@@ -102,7 +99,7 @@ export const ProductCardUI = memo(
               {priceLabel}
             </span>
             {isHighlighted && (
-              <div className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse" />
+              <StatusDot variant="warning" pulse={true} size="sm" />
             )}
           </div>
         </div>

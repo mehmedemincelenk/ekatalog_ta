@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { resolveVisualAssetUrl } from '../utils/image';
 import { THEME } from '../data/config';
+import Loading from './Loading';
 
 import { SmartImageProps } from '../types';
 
@@ -54,7 +55,7 @@ export default function SmartImage({
             className="absolute inset-0 z-10 flex items-center justify-center bg-stone-50"
           >
             <div className="absolute inset-0 shimmer-animation opacity-50" />
-            <div className="relative w-12 h-12 border-2 border-stone-200 border-t-stone-900 rounded-full animate-spin opacity-20" />
+            <Loading size="md" variant="dark" className="opacity-20" />
             {/* Subtle Diamond Grid Pattern */}
             <div
               className="absolute inset-0 opacity-[0.03] pointer-events-none"

@@ -19,6 +19,7 @@ export interface FloatingAction {
   label: string;
   primary?: boolean;
   className?: string;
+  variant?: string;
 }
 
 interface BaseFloatingMenuProps {
@@ -118,7 +119,7 @@ export default function BaseFloatingMenu({
                     <Button
                       onClick={() => handleAction(btn.action)}
                       icon={btn.icon}
-                      variant={btn.primary ? 'primary' : 'secondary'}
+                      variant={(btn.variant as any) || (btn.primary ? 'primary' : 'secondary')}
                       size="sm"
                       mode="rectangle"
                       className={`shrink-0 shadow-md !rounded-xl ${btn.className || ''} w-full !justify-start px-2 sm:px-3 gap-2 sm:gap-3 h-[42px] sm:h-[63px]`}
@@ -150,7 +151,7 @@ export default function BaseFloatingMenu({
                     <Button
                       onClick={() => handleAction(btn.action)}
                       icon={btn.icon}
-                      variant={btn.primary ? 'primary' : 'secondary'}
+                      variant={(btn.variant as any) || (btn.primary ? 'primary' : 'secondary')}
                       size="sm"
                       mode="circle"
                       className={`shrink-0 shadow-md !rounded-xl ${btn.className || ''} w-[42px] h-[42px] sm:w-[63px] sm:h-[63px] !p-0`}

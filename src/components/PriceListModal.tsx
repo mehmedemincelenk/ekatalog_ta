@@ -11,14 +11,7 @@ import {
 } from '../utils/core';
 import { TECH } from '../data/config';
 import html2canvas from 'html2canvas';
-import {
-  Download,
-  Printer,
-  ArrowLeft,
-  Layers3,
-  CheckSquare,
-  Square,
-} from 'lucide-react';
+import * as Lucide from 'lucide-react';
 
 import { useStore } from '../store';
 import { PriceListModalProps } from '../types';
@@ -38,9 +31,11 @@ export default function PriceListModal({
   exchangeRates,
   activeDiscount,
   storeName,
+  isStatic = false,
+  initialStep,
 }: PriceListModalProps) {
   const { settings } = useStore();
-  const [step, setStep] = useState<0 | 1 | 2 | 3 | 4>(1); // 0: Intro, 1: Mode, 2: Theme, 3: Categories, 4: Preview
+  const [step, setStep] = useState<0 | 1 | 2 | 3 | 4>((initialStep as any) || 1); // 0: Intro, 1: Mode, 2: Theme, 3: Categories, 4: Preview
   const [exportMode, setExportMode] = useState<'LIST' | 'STORY'>('LIST');
   const [storyTheme, setStoryTheme] = useState<'LIGHT' | 'DARK'>('LIGHT');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -95,13 +90,19 @@ export default function PriceListModal({
   }, [categories, groupedProducts]);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && initialStep === undefined) {
       const skipIntro = localStorage.getItem('ekatalog_skip_price_list_intro');
       setStep(skipIntro === 'true' ? 1 : 0);
       setSelectedCategories([]);
       setIsExporting(false);
     }
-  }, [isOpen]);
+  }, [isOpen, initialStep]);
+
+  useEffect(() => {
+    if (initialStep !== undefined) {
+      setStep(initialStep as any);
+    }
+  }, [initialStep]);
 
   if (!isOpen) return null;
 
@@ -199,73 +200,66 @@ export default function PriceListModal({
   const footer = (
     <div className="w-full">
       {step === 0 ? (
-        <div className="flex flex-col gap-2 w-full">
-          <div className="grid grid-cols-2 gap-3 w-full">
+        <div className="flex flex-col gap-4 w-full">
+          <div className="flex gap-3 w-full">
             <Button
-              variant="ghost"
+              onClick={() => {
+                localStorage.setItem('ekatalog_skip_price_list_intro', 'true');
+                setStep(1);
+              }}
+              variant="secondary"
               size="md"
-              onClick={onClose}
-              className="!w-full h-12 shadow-none"
               mode="rectangle"
+              className="flex-1 h-16 !rounded-[24px]"
+              showFingerprint={true}
             >
-              KAPAT
+              ANLADIM TEKRAR GÖSTERME
             </Button>
             <Button
               variant="primary"
               size="md"
               onClick={() => setStep(1)}
-              className="!w-full h-12 !bg-stone-900 !text-white text-xs font-black uppercase shadow-xl shadow-stone-200"
+              className="flex-1 h-16 !rounded-[24px]"
               mode="rectangle"
+              showFingerprint={true}
             >
-              DEVAM ET
+              TAMAM
             </Button>
           </div>
-          <Button
-            onClick={() => {
-              localStorage.setItem('ekatalog_skip_price_list_intro', 'true');
-              setStep(1);
-            }}
-            variant="ghost"
-            size="sm"
-            mode="rectangle"
-            className="!w-full h-10 !text-[10px] font-black !text-stone-400 hover:!text-stone-900 uppercase tracking-widest transition-all shadow-none"
-          >
-            BİR DAHA GÖSTERME
-          </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="flex gap-3 w-full">
           <Button
-            variant="ghost"
-            size="md"
+            variant="secondary"
+            mode="rectangle"
             onClick={() => {
               setStep((prev) => (prev - 1) as 0 | 1 | 2 | 3 | 4);
             }}
-            className="!w-full h-12 shadow-none"
-            mode="rectangle"
-            icon={<ArrowLeft size={16} />}
+            className="w-16 h-16 shrink-0"
+            showFingerprint={false}
           >
-            GERİ
+            <Lucide.ChevronLeft size={24} strokeWidth={4} />
           </Button>
           {step === 4 ? (
-            <div className="flex gap-2 w-full">
+            <div className="flex gap-2 flex-1">
               <Button
                 variant="primary"
                 size="md"
-                icon={<Download size={18} />}
+                icon={<Lucide.Download size={18} />}
                 onClick={downloadAsImage}
                 loading={isExporting}
-                className="flex-1 h-12 shadow-lg"
+                className="flex-1 h-16 shadow-lg !rounded-[24px]"
                 mode="rectangle"
+                showFingerprint={true}
               >
                 {exportMode === 'STORY' ? 'SERİ KAYDET' : 'KAYDET'}
               </Button>
               <Button
                 variant="secondary"
                 size="md"
-                icon={<Printer size={18} />}
+                icon={<Lucide.Printer size={18} />}
                 onClick={printAsPDF}
-                className="w-12 shrink-0 h-12 flex items-center justify-center p-0"
+                className="w-16 shrink-0 h-16 flex items-center justify-center p-0 !bg-stone-50 border-stone-100 shadow-sm"
                 mode="rectangle"
               />
             </div>
@@ -277,10 +271,11 @@ export default function PriceListModal({
               onClick={() => {
                 setStep((prev) => (prev + 1) as 0 | 1 | 2 | 3 | 4);
               }}
-              className="!w-full h-12 shadow-lg shadow-stone-200"
+              className="flex-1 h-16 !rounded-[24px]"
               mode="rectangle"
+              showFingerprint={true}
             >
-              {step === 3 ? 'ÖNİZLEME' : 'İLERLE'}
+              {step === 3 ? 'ÖNİZLEME' : 'DEVAM'}
             </Button>
           )}
         </div>
@@ -290,10 +285,10 @@ export default function PriceListModal({
 
   const getStepTitle = () => {
     switch (step) {
-      case 0: return "Hoş Geldiniz";
-      case 1: return "Kategori Seçimi";
-      case 2: return "Format Seçimi";
-      case 3: return "Görünüm Tarzı";
+      case 0: return "";
+      case 1: return "KATEGORİ";
+      case 2: return "BİÇİM";
+      case 3: return "TEMA";
       case 4: return "Katalog Hazır!";
       default: return "Fiyat Listesi";
     }
@@ -307,10 +302,10 @@ export default function PriceListModal({
   const getMaxWidth = () => {
     switch (step) {
       case 0: return "max-w-4xl";
-      case 1: return "max-w-3xl";
+      case 1: return "max-w-4xl";
       case 2: return "max-w-2xl";
       case 3: return "max-w-xl";
-      case 4: return exportMode === 'STORY' ? 'max-w-[360px]' : 'max-w-5xl';
+      case 4: return exportMode === 'STORY' ? 'max-w-sm' : 'max-w-5xl';
       default: return "max-w-4xl";
     }
   };
@@ -319,63 +314,40 @@ export default function PriceListModal({
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title={getStepTitle()}
+      title={step === 1 ? "" : getStepTitle()}
       maxWidth={getMaxWidth()}
       footer={footer}
       progress={progress}
       noPadding={step === 4}
+      isStatic={isStatic}
     >
       <div className="print:p-0">
         {step === 0 ? (
           <div className="py-2 px-1 flex flex-col items-center">
-            <div className="flex items-center gap-5 mb-8 w-full px-4">
-              <div className="w-16 h-16 bg-stone-50 rounded-2xl flex items-center justify-center shadow-sm border border-stone-100 rotate-2 text-stone-900 shrink-0">
-                <Layers3 size={32} />
-              </div>
-              <h4 className="text-xl sm:text-2xl font-black text-stone-900 tracking-tighter text-left leading-tight">
-                Fiyat Listemizi Galerinize İndirin
-              </h4>
-            </div>
+            <div className="w-full grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+              {[
+                { id: 1, img: '/assets/onboarding/step1.png', text: 'İndirmek istediğiniz ürün kategorilerini seçin.' },
+                { id: 2, img: '/assets/onboarding/step2.png', text: 'Formatınızı seçin ve indir butonuna basın.' },
+                { id: 3, img: '/assets/onboarding/step3.png', text: "Tüm ürünler galerinizde! WhatsApp'ta paylaşın." }
+              ].map((card) => (
+                <div key={card.id} className="relative bg-stone-50/50 p-3 rounded-[2rem] border border-stone-100 flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-4 text-left group hover:bg-white hover:shadow-xl transition-all duration-500 overflow-hidden">
+                  {/* Image Unit (Hardened Square 1:1) */}
+                  <div 
+                    className="w-24 h-24 sm:w-full aspect-square rounded-3xl overflow-hidden shadow-sm border border-white shrink-0 group-hover:scale-105 transition-transform duration-500 relative bg-stone-100"
+                  >
+                    <img src={card.img} alt="" className="w-full h-full object-cover" />
+                    {/* Sequence Number Overlay */}
+                    <div className="absolute top-2 left-2 w-7 h-7 bg-white/90 backdrop-blur-sm text-stone-900 rounded-xl flex items-center justify-center font-black text-[11px] shadow-sm border border-white/50 z-10">
+                      {card.id}
+                    </div>
+                  </div>
 
-            <div className="w-full grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-              {/* STEP 1 */}
-              <div className="bg-stone-50/50 p-4 rounded-[2.5rem] border border-stone-100 flex flex-col items-center text-center group hover:bg-white hover:shadow-xl transition-all duration-500">
-                <div className="w-24 h-24 mb-4 rounded-3xl overflow-hidden shadow-sm border border-white group-hover:scale-110 transition-transform">
-                  <img src="/assets/onboarding/step1.png" alt="Adım 1" className="w-full h-full object-cover" />
+                  {/* Text Unit */}
+                  <p className="text-[10px] font-bold text-stone-500 leading-relaxed flex-1 sm:px-2 pb-2">
+                    {card.text}
+                  </p>
                 </div>
-                <div className="w-7 h-7 bg-white text-stone-900 rounded-full flex items-center justify-center shrink-0 font-black text-[10px] shadow-sm border border-stone-100 mb-3">
-                  1
-                </div>
-                <p className="text-[10px] font-bold text-stone-600 leading-relaxed px-2">
-                  İndirmek istediğiniz ürün kategorilerini seçin.
-                </p>
-              </div>
-
-              {/* STEP 2 */}
-              <div className="bg-stone-50/50 p-4 rounded-[2.5rem] border border-stone-100 flex flex-col items-center text-center group hover:bg-white hover:shadow-xl transition-all duration-500">
-                <div className="w-24 h-24 mb-4 rounded-3xl overflow-hidden shadow-sm border border-white group-hover:scale-110 transition-transform">
-                  <img src="/assets/onboarding/step2.png" alt="Adım 2" className="w-full h-full object-cover" />
-                </div>
-                <div className="w-7 h-7 bg-white text-stone-900 rounded-full flex items-center justify-center shrink-0 font-black text-[10px] shadow-sm border border-stone-100 mb-3">
-                  2
-                </div>
-                <p className="text-[10px] font-bold text-stone-600 leading-relaxed px-2">
-                  Formatınızı seçin ve indir butonuna basın.
-                </p>
-              </div>
-
-              {/* STEP 3 */}
-              <div className="bg-stone-50/50 p-4 rounded-[2.5rem] border border-stone-100 flex flex-col items-center text-center group hover:bg-white hover:shadow-xl transition-all duration-500">
-                <div className="w-24 h-24 mb-4 rounded-3xl overflow-hidden shadow-sm border border-white group-hover:scale-110 transition-transform">
-                  <img src="/assets/onboarding/step3.png" alt="Adım 3" className="w-full h-full object-cover" />
-                </div>
-                <div className="w-7 h-7 bg-white text-stone-900 rounded-full flex items-center justify-center shrink-0 font-black text-[10px] shadow-sm border border-stone-100 mb-3">
-                  3
-                </div>
-                <p className="text-[10px] font-bold text-stone-600 leading-relaxed px-2">
-                  Tüm ürünler galerinizde! WhatsApp'ta paylaşın.
-                </p>
-              </div>
+              ))}
             </div>
             <p className="text-[10px] font-black text-stone-300 uppercase tracking-[0.2em] mb-2 italic">
               İşte bu kadar kolay!
@@ -383,182 +355,141 @@ export default function PriceListModal({
           </div>
         ) : step === 1 ? (
           <div className="p-2">
-            <div className="mb-8 px-2 flex items-end justify-between">
-              <div>
-                <h5 className="text-xs font-black text-stone-900 uppercase tracking-[0.2em] mb-1">
-                  REYOUN / KATEGORİ SEÇİMİ
-                </h5>
-                <p className="text-[11px] text-stone-400 font-medium italic">
-                  Hangi ürün gruplarını kataloğa ekleyelim?
-                </p>
-              </div>
+            <div className="mb-6 flex items-center justify-between -mt-2">
+              <h3 className="text-xl font-black text-stone-900 uppercase tracking-tight leading-tight">
+                KATEGORİ
+              </h3>
               <Button
                 onClick={selectAllCategories}
                 variant="secondary"
                 mode="rectangle"
                 size="sm"
-                className="!flex !items-center !gap-1.5 !text-[9px] font-black !text-stone-900 hover:!text-stone-600 transition-colors !bg-stone-100 !px-3 !py-1.5 !rounded-lg whitespace-nowrap shrink-0 border-none shadow-none"
+                className="!flex !items-center !gap-1.5 !text-[9px] font-black !text-stone-900 hover:!text-stone-600 transition-colors !bg-stone-50 !px-4 !py-2 !rounded-xl whitespace-nowrap shrink-0 border border-stone-100 shadow-sm"
+                showFingerprint={true}
                 icon={
                   selectedCategories.length === populatedCategories.length ? (
-                    <CheckSquare size={14} />
+                    <Lucide.CheckSquare size={14} />
                   ) : (
-                    <Square size={14} />
+                    <Lucide.Square size={14} />
                   )
                 }
               >
                 TÜMÜNÜ SEÇ
               </Button>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="flex flex-wrap gap-2">
               {populatedCategories.map((cat) => (
                 <Button
                   key={cat}
                   onClick={() => handleToggleCategory(cat)}
-                  variant="ghost"
+                  variant={selectedCategories.includes(cat) ? 'primary' : 'secondary'}
                   mode="rectangle"
-                  selected={selectedCategories.includes(cat)}
-                  className={`
-                      !p-4 border-2 transition-all group !h-auto shadow-none
-                      ${
-                        selectedCategories.includes(cat)
-                          ? '!bg-stone-900 !border-stone-900 !text-white shadow-xl scale-[1.02]'
-                          : '!bg-stone-50 !border-stone-100 !text-stone-600 hover:!border-stone-300'
-                      }
-                    `}
+                  size="sm"
+                  className="!text-[10px] !py-2 !px-4 !rounded-xl"
+                  showFingerprint={true}
                 >
-                  <span className="font-black text-[10px] uppercase tracking-tight text-left flex-1 leading-tight mr-3">
-                    {cat}
-                  </span>
-                  <div
-                    className={`
-                      px-2.5 py-1.5 rounded-lg flex items-center justify-center text-[9px] font-black shrink-0
-                      ${
-                        selectedCategories.includes(cat)
-                          ? 'bg-white/20 text-white'
-                          : 'bg-stone-100 text-stone-400'
-                      }
-                    `}
-                  >
-                    {groupedProducts[cat]?.length || 0} ÜRÜN
-                  </div>
+                  {cat}
                 </Button>
               ))}
             </div>
           </div>
         ) : step === 2 ? (
           <div className="p-2 space-y-6">
-            <div className="text-center mb-8">
-              <h3 className="text-lg font-black text-stone-900 uppercase tracking-tight">Katalog Formatını Seç</h3>
-              <p className="text-xs text-stone-400 font-bold mt-1 uppercase tracking-widest">Nasıl bir dosya oluşturmak istersiniz?</p>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <Button
-                description="Tüm ürünleri alt alta, uzun bir liste halinde toplar. WhatsApp'ta PDF gibi göndermek veya çıktı almak için idealdir."
-                icon={<Printer size={28} />}
+                layout="vertical"
                 selected={exportMode === 'LIST'}
                 onClick={() => setExportMode('LIST')}
+                className="!h-auto !py-10 !rounded-[2.5rem]"
+                showFingerprint={false}
+                icon={
+                  <div className="w-16 h-24 bg-stone-50 border-2 border-stone-200 rounded-lg flex flex-col gap-1 p-2 group-hover:border-stone-400 transition-colors">
+                    <div className="grid grid-cols-3 gap-1">
+                      {[1,2,3,4,5,6,7,8,9].map(i => (
+                        <div key={i} className="aspect-square bg-stone-200 rounded-[2px]" />
+                      ))}
+                    </div>
+                  </div>
+                }
               >
-                Hepsini Tek Fotoğrafta Al
+                <span className="text-[11px] font-black uppercase tracking-widest mt-2">TEKTE HEPSİ</span>
               </Button>
 
               <Button
-                description="Ürünleri ekran boyutuna göre sayfalara ayırır (9:16). Instagram ve WhatsApp durumlarında paylaşmak için en profesyonel yöntemdir."
-                icon={<Download size={28} />}
+                layout="vertical"
                 selected={exportMode === 'STORY'}
                 onClick={() => setExportMode('STORY')}
-                badge="POPÜLER"
+                className="!h-auto !py-10 !rounded-[2.5rem]"
+                showFingerprint={false}
+                icon={
+                  <div className="grid grid-cols-2 gap-1.5 p-2">
+                    {[1,2,3,4].map(i => (
+                      <div key={i} className="w-6 h-10 bg-stone-50 border border-stone-200 rounded-sm flex flex-col gap-0.5 p-0.5 group-hover:border-stone-400 transition-colors">
+                        <div className="grid grid-cols-2 gap-0.5">
+                           <div className="w-full h-1.5 bg-stone-200 rounded-[1px]" />
+                           <div className="w-full h-1.5 bg-stone-200 rounded-[1px]" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                }
               >
-                WhatsApp Hikaye Boyutu
+                <span className="text-[11px] font-black uppercase tracking-widest mt-2">SOSYAL MEDYA</span>
               </Button>
             </div>
+
+            {/* CONDITIONAL ORIENTATION CHOICE */}
+            {exportMode === 'LIST' && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="grid grid-cols-2 gap-3 pt-2"
+              >
+                <Button
+                  onClick={() => setListOrientation('VERTICAL')}
+                  selected={listOrientation === 'VERTICAL'}
+                  variant="secondary"
+                  mode="rectangle"
+                  className="!h-16 !rounded-2xl flex flex-col items-center justify-center gap-1 border-2"
+                  showFingerprint={false}
+                >
+                  <span className="text-[10px] font-black uppercase tracking-widest">DİKEY</span>
+                </Button>
+                <Button
+                  onClick={() => setListOrientation('HORIZONTAL')}
+                  selected={listOrientation === 'HORIZONTAL'}
+                  variant="secondary"
+                  mode="rectangle"
+                  className="!h-16 !rounded-2xl flex flex-col items-center justify-center gap-1 border-2"
+                  showFingerprint={false}
+                >
+                  <span className="text-[10px] font-black uppercase tracking-widest">YATAY</span>
+                </Button>
+              </motion.div>
+            )}
           </div>
         ) : step === 3 ? (
-          <div className="p-2 space-y-8">
-            <div className="text-center mb-4">
-              <h3 className="text-lg font-black text-stone-900 uppercase tracking-tight">Görünüm ve Düzen</h3>
-              <p className="text-xs text-stone-400 font-bold mt-1 uppercase tracking-widest">Kataloğunuzun stilini belirleyin</p>
-            </div>
+          <div className="p-2">
+            <div className="grid grid-cols-2 gap-4">
+              <Button
+                variant="secondary"
+                layout="vertical"
+                selected={storyTheme === 'LIGHT'}
+                onClick={() => setStoryTheme('LIGHT')}
+                className="!h-auto !py-10 !rounded-[2.5rem]"
+              >
+                BEYAZ
+              </Button>
 
-            <div className="space-y-8">
-              {/* THEME SELECTION */}
-              <div>
-                <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest mb-4 px-1">Renk Teması</p>
-                <div className="grid grid-cols-2 gap-4">
-                  <Button
-                    layout="vertical"
-                    selected={storyTheme === 'LIGHT'}
-                    onClick={() => setStoryTheme('LIGHT')}
-                    icon={
-                      <div className="w-12 h-16 bg-white border border-stone-100 rounded-xl shadow-sm flex flex-col p-1.5 gap-1 overflow-hidden">
-                        <div className="w-full h-1 bg-stone-100 rounded-full"></div>
-                        <div className="w-full h-4 bg-stone-50 rounded-md"></div>
-                        <div className="w-full h-4 bg-stone-50 rounded-md"></div>
-                      </div>
-                    }
-                  >
-                    Ferah Beyaz
-                  </Button>
-
-                  <Button
-                    layout="vertical"
-                    selected={storyTheme === 'DARK'}
-                    onClick={() => setStoryTheme('DARK')}
-                    icon={
-                      <div className="w-12 h-16 bg-stone-950 border border-stone-800 rounded-xl shadow-sm flex flex-col p-1.5 gap-1 overflow-hidden">
-                        <div className="w-full h-1 bg-stone-900 rounded-full"></div>
-                        <div className="w-full h-4 bg-stone-900/50 rounded-md"></div>
-                        <div className="w-full h-4 bg-stone-900/50 rounded-md"></div>
-                      </div>
-                    }
-                  >
-                    Asil Siyah
-                  </Button>
-                </div>
-              </div>
-
-              {/* ORIENTATION SELECTION (Only for LIST) */}
-              {exportMode === 'LIST' && (
-                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <p className="text-[10px] font-black text-stone-400 uppercase tracking-widest mb-4 px-1">Sayfa Yapısı</p>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Button
-                      layout="vertical"
-                      selected={listOrientation === 'VERTICAL'}
-                      onClick={() => setListOrientation('VERTICAL')}
-                      icon={
-                        <div className="w-10 h-14 bg-stone-50 border-2 border-stone-200 rounded-lg flex flex-col items-center justify-center gap-1.5 p-2">
-                           <div className="w-full h-1 bg-stone-200 rounded-full"></div>
-                           <div className="w-full h-1 bg-stone-200 rounded-full"></div>
-                           <div className="w-full h-1 bg-stone-200 rounded-full"></div>
-                        </div>
-                      }
-                    >
-                      Dikey (A4)
-                    </Button>
-
-                    <Button
-                      layout="vertical"
-                      selected={listOrientation === 'HORIZONTAL'}
-                      onClick={() => setListOrientation('HORIZONTAL')}
-                      icon={
-                        <div className="w-14 h-10 bg-stone-50 border-2 border-stone-200 rounded-lg flex flex-col items-center justify-center gap-1.5 p-2">
-                           <div className="flex gap-1 w-full">
-                             <div className="flex-1 h-3 bg-stone-200 rounded"></div>
-                             <div className="flex-1 h-3 bg-stone-200 rounded"></div>
-                           </div>
-                           <div className="flex gap-1 w-full">
-                             <div className="flex-1 h-3 bg-stone-200 rounded"></div>
-                             <div className="flex-1 h-3 bg-stone-200 rounded"></div>
-                           </div>
-                        </div>
-                      }
-                    >
-                      Yatay (Katalog)
-                    </Button>
-                  </div>
-                </div>
-              )}
+              <Button
+                variant="primary"
+                layout="vertical"
+                selected={storyTheme === 'DARK'}
+                onClick={() => setStoryTheme('DARK')}
+                className="!h-auto !py-10 !rounded-[2.5rem]"
+              >
+                SİYAH
+              </Button>
             </div>
           </div>
         ) : (
@@ -642,7 +573,7 @@ export default function PriceListModal({
                                   />
                                 ) : (
                                   <div className="w-full h-full flex items-center justify-center opacity-20">
-                                    <Layers3 size={24} />
+                                    <Lucide.Layers3 size={24} />
                                   </div>
                                 )}
                               </div>
@@ -675,10 +606,6 @@ export default function PriceListModal({
                 ref={storiesContainerRef}
                 className="flex flex-col items-center overflow-y-auto scrollbar-hide"
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                onMouseDown={() => setIsAutoScrolling(false)}
-                onMouseUp={() => setIsAutoScrolling(true)}
-                onTouchStart={() => setIsAutoScrolling(false)}
-                onTouchEnd={() => setIsAutoScrolling(true)}
               >
                 {storyPages.map((page, pageIdx) => (
                   <div
@@ -725,7 +652,7 @@ export default function PriceListModal({
                                 />
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center text-stone-200">
-                                  <Layers3 size={20} />
+                                  <Lucide.Layers3 size={20} />
                                 </div>
                               )}
                             </div>

@@ -1,88 +1,84 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Settings } from 'lucide-react';
-import Button from './Button';
-import { resolveVisualAssetUrl } from '../utils/image';
-import { MaintenancePageProps } from '../types';
+import * as Lucide from 'lucide-react';
+import Numpad from './Numpad';
+import { useSettings } from '../hooks/useSettingsHub';
 
-export default function MaintenancePage({
-  settings,
-  onLogoPointerDown,
-  onLogoPointerUp,
-}: MaintenancePageProps) {
-  const handleWhatsAppClick = () => {
-    window.open(`https://wa.me/${settings.whatsapp}`, '_blank');
+/**
+ * MAINTENANCE PAGE (Diamond Standard)
+ * -----------------------------------------------------------
+ * A professional downtime interface with lead capture.
+ */
+export default function MaintenancePage() {
+  const [isSuccess, setIsSuccess] = useState(false);
+  const { settings, addVisitorLead } = useSettings(false);
+
+  const handleLeadSubmit = async (phone: string) => {
+    try {
+      await addVisitorLead(phone);
+      setIsSuccess(true);
+    } catch (err) {
+      console.error('Maintenance lead failed', err);
+    }
   };
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center">
-      {/* Animated Background Element */}
-      <motion.div
-        animate={{
-          rotate: 360,
-          scale: [1, 1.1, 1],
-        }}
-        transition={{
-          rotate: { duration: 20, repeat: Infinity, ease: 'linear' },
-          scale: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
-        }}
-        className="absolute w-[500px] h-[500px] bg-stone-50 rounded-full blur-3xl -z-10"
-      />
-
-      <div className="max-w-md w-full flex flex-col items-center">
-        {/* LOGO */}
-        {settings.logoUrl && (
-          <div className="relative mb-12">
-            <motion.img
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              src={resolveVisualAssetUrl(settings.logoUrl) || ''}
-              alt={settings.name}
-              className="h-16 sm:h-20 object-contain"
-            />
-            {/* INVISIBLE SHIELD: This layer catches the gestures */}
-            <div
-              className="absolute inset-0 z-20 cursor-pointer"
-              onPointerDown={onLogoPointerDown}
-              onPointerUp={onLogoPointerUp}
-              onContextMenu={(e) => e.preventDefault()}
-              style={{ touchAction: 'none' }}
-            />
-          </div>
-        )}
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-          className="bg-stone-900 text-white p-2 px-4 rounded-full text-[10px] font-black tracking-[0.2em] uppercase mb-6"
-        >
-          Sistem Bakımda
-        </motion.div>
-
-        <h1 className="text-3xl sm:text-4xl font-black text-stone-900 leading-tight mb-4 tracking-tighter uppercase">
-          Size Daha İyi Bir <br /> Deneyim Hazırlıyoruz
-        </h1>
-
-        <p className="text-stone-400 text-sm sm:text-base font-medium max-w-sm mb-10 leading-relaxed">
-          Katalog güncellemeleri ve sistem iyileştirmeleri nedeniyle kısa bir
-          ara verdik. Çok yakında buradayız.
-        </p>
-
-        <div className="flex flex-col sm:flex-row gap-3 w-full">
-          <Button
-            onClick={handleWhatsAppClick}
-            variant="primary"
-            mode="rectangle"
-            className="flex-1 !py-4 font-black tracking-widest uppercase text-xs"
-            icon={<Settings className="w-4 h-4 animate-spin-slow" />}
-          >
-            BİZE ULAŞIN
-          </Button>
+      <div className="max-w-md w-full space-y-12">
+        {/* BRANDING */}
+        <div className="flex flex-col items-center space-y-4">
+          {settings?.logoUrl ? (
+            <img src={settings.logoUrl} alt={settings.title} className="h-16 w-auto object-contain mb-2" />
+          ) : (
+            <div className="w-16 h-16 bg-stone-900 rounded-[1.5rem] flex items-center justify-center text-white text-2xl font-black">
+              {settings?.title?.charAt(0) || 'E'}
+            </div>
+          )}
+          <h1 className="text-2xl font-black text-stone-900 tracking-tighter uppercase">{settings?.title}</h1>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-stone-100 w-full">
-          <p className="text-[10px] font-black text-stone-300 uppercase tracking-widest">
-            {settings.name} &copy; {new Date().getFullYear()}
+        <div className="relative">
+          {/* SUCCESS STATE */}
+          {isSuccess ? (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-stone-50 rounded-[2rem] p-12 border border-stone-100 flex flex-col items-center space-y-6"
+            >
+              <div className="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center shadow-inner">
+                <Lucide.CheckCircle2 size={40} strokeWidth={2.5} />
+              </div>
+              <div className="space-y-2">
+                <h4 className="text-2xl font-black text-stone-900 uppercase tracking-tight">KAYDEDİLDİ!</h4>
+                <p className="text-stone-400 text-sm font-bold leading-relaxed px-4">
+                  Dükkanı açtığımızda sizi ilk biz arayacağız. İlginiz için teşekkürler!
+                </p>
+              </div>
+            </motion.div>
+          ) : (
+            <div className="space-y-10">
+              <div className="space-y-4">
+                <h2 className="text-5xl font-black text-stone-900 tracking-tighter leading-none uppercase">
+                  BAKIMDA
+                </h2>
+              </div>
+
+              {/* LEAD CAPTURE SECTION */}
+              <div className="bg-white border-2 border-stone-100 rounded-[2rem] p-8 shadow-2xl shadow-stone-200/50">
+                <div className="text-center mb-8">
+                  <p className="text-xl font-black text-stone-900 tracking-tighter uppercase">Sizi Arayalım</p>
+                </div>
+                
+                <Numpad onSubmit={handleLeadSubmit} maxDigits={10} />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* FOOTER */}
+        <div className="pt-8 opacity-20">
+          <p className="text-[9px] font-black text-stone-400 uppercase tracking-[0.5em]">
+            EKATALOG.SITE — #ELİTETRADERS
           </p>
         </div>
       </div>

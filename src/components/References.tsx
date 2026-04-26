@@ -6,7 +6,7 @@ import OrderSelector from './OrderSelector';
 import Button from './Button';
 import PlusPlaceholder from './PlusPlaceholder';
 import QuickEditModal from './QuickEditModal';
-import { Trash2, Check, X } from 'lucide-react';
+import * as Lucide from 'lucide-react';
 
 import { ReferencesProps, Reference } from '../types';
 
@@ -78,7 +78,7 @@ const ReferenceCard = memo(({
                 variant="danger"
                 mode="circle"
                 size="sm"
-                icon={<Trash2 size={14} />}
+                icon={<Lucide.Trash2 size={14} />}
                 className="!w-7 !h-7 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
                 title="Referansı Sil"
               />
@@ -92,7 +92,7 @@ const ReferenceCard = memo(({
                   variant="danger"
                   mode="circle"
                   size="sm"
-                  icon={<Check size={14} />}
+                  icon={<Lucide.Check size={14} />}
                   className="!w-7 !h-7 shadow-lg"
                 />
                 <Button
@@ -100,7 +100,7 @@ const ReferenceCard = memo(({
                   variant="secondary"
                   mode="circle"
                   size="sm"
-                  icon={<X size={14} />}
+                  icon={<Lucide.X size={14} />}
                   className="!w-7 !h-7 shadow-lg"
                 />
               </div>

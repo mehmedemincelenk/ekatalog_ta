@@ -1,5 +1,5 @@
 import { render, fireEvent, act } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import FloatingAdminMenu from './FloatingAdminMenu';
 
 vi.mock('../store', () => ({
@@ -12,14 +12,6 @@ vi.mock('../store', () => ({
 }));
 
 describe('FloatingAdminMenu (Diamond Snapshot)', () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
   it('admin menüsü kilitli tasarım snapshotu ile eşleşmeli', () => {
     const { asFragment } = render(
       <FloatingAdminMenu 
@@ -43,12 +35,6 @@ describe('FloatingAdminMenu (Diamond Snapshot)', () => {
     const toggle = getByLabelText('Menüyü Aç');
     act(() => {
       fireEvent.click(toggle);
-    });
-    
-    // Timer'ları ilerletmeye gerek yok çünkü isExpanded state değişimi anında olur, 
-    // ama timer hata çıkarıyorsa bu blok korur.
-    act(() => {
-      vi.runAllTimers();
     });
     
     expect(asFragment()).toMatchSnapshot();

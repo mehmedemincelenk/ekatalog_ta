@@ -5,6 +5,7 @@ import Button from './Button';
 import PlusPlaceholder from './PlusPlaceholder';
 import CategoryFilterChip from './CategoryFilterChip';
 import QuickEditModal from './QuickEditModal';
+import FormInput from './FormInput';
 import { useDebounce } from '../hooks/useCommon';
 import { useStore } from '../store';
 import { SearchFilterProps } from '../types';
@@ -65,7 +66,6 @@ const SearchFilter = memo(
       ? sortedList 
       : sortedList.slice(0, pcInitialLimit);
 
-    const totalProductCount = Object.values(stats).reduce((acc, curr) => acc + curr, 0);
     const isAllSelected = activeCategories.length === 0;
     const chipTheme = THEME.searchFilter.categoryList.chip;
 
@@ -141,13 +141,14 @@ const SearchFilter = memo(
                 <div className={filterTheme.searchArea.iconSize}>
                   {globalIcons.search}
                 </div>
-                <input
+                <FormInput
                   id="mobile-search-input"
                   type="text"
                   value={internalSearch}
                   onChange={(e) => setInternalSearch(e.target.value)}
                   placeholder={LABELS.filter.searchPlaceholder}
-                  className={`${filterTheme.searchArea.input} ${THEME.radius.input} h-full w-full flex-1`}
+                  className="!pl-9 !border-none !bg-transparent !h-full"
+                  containerClassName="flex-1 h-full"
                 />
               </div>
             )}
@@ -158,7 +159,7 @@ const SearchFilter = memo(
                   onClick={() => setIsPanelOpen(!isPanelOpen)}
                   variant="primary"
                   mode="rectangle"
-                  className="h-11 px-3 flex-none font-black !text-[10px] !bg-stone-900 !text-white !rounded-lg"
+                  className="h-11 px-3 flex-none !text-[10px]"
                 >
                   {LABELS.filter.categoryBtn}
                 </Button>
@@ -179,7 +180,7 @@ const SearchFilter = memo(
                     className="overflow-hidden"
                   >
                     <div className="flex flex-wrap justify-start items-center gap-2 py-1 w-full">
-                      {renderCategoryList(sortedList)}
+                      {renderCategoryList(visibleList)}
                     </div>
                   </motion.div>
                 ) : null}

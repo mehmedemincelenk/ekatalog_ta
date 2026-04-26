@@ -3,10 +3,13 @@ import { useStore } from '../store';
 import { FloatingAdminMenuProps } from '../types';
 import { THEME } from '../data/config';
 
+import { Bell } from 'lucide-react';
+
 /**
  * FLOATING ADMIN MENU COMPONENT
  * -----------------------------------------------------------
  * Specialized AssistiveTouch hub for store owners.
+ * Refined layout: 2x2 grid with spanning top action.
  */
 export default function FloatingAdminMenu({
   onProductAddTrigger,
@@ -31,10 +34,32 @@ export default function FloatingAdminMenu({
   };
 
   const adminActions: FloatingAction[] = [
+    // TOP ROW: SPANNING ACTION
+    ...(onBulkUpdateTrigger
+      ? [
+          {
+            id: 'bulk',
+            icon: <div className="w-6 h-6 sm:w-9 sm:h-9 flex items-center justify-center">{globalIcons.bulkPrice}</div>,
+            action: onBulkUpdateTrigger,
+            label: 'TOPLU İŞLEM',
+            className: 'bg-stone-900 text-white w-full !col-span-2 !rounded-2xl mb-1',
+            primary: true
+          },
+        ]
+      : []),
+    
+    // BOTTOM ROW: 2x2 GRID ITEMS
+    {
+      id: 'notifications',
+      icon: <div className="w-6 h-6 sm:w-9 sm:h-9 flex items-center justify-center"><Bell size={24} /></div>,
+      action: () => useStore.getState().openModal('NOTIFICATIONS'),
+      label: 'BİLDİRİMLER', 
+      className: 'bg-white text-stone-900 border-2 border-stone-100',
+    },
     {
       id: 'currency',
       icon: (
-        <div className="w-6 h-6 sm:w-9 sm:h-9 flex flex-col items-center justify-center leading-none bg-stone-900 text-white rounded-md">
+        <div className="w-6 h-6 sm:w-9 sm:h-9 flex flex-col items-center justify-center leading-none">
           <span className="text-[12px] sm:text-[18px] font-black">
             {activeCurrency === 'TRY' ? '₺' : activeCurrency === 'USD' ? '$' : '€'}
           </span>
@@ -47,17 +72,8 @@ export default function FloatingAdminMenu({
       label: 'PARA BİRİMİ',
       className: 'bg-white text-stone-900 border-2 border-stone-100',
     },
-    ...(onBulkUpdateTrigger
-      ? [
-          {
-            id: 'bulk',
-            icon: <div className="w-6 h-6 sm:w-9 sm:h-9 flex items-center justify-center">{globalIcons.bulkPrice}</div>,
-            action: onBulkUpdateTrigger,
-            label: 'TOPLU İŞLEM',
-            className: 'bg-white text-stone-900 border-2 border-stone-100',
-          },
-        ]
-      : []),
+
+    // CENTER PRIMARY ACTIONS (FAB STYLE)
     {
       id: 'add',
       icon: <div className="w-6 h-6 sm:w-9 sm:h-9 flex items-center justify-center">{globalIcons.plus}</div>,

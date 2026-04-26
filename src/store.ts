@@ -109,4 +109,8 @@ export const useStore = create<StoreState>((set) => ({
   modalData: null,
   openModal: (type, data = null) => set({ activeModal: type, modalData: data }),
   closeModal: () => set({ activeModal: null, modalData: null }),
+
+  // Workspace
+  isWorkspaceOpen: false,
+  toggleWorkspace: () => set((state) => ({ isWorkspaceOpen: !state.isWorkspaceOpen })),
 }));

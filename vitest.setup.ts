@@ -32,3 +32,11 @@ Object.defineProperty(window, 'localStorage', {
 
 // Kaydırma (scroll) fonksiyonlarını taklit ediyoruz.
 window.scrollTo = vi.fn();
+
+// ResizeObserver mock (Required for MarqueeText and other responsive components)
+class ResizeObserverMock {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+window.ResizeObserver = ResizeObserverMock as any;

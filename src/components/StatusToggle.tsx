@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Check, X } from 'lucide-react';
+import * as Lucide from 'lucide-react';
 import Button from './Button';
 import { THEME } from '../data/config';
 
@@ -36,7 +36,7 @@ const StatusToggle = memo(
               mode="square"
               size="sm"
               className={`!w-7 !h-7 !p-0 !rounded-lg transition-all ${value ? activeColor : THEME.statusState.inactive}`}
-              icon={<Check size={14} strokeWidth={4} />}
+              icon={<Lucide.Check size={14} strokeWidth={4} />}
             />
           </motion.div>
           <motion.div whileTap={{ scale: 0.9 }} whileHover={{ scale: 1.05 }}>
@@ -46,7 +46,7 @@ const StatusToggle = memo(
               mode="square"
               size="sm"
               className={`!w-7 !h-7 !p-0 !rounded-lg transition-all ${!value ? inactiveColor : THEME.statusState.inactive}`}
-              icon={<X size={14} strokeWidth={4} />}
+              icon={<Lucide.X size={14} strokeWidth={4} />}
             />
           </motion.div>
         </div>

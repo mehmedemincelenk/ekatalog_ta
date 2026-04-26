@@ -20,6 +20,7 @@ const AIStudioCompareModal = ({
   onClose,
   onApply,
   onDismiss,
+  isStatic = false,
 }: AIStudioCompareModalProps) => {
   const [v] = useState(() => Date.now());
 
@@ -34,6 +35,7 @@ const AIStudioCompareModal = ({
       onClose={onClose}
       title="GÖRÜNÜM TAVSİYESİ"
       maxWidth="max-w-4xl"
+      isStatic={isStatic}
     >
       <div className="flex flex-col gap-5 py-4">
         {/* EXPLANATION */}

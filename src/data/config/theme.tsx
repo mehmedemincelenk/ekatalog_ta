@@ -449,7 +449,7 @@ export const THEME = {
       stepActive: 'bg-kraft-600',
       stepInactive: 'bg-stone-200',
       stepContent:
-        'space-y-6 sm:space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-500',
+        'space-y-2 sm:space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500',
     },
     typography: {
       label: `${FS.xs} sm:text-lg font-semibold text-stone-600 mb-1 sm:mb-2`,
@@ -476,11 +476,11 @@ export const THEME = {
 
   pinModal: {
     overlay:
-      'fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-xl',
+      'fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/70 backdrop-blur-2xl',
     container:
       'relative w-full max-w-[240px] sm:max-w-[280px] flex flex-col items-center select-none transform transition-transform duration-300',
     headerWrapper: 'text-center mb-6',
-    headerIconWrapper: `w-12 h-12 bg-white/10 backdrop-blur-md ${BR.md} flex items-center justify-center mx-auto mb-3 shadow-xl border border-white/20`,
+    headerIconWrapper: `w-12 h-12 bg-white/20 backdrop-blur-md ${BR.md} flex items-center justify-center mx-auto mb-3 shadow-2xl border border-white/20`,
     headerIconSize: 'w-6 h-6 text-white',
     dotsWrapper: 'flex justify-center gap-4 mb-8',
     dotBase: `w-2.5 h-2.5 ${BR.full} border transition-all duration-300`,
@@ -489,14 +489,14 @@ export const THEME = {
     dotInactive: 'bg-transparent border-white/40',
     dotError: 'bg-red-500 border-red-500',
     keyboardGrid: 'grid grid-cols-3 gap-x-4 gap-y-3 w-full',
-    keyButton: `group relative w-14 h-14 sm:w-16 sm:h-16 ${BR.full} bg-white/10 hover:bg-white/20 active:bg-white/30 border border-white/10 backdrop-blur-md transition-all flex items-center justify-center mx-auto overflow-hidden active:scale-90`,
-    cancelButton: `w-14 h-14 sm:w-16 sm:h-16 ${BR.full} flex items-center justify-center mx-auto text-white/40 hover:text-white/80 transition-colors ${FS.xs} font-bold active:scale-95`,
-    deleteButton: `w-14 h-14 sm:w-16 sm:h-16 ${BR.full} flex items-center justify-center mx-auto text-white/60 hover:text-white active:scale-90 transition-all`,
+    keyButton: `group relative w-14 h-14 sm:w-16 sm:h-16 ${BR.full} bg-white/20 hover:bg-white/30 active:bg-white/40 border border-white/10 backdrop-blur-md transition-all flex items-center justify-center mx-auto overflow-hidden active:scale-90 shadow-xl`,
+    cancelButton: `w-14 h-14 sm:w-16 sm:h-16 ${BR.full} flex items-center justify-center mx-auto text-white/50 hover:text-white transition-colors ${FS.xs} font-bold active:scale-95`,
+    deleteButton: `w-14 h-14 sm:w-16 sm:h-16 ${BR.full} flex items-center justify-center mx-auto text-white/70 hover:text-white active:scale-90 transition-all`,
     deleteIconSize: 'w-6 h-6',
     typography: {
-      title: `${FS.base} text-white font-bold`,
-      subtitle: `${FS.xs} text-white/60 mt-1 font-medium`,
-      keyText: `${FS.lg} font-light text-white leading-none`,
+      title: `${FS.base} text-white font-black uppercase tracking-widest`,
+      subtitle: `${FS.xs} text-white/60 mt-1 font-bold`,
+      keyText: `${FS.lg} font-black text-white leading-none`,
     },
     animations: {
       shake: 'animate-shake',

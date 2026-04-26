@@ -11,6 +11,7 @@ import GlobalAddMenuModal from './GlobalAddMenuModal';
 import AIStudioCompareModal from './AIStudioCompareModal';
 import LocationModal from './LocationModal';
 import ContactModal from './ContactModal';
+import NotificationsModal from './NotificationsModal';
 
 import { useStore } from '../store';
 import { useProducts } from '../hooks/useProductsHub';
@@ -129,12 +130,17 @@ const AppModals = memo(() => {
               />
             )}
 
-            <GlobalAddMenuModal
-              isOpen={activeModal === 'GLOBAL_ADD_MENU'}
-              onClose={closeModal}
-              onAction={handleGlobalAddAction}
-            />
-          </>
+              <GlobalAddMenuModal
+                isOpen={activeModal === 'GLOBAL_ADD_MENU'}
+                onClose={closeModal}
+                onAction={handleGlobalAddAction}
+              />
+
+              <NotificationsModal
+                isOpen={activeModal === 'NOTIFICATIONS'}
+                onClose={closeModal}
+              />
+            </>
         )}
       </AnimatePresence>
 

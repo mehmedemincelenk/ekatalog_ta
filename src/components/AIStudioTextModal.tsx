@@ -16,6 +16,7 @@ const AIStudioTextModal: React.FC<AIStudioTextModalProps> = ({
   onDismiss,
   displayCurrency = 'TRY',
   exchangeRates,
+  isStatic = false,
 }) => {
   return (
     <BaseModal
@@ -24,6 +25,7 @@ const AIStudioTextModal: React.FC<AIStudioTextModalProps> = ({
       title="GÖRÜNÜM TAVSİYESİ"
       subtitle="Ürün yazılarınızı sizin için standardize ediyoruz"
       maxWidth="max-w-5xl"
+      isStatic={isStatic}
     >
       <div className="flex flex-col items-center">
         {/* COMPARISON - FORCED 2 COLUMNS */}

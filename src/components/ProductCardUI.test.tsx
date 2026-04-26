@@ -18,8 +18,6 @@ describe('ProductCardUI (Diamond Snapshot)', () => {
     const { asFragment } = render(
       <ProductCardUI 
         product={mockProduct as any} 
-        isAdmin={false}
-        showPrice={true}
         displayCurrency="TRY"
       />
     );
@@ -30,8 +28,6 @@ describe('ProductCardUI (Diamond Snapshot)', () => {
     const { asFragment } = render(
       <ProductCardUI 
         product={mockProduct as any} 
-        isAdmin={true}
-        showPrice={true}
         displayCurrency="TRY"
       />
     );
@@ -42,8 +38,6 @@ describe('ProductCardUI (Diamond Snapshot)', () => {
     const { asFragment } = render(
       <ProductCardUI 
         product={{ ...mockProduct, out_of_stock: true } as any} 
-        isAdmin={false}
-        showPrice={true}
         displayCurrency="TRY"
       />
     );

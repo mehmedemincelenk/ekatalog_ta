@@ -118,6 +118,7 @@ export interface CompanySettings {
     enabled: boolean;
     message: string;
   };
+  visitor_leads?: any;
   exchangeRates: {
     usd: number;
     eur: number;
@@ -152,6 +153,8 @@ export interface AddProductModalProps {
   onProductAddition: (productData: NewProductPayload, imageFile?: File) => void;
   onModalClose: () => void;
   initialCategory?: string;
+  isStatic?: boolean;
+  initialStep?: number;
 }
 
 export interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -215,6 +218,8 @@ export interface DisplaySettingsModalProps {
   ) => void;
   isInlineEnabled: boolean;
   onToggleInline: () => void;
+  isStatic?: boolean;
+  initialStep?: number;
 }
 
 export interface HeroCarouselProps {
@@ -380,6 +385,8 @@ export interface EditProdCardProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   onImageUpload?: (id: string, file: File) => Promise<string | undefined>;
+  isStatic?: boolean;
+  initialStep?: number;
 }
 
 export interface LoadingProps {
@@ -413,6 +420,7 @@ export interface BaseModalProps {
   disableClickOutside?: boolean;
   className?: string;
   noPadding?: boolean;
+  isStatic?: boolean;
 }
 
 export interface PinModalProps {
@@ -422,6 +430,8 @@ export interface PinModalProps {
   onModalClose: () => void;
   isLockedOut?: boolean;
   failedAttempts?: number;
+  isStatic?: boolean;
+  initialStep?: number;
 }
 
 export interface TurnstileProps {
@@ -442,6 +452,7 @@ export interface TurnstileOptions {
 export interface QRModalProps {
   isOpen: boolean;
   onClose: () => void;
+  isStatic?: boolean;
 }
 
 export interface PriceListModalProps {
@@ -453,6 +464,8 @@ export interface PriceListModalProps {
   exchangeRates?: { usd: number; eur: number };
   activeDiscount?: { rate: number; category?: string } | null;
   storeName: string;
+  isStatic?: boolean;
+  initialStep?: number;
 }
 export interface AppModalsProps {
   isAdmin: boolean;
@@ -508,15 +521,14 @@ export interface AppModalsProps {
 }
 
 export interface MaintenancePageProps {
-  settings: CompanySettings;
-  onLogoPointerDown: () => void;
-  onLogoPointerUp: () => void;
+  forceVisible?: boolean;
 }
 
 export interface GlobalAddMenuModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAction: (type: 'PRODUCT' | 'CATEGORY' | 'REFERENCE' | 'CAROUSEL') => void;
+  isStatic?: boolean;
 }
 
 export interface FloatingGuestMenuProps {
@@ -538,6 +550,7 @@ export interface CouponModalProps {
   onApplyDiscount: (code: string) => void;
   discountError?: string | null;
   activeDiscount?: { rate: number; category?: string } | null;
+  isStatic?: boolean;
 }
 
 export interface CarouselSlideUnitProps {
@@ -549,7 +562,6 @@ export interface CarouselSlideUnitProps {
   isMobileView?: boolean;
   onImageUpdateTrigger: (slideId: number) => void;
   onDeleteTrigger: (slideId: number) => void;
-  onAddTrigger: () => void;
   onReorderTrigger: (slideId: number, newIndex: number) => void;
   currentIndex: number;
   totalSlides: number;
@@ -569,10 +581,11 @@ export interface QuickEditModalProps {
   initialValue: string;
   placeholder?: string;
   type?: 'text' | 'number' | 'tel' | 'url';
+  isStatic?: boolean;
 }
 
 export interface OffHoursNoticeProps {
-  whatsappNumber: string;
+  forceVisible?: boolean;
 }
 
 export interface BulkPriceUpdateModalProps {
@@ -589,11 +602,14 @@ export interface BulkPriceUpdateModalProps {
       is_archived?: boolean;
     }[],
   ) => Promise<void>;
+  isStatic?: boolean;
+  initialStep?: number;
 }
 
 export type ModalType =
   | 'ADD_PRODUCT'
   | 'BULK_UPDATE'
+  | 'NOTIFICATIONS'
   | 'DISPLAY_SETTINGS'
   | 'QR'
   | 'PIN'
@@ -637,6 +653,10 @@ export interface StoreState {
   modalData: unknown;
   openModal: (type: ModalType, data?: unknown) => void;
   closeModal: () => void;
+
+  // Workspace
+  isWorkspaceOpen: boolean;
+  toggleWorkspace: () => void;
 }
 
 export interface AIStudioTextModalProps {
@@ -649,6 +669,7 @@ export interface AIStudioTextModalProps {
   onDismiss: () => void;
   displayCurrency?: 'TRY' | 'USD' | 'EUR';
   exchangeRates?: { usd: number; eur: number };
+  isStatic?: boolean;
 }
 
 export interface AIStudioCompareModalProps {
@@ -657,5 +678,6 @@ export interface AIStudioCompareModalProps {
   onClose: () => void;
   onApply: (productId: string, polishedUrl: string) => void;
   onDismiss: (productId: string) => void;
+  isStatic?: boolean;
 }
 

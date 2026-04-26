@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import Navbar from './Navbar';
 import { useStore } from '../store';
 import { useSettings } from '../hooks/useSettingsHub';
@@ -31,7 +31,13 @@ describe('Navbar UI (Diamond Lock)', () => {
       isInitialLoading: false
     });
 
-    const { asFragment } = render(<Navbar />);
+    const { asFragment } = render(
+      <Navbar 
+        onLogoPointerDown={vi.fn()} 
+        onLogoPointerUp={vi.fn()} 
+        isInlineEnabled={false} 
+      />
+    );
     expect(asFragment()).toMatchSnapshot();
   });
 });

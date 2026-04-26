@@ -1,10 +1,13 @@
 import React, { useState, memo, useCallback, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { LABELS, THEME } from '../data/config';
 import Button from './Button';
 import BaseModal from './BaseModal';
-import StatusToggle from './StatusToggle';
-import ProductCardUI from './ProductCardUI';
-import { ArrowLeft } from 'lucide-react';
+import * as Lucide from 'lucide-react';
+import CategoryChipSelector from './CategoryChipSelector';
+import FormInput from './FormInput';
+import StatusOverlay from './StatusOverlay';
+import StatusDot from './StatusDot';
 
 /**
  * ADD PRODUCT MODAL COMPONENT (100% Tokenized & Professional English)
@@ -15,8 +18,6 @@ import { ArrowLeft } from 'lucide-react';
 import {
   AddProductModalProps,
   FormInputProps,
-  ProductImagePickerProps,
-  ProductCategorySelectorProps,
 } from '../types';
 import { useStore } from '../store';
 
@@ -25,6 +26,7 @@ const INITIAL_FORM_STATE = {
   selectedCategory: '',
   customCategoryName: '',
   productPrice: '',
+  currency: '₺',
   productDescription: '',
   selectedImageFile: null as File | null,
   isProductInStock: true,
@@ -32,106 +34,23 @@ const INITIAL_FORM_STATE = {
 
 // --- INTERNAL UI SUB-COMPONENTS ---
 
-const FormInput = memo(
-  ({ labelText, id, ...inputProperties }: FormInputProps) => {
-    const theme = THEME.addProductModal;
-    return (
-      <div>
-        <label htmlFor={id} className={theme.typography.label}>
-          {labelText}
-        </label>
-        <input id={id} {...inputProperties} className={theme.inputField} />
-      </div>
-    );
-  },
+// CUSTOM DIAMOND SEAL SVG (Same as Button.tsx)
+const ToggleFingerprint = () => (
+  <div className="absolute -right-4 -bottom-4 opacity-[0.04] pointer-events-none transform scaleX(-1) rotate-[10deg]">
+    <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" fill="currentColor" viewBox="0 0 16 16">
+      <path d="M8.06 6.5a.5.5 0 0 1 .5.5v.776a11.5 11.5 0 0 1-.552 3.519l-1.331 4.14a.5.5 0 0 1-.952-.305l1.33-4.141a10.5 10.5 0 0 0 .504-3.213V7a.5.5 0 0 1 .5-.5Z"/>
+      <path d="M6.06 7a2 2 0 1 1 4 0 .5.5 0 1 1-1 0 1 1 0 1 0-2 0v.332q0 .613-.066 1.221A.5.5 0 0 1 6 8.447q.06-.555.06-1.115zm3.509 1a.5.5 0 0 1 .487.513 11.5 11.5 0 0 1-.587 3.339l-1.266 3.8a.5.5 0 0 1-.949-.317l1.267-3.8a10.5 10.5 0 0 0 .535-3.048A.5.5 0 0 1 9.569 8m-3.356 2.115a.5.5 0 0 1 .33.626L5.24 14.939a.5.5 0 1 1-.955-.296l1.303-4.199a.5.5 0 0 1 .625-.329"/>
+      <path d="M4.759 5.833A3.501 3.501 0 0 1 11.559 7a.5.5 0 0 1-1 0 2.5 2.5 0 0 0-4.857-.833.5.5 0 1 1-.943-.334m.3 1.67a.5.5 0 0 1 .449.546 10.7 10.7 0 0 1-.4 2.031l-1.222 4.072a.5.5 0 1 1-.958-.287L4.15 9.793a9.7 9.7 0 0 0 .363-1.842.5.5 0 0 1 .546-.449Zm6 .647a.5.5 0 0 1 .5.5c0 1.28-.213 2.552-.632 3.762l-1.09 3.145a.5.5 0 0 1-.944-.327l1.089-3.145c.382-1.105.578-2.266.578-3.435a.5.5 0 0 1 .5-.5Z"/>
+      <path d="M3.902 4.222a5 5 0 0 1 5.202-2.113.5.5 0 0 1-.208.979 4 4 0 0 0-4.163 1.69.5.5 0 0 1-.831-.556m6.72-.955a.5.5 0 0 1 .705-.052A4.99 4.99 0 0 1 13.059 7v1.5a.5.5 0 1 1-1 0V7a3.99 3.99 0 0 0-1.386-3.028.5.5 0 0 1-.051-.705M3.68 5.842a.5.5 0 0 1 .422.568q-.044.289-.044.59c0 .71-.1 1.417-.298 2.1l-1.14 3.923a.5.5 0 1 1-.96-.279L2.8 8.821A6.5 6.5 0 0 0 3.058 7q0-.375.054-.736a.5.5 0 0 1 .568-.422m8.882 3.66a.5.5 0 0 1 .456.54c-.084 1-.298 1.986-.64 2.934l-.744 2.068a.5.5 0 0 1-.941-.338l.745-2.07a10.5 10.5 0 0 0 .584-2.678.5.5 0 0 1 .54-.456"/>
+      <path d="M4.81 1.37A6.5 6.5 0 0 1 14.56 7a.5.5 0 1 1-1 0 5.5 5.5 0 0 0-8.25-4.765.5.5 0 0 1-.5-.865m-.89 1.257a.5.5 0 0 1 .04.706A5.48 5.48 0 0 0 2.56 7a.5.5 0 0 1-1 0c0-1.664.626-3.184 1.655-4.333a.5.5 0 0 1 .706-.04ZM1.915 8.02a.5.5 0 0 1 .346.616l-.779 2.767a.5.5 0 1 1-.962-.27l.778-2.767a.5.5 0 0 1 .617-.346m12.15.481a.5.5 0 0 1 .49.51c-.03 1.499-.161 3.025-.727 4.533l-.07.187a.5.5 0 0 1-.936-.351l.07-.187c.506-1.35.634-2.74.663-4.202a.5.5 0 0 1 .51-.49"/>
+    </svg>
+  </div>
 );
 
-const ProductImagePicker = memo(
-  ({ imagePreviewUrl, onFileSelectionChange }: ProductImagePickerProps) => {
-    const theme = THEME.addProductModal.imagePicker;
-    const fileInputRef = useRef<HTMLInputElement>(null);
+// (FormInput was here, now global)
 
-    return (
-      <div className={theme.wrapper}>
-        <div className={theme.frame}>
-          {imagePreviewUrl ? (
-            <img
-              src={imagePreviewUrl}
-              alt={LABELS.form.preview}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <span className="text-3xl text-stone-300">📷</span>
-          )}
-        </div>
-        <Button
-          onClick={() => fileInputRef.current?.click()}
-          variant="secondary"
-          mode="rectangle"
-          size="sm"
-          className="mx-auto !rounded-xl px-8"
-        >
-          GALERİDEN SEÇ
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={onFileSelectionChange}
-          />
-        </Button>
-      </div>
-    );
-  },
-);
 
-const ProductCategorySelector = memo(
-  ({
-    categories,
-    currentSelection,
-    customCategory,
-    onCategorySelect,
-    onCustomCategoryChange,
-  }: ProductCategorySelectorProps) => {
-    const theme = THEME.addProductModal;
 
-    return (
-      <div>
-        <label className={theme.typography.categoryLabel}>
-          {LABELS.form.category}
-        </label>
-        {categories.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-3">
-            {categories.map((category) => (
-              <Button
-                key={category}
-                onClick={() => onCategorySelect(category)}
-                variant={
-                  currentSelection === category && !customCategory
-                    ? 'primary'
-                    : 'secondary'
-                }
-                mode="rectangle"
-                size="sm"
-                className="!text-[10px] !py-1 !px-2.5 !rounded-lg"
-              >
-                {category}
-              </Button>
-            ))}
-          </div>
-        )}
-        <input
-          name="customCategoryName"
-          type="text"
-          value={customCategory}
-          onChange={onCustomCategoryChange}
-          placeholder={LABELS.form.newCategoryPlaceholder}
-          className={`${theme.inputField} italic`}
-        />
-      </div>
-    );
-  },
-);
 
 export default function AddProductModal({
   isModalOpen,
@@ -139,16 +58,18 @@ export default function AddProductModal({
   onProductAddition,
   onModalClose,
   initialCategory,
+  isStatic = false,
+  initialStep,
 }: AddProductModalProps) {
   const { settings } = useStore();
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(initialStep || 1);
   const [formState, setFormState] = useState(INITIAL_FORM_STATE);
-  const [temporaryImagePreviewUrl, setTemporaryImagePreviewUrl] = useState<
-    string | null
-  >(null);
+  const [temporaryImagePreviewUrl, setTemporaryImagePreviewUrl] = useState<string | null>(null);
   const [formErrorMessage, setFormErrorMessage] = useState('');
   const [isSubmittingData, setIsSubmittingData] = useState(false);
+  const [submissionStatus, setSubmissionStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const theme = THEME.addProductModal;
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Effect: Handle initial category sync and cleanup memory leaks from image previews
   React.useEffect(() => {
@@ -167,6 +88,13 @@ export default function AddProductModal({
       }
     };
   }, [isModalOpen, initialCategory, temporaryImagePreviewUrl]);
+
+  // Sync step from props if provided (Workspace Mode)
+  React.useEffect(() => {
+    if (initialStep !== undefined) {
+      setCurrentStep(initialStep);
+    }
+  }, [initialStep]);
 
   const handleCloseAndReset = useCallback(() => {
     if (isSubmittingData) return;
@@ -223,6 +151,7 @@ export default function AddProductModal({
       }));
       const localUrl = URL.createObjectURL(file);
       setTemporaryImagePreviewUrl(localUrl);
+      setCurrentStep(2); // AUTO ADVANCE TO NAME
     },
     [temporaryImagePreviewUrl],
   );
@@ -233,13 +162,16 @@ export default function AddProductModal({
       formState.customCategoryName.trim() || formState.selectedCategory.trim();
 
     setIsSubmittingData(true);
+    setSubmissionStatus('loading');
     try {
-      const { transformCurrencyStringToNumber, formatNumberToCurrency } =
+      const { transformCurrencyStringToNumber } =
         await import('../utils/price');
       const numericPrice = transformCurrencyStringToNumber(
         formState.productPrice,
       );
-      const standardizedPriceLabel = formatNumberToCurrency(numericPrice);
+      
+      // Manual currency prefixing for the Diamond Standard
+      const standardizedPriceLabel = `${formState.currency}${numericPrice}`;
 
       if (!settings?.id) throw new Error('Mağaza ID bulunamadı');
 
@@ -256,9 +188,16 @@ export default function AddProductModal({
         },
         formState.selectedImageFile || undefined,
       );
-      handleCloseAndReset();
+      
+      setSubmissionStatus('success');
+      setTimeout(() => {
+        handleCloseAndReset();
+        setSubmissionStatus('idle');
+      }, 2000);
     } catch {
+      setSubmissionStatus('error');
       setFormErrorMessage(LABELS.saveError);
+      setTimeout(() => setSubmissionStatus('idle'), 3000);
     } finally {
       setIsSubmittingData(false);
     }
@@ -268,6 +207,7 @@ export default function AddProductModal({
   const prevStep = () => setCurrentStep((prev) => prev - 1);
 
   const isStepValid = () => {
+    if (currentStep === 1 && !formState.selectedImageFile) return true; // Allows skipping photo
     if (currentStep === 2) return !!formState.productName.trim();
     if (currentStep === 4)
       return !!(
@@ -283,112 +223,138 @@ export default function AddProductModal({
     <BaseModal
       isOpen={isModalOpen}
       onClose={handleCloseAndReset}
-      title={LABELS.newProductBtn}
+      title={
+        currentStep === 1 ? 'FOTOĞRAF' : 
+        currentStep === 2 ? 'İSİM' : 
+        currentStep === 3 ? 'DETAYLAR' : 
+        currentStep === 4 ? 'KATEGORİ' : 
+        currentStep === 5 ? 'FİYAT' : 
+        currentStep === 6 ? 'STOKTA MI?' : 
+        'ÖNİZLEME'
+      }
       progress={{ current: currentStep, total: 7 }}
       disableClickOutside={isSubmittingData}
       hideCloseButton={isSubmittingData}
+      isStatic={isStatic}
     >
-      <div className="space-y-8 flex flex-col">
-        {/* STEP 1: PHOTO */}
+      <div className="flex flex-col">
+        {/* STEP 1: PHOTO CHOICE */}
         {currentStep === 1 && (
-          <div className={theme.wizard.stepContent}>
-            <div className="text-center space-y-2 mb-6">
-              <h3 className="font-bold text-stone-800">Ürün Fotoğrafı</h3>
-            </div>
-            <ProductImagePicker
-              imagePreviewUrl={temporaryImagePreviewUrl}
-              onFileSelectionChange={handleImageFileSelection}
+          <div className="flex flex-col gap-3 py-2 fade-in">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageFileSelection}
             />
-            <div className="grid grid-cols-2 gap-3 mt-8">
-              <Button
-                onClick={handleCloseAndReset}
-                variant="ghost"
-                className="w-full"
-                mode="rectangle"
-              >
-                İPTAL
-              </Button>
-              <Button
-                onClick={nextStep}
-                variant="secondary"
-                className="w-full"
-                mode="rectangle"
-              >
-                {temporaryImagePreviewUrl ? 'İLERLE' : 'FOTOĞRAFSIZ DEVAM ET'}
-              </Button>
-            </div>
+
+            <Button
+              onClick={() => fileInputRef.current?.click()}
+              variant="secondary"
+              mode="rectangle"
+              className="w-full !h-16 !justify-start !px-8"
+              showFingerprint={true}
+              fingerprintType="detailed"
+              icon={<Lucide.ImageIcon size={24} className="text-stone-400" />}
+            >
+              <span className="text-[13px] font-black tracking-widest text-stone-900">GALERİ</span>
+            </Button>
+
+            <Button
+              onClick={() => {
+                fileInputRef.current?.setAttribute('capture', 'environment');
+                fileInputRef.current?.click();
+              }}
+              variant="secondary"
+              mode="rectangle"
+              className="w-full !h-16 !justify-start !px-8"
+              showFingerprint={true}
+              fingerprintType="detailed"
+              icon={<Lucide.Camera size={24} className="text-stone-400" />}
+            >
+              <span className="text-[13px] font-black tracking-widest text-stone-900">KAMERA</span>
+            </Button>
+
+            <Button
+              onClick={() => setCurrentStep(2)} 
+              variant="secondary"
+              mode="rectangle"
+              className="w-full !h-16 !justify-start !px-8"
+              showFingerprint={true}
+              fingerprintType="detailed"
+            >
+              <span className="text-[11px] font-black tracking-widest uppercase text-stone-400">Fotoğrafsız Devam Edelim</span>
+            </Button>
           </div>
         )}
 
         {/* STEP 2: NAME */}
         {currentStep === 2 && (
-          <div className={theme.wizard.stepContent}>
+          <div className={`${theme.wizard.stepContent} relative`}>
             <FormInput
               id="product-name-input"
-              labelText={LABELS.form.productName}
+              labelText=""
               name="productName"
               value={formState.productName}
               onChange={handleFormInputChange}
-              placeholder={LABELS.form.productNamePlaceholder}
+              placeholder="Örn: Türk Kahvesi"
               autoFocus
             />
-            <div className="grid grid-cols-2 gap-3 mt-8">
-              <Button
-                onClick={prevStep}
-                variant="ghost"
-                className="w-full"
-                mode="rectangle"
-                icon={<ArrowLeft size={16} />}
-              >
-                GERİ
+            <div className="flex gap-2 mt-1">
+              <Button onClick={prevStep} variant="secondary" mode="rectangle" className="w-20 h-16 shrink-0" showFingerprint={false}>
+                <Lucide.ChevronLeft size={24} strokeWidth={3} />
               </Button>
               <Button
                 onClick={nextStep}
                 disabled={!formState.productName.trim()}
                 variant="primary"
-                className="w-full"
-                mode="rectangle"
+                className="flex-1 h-16 !rounded-[24px]"
+                showFingerprint={true}
               >
-                SONRAKİ
+                <span className="font-black tracking-widest text-[11px] uppercase">DEVAM</span>
               </Button>
             </div>
           </div>
         )}
 
-        {/* STEP 3: DESCRIPTION */}
+        {/* STEP 3: DETAILS (Multi-Input) */}
         {currentStep === 3 && (
-          <div className={theme.wizard.stepContent}>
-            <div>
-              <label className={theme.typography.label}>
-                {LABELS.form.description}
-              </label>
-              <textarea
-                name="productDescription"
-                value={formState.productDescription}
-                onChange={handleFormInputChange}
-                rows={4}
-                className={`${theme.inputField} resize-none block`}
-                placeholder={LABELS.form.descriptionPlaceholder}
-                autoFocus
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-3 mt-6">
-              <Button
-                onClick={prevStep}
-                variant="ghost"
-                className="w-full"
-                mode="rectangle"
-                icon={<ArrowLeft size={16} />}
-              >
-                GERİ
+          <div className={`${theme.wizard.stepContent} relative`}>
+            {[
+              { label: '1.', placeholder: 'Örn: 20X20' },
+              { label: '2.', placeholder: 'Örn: Kırmızı, Beyaz, Mavi' },
+              { label: '3.', placeholder: 'Örn: 100ad.' }
+            ].map((item, idx) => {
+              const currentValues = formState.productDescription.split('\n');
+              return (
+                <div key={idx} className="flex items-center gap-4">
+                  <span className="text-[14px] font-black text-stone-400 w-4">{item.label}</span>
+                  <input
+                    type="text"
+                    value={currentValues[idx] || ''}
+                    onChange={(e) => {
+                      const newValues = [...currentValues];
+                      while (newValues.length < 3) newValues.push('');
+                      newValues[idx] = e.target.value;
+                      handleFormInputChange({
+                        target: { name: 'productDescription', value: newValues.join('\n') }
+                      } as any);
+                    }}
+                    placeholder={item.placeholder}
+                    className={`${theme.inputField} pt-4 pb-2 flex-1`}
+                    autoFocus={idx === 0}
+                  />
+                </div>
+              );
+            })}
+
+            <div className="flex gap-2 mt-2">
+              <Button onClick={prevStep} variant="secondary" mode="rectangle" className="w-20 h-16 shrink-0 shadow-sm" showFingerprint={false}>
+                <Lucide.ChevronLeft size={24} strokeWidth={3} />
               </Button>
-              <Button
-                onClick={nextStep}
-                variant="primary"
-                className="w-full"
-                mode="rectangle"
-              >
-                {formState.productDescription.trim() ? 'SONRAKİ' : 'GEÇ'}
+              <Button onClick={nextStep} variant="primary" className="flex-1 h-16 !rounded-[24px]" showFingerprint={true}>
+                <span className="font-black tracking-widest text-[11px] uppercase">DEVAM</span>
               </Button>
             </div>
           </div>
@@ -397,31 +363,19 @@ export default function AddProductModal({
         {/* STEP 4: CATEGORY */}
         {currentStep === 4 && (
           <div className={theme.wizard.stepContent}>
-            <ProductCategorySelector
+            <CategoryChipSelector
               categories={availableCategories}
-              currentSelection={formState.selectedCategory}
-              customCategory={formState.customCategoryName}
+              selectedCategory={formState.selectedCategory}
+              customCategoryName={formState.customCategoryName}
               onCategorySelect={handleCategorySelection}
               onCustomCategoryChange={handleFormInputChange}
             />
-            <div className="grid grid-cols-2 gap-3 mt-8">
-              <Button
-                onClick={prevStep}
-                variant="ghost"
-                className="w-full"
-                mode="rectangle"
-                icon={<ArrowLeft size={16} />}
-              >
-                GERİ
+            <div className="flex gap-2 mt-1">
+              <Button onClick={prevStep} variant="secondary" mode="rectangle" className="w-20 h-16 shrink-0 shadow-sm" showFingerprint={false}>
+                <Lucide.ChevronLeft size={24} strokeWidth={3} />
               </Button>
-              <Button
-                onClick={nextStep}
-                disabled={!isStepValid()}
-                variant="primary"
-                className="w-full"
-                mode="rectangle"
-              >
-                SONRAKİ
+              <Button onClick={nextStep} disabled={!isStepValid()} variant="primary" className="flex-1 h-16 !rounded-[24px]" showFingerprint={true}>
+                <span className="font-black tracking-widest text-[11px] uppercase">DEVAM</span>
               </Button>
             </div>
           </div>
@@ -429,34 +383,40 @@ export default function AddProductModal({
 
         {/* STEP 5: PRICE */}
         {currentStep === 5 && (
-          <div className={theme.wizard.stepContent}>
-            <FormInput
-              id="product-price-input"
-              labelText={LABELS.form.price}
-              name="productPrice"
-              value={formState.productPrice}
-              onChange={handleFormInputChange}
-              placeholder={LABELS.form.pricePlaceholder}
-              autoFocus
-            />
-            <div className="grid grid-cols-2 gap-3 mt-8">
-              <Button
-                onClick={prevStep}
-                variant="ghost"
-                className="w-full"
-                mode="rectangle"
-                icon={<ArrowLeft size={16} />}
-              >
-                GERİ
+          <div className={`${theme.wizard.stepContent} relative flex flex-col items-center`}>
+            <div className="flex flex-col gap-6 w-full items-center">
+              <input
+                type="text"
+                inputMode="decimal"
+                value={formState.productPrice}
+                onChange={handleFormInputChange}
+                name="productPrice"
+                placeholder="0.00"
+                className={`${theme.inputField} text-2xl font-black py-6 text-center w-full`}
+                autoFocus
+              />
+              <div className="bg-stone-100 p-1 rounded-[var(--radius-button)] flex w-fit mx-auto relative overflow-hidden gap-1">
+                <ToggleFingerprint />
+                {['₺', '$', '€'].map((curr) => (
+                  <Button
+                    key={curr}
+                    onClick={() => setFormState(p => ({ ...p, currency: curr }))}
+                    variant={formState.currency === curr ? 'primary' : 'ghost'}
+                    className={`px-8 h-10 !rounded-[calc(var(--radius-button)-4px)] z-10`}
+                    mode="rectangle"
+                    showFingerprint={false}
+                  >
+                    <span className="text-lg font-black">{curr}</span>
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-2 mt-8 w-full">
+              <Button onClick={prevStep} variant="secondary" mode="rectangle" className="w-20 h-16 shrink-0" showFingerprint={false}>
+                <Lucide.ChevronLeft size={24} strokeWidth={3} />
               </Button>
-              <Button
-                onClick={nextStep}
-                disabled={!isStepValid()}
-                variant="primary"
-                className="w-full"
-                mode="rectangle"
-              >
-                SONRAKİ
+              <Button onClick={nextStep} variant="primary" className="flex-1 h-16 !rounded-[24px]" showFingerprint={true}>
+                <span className="font-black tracking-widest text-[11px] uppercase">DEVAM</span>
               </Button>
             </div>
           </div>
@@ -464,123 +424,105 @@ export default function AddProductModal({
 
         {/* STEP 6: STOCK */}
         {currentStep === 6 && (
-          <div className={theme.wizard.stepContent}>
-            <div className="space-y-4">
-              <StatusToggle
-                label="Stokta Var mı?"
-                value={formState.isProductInStock}
-                onChange={(val) =>
-                  setFormState((p) => ({ ...p, isProductInStock: val }))
-                }
-                disabled={isSubmittingData}
-              />
-              <p className="text-[10px] text-stone-400 font-bold uppercase tracking-tight text-center px-4">
-                Ürün şu anda satışa hazır ve müşteriler tarafından sipariş
-                edilebilir durumda mı?
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 mt-8">
-              <Button
-                onClick={prevStep}
-                variant="ghost"
-                className="w-full"
-                mode="rectangle"
-                icon={<ArrowLeft size={16} />}
-              >
-                GERİ
-              </Button>
-              <Button
-                onClick={nextStep}
-                variant="primary"
-                className="w-full"
-                mode="rectangle"
-              >
-                ÖNİZLEME
-              </Button>
+          <div className={`${theme.wizard.stepContent} relative pt-4 flex flex-col items-center`}>
+            <div className="flex flex-col gap-6 w-full max-w-[320px]">
+              <div className="bg-stone-100 p-1 rounded-[var(--radius-button)] flex w-fit mx-auto relative overflow-hidden gap-1">
+                <ToggleFingerprint />
+                <Button
+                  onClick={() => setFormState(p => ({ ...p, isProductInStock: false }))}
+                  variant={!formState.isProductInStock ? 'primary' : 'ghost'}
+                  className={`px-8 h-10 !rounded-[calc(var(--radius-button)-4px)] z-10`}
+                  mode="rectangle"
+                  showFingerprint={false}
+                >
+                  <span className="text-[10px] font-black whitespace-nowrap">STOKTA YOK</span>
+                </Button>
+                <Button
+                  onClick={() => setFormState(p => ({ ...p, isProductInStock: true }))}
+                  variant={formState.isProductInStock ? 'primary' : 'ghost'}
+                  className={`px-8 h-10 !rounded-[calc(var(--radius-button)-4px)] z-10`}
+                  mode="rectangle"
+                  showFingerprint={false}
+                >
+                  <span className="text-[10px] font-black whitespace-nowrap">STOKTA</span>
+                </Button>
+              </div>
+              
+              <div className="flex gap-2 w-full mt-2">
+                <Button onClick={prevStep} variant="secondary" mode="rectangle" className="w-20 h-16 shrink-0" showFingerprint={false}>
+                  <Lucide.ChevronLeft size={24} strokeWidth={3} />
+                </Button>
+                <Button onClick={nextStep} variant="primary" className="flex-1 h-16 !rounded-[24px]" showFingerprint={true}>
+                  <span className="font-black tracking-widest text-[11px] uppercase">DEVAM</span>
+                </Button>
+              </div>
             </div>
           </div>
         )}
 
         {/* STEP 7: PREVIEW & CONFIRM */}
         {currentStep === 7 && (
-          <div className={theme.wizard.stepContent}>
-            <div className="text-center space-y-1 mb-6">
-              <h3 className="font-bold text-stone-800">Son Kontrol</h3>
-              <p className="text-xs text-stone-500">
-                Ürününüz dükkanda böyle görünecek.
-              </p>
-            </div>
-
-            {/* REAL UI PREVIEW CARD - 100% VISUAL CONSISTENCY */}
-            <div className="flex justify-center py-2">
-              <div className="w-full max-w-[200px]">
-                <ProductCardUI
-                  product={{
-                    id: 'preview',
-                    name: formState.productName || 'İsimsiz Ürün',
-                    description: formState.productDescription || 'Açıklama yok',
-                    price: formState.productPrice || '0',
-                    category:
-                      formState.customCategoryName ||
-                      formState.selectedCategory ||
-                      'Kategorisiz',
-                    image_url: temporaryImagePreviewUrl || '',
-                    out_of_stock: !formState.isProductInStock,
-                    is_archived: false,
-                    sort_order: 0,
-                    store_id: settings?.id || '',
-                    polished_image_url: null,
-                    original_image_url: null,
-                    is_polished_pending: false,
-                    polished_ready_dismissed: false,
-                    text_polished_dismissed: false,
-                    suggested_name: null,
-                    suggested_description: null,
-                  }}
-                  className="shadow-2xl shadow-stone-200/50"
-                  labelOverride="ÖNİZLEME"
-                />
-              </div>
+          <div className="flex flex-col gap-6 fade-in pt-2">
+            <div className="bg-stone-50 border border-stone-100 p-6 rounded-[var(--radius-card)] relative overflow-hidden">
+               <div className="flex gap-5 items-center relative z-10">
+                 <div className="w-24 h-24 rounded-2xl overflow-hidden bg-stone-200 shrink-0 shadow-sm">
+                   {temporaryImagePreviewUrl ? (
+                     <img src={temporaryImagePreviewUrl} className="w-full h-full object-cover" alt="Preview" />
+                   ) : (
+                     <div className="w-full h-full flex items-center justify-center text-stone-400">📷</div>
+                   )}
+                 </div>
+                 <div className="flex flex-col min-w-0">
+                    <span className="text-[10px] font-black text-stone-400 tracking-widest uppercase mb-1">{formState.customCategoryName || formState.selectedCategory || 'DİĞER'}</span>
+                    <h3 className="text-xl font-black text-stone-900 truncate uppercase tracking-tighter">{formState.productName || 'İsimsiz Ürün'}</h3>
+                    <span className="text-xl font-black text-black tracking-tighter mt-1">{formState.currency}{formState.productPrice || '0.00'}</span>
+                 </div>
+               </div>
+               
+               <div className="mt-6 pt-6 border-t border-stone-200/50 space-y-3">
+                 {formState.productDescription.split('\n').filter(l => l.trim()).map((line, idx) => (
+                   <div key={idx} className="flex gap-3 items-start">
+                     <div className="w-1.5 h-1.5 rounded-full bg-stone-300 mt-1.5 shrink-0" />
+                     <p className="text-[13px] font-bold text-stone-600 leading-relaxed">{line}</p>
+                   </div>
+                 ))}
+                 <div className="flex gap-3 items-center pt-2">
+                  <div className="flex gap-3 items-center pt-2">
+                     <StatusDot variant={formState.isProductInStock ? 'success' : 'danger'} />
+                     <p className="text-[11px] font-black text-stone-900 tracking-widest uppercase">{formState.isProductInStock ? 'STOKTA VAR' : 'STOKTA YOK'}</p>
+                  </div>
+                 </div>
+               </div>
             </div>
 
             {formErrorMessage && (
-              <div className={theme.typography.errorBadge}>
+              <div className="p-4 bg-red-50 text-red-600 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-red-100 animate-in slide-in-from-top-2 duration-300">
                 {formErrorMessage}
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-3 mt-8">
-              <Button
-                onClick={prevStep}
-                disabled={isSubmittingData}
-                variant="ghost"
-                className="w-full"
-                mode="rectangle"
-                icon={<ArrowLeft size={16} />}
-              >
-                GERİ
+            <div className="flex gap-2 w-full pt-4">
+              <Button onClick={prevStep} variant="secondary" mode="rectangle" className="w-20 h-16 shrink-0" showFingerprint={false}>
+                <Lucide.ChevronLeft size={24} strokeWidth={3} />
               </Button>
-              <Button
-                onClick={handleProductSubmission}
-                disabled={isSubmittingData}
-                variant="primary"
-                className="w-full"
-                mode="rectangle"
-                icon={
-                  isSubmittingData ? (
-                    <div
-                      className={THEME.loading.spinner + ' w-3.5 h-3.5'}
-                    ></div>
-                  ) : null
-                }
+              <Button 
+                onClick={handleProductSubmission} 
+                variant="action" 
+                className="flex-1 h-16 !rounded-[24px]" 
+                showFingerprint={true}
               >
-                {isSubmittingData ? 'EKLENİYOR...' : 'ONAYLA'}
+                <span className="font-black tracking-[0.2em] text-[15px] uppercase">TAMAM</span>
               </Button>
             </div>
           </div>
         )}
       </div>
+
+      {/* SUCCESS / ERROR OVERLAY (DIAMOND FEEDBACK) */}
+      <StatusOverlay 
+        status={submissionStatus} 
+        message="" 
+      />
     </BaseModal>
   );
 }

@@ -2,7 +2,8 @@ import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from './Button';
 import BaseModal from './BaseModal';
-import { ArrowLeft, Gift } from 'lucide-react';
+import * as Lucide from 'lucide-react';
+import FormInput from './FormInput';
 import { CouponModalProps } from '../types';
 
 /**
@@ -17,6 +18,7 @@ export default function CouponModal({
   onApplyDiscount,
   discountError,
   activeDiscount,
+  isStatic = false,
 }: CouponModalProps) {
   const [couponCode, setCouponCode] = useState('');
 
@@ -30,51 +32,45 @@ export default function CouponModal({
     if (e.key === 'Enter') handleApply();
   };
 
-  const footer = (
-    <div className="grid grid-cols-2 gap-3 w-full">
-      <Button
-        onClick={onClose}
-        variant="ghost"
-        size="md"
-        mode="rectangle"
-        className="w-full !rounded-2xl !py-4"
-        icon={<ArrowLeft size={16} />}
-      >
-        GERİ
-      </Button>
-      <Button
-        onClick={handleApply}
-        variant="primary"
-        size="md"
-        mode="rectangle"
-        className="w-full !rounded-2xl !py-4 !bg-emerald-600 hover:!bg-emerald-700 shadow-xl shadow-emerald-100"
-      >
-        KABUL ET
-      </Button>
-    </div>
-  );
 
   return (
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
       maxWidth="max-w-sm"
-      icon={<Gift className="text-emerald-600" size={24} />}
-      title="İndirim Kuponu"
-      subtitle="Avantajlı fiyatlar için kodunuzu girin"
-      footer={footer}
+      isStatic={isStatic}
     >
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div className="relative">
-          <input
+          <FormInput
+            id="coupon-input"
             type="text"
             value={couponCode}
             onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
             onKeyPress={handleKeyPress}
-            placeholder="KODU BURAYA YAZIN"
-            className="w-full bg-stone-50 border-2 border-stone-100 rounded-2xl px-5 py-5 text-center font-black text-stone-900 tracking-[0.25em] uppercase focus:border-emerald-500 focus:bg-white transition-all outline-none placeholder:text-stone-300 placeholder:tracking-normal placeholder:text-[10px]"
+            placeholder="Kodu buraya yazın"
+            className="!text-center !py-6 focus:!border-emerald-500 !text-sm !rounded-3xl"
             autoFocus
           />
+        </div>
+
+        <div className="flex gap-3 w-full">
+          <Button
+            onClick={onClose}
+            variant="secondary"
+            className="w-16 h-16 shrink-0"
+            mode="rectangle"
+          >
+            <Lucide.ChevronLeft size={24} strokeWidth={3} />
+          </Button>
+          <Button
+            onClick={handleApply}
+            variant="action"
+            className="flex-1 h-16 !rounded-[24px]"
+            showFingerprint={true}
+          >
+            <Lucide.Check size={28} strokeWidth={4} />
+          </Button>
         </div>
 
         <AnimatePresence mode="wait">

@@ -1,66 +1,53 @@
-import React from 'react';
-import { Phone, MessageSquare, ShieldCheck } from 'lucide-react';
 import BaseModal from './BaseModal';
-import Button from './Button';
-import { generateWhatsAppLink } from '../utils/core';
+import Numpad from './Numpad';
+import { useStore } from '../store';
 
 interface ContactModalProps {
   isOpen: boolean;
   onClose: () => void;
   phone: string;
   storeName: string;
+  isStatic?: boolean;
 }
 
-export default function ContactModal({ isOpen, onClose, phone, storeName }: ContactModalProps) {
-  const handleCall = () => {
-    window.open(`tel:${phone.replace(/\D/g, '')}`, '_self');
-    onClose();
-  };
+export default function ContactModal({ isOpen, onClose, phone, storeName, isStatic = false }: ContactModalProps) {
+  const { settings } = useStore();
 
-  const handleWhatsApp = () => {
-    const message = `Merhaba, ${storeName} web sitenizden ulaşıyorum.`;
-    window.open(generateWhatsAppLink(phone, message), '_blank');
-    onClose();
+  const handleNumpadSubmit = async (customerPhone: string) => {
+    try {
+      const currentLeads = settings?.visitor_leads || [];
+      const newLead = { phone: customerPhone, created_at: new Date().toISOString() };
+      
+      // Update store with new lead
+      const { supabase } = await import('../supabase');
+      if (settings?.id) {
+        await supabase
+          .from('stores')
+          .update({ visitor_leads: [...currentLeads, newLead] })
+          .eq('id', settings.id);
+      }
+      
+      onClose();
+    } catch (err) {
+      console.error('Lead capture failed', err);
+    }
   };
 
   return (
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title="İLETİŞİME GEÇİN"
-      subtitle="Size nasıl yardımcı olabiliriz?"
-      icon={<ShieldCheck className="w-8 h-8 text-stone-900" />}
-      maxWidth="max-w-sm"
+      isStatic={isStatic}
+      maxWidth="max-w-[320px]"
+      position="bottom-right"
+      title="SİZİ ARAYALIM"
+      className="!rounded-[2.5rem]"
     >
-      <div className="flex flex-col gap-4">
-        {/* OPTION 1: CALL */}
-        <Button
-          onClick={handleCall}
-          variant="primary"
-          mode="rectangle"
-          className="w-full !py-5 flex flex-col items-center gap-1 shadow-xl group"
-          icon={<Phone size={20} className="group-hover:scale-110 transition-transform" strokeWidth={2.5} />}
-        >
-          <span className="text-sm font-black tracking-widest">DİREKT ARA</span>
-          <span className="text-[10px] font-bold opacity-60 normal-case">{phone}</span>
-        </Button>
-
-        {/* OPTION 2: WHATSAPP */}
-        <Button
-          onClick={handleWhatsApp}
-          variant="secondary"
-          mode="rectangle"
-          className="w-full !py-5 flex flex-col items-center gap-1 border-2 border-stone-100 group"
-          icon={<MessageSquare size={20} className="text-[#25D366] group-hover:scale-110 transition-transform" strokeWidth={2.5} />}
-        >
-          <span className="text-sm font-black tracking-widest text-stone-900">WHATSAPP MESAJ</span>
-          <span className="text-[10px] font-bold text-stone-400 normal-case">Hızlı ve yazılı iletişim</span>
-        </Button>
-
-        {/* SECURITY INFO */}
-        <p className="text-[10px] font-medium text-stone-400 text-center mt-2 px-4 italic leading-relaxed">
-          Verileriniz güvenli bağlantı üzerinden işlenir. Mağaza yetkilisiyle anında görüşme sağlayabilirsiniz.
-        </p>
+      <div className="py-2">
+        <Numpad 
+          onSubmit={handleNumpadSubmit}
+          title="" // Title is in BaseModal
+        />
       </div>
     </BaseModal>
   );

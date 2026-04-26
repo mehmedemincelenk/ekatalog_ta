@@ -4,6 +4,7 @@
 import { useRef, useState, useEffect, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Loading from './Loading';
+import Badge from './Badge';
 import { LABELS, THEME } from '../data/config';
 import { Product } from '../types';
 import { resolveVisualAssetUrl } from '../utils/image';
@@ -12,15 +13,12 @@ import {
   transformCurrencyStringToNumber,
   formatNumberToCurrency,
 } from '../utils/core';
-import { refineProductTexts } from '../utils/ai';
-import Button from './Button';
 import SmartImage from './SmartImage';
 import { MarqueeText } from './MarqueeText';
 import OrderSelector from './OrderSelector';
-import BaseModal from './BaseModal';
-import InfoHint from './InfoHint';
 import AIStudioTextModal from './AIStudioTextModal';
 import QuickEditModal from './QuickEditModal';
+import ProductDetailModal from './ProductDetailModal';
 import { useStore } from '../store';
 
 /**
@@ -48,12 +46,11 @@ const ProductCard = memo(
     displayCurrency = 'TRY',
     exchangeRates,
   }: ProductCardProps) => {
-    const { openModal } = useStore();
+    const { } = useStore();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const cardContainerRef = useRef<HTMLElement>(null);
 
     const [isUploadingImage, setIsUploadingImage] = useState(false);
-    const [isOptimizingText, setIsOptimizingText] = useState(false);
     const [isTextModalOpen, setIsTextModalOpen] = useState(false);
     const [optimisticImagePreview, setOptimisticImagePreview] = useState<
       string | null
@@ -71,30 +68,6 @@ const ProductCard = memo(
 
     const theme = THEME.productCard;
     const adminLabels = LABELS.adminActions;
-
-    const handleAIOptimizeText = async () => {
-      // 1. If we already have a suggestion in the cloud, reuse it instantly
-      if (product.suggested_name && product.suggested_description) {
-        setIsTextModalOpen(true);
-        return;
-      }
-
-      // 2. Otherwise, call Diamond Studio
-      setIsOptimizingText(true);
-      try {
-        const suggestions = await refineProductTexts(product);
-        // Synchronize with cloud immediately so it's consistent across devices
-        onUpdate(product.id, {
-          suggested_name: suggestions.name,
-          suggested_description: suggestions.description,
-        });
-        setIsTextModalOpen(true);
-      } catch (err) {
-        console.error('Text AI Error:', err);
-      } finally {
-        setIsOptimizingText(false);
-      }
-    };
 
     const handleConfirmTextSuggestion = (newName: string, newDesc: string) => {
       onUpdate(product.id, {
@@ -221,7 +194,7 @@ const ProductCard = memo(
               flexShrink: 0,
             }}
             onClick={() => {
-              if (isAdmin && !isUploadingImage && !isOptimizingText)
+              if (isAdmin && !isUploadingImage)
                 setIsAdminMenuOpen(true);
               else if (!isAdmin && primaryImageSource)
                 setIsZoomDetailOpen(true);
@@ -278,50 +251,6 @@ const ProductCard = memo(
                         }
                         className="shadow-xl"
                       />
-
-                      {/* AI ADVICE CLUSTER: PHOTO & TEXT */}
-                      <div className="flex flex-col items-end gap-1.5">
-                        {/* 1. PHOTO ADVICE (POLISHED IMAGE) */}
-                        {product.polished_image_url &&
-                          !product.polished_ready_dismissed &&
-                          !product.is_polished_pending &&
-                          !isUploadingImage && (
-                            <Button
-                              onClick={(e: React.MouseEvent) => {
-                                e.stopPropagation();
-                                openModal('AI_STUDIO_COMPARE', { product });
-                              }}
-                              variant="primary"
-                              mode="circle"
-                              size="sm"
-                              className="!w-6 !h-6 !p-0 !bg-stone-900 border !border-white/20 shadow-xl animate-bounce-subtle !text-amber-400"
-                              title="Görsel Tavsiyesi Hazır!"
-                              icon={
-                                <div className="w-4 h-4">{THEME.icons.ai}</div>
-                              }
-                            />
-                          )}
-
-                        {/* 2. TEXT ADVICE (SUGGESTED NAME/DESC) */}
-                        {product.suggested_name &&
-                          !product.text_polished_dismissed &&
-                          !isOptimizingText && (
-                            <Button
-                              onClick={(e: React.MouseEvent) => {
-                                e.stopPropagation();
-                                handleAIOptimizeText();
-                              }}
-                              variant="primary"
-                              mode="circle"
-                              size="sm"
-                              className="!w-6 !h-6 !p-0 !bg-stone-900 border !border-white/20 shadow-xl animate-pulse !text-amber-400"
-                              title="Metin Tavsiyesi Hazır!"
-                              icon={
-                                <div className="w-4 h-4">{THEME.icons.ai}</div>
-                              }
-                            />
-                          )}
-                      </div>
                     </div>
                   </div>
 
@@ -462,71 +391,23 @@ const ProductCard = memo(
           {/* STATUS BADGES */}
           <div className={theme.status.wrapper}>
             {product.out_of_stock && (
-              <div className={theme.status.outOfStockLabel}>TÜKENDİ</div>
+              <Badge variant="primary" size="md" className="-translate-y-4 shadow-2xl">TÜKENDİ</Badge>
             )}
             {product.is_archived && (
-              <div className={theme.status.badge}>📦</div>
+              <Badge variant="primary" size="md" className="-translate-y-4 shadow-2xl">📦</Badge>
             )}
           </div>
         </article>
 
-        <BaseModal
+        <ProductDetailModal
           isOpen={isZoomDetailOpen}
           onClose={() => setIsZoomDetailOpen(false)}
-          maxWidth="max-w-lg"
-          className="!p-0 overflow-hidden"
-          hideCloseButton={false}
-        >
-          <div className="-m-6 flex flex-col">
-            {highDefinitionImageSource && (
-              <div className="relative aspect-[4/3] bg-stone-50 overflow-hidden">
-                <img
-                  src={highDefinitionImageSource}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
-
-            {/* PRODUCT INFO & ACTIONS - LEFT ALIGNED */}
-            <div className="p-8 space-y-6">
-              <div className="space-y-2 text-left">
-                <div className="mb-3">
-                  <span className="bg-stone-100 text-stone-500 px-3 py-1.5 rounded-full text-[0.625rem] font-black uppercase tracking-widest inline-block border border-stone-200">
-                    {product.category}
-                  </span>
-                </div>
-                <h3 className="text-xl sm:text-2xl font-black text-stone-900 tracking-tighter leading-none">
-                  {product.name}
-                </h3>
-                {product.description && (
-                  <p className="text-stone-500 text-xs sm:text-sm font-medium leading-relaxed max-w-full">
-                    {product.description}
-                  </p>
-                )}
-              </div>
-
-              <div className="pt-4 flex flex-col items-start gap-2">
-                <div className="flex flex-col items-start">
-                  {isPromotionActive ? (
-                    <div className="flex items-center gap-3">
-                      <span className="text-stone-300 line-through text-sm font-bold">
-                        {originalPriceLabel}
-                      </span>
-                      <span className="text-green-600 text-2xl font-black tracking-tighter">
-                        {discountedPriceLabel}
-                      </span>
-                    </div>
-                  ) : (
-                    <span className="text-stone-900 text-2xl font-black tracking-tighter">
-                      {originalPriceLabel}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </BaseModal>
+          product={product}
+          isPromotionActive={isPromotionActive || false}
+          originalPriceLabel={originalPriceLabel}
+          discountedPriceLabel={discountedPriceLabel}
+          highDefinitionImageSource={highDefinitionImageSource}
+        />
 
         <AIStudioTextModal
           isOpen={isTextModalOpen}

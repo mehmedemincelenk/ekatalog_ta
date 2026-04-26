@@ -1,6 +1,5 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { TECH, commerce } from '../data/config';
 import { ExchangeRates, Product } from '../types';
 export * from './price';
 

@@ -157,7 +157,7 @@ const ProductGrid = memo(
                       onClick={() => onAddClick?.()}
                       variant="secondary"
                       mode="rectangle"
-                      className="!bg-stone-900/5 !text-stone-900 !px-6 !py-2 !rounded-full font-black text-[10px] uppercase tracking-widest hover:!bg-stone-900 hover:!text-white transition-all border border-stone-200 admin-fab shadow-none"
+                      className="!px-6 !py-2 !rounded-full !text-[10px]"
                     >
                       + BU KATEGORİYE ÜRÜN EKLE
                     </Button>

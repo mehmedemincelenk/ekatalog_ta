@@ -10,7 +10,7 @@ import * as jose from 'jose';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Product, ProductAnalysis } from '../types';
 import { supabase } from '../supabase';
-import { fileToBase64, base64ToBlob, normalizeText } from './core';
+import { fileToBase64, base64ToBlob } from './core';
 
 // --- CONFIGURATION & INITIALIZATION ---
 

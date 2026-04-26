@@ -84,7 +84,15 @@ exports[`Button Atomic UI (Diamond Snapshot) > Loading state snapshotu ile eşle
         
         
       "
+    disabled=""
   >
+    <div
+      class="absolute inset-0 bg-inherit flex items-center justify-center"
+    >
+      <div
+        class="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"
+      />
+    </div>
     <div
       class="
           

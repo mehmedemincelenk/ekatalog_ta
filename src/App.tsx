@@ -3,6 +3,8 @@
 // CONSUMED BY: main.tsx
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import * as Lucide from 'lucide-react';
+import { useGlobalFeedback } from './hooks/useGlobalFeedback';
 import Navbar from './components/Navbar';
 import { LABELS, UI } from './data/config';
 import HeroCarousel from './components/HeroCarousel';
@@ -16,6 +18,7 @@ import References from './components/References';
 import LandingPage from './components/LandingPage';
 import OffHoursNotice from './components/OffHoursNotice';
 import MaintenancePage from './components/MaintenancePage';
+import StatusOverlay from './components/StatusOverlay';
 import FloatingGuestMenu from './components/FloatingGuestMenu';
 import AppModals from './components/AppModals';
 import { useSyncMetadata } from './hooks/useCommon';
@@ -24,6 +27,8 @@ import { useAdminMode } from './hooks/useAdminMode';
 import { useSettings } from './hooks/useSettingsHub';
 import { useStore } from './store';
 import { getActiveStoreSlug } from './utils/core';
+import ModalWorkspace from './components/ModalWorkspace';
+import { Layout } from 'lucide-react';
 
 /**
  * CATALOG VIEW: Sadece dükkanlar için çalışan ana bileşen.
@@ -71,6 +76,7 @@ function CatalogView() {
   const [visibleCategoryLimit, setVisibleCategoryLimit] = useState(2);
   const [activeAdminProductId, setActiveAdminProductId] = useState<string | null>(null);
 
+  const toggleWorkspace = useStore((state) => state.toggleWorkspace);
 
   if (settingsLoading || productsLoading) {
     return (
@@ -110,11 +116,7 @@ function CatalogView() {
   if (settings && settings.maintenanceMode?.enabled && !isAdmin) {
     return (
       <>
-        <MaintenancePage
-          settings={settings}
-          onLogoPointerDown={handleLogoPointerDown}
-          onLogoPointerUp={handleLogoPointerUp}
-        />
+        <MaintenancePage />
         <AppModals />
       </>
     );
@@ -135,7 +137,6 @@ function CatalogView() {
           <SearchFilter
             sortedList={sortedList}
             stats={stats}
-            categoryOrder={categoryOrder}
             onCategoryOrderChange={updateCategoryOrder}
             renameCategory={(oldName, newName) =>
               renameCategory({ oldName, newName })
@@ -172,7 +173,7 @@ function CatalogView() {
       {/* OFF-HOURS ENGAGEMENT: Only for customers */}
       {!isAdmin && settings && (
         <div className="print:hidden">
-          <OffHoursNotice whatsappNumber={settings.whatsapp} />
+          <OffHoursNotice />
         </div>
       )}
 
@@ -214,8 +215,28 @@ function CatalogView() {
       </AnimatePresence>
 
       <AppModals />
+      <ModalWorkspace />
+
+      {/* DEVELOPER WORKSPACE TRIGGER (Bottom Left) */}
+      <div className="fixed bottom-4 left-4 z-[9999] print:hidden">
+        <Button
+          onClick={toggleWorkspace}
+          variant="secondary"
+          mode="circle"
+          className="!w-12 !h-12 !bg-stone-900/10 hover:!bg-stone-900 !text-stone-900 hover:!text-white border-stone-900/20 shadow-lg backdrop-blur-md group"
+          icon={<Layout size={18} className="group-hover:rotate-12 transition-transform" />}
+          aria-label="Diamond Workspace"
+        />
+      </div>
+
+      <GlobalFeedbackOverlay />
     </div>
   );
+}
+
+function GlobalFeedbackOverlay() {
+  const { status, message, clearFeedback } = useGlobalFeedback();
+  return <StatusOverlay status={status} message={message} onClose={clearFeedback} />;
 }
 
 /**
