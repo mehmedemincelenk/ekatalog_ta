@@ -116,11 +116,11 @@ export default function BaseFloatingMenu({
             <motion.div
               key="action-cluster"
               layout
-              initial={{ height: 0, opacity: 0, marginBottom: 0 }}
-              animate={{ height: 'auto', opacity: 1, marginBottom: 8 }}
-              exit={{ height: 0, opacity: 0, marginBottom: 0 }}
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
               transition={{ 
-                height: { type: 'spring', stiffness: 500, damping: 40 },
+                height: { duration: 0.25, ease: "easeOut" },
                 opacity: { duration: 0.15 }
               }}
               className="w-full flex flex-col items-center overflow-hidden"
