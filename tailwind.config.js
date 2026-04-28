@@ -5,6 +5,14 @@ export default {
     hoverOnlyWhenSupported: true,
   },
   theme: {
+    screens: {
+      'sm': '9999px',
+      'md': '9999px',
+      'lg': '9999px',
+      'xl': '9999px',
+      '2xl': '9999px',
+      'desktop': '640px',
+    },
     extend: {
       colors: {
         // Design Tokens: Merkezi renk paleti

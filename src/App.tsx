@@ -28,7 +28,6 @@ import { useSettings } from './hooks/useSettingsHub';
 import { useStore } from './store';
 import { getActiveStoreSlug } from './utils/core';
 import ModalWorkspace from './components/ModalWorkspace';
-import { Layout } from 'lucide-react';
 
 /**
  * CATALOG VIEW: Sadece dükkanlar için çalışan ana bileşen.
@@ -123,10 +122,10 @@ function CatalogView() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-100 flex items-center justify-center sm:py-8 sm:px-4 overflow-hidden">
+    <div className="min-h-screen bg-stone-100 flex items-center justify-center desktop:py-8 desktop:px-4 overflow-hidden">
       {/* MOBILE FRAME FOR DESKTOP */}
       <div 
-        className="w-full max-w-[480px] min-h-screen sm:min-h-[88vh] sm:h-[88vh] bg-stone-50 sm:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] relative overflow-hidden sm:rounded-[3rem] border-0 sm:border-[10px] sm:border-stone-900 flex flex-col"
+        className="w-full max-w-[480px] min-h-screen desktop:min-h-[88vh] desktop:h-[88vh] bg-stone-50 desktop:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] relative overflow-hidden desktop:rounded-[3rem] border-0 desktop:border-[10px] desktop:border-stone-900 flex flex-col"
         id="app-mobile-frame"
       >
         <div
@@ -178,7 +177,7 @@ function CatalogView() {
           </div>
 
           {!isAdmin && (
-            <div className="fixed sm:absolute bottom-4 right-4 z-[90] print:hidden">
+            <div className="fixed desktop:absolute bottom-4 right-4 z-[90] print:hidden">
               <FloatingGuestMenu
                 onCouponClick={() => openModal('COUPON')}
                 onExcelClick={() => openModal('PRICE_LIST')}
@@ -197,8 +196,6 @@ function CatalogView() {
                 onQRClick={() => openModal('QR')}
               />
             </div>
-          )}
-
           <AnimatePresence mode="wait">
             {isAdmin && (
               <motion.div
@@ -206,7 +203,7 @@ function CatalogView() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
-                className="fixed sm:absolute bottom-4 right-4 z-[150] print:hidden"
+                className="fixed desktop:absolute bottom-4 right-4 z-[150] print:hidden"
               >
                 <FloatingAdminMenu
                   onProductAddTrigger={() => openModal('GLOBAL_ADD_MENU')}
@@ -222,13 +219,13 @@ function CatalogView() {
         <ModalWorkspace />
 
         {/* DEVELOPER WORKSPACE TRIGGER (Bottom Left) */}
-        <div className="fixed sm:absolute bottom-4 left-4 z-[9999] print:hidden">
+        <div className="fixed desktop:absolute bottom-4 left-4 z-[9999] print:hidden">
           <Button
             onClick={toggleWorkspace}
             variant="secondary"
             mode="circle"
             className="!w-12 !h-12 !bg-stone-900/10 hover:!bg-stone-900 !text-stone-900 hover:!text-white border-stone-900/20 shadow-lg backdrop-blur-md group"
-            icon={<Layout size={18} className="group-hover:rotate-12 transition-transform" />}
+            icon={<Lucide.Layout size={18} className="group-hover:rotate-12 transition-transform" />}
             aria-label="Diamond Workspace"
           />
         </div>
