@@ -196,6 +196,8 @@ function CatalogView() {
                 onQRClick={() => openModal('QR')}
               />
             </div>
+          )}
+
           <AnimatePresence mode="wait">
             {isAdmin && (
               <motion.div
