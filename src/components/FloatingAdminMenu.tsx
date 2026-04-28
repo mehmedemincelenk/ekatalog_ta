@@ -39,7 +39,7 @@ export default function FloatingAdminMenu({
       ? [
           {
             id: 'bulk',
-            icon: <div className="w-6 h-6 sm:w-9 sm:h-9 flex items-center justify-center">{globalIcons.bulkPrice}</div>,
+            icon: <div className="w-6 h-6 sm:w-5 sm:h-5 flex items-center justify-center">{globalIcons.bulkPrice}</div>,
             action: onBulkUpdateTrigger,
             label: 'TOPLU İŞLEM',
             className: 'bg-stone-900 text-white w-full !col-span-2 !rounded-2xl mb-1',
@@ -51,7 +51,7 @@ export default function FloatingAdminMenu({
     // BOTTOM ROW: 2x2 GRID ITEMS
     {
       id: 'notifications',
-      icon: <div className="w-6 h-6 sm:w-9 sm:h-9 flex items-center justify-center"><Bell size={24} /></div>,
+      icon: <div className="w-6 h-6 sm:w-5 sm:h-5 flex items-center justify-center"><Bell size={24} /></div>,
       action: () => useStore.getState().openModal('NOTIFICATIONS'),
       label: 'BİLDİRİMLER', 
       className: 'bg-white text-stone-900 border-2 border-stone-100',
@@ -59,11 +59,11 @@ export default function FloatingAdminMenu({
     {
       id: 'currency',
       icon: (
-        <div className="w-6 h-6 sm:w-9 sm:h-9 flex flex-col items-center justify-center leading-none">
-          <span className="text-[12px] sm:text-[18px] font-black">
+        <div className="w-6 h-6 sm:w-5 sm:h-5 flex flex-col items-center justify-center leading-none">
+          <span className="text-[12px] sm:text-[14px] font-black">
             {activeCurrency === 'TRY' ? '₺' : activeCurrency === 'USD' ? '$' : '€'}
           </span>
-          <span className="text-[5px] sm:text-[7px] font-bold uppercase tracking-tighter opacity-70 -mt-0.5">
+          <span className="text-[5px] sm:text-[6px] font-bold uppercase tracking-tighter opacity-70 -mt-0.5">
             {activeCurrency}
           </span>
         </div>
@@ -76,14 +76,14 @@ export default function FloatingAdminMenu({
     // CENTER PRIMARY ACTIONS (FAB STYLE)
     {
       id: 'add',
-      icon: <div className="w-6 h-6 sm:w-9 sm:h-9 flex items-center justify-center">{globalIcons.plus}</div>,
+      icon: <div className="w-6 h-6 sm:w-5 sm:h-5 flex items-center justify-center">{globalIcons.plus}</div>,
       action: onProductAddTrigger,
       label: '', 
       primary: true,
     },
     {
       id: 'settings',
-      icon: <div className="w-6 h-6 sm:w-9 sm:h-9 flex items-center justify-center">{globalIcons.settings}</div>,
+      icon: <div className="w-6 h-6 sm:w-5 sm:h-5 flex items-center justify-center">{globalIcons.settings}</div>,
       action: onSettingsTrigger,
       label: '', 
       className: 'bg-white text-stone-900 border-2 border-stone-100',

@@ -215,8 +215,8 @@ export const THEME = {
 
   floatingAdminMenu: {
     wrapper:
-      'fixed bottom-2 right-2 sm:bottom-4 sm:right-4 z-[150] sm:scale-[2] sm:origin-bottom-right',
-    container: `flex flex-col items-center p-1 bg-stone-200/50 backdrop-blur-xl border border-white/20 shadow-2xl ${BR.full} transition-all duration-200`,
+      'fixed bottom-2 right-2 z-[150] sm:scale-[1.7] sm:origin-bottom-right',
+    container: `flex flex-col items-center p-1 bg-stone-200/50 backdrop-blur-xl border border-white/20 shadow-2xl ${BR.full}`,
     innerActions: 'flex flex-col gap-1.5 overflow-hidden',
     actionsActive: 'max-h-64 opacity-100 mt-1 mb-2',
     actionsInactive: 'max-h-0 opacity-0',

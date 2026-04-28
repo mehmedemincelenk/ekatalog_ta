@@ -80,7 +80,7 @@ export default function BaseFloatingMenu({
   }, [isExpanded, autoCloseDelay, clearTimer]);
 
   return (    <div ref={containerRef} className="z-[100]">
-      <div className={`${menuTheme.container} w-[104px] sm:w-[150px] flex flex-col items-center justify-end shadow-[0_10px_40px_rgba(0,0,0,0.15)] !rounded-2xl bg-white/50 backdrop-blur-2xl border border-white/50 p-1.5`}>
+      <div className={`${menuTheme.container} w-[104px] flex flex-col items-center justify-end shadow-[0_10px_40px_rgba(0,0,0,0.15)] rounded-xl sm:rounded-lg bg-white/50 backdrop-blur-2xl border border-white/50 p-1.5 sm:p-1`}>
         {/* ACTION CLUSTER */}
         <AnimatePresence>
           {isExpanded && (
@@ -92,7 +92,7 @@ export default function BaseFloatingMenu({
                 open: {
                   height: 'auto',
                   opacity: 1,
-                  marginBottom: 10,
+                  marginBottom: 5,
                   transition: { height: { type: 'spring', stiffness: 300, damping: 30 }, staggerChildren: 0.05, delayChildren: 0.1 }
                 },
                 closed: {
@@ -102,11 +102,11 @@ export default function BaseFloatingMenu({
                   transition: { height: { type: 'spring', stiffness: 300, damping: 35 }, staggerChildren: 0.03, staggerDirection: -1 }
                 }
               }}
-              className="flex flex-col gap-2 sm:gap-3 items-center w-full"
+              className="flex flex-col gap-2 sm:gap-1 items-center w-full"
               style={{ transformOrigin: 'bottom' }}
             >
               {/* LABELED ACTIONS (Full Width) */}
-              <div className="flex flex-col gap-2 sm:gap-3 items-center w-full">
+              <div className="flex flex-col gap-2 sm:gap-1 items-center w-full">
                 {actions.filter(a => a.label).map((btn) => (
                   <motion.div
                     key={btn.id}
@@ -114,7 +114,7 @@ export default function BaseFloatingMenu({
                       open: { opacity: 1, y: 0, scale: 1 },
                       closed: { opacity: 0, y: 15, scale: 0.5 }
                     }}
-                    className="w-[92px] sm:w-[138px]"
+                    className="w-[92px]"
                   >
                     <Button
                       onClick={() => handleAction(btn.action)}
@@ -122,13 +122,13 @@ export default function BaseFloatingMenu({
                       variant={(btn.variant as any) || (btn.primary ? 'primary' : 'secondary')}
                       size="sm"
                       mode="rectangle"
-                      className={`shrink-0 shadow-md !rounded-xl ${btn.className || ''} w-full !justify-start px-2 sm:px-3 gap-2 sm:gap-3 h-[42px] sm:h-[63px]`}
+                      className={`shrink-0 shadow-md rounded-xl sm:rounded-lg ${btn.className || ''} w-full !justify-start px-2 gap-2 h-[42px]`}
                       aria-label={btn.label}
                     >
                       <div className="flex-1 min-w-0 overflow-hidden">
                         <MarqueeText
                           text={btn.label}
-                          textClass="text-[8px] sm:text-[11px] font-black uppercase tracking-tighter"
+                          textClass="text-[8px] font-black uppercase tracking-tighter"
                           isAdmin={false}
                         />
                       </div>
@@ -138,7 +138,7 @@ export default function BaseFloatingMenu({
               </div>
 
               {/* ICON-ONLY ACTIONS (2x2 Grid) */}
-              <div className="grid grid-cols-2 gap-2 sm:gap-3 justify-items-center w-full max-w-[92px] sm:max-w-[138px]">
+              <div className="grid grid-cols-2 gap-2 sm:gap-1 justify-items-center w-full max-w-[92px]">
                 {actions.filter(a => !a.label).map((btn) => (
                   <motion.div
                     key={btn.id}
@@ -146,7 +146,7 @@ export default function BaseFloatingMenu({
                       open: { opacity: 1, y: 0, scale: 1 },
                       closed: { opacity: 0, y: 15, scale: 0.5 }
                     }}
-                    className="w-[42px] sm:w-[63px]"
+                    className="w-[42px]"
                   >
                     <Button
                       onClick={() => handleAction(btn.action)}
@@ -154,7 +154,7 @@ export default function BaseFloatingMenu({
                       variant={(btn.variant as any) || (btn.primary ? 'primary' : 'secondary')}
                       size="sm"
                       mode="circle"
-                      className={`shrink-0 shadow-md !rounded-xl ${btn.className || ''} w-[42px] h-[42px] sm:w-[63px] sm:h-[63px] !p-0`}
+                      className={`shrink-0 shadow-md rounded-full sm:rounded-lg ${btn.className || ''} w-[42px] h-[42px] !p-0`}
                     />
                   </motion.div>
                 ))}
@@ -173,14 +173,14 @@ export default function BaseFloatingMenu({
             variant={isPrimaryToggle && !isExpanded ? 'secondary' : 'primary'}
             size="sm"
             mode="rectangle"
-            className={`${isExpanded ? '!bg-white !text-stone-900 border-2 border-stone-100' : '!bg-stone-900 !text-white'} hover:scale-105 active:scale-95 transition-all h-11 sm:h-16 w-[92px] sm:w-[138px] shadow-lg !rounded-xl relative overflow-hidden`}
+            className={`${isExpanded ? '!bg-white !text-stone-900 border-2 border-stone-100' : '!bg-stone-900 !text-white'} hover:scale-105 active:scale-95 transition-all h-11 sm:h-8 w-[92px] shadow-lg rounded-xl sm:rounded-lg relative overflow-hidden`}
             aria-label={isExpanded ? 'Menüyü Kapat' : 'Menüyü Aç'}
           >
-            <div className="flex flex-row items-center justify-center gap-1.5 sm:gap-2.5 w-full h-full">
-              <div className="w-4 h-4 sm:w-6 sm:h-6 flex items-center justify-center shrink-0">
+            <div className="flex flex-row items-center justify-center gap-1.5 w-full h-full">
+              <div className="w-4 h-4 flex items-center justify-center shrink-0">
                 {isExpanded ? activeMainIcon : mainIcon}
               </div>
-              <span className="text-[10px] sm:text-[14px] font-black uppercase tracking-widest leading-none">
+              <span className="text-[10px] font-black uppercase tracking-widest leading-none">
                 {labelText}
               </span>
             </div>

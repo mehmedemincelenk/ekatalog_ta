@@ -2,7 +2,7 @@ import BaseModal from './BaseModal';
 import Button from './Button';
 import { Phone, MessageCircle, BellRing } from 'lucide-react';
 import { useStore } from '../store';
-import StatusDot from './StatusDot';
+import Badge from './Badge';
 
 interface Lead {
   phone: string;
@@ -64,7 +64,7 @@ export default function NotificationsModal({
                     {new Date(lead.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}
                   </span>
                   <div className="flex items-center gap-2">
-                    <StatusDot variant="success" pulse={true} size="sm" />
+                    <Badge variant="success" showDot={true} pulse={true} size="xs" />
                     <span className="text-[13px] font-black text-stone-900 tracking-widest">
                       {lead.phone}
                     </span>

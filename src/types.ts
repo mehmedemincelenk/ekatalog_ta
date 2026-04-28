@@ -242,8 +242,6 @@ export interface ProductCardProps {
   onOrderChange?: (id: string, newPosition: number) => void;
   onOrderIndexChange?: (id: string, newIndex: number) => void;
   onImageUpload?: (id: string, file: File) => Promise<string | undefined>;
-  orderIndex?: number;
-  itemsInCategory?: number;
   activeDiscount?: ActiveDiscount | null;
   isPriority?: boolean;
   activeAdminProductId?: string | null;
@@ -267,9 +265,7 @@ export interface CategoryFilterChipProps {
   productCount: number;
   onSelect: (categoryName: string) => void;
   onRename: (oldName: string, newName: string) => void;
-  onOrderChange: (categoryName: string, newPosition: number) => void;
-  currentOrder: number;
-  totalCategories: number;
+  showFingerprint?: boolean;
 }
 
 export interface CategoryHeaderProps {
@@ -277,9 +273,6 @@ export interface CategoryHeaderProps {
   productCount: number;
   isAdmin: boolean;
   onRename: (oldName: string, newName: string) => void;
-  onOrderChange: (categoryName: string, newPosition: number) => void;
-  currentOrder: number;
-  totalCategories: number;
 }
 
 export interface SearchFilterProps {
@@ -345,22 +338,6 @@ export interface ProductCardUIProps {
   exchangeRates?: { usd: number; eur: number };
   className?: string;
   labelOverride?: string;
-}
-
-export interface SocialProofCardProps {
-  message: string;
-  isAdmin?: boolean;
-  onEdit?: (message: string) => void;
-}
-
-export interface OrderSelectorProps {
-  currentOrder: number;
-  totalCount: number;
-  onChange: (newPosition: number) => void;
-  onIndexChange?: (newIndex: number) => void;
-  className?: string;
-  isDark?: boolean;
-  variant?: 'small' | 'medium' | 'large';
 }
 
 export interface InfoHintProps {
@@ -562,7 +539,6 @@ export interface CarouselSlideUnitProps {
   isMobileView?: boolean;
   onImageUpdateTrigger: (slideId: number) => void;
   onDeleteTrigger: (slideId: number) => void;
-  onReorderTrigger: (slideId: number, newIndex: number) => void;
   currentIndex: number;
   totalSlides: number;
 }
@@ -680,4 +656,3 @@ export interface AIStudioCompareModalProps {
   onDismiss: (productId: string) => void;
   isStatic?: boolean;
 }
-

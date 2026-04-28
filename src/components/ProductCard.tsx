@@ -15,7 +15,6 @@ import {
 } from '../utils/core';
 import SmartImage from './SmartImage';
 import { MarqueeText } from './MarqueeText';
-import OrderSelector from './OrderSelector';
 import AIStudioTextModal from './AIStudioTextModal';
 import QuickEditModal from './QuickEditModal';
 import ProductDetailModal from './ProductDetailModal';
@@ -36,11 +35,7 @@ const ProductCard = memo(
     isInlineEnabled,
     showPrice = true,
     onUpdate,
-    onOrderChange,
-    onOrderIndexChange,
     onImageUpload,
-    orderIndex = 1,
-    itemsInCategory = 1,
     activeDiscount,
     setActiveAdminProductId,
     displayCurrency = 'TRY',
@@ -220,43 +215,6 @@ const ProductCard = memo(
                 <Loading size="sm" label="" variant="white" />
               </div>
             )}
-
-            {/* ADMIN TOOLS CLUSTER (Z-Indexed area) */}
-            <AnimatePresence>
-              {isAdmin && (
-                <motion.div
-                  key="admin-actions"
-                  initial={false}
-                  animate={{ opacity: 1, scale: 1, transform: 'translateZ(0)' }}
-                  exit={{ opacity: 0, filter: 'blur(8px)', scale: 0.9 }}
-                  transition={{ duration: 0.3 }}
-                  className="absolute inset-0 z-[50] pointer-events-none"
-                >
-                  {/* TOP-RIGHT CLUSTER: Order Index & Advice Notifications */}
-                  <div
-                    className="absolute top-2 right-2 z-[30] pointer-events-auto flex flex-col items-end gap-1.5"
-                    onClick={(e) => e.stopPropagation()}
-                    onPointerDown={(e) => e.stopPropagation()}
-                    onMouseDown={(e) => e.stopPropagation()}
-                  >
-                    <div className="flex flex-row-reverse items-center gap-1.5">
-                      <OrderSelector
-                        currentOrder={orderIndex}
-                        totalCount={itemsInCategory}
-                        onChange={(newPos) =>
-                          onOrderChange?.(product.id, newPos)
-                        }
-                        onIndexChange={(newIdx) =>
-                          onOrderIndexChange?.(product.id, newIdx)
-                        }
-                        className="shadow-xl"
-                      />
-                    </div>
-                  </div>
-
-                </motion.div>
-              )}
-            </AnimatePresence>
 
             <input
               ref={fileInputRef}

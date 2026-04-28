@@ -1,13 +1,11 @@
 import React, { useState, memo, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { LABELS, THEME } from '../data/config';
 import Button from './Button';
 import BaseModal from './BaseModal';
 import * as Lucide from 'lucide-react';
-import CategoryChipSelector from './CategoryChipSelector';
 import FormInput from './FormInput';
 import StatusOverlay from './StatusOverlay';
-import StatusDot from './StatusDot';
+import Badge from './Badge';
 
 /**
  * ADD PRODUCT MODAL COMPONENT (100% Tokenized & Professional English)
@@ -17,7 +15,6 @@ import StatusDot from './StatusDot';
 
 import {
   AddProductModalProps,
-  FormInputProps,
 } from '../types';
 import { useStore } from '../store';
 
@@ -46,10 +43,6 @@ const ToggleFingerprint = () => (
     </svg>
   </div>
 );
-
-// (FormInput was here, now global)
-
-
 
 
 export default function AddProductModal({
@@ -362,14 +355,33 @@ export default function AddProductModal({
 
         {/* STEP 4: CATEGORY */}
         {currentStep === 4 && (
-          <div className={theme.wizard.stepContent}>
-            <CategoryChipSelector
-              categories={availableCategories}
-              selectedCategory={formState.selectedCategory}
-              customCategoryName={formState.customCategoryName}
-              onCategorySelect={handleCategorySelection}
-              onCustomCategoryChange={handleFormInputChange}
-            />
+          <div className="flex flex-col gap-6 py-2">
+            <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+              {availableCategories.map((cat) => (
+                <Button
+                  key={cat}
+                  onClick={() => handleCategorySelection(cat)}
+                  variant={formState.selectedCategory === cat ? 'primary' : 'secondary'}
+                  className="!h-10 !px-4 !rounded-xl"
+                  mode="rectangle"
+                >
+                  <span className="text-[11px] font-black uppercase tracking-widest">{cat}</span>
+                </Button>
+              ))}
+            </div>
+
+            <div className="space-y-2">
+              <span className="text-[10px] font-black text-stone-400 tracking-widest uppercase px-2">VEYA YENİ OLUŞTUR</span>
+              <FormInput
+                id="custom-category-input"
+                labelText=""
+                name="customCategoryName"
+                value={formState.customCategoryName}
+                onChange={handleFormInputChange}
+                placeholder="Yeni kategori adı..."
+              />
+            </div>
+
             <div className="flex gap-2 mt-1">
               <Button onClick={prevStep} variant="secondary" mode="rectangle" className="w-20 h-16 shrink-0 shadow-sm" showFingerprint={false}>
                 <Lucide.ChevronLeft size={24} strokeWidth={3} />
@@ -488,7 +500,7 @@ export default function AddProductModal({
                  ))}
                  <div className="flex gap-3 items-center pt-2">
                   <div className="flex gap-3 items-center pt-2">
-                     <StatusDot variant={formState.isProductInStock ? 'success' : 'danger'} />
+                     <Badge variant={formState.isProductInStock ? 'success' : 'danger'} showDot={true} pulse={formState.isProductInStock} />
                      <p className="text-[11px] font-black text-stone-900 tracking-widest uppercase">{formState.isProductInStock ? 'STOKTA VAR' : 'STOKTA YOK'}</p>
                   </div>
                  </div>

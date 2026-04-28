@@ -1,16 +1,16 @@
-import { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useCallback, useEffect } from 'react';
 import Button from './Button';
 import BaseModal from './BaseModal';
 import * as Lucide from 'lucide-react';
 import FormInput from './FormInput';
 import { CouponModalProps } from '../types';
+import { useGlobalFeedback } from '../hooks/useGlobalFeedback';
 
 /**
  * COUPON MODAL (DIAMOND EDITION)
  * -----------------------------------------------------------
- * Handles discount code entry with smooth cinematic feedback.
- * State reset is handled by the 'key' prop pattern in AppModals.
+ * Handles discount code entry. Feedback is now handled via
+ * global StatusOverlay for a cleaner cinematic experience.
  */
 export default function CouponModal({
   isOpen,
@@ -21,6 +21,7 @@ export default function CouponModal({
   isStatic = false,
 }: CouponModalProps) {
   const [couponCode, setCouponCode] = useState('');
+  const { showFeedback } = useGlobalFeedback();
 
   const handleApply = useCallback(() => {
     if (couponCode.trim()) {
@@ -28,10 +29,20 @@ export default function CouponModal({
     }
   }, [couponCode, onApplyDiscount]);
 
+  // Sync Global Feedback with Store State
+  useEffect(() => {
+    if (isOpen && activeDiscount) {
+      showFeedback('success', `İNDİRİM UYGULANDI: %${Math.round(activeDiscount.rate * 100)}`);
+      onClose();
+    }
+    if (isOpen && discountError) {
+      showFeedback('error', discountError);
+    }
+  }, [activeDiscount, discountError, isOpen, showFeedback, onClose]);
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') handleApply();
   };
-
 
   return (
     <BaseModal
@@ -39,8 +50,9 @@ export default function CouponModal({
       onClose={onClose}
       maxWidth="max-w-sm"
       isStatic={isStatic}
+      title="İNDİRİM KUPONU"
     >
-      <div className="space-y-6">
+      <div className="space-y-6 py-2">
         <div className="relative">
           <FormInput
             id="coupon-input"
@@ -49,7 +61,7 @@ export default function CouponModal({
             onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
             onKeyPress={handleKeyPress}
             placeholder="Kodu buraya yazın"
-            className="!text-center !py-6 focus:!border-emerald-500 !text-sm !rounded-3xl"
+            className="!text-center !py-6 focus:!border-emerald-500 !text-sm !rounded-3xl shadow-inner"
             autoFocus
           />
         </div>
@@ -69,43 +81,9 @@ export default function CouponModal({
             className="flex-1 h-16 !rounded-[24px]"
             showFingerprint={true}
           >
-            <Lucide.Check size={28} strokeWidth={4} />
+            <span className="font-black tracking-[0.2em] text-[15px] uppercase">UYGULA</span>
           </Button>
         </div>
-
-        <AnimatePresence mode="wait">
-          {activeDiscount && (
-            <motion.div
-              key="success"
-              initial={{ opacity: 0, y: 10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-emerald-50 text-emerald-600 rounded-xl px-4 py-3 text-center border border-emerald-100 flex flex-col items-center gap-1 shadow-sm"
-            >
-              <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
-                Aktif İndirim
-              </span>
-              <span className="text-sm font-bold">
-                %{Math.round(activeDiscount.rate * 100)} İNDİRİM UYGULANDI ✓
-              </span>
-            </motion.div>
-          )}
-
-          {discountError && (
-            <motion.div
-              key="error"
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 10 }}
-              className="bg-red-50 text-red-500 rounded-xl px-4 py-3 text-center border border-red-100 flex flex-col items-center gap-1 shadow-sm"
-            >
-              <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
-                Geçersiz Kod
-              </span>
-              <span className="text-xs font-bold">LÜTFEN TEKRAR DENEYİN</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
     </BaseModal>
   );

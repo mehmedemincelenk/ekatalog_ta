@@ -2,7 +2,6 @@ import { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { THEME } from '../data/config';
 import SmartImage from './SmartImage';
-import OrderSelector from './OrderSelector';
 import Button from './Button';
 
 import { CarouselSlideUnitProps } from '../types';
@@ -24,9 +23,6 @@ const CarouselSlideUnit = memo(
     isMobileView,
     onImageUpdateTrigger,
     onDeleteTrigger,
-    onReorderTrigger,
-    currentIndex,
-    totalSlides,
   }: CarouselSlideUnitProps) => {
     const carouselTheme = THEME.heroCarousel;
     const globalIcons = THEME.icons;
@@ -79,14 +75,6 @@ const CarouselSlideUnit = memo(
               className="absolute top-4 right-4 z-[50] flex items-center gap-2"
               onClick={(e) => e.stopPropagation()}
             >
-              <OrderSelector
-                currentOrder={currentIndex}
-                totalCount={totalSlides}
-                variant="large"
-                className="!w-8 !h-8 sm:!w-10 sm:!h-10"
-                onChange={(newIdx) => onReorderTrigger?.(slideData.id, newIdx)}
-              />
-
               <Button
                 onClick={(e) => {
                   e.preventDefault();

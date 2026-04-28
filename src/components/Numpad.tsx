@@ -6,13 +6,16 @@ interface NumpadProps {
   onSubmit: (phoneNumber: string) => void;
   title?: string;
   maxDigits?: number;
+  variant?: 'light' | 'dark';
 }
 
 export default function Numpad({ 
   onSubmit, 
   title = 'Sizi Arayalım',
-  maxDigits = 10 
+  maxDigits = 10,
+  variant = 'light'
 }: NumpadProps) {
+  const isDark = variant === 'dark';
   const [value, setValue] = useState('');
 
   const handlePress = (num: string) => {
@@ -31,8 +34,12 @@ export default function Numpad({
     <div className="flex flex-col items-center w-full mx-auto space-y-4">
 
       {/* DISPLAY FIELD */}
-      <div className="flex items-center justify-between w-full h-14 px-4 bg-stone-50 border border-stone-100 rounded-2xl overflow-hidden">
-        <span className="text-xl font-black text-stone-900 tracking-[0.2em]">
+      <div className={`flex items-center justify-between w-full h-14 px-4 border rounded-2xl overflow-hidden ${
+        isDark ? 'bg-stone-800 border-stone-700' : 'bg-stone-50 border-stone-100'
+      }`}>
+        <span className={`text-xl font-black tracking-[0.2em] ${
+          isDark ? 'text-white' : 'text-stone-900'
+        }`}>
           {value || '05XXXXXXXX'}
         </span>
         {value.length > 0 && (
@@ -41,7 +48,7 @@ export default function Numpad({
             variant="ghost"
             mode="circle"
             size="sm"
-            className="!text-stone-400 hover:!text-stone-900"
+            className={`${isDark ? 'text-stone-500 hover:text-white' : '!text-stone-400 hover:!text-stone-900'}`}
             icon={<Delete size={20} />}
           />
         )}
@@ -53,9 +60,11 @@ export default function Numpad({
           <Button
             key={key}
             onClick={() => handlePress(key)}
-            variant="secondary"
+            variant={isDark ? 'primary' : 'secondary'}
             mode="circle"
-            className="!w-full !h-16 !text-xl font-black !bg-white hover:!border-stone-900"
+            className={`!w-full !h-16 !text-xl font-black ${
+              isDark ? '!bg-stone-800 !text-white border-stone-700 hover:!bg-stone-700' : '!bg-white !text-stone-900 hover:!border-stone-900'
+            }`}
           >
             {key}
           </Button>
@@ -66,9 +75,11 @@ export default function Numpad({
         
         <Button
           onClick={() => handlePress('0')}
-          variant="secondary"
+          variant={isDark ? 'primary' : 'secondary'}
           mode="circle"
-          className="!w-full !h-16 !text-xl font-black !bg-white hover:!border-stone-900"
+          className={`!w-full !h-16 !text-xl font-black ${
+            isDark ? '!bg-stone-800 !text-white border-stone-700 hover:!bg-stone-700' : '!bg-white !text-stone-900 hover:!border-stone-900'
+          }`}
         >
           0
         </Button>

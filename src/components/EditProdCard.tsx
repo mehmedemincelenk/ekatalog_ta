@@ -13,7 +13,6 @@ import {
   Settings2,
   Check
 } from 'lucide-react';
-import CategoryChipSelector from './CategoryChipSelector';
 
 import { EditProdCardProps } from '../types';
 import { useScrollLock } from '../hooks/useCommon';
@@ -243,13 +242,19 @@ export const EditProdCard = memo(
                 <Settings2 size={14} className="text-stone-300" />
                 <h4 className="text-[10px] font-black text-stone-900 uppercase tracking-[0.2em]">KATEGORİ YÖNETİMİ</h4>
               </div>
-              <CategoryChipSelector
-                categories={categories}
-                selectedCategory={product.category}
-                onCategorySelect={(cat) => handleAction('CATEGORY', cat)}
-                allowCustom={true}
-                className="!gap-2"
-              />
+              <div className="flex flex-wrap gap-2">
+                {categories.map((cat) => (
+                  <Button
+                    key={cat}
+                    onClick={() => handleAction('CATEGORY', cat)}
+                    variant={product.category === cat ? 'primary' : 'secondary'}
+                    className="!h-9 !px-4 !rounded-xl"
+                    mode="rectangle"
+                  >
+                    <span className="text-[10px] font-black uppercase tracking-widest">{cat}</span>
+                  </Button>
+                ))}
+              </div>
             </div>
           </div>
         </BaseModal>

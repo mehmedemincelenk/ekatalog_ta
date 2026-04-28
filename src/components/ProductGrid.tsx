@@ -5,7 +5,6 @@ import { memo, Fragment } from 'react';
 import { THEME, LABELS } from '../data/config';
 import ProductCard from './ProductCard';
 import PlusPlaceholder from './PlusPlaceholder';
-import SocialProofCard from './SocialProofCard';
 import Button from './Button';
 import { EditProdCard } from './EditProdCard';
 import CategoryHeader from './CategoryHeader';
@@ -103,16 +102,6 @@ const ProductGrid = memo(
                     const isPriority = priorityCounter < 4;
                     priorityCounter++;
 
-                    const shouldInjectSocialProof =
-                      socialProofCards &&
-                      socialProofCards.length > 0 &&
-                      (index + 1) % 6 === 0;
-                    const socialProofMessage = shouldInjectSocialProof
-                      ? socialProofCards[
-                          Math.floor((index + 1) / 6) % socialProofCards.length
-                        ]
-                      : null;
-
                     return (
                       <Fragment key={product.id}>
                         <ProductCard
@@ -135,12 +124,6 @@ const ProductGrid = memo(
                           displayCurrency={displayCurrency}
                           exchangeRates={exchangeRates}
                         />
-                        {shouldInjectSocialProof && socialProofMessage && (
-                          <SocialProofCard
-                            message={socialProofMessage}
-                            isAdmin={isAdmin}
-                          />
-                        )}
                       </Fragment>
                     );
                   })}

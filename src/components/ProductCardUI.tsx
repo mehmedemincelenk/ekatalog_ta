@@ -6,7 +6,6 @@ import {
 } from '../utils/core';
 import SmartImage from './SmartImage';
 import Badge from './Badge';
-import StatusDot from './StatusDot';
 
 import { ProductCardUIProps } from '../types';
 
@@ -99,7 +98,7 @@ export const ProductCardUI = memo(
               {priceLabel}
             </span>
             {isHighlighted && (
-              <StatusDot variant="warning" pulse={true} size="sm" />
+              <Badge variant="warning" showDot={true} pulse={true} size="xs" />
             )}
           </div>
         </div>

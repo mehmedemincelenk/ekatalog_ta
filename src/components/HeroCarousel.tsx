@@ -287,9 +287,6 @@ export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
                   editingTargetSlideId={activeEditingSlideId}
                   onImageUpdateTrigger={triggerImageUpdate}
                   onDeleteTrigger={deleteSlide}
-                  onReorderTrigger={reorderSlides}
-                  currentIndex={index + 1}
-                  totalSlides={slides.length}
                 />
               </div>
             );

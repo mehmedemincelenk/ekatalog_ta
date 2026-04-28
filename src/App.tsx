@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import * as Lucide from 'lucide-react';
 import { useGlobalFeedback } from './hooks/useGlobalFeedback';
 import Navbar from './components/Navbar';
-import { LABELS, UI } from './data/config';
+import { THEME, LABELS, UI } from './data/config';
 import HeroCarousel from './components/HeroCarousel';
 import SearchFilter from './components/SearchFilter';
 import ProductGrid from './components/ProductGrid';
@@ -170,15 +170,15 @@ function CatalogView() {
         <Footer />
       </div>
 
-      {/* OFF-HOURS ENGAGEMENT: Only for customers */}
-      {!isAdmin && settings && (
+      {/* OFF-HOURS ENGAGEMENT: Disabled by user request */}
+      {/* {!isAdmin && settings && (
         <div className="print:hidden">
           <OffHoursNotice />
         </div>
-      )}
+      )} */}
 
       {!isAdmin && (
-        <div className="fixed bottom-4 right-2 z-[90] print:hidden">
+        <div className={`${THEME.floatingAdminMenu.wrapper} z-[90] print:hidden`}>
           <FloatingGuestMenu
             onCouponClick={() => openModal('COUPON')}
             onExcelClick={() => openModal('PRICE_LIST')}
@@ -203,7 +203,7 @@ function CatalogView() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="fixed bottom-2 right-2 z-[150] print:hidden"
+            className={`${THEME.floatingAdminMenu.wrapper} z-[150] print:hidden`}
           >
             <FloatingAdminMenu
               onProductAddTrigger={() => openModal('GLOBAL_ADD_MENU')}

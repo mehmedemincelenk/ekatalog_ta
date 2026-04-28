@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Button from './Button';
 import BaseModal from './BaseModal';
-import { motion } from 'framer-motion';
+import StatusToggle from './StatusToggle';
 import * as Lucide from 'lucide-react';
 import { DisplaySettingsModalProps, DisplayConfig } from '../types';
 
@@ -38,21 +38,6 @@ const HELP_CONTENTS: Record<string, HelpInfo> = {
       'Dükkanınız herkese açıktır. Müşterileriniz ürünlerinizi inceleyebilir ve sipariş oluşturabilir.',
   },
 };
-
-/**
- * SETTING TOGGLE (Local Utility)
- */
-const SettingToggle = ({ value }: { value: boolean }) => (
-  <div className={`w-8 h-4 rounded-full transition-all duration-500 relative flex items-center px-0.5 overflow-hidden ${value ? 'bg-emerald-500/20' : 'bg-stone-200'}`}>
-    <motion.div
-      animate={{ x: value ? 16 : 0 }}
-      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-      className={`relative z-10 w-3 h-3 rounded-full flex items-center justify-center shadow-sm ${value ? 'bg-emerald-500 text-white' : 'bg-white text-stone-400'}`}
-    >
-      {value ? <Lucide.Check size={8} strokeWidth={4} /> : <Lucide.X size={8} strokeWidth={4} />}
-    </motion.div>
-  </div>
-);
 
 /**
  * SETTING CARD (DIAMOND ATOM)
@@ -105,8 +90,13 @@ const SettingCard = ({
         </span>
       </div>
 
-      <div className="relative z-10 shrink-0 ml-2">
-        <SettingToggle value={option.isOn} />
+      <div className="relative z-10 shrink-0 ml-2 pointer-events-auto">
+        <StatusToggle 
+          value={option.isOn} 
+          onChange={option.onToggle}
+          variant="compact"
+          activeColor="!bg-emerald-500 !text-white border-none"
+        />
       </div>
     </div>
   );

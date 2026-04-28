@@ -106,9 +106,6 @@ const SearchFilter = memo(
             productCount={stats[cat] || 0}
             onSelect={onCategoryToggle}
             onRename={renameCategory}
-            onOrderChange={onCategoryOrderChange}
-            currentOrder={sortedList.indexOf(cat) + 1}
-            totalCategories={sortedList.length}
           />
         ))}
         

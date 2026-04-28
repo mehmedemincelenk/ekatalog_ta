@@ -6,6 +6,7 @@ import BaseModal from './BaseModal';
 import * as Lucide from 'lucide-react';
 import FormInput from './FormInput';
 import StatusOverlay from './StatusOverlay';
+import StatusToggle from './StatusToggle';
 import { transformCurrencyStringToNumber } from '../utils/core';
 import { BulkPriceUpdateModalProps, Product } from '../types';
 
@@ -17,41 +18,6 @@ interface DeskItemState {
   manualInStock?: boolean;
   manualArchived?: boolean;
 }
-
-const YapYapmaToggle = ({ id, value, onChange }: { id: string; value: boolean; onChange: (val: boolean) => void }) => (
-  <div className="flex bg-stone-100 p-0.5 rounded-[18px] border border-stone-200 shrink-0 relative overflow-hidden pointer-events-auto">
-    <Button
-      type="button"
-      onClick={() => { if (!value) onChange(true); }}
-      variant={value ? 'primary' : 'ghost'}
-      className={`!px-3 sm:!px-6 !py-2 sm:!py-2.5 !rounded-[15px] !text-[10px] sm:!text-[11px] font-black transition-all !h-auto !min-w-[50px] sm:!min-w-[80px] border-none shadow-none ${value ? '!bg-stone-900 !text-white' : '!text-stone-400 hover:!text-stone-600'}`}
-    >
-      {value && (
-        <motion.div
-          layoutId={`toggle-bg-${id}`}
-          className="absolute inset-0 bg-stone-900 rounded-[15px] z-[-1] shadow-md pointer-events-none"
-          transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-        />
-      )}
-      YAP
-    </Button>
-    <Button
-      type="button"
-      onClick={() => { if (value) onChange(false); }}
-      variant={!value ? 'secondary' : 'ghost'}
-      className={`!px-3 sm:!px-6 !py-2 sm:!py-2.5 !rounded-[15px] !text-[10px] sm:!text-[11px] font-black transition-all !h-auto !min-w-[50px] sm:!min-w-[80px] border-none shadow-none ${!value ? '!bg-white !text-stone-900 !shadow-sm' : '!text-stone-400 hover:!text-stone-600'}`}
-    >
-      {!value && (
-        <motion.div
-          layoutId={`toggle-bg-${id}`}
-          className="absolute inset-0 bg-white rounded-[15px] z-[-1] shadow-sm border border-stone-100 pointer-events-none"
-          transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-        />
-      )}
-      YAPMA
-    </Button>
-  </div>
-);
 
 /**
  * DESK ITEM ROW (Local Diamond Utility)
@@ -118,13 +84,11 @@ const DeskItemRow = memo(
             </div>
           )}
 
-          <div className="shrink-0 pointer-events-auto">
-            <YapYapmaToggle 
-              id={product.id}
+          <div className="shrink-0 pointer-events-auto min-w-[80px]">
+            <StatusToggle 
               value={state.included} 
-              onChange={(val) => {
-                if (val !== state.included) onToggle(product.id);
-              }} 
+              onChange={() => onToggle(product.id)}
+              variant="compact"
             />
           </div>
         </div>

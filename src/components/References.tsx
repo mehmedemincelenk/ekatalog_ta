@@ -2,7 +2,6 @@ import { useState, memo } from 'react';
 import { THEME, REFERENCES } from '../data/config';
 import { useSettings } from '../hooks/useSettingsHub';
 import { reorderArray } from '../utils/core';
-import OrderSelector from './OrderSelector';
 import Button from './Button';
 import PlusPlaceholder from './PlusPlaceholder';
 import QuickEditModal from './QuickEditModal';
@@ -17,21 +16,15 @@ import { ReferencesProps, Reference } from '../types';
  */
 const ReferenceCard = memo(({ 
   refData, 
-  index, 
-  totalCount, 
   isAdmin, 
   isInlineEnabled, 
   onDelete, 
-  onOrderChange, 
   onEdit 
 }: { 
   refData: Reference; 
-  index: number; 
-  totalCount: number; 
   isAdmin: boolean; 
   isInlineEnabled: boolean; 
   onDelete: (id: number) => void; 
-  onOrderChange: (id: number, pos: number) => void; 
   onEdit: (id: number, name: string) => void;
 }) => {
   const [isDeleteConfirming, setIsDeleteConfirming] = useState(false);
@@ -60,16 +53,6 @@ const ReferenceCard = memo(({
 
       {isAdmin && (
         <>
-          {/* ORDER SELECTOR */}
-          <div className="absolute top-2 left-2 z-10 transition-transform hover:scale-105">
-            <OrderSelector
-              currentOrder={index + 1}
-              totalCount={totalCount}
-              onChange={(newPos) => onOrderChange(refData.id, newPos)}
-              className="shadow-xl"
-            />
-          </div>
-
           {/* DELETE ACTIONS */}
           <div className="absolute top-2 right-2 z-20 flex gap-1">
             {!isDeleteConfirming ? (
@@ -137,14 +120,6 @@ export default function References({
     updateSetting('referencesData', updated);
   };
 
-  const handleOrderChange = (id: number, targetPos: number) => {
-    const currentIndex = activeReferences.findIndex((r) => r.id === id);
-    if (currentIndex === -1) return;
-
-    const updated = reorderArray(activeReferences, currentIndex, targetPos - 1);
-    updateSetting('referencesData', updated);
-  };
-
   const handleSaveEdit = (newName: string) => {
     if (!activeQuickEdit) return;
 
@@ -180,12 +155,9 @@ export default function References({
             <ReferenceCard
               key={ref.id}
               refData={ref}
-              index={index}
-              totalCount={activeReferences.length}
               isAdmin={isAdmin}
               isInlineEnabled={isInlineEnabled}
               onDelete={handleDelete}
-              onOrderChange={handleOrderChange}
               onEdit={(id, name) => setActiveQuickEdit({ id, name })}
             />
           ))}
