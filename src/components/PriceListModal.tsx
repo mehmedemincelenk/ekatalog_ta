@@ -35,7 +35,7 @@ export default function PriceListModal({
   initialStep,
 }: PriceListModalProps) {
   const { settings } = useStore();
-  const [step, setStep] = useState<0 | 1 | 2 | 3 | 4>((initialStep as any) || 1); // 0: Intro, 1: Mode, 2: Theme, 3: Categories, 4: Preview
+  const [step, setStep] = useState<0 | 1 | 2 | 3 | 4>((initialStep as 0 | 1 | 2 | 3 | 4) || 1); // 0: Intro, 1: Mode, 2: Theme, 3: Categories, 4: Preview
   const [exportMode, setExportMode] = useState<'LIST' | 'STORY'>('LIST');
   const [storyTheme, setStoryTheme] = useState<'LIGHT' | 'DARK'>('LIGHT');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -100,7 +100,7 @@ export default function PriceListModal({
 
   useEffect(() => {
     if (initialStep !== undefined) {
-      setStep(initialStep as any);
+      setStep(initialStep as 0 | 1 | 2 | 3 | 4);
     }
   }, [initialStep]);
 

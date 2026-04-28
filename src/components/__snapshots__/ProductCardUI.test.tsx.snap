@@ -25,8 +25,17 @@ exports[`ProductCardUI (Diamond Snapshot) > Admin görünümü snapshotu ile eş
             class="absolute inset-0 shimmer-animation opacity-50"
           />
           <div
-            class="relative w-12 h-12 border-2 border-stone-200 border-t-stone-900 rounded-full animate-spin opacity-20"
-          />
+            class="flex flex-col items-center justify-center gap-3 opacity-20"
+          >
+            <div
+              class="
+          w-8 h-8 border-3 
+          border-stone-200 border-t-stone-800 
+          rounded-full
+        "
+              style="opacity: 0; transform: scale(0.8);"
+            />
+          </div>
           <div
             class="absolute inset-0 opacity-[0.03] pointer-events-none"
             style="background-image: radial-gradient(rgb(0, 0, 0) 0.5px, transparent 0.5px); background-size: 16px 16px;"
@@ -48,9 +57,11 @@ exports[`ProductCardUI (Diamond Snapshot) > Admin görünümü snapshotu ile eş
       >
         <span
           class="
-            px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest border backdrop-blur-sm
-            bg-white/90 text-stone-900 border-stone-200
-          "
+        inline-flex items-center justify-center rounded-lg font-black uppercase tracking-widest border gap-1.5
+        bg-white/90 text-stone-900 border-stone-200 backdrop-blur-sm
+        px-2 py-1 text-[8px]
+        
+      "
         >
           Orijinal
         </span>
@@ -112,8 +123,17 @@ exports[`ProductCardUI (Diamond Snapshot) > Normal görünüm snaphotu ile eşle
             class="absolute inset-0 shimmer-animation opacity-50"
           />
           <div
-            class="relative w-12 h-12 border-2 border-stone-200 border-t-stone-900 rounded-full animate-spin opacity-20"
-          />
+            class="flex flex-col items-center justify-center gap-3 opacity-20"
+          >
+            <div
+              class="
+          w-8 h-8 border-3 
+          border-stone-200 border-t-stone-800 
+          rounded-full
+        "
+              style="opacity: 0; transform: scale(0.8);"
+            />
+          </div>
           <div
             class="absolute inset-0 opacity-[0.03] pointer-events-none"
             style="background-image: radial-gradient(rgb(0, 0, 0) 0.5px, transparent 0.5px); background-size: 16px 16px;"
@@ -135,9 +155,11 @@ exports[`ProductCardUI (Diamond Snapshot) > Normal görünüm snaphotu ile eşle
       >
         <span
           class="
-            px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest border backdrop-blur-sm
-            bg-white/90 text-stone-900 border-stone-200
-          "
+        inline-flex items-center justify-center rounded-lg font-black uppercase tracking-widest border gap-1.5
+        bg-white/90 text-stone-900 border-stone-200 backdrop-blur-sm
+        px-2 py-1 text-[8px]
+        
+      "
         >
           Orijinal
         </span>
@@ -199,8 +221,17 @@ exports[`ProductCardUI (Diamond Snapshot) > Stokta olmayan görünüm snapshotu 
             class="absolute inset-0 shimmer-animation opacity-50"
           />
           <div
-            class="relative w-12 h-12 border-2 border-stone-200 border-t-stone-900 rounded-full animate-spin opacity-20"
-          />
+            class="flex flex-col items-center justify-center gap-3 opacity-20"
+          >
+            <div
+              class="
+          w-8 h-8 border-3 
+          border-stone-200 border-t-stone-800 
+          rounded-full
+        "
+              style="opacity: 0; transform: scale(0.8);"
+            />
+          </div>
           <div
             class="absolute inset-0 opacity-[0.03] pointer-events-none"
             style="background-image: radial-gradient(rgb(0, 0, 0) 0.5px, transparent 0.5px); background-size: 16px 16px;"
@@ -222,14 +253,21 @@ exports[`ProductCardUI (Diamond Snapshot) > Stokta olmayan görünüm snapshotu 
       >
         <span
           class="
-            px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest border backdrop-blur-sm
-            bg-white/90 text-stone-900 border-stone-200
-          "
+        inline-flex items-center justify-center rounded-lg font-black uppercase tracking-widest border gap-1.5
+        bg-white/90 text-stone-900 border-stone-200 backdrop-blur-sm
+        px-2 py-1 text-[8px]
+        
+      "
         >
           Orijinal
         </span>
         <span
-          class="px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest border bg-red-500 text-white border-red-600 shadow-lg shadow-red-500/20"
+          class="
+        inline-flex items-center justify-center rounded-lg font-black uppercase tracking-widest border gap-1.5
+        bg-red-500 text-white border-red-600 shadow-lg shadow-red-500/20
+        px-2 py-1 text-[8px]
+        
+      "
         >
           Stokta Yok
         </span>

@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, forwardRef } from 'react';
 import { THEME } from '../data/config';
 
 interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -13,13 +13,13 @@ interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
  * -----------------------------------------------------------
  * Standardized input component for consistent UI across all forms.
  */
-const FormInput = memo(({ 
+const FormInput = memo(forwardRef<HTMLInputElement, FormInputProps>(({ 
   labelText, 
   id, 
   className = '', 
   containerClassName = '',
   ...inputProperties 
-}: FormInputProps) => {
+}, ref) => {
   const modalTheme = THEME.addProductModal; // Using these shared tokens
 
   return (
@@ -30,13 +30,14 @@ const FormInput = memo(({
         </label>
       )}
       <input 
+        ref={ref}
         id={id} 
         {...inputProperties} 
         className={`${modalTheme.inputField} ${className}`} 
       />
     </div>
   );
-});
+}));
 
 FormInput.displayName = 'FormInput';
 export default FormInput;

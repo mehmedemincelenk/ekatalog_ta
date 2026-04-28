@@ -28,8 +28,17 @@ exports[`CarouselSlideUnit (Diamond Snapshot) > Admin modunda aktif slide görü
             class="absolute inset-0 shimmer-animation opacity-50"
           />
           <div
-            class="relative w-12 h-12 border-2 border-stone-200 border-t-stone-900 rounded-full animate-spin opacity-20"
-          />
+            class="flex flex-col items-center justify-center gap-3 opacity-20"
+          >
+            <div
+              class="
+          w-8 h-8 border-3 
+          border-stone-200 border-t-stone-800 
+          rounded-full
+        "
+              style="opacity: 0; transform: scale(0.8);"
+            />
+          </div>
           <div
             class="absolute inset-0 opacity-[0.03] pointer-events-none"
             style="background-image: radial-gradient(rgb(0, 0, 0) 0.5px, transparent 0.5px); background-size: 16px 16px;"
@@ -51,47 +60,6 @@ exports[`CarouselSlideUnit (Diamond Snapshot) > Admin modunda aktif slide görü
       class="absolute top-4 right-4 z-[50] flex items-center gap-2"
       style="opacity: 0; transform: translateX(20px);"
     >
-      <div
-        class="
-        relative flex items-center justify-center shadow-2xl transition-all active:scale-95 group border
-        bg-white/95 backdrop-blur-md border-white/40 hover:bg-white text-stone-900
-        w-10 h-10 rounded-full !w-8 !h-8 sm:!w-10 sm:!h-10
-      "
-      >
-        <div
-          class="flex items-center justify-center overflow-hidden w-6 h-full pointer-events-none relative"
-        >
-          <div
-            class="flex items-center justify-center h-full"
-            style="opacity: 0; transform: translateY(5px);"
-          >
-            <span
-              class="font-black tracking-tighter flex items-center justify-center text-[14px]"
-            >
-              1.
-            </span>
-          </div>
-        </div>
-        <select
-          class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-[5] appearance-none"
-        >
-          <option
-            value="1"
-          >
-            1. Sıraya Alalım
-          </option>
-          <option
-            value="2"
-          >
-            2. Sıraya Alalım
-          </option>
-          <option
-            value="3"
-          >
-            3. Sıraya Alalım
-          </option>
-        </select>
-      </div>
       <button
         class="
         relative inline-flex items-center justify-center transition-all duration-300 font-black uppercase tracking-widest active:scale-95 disabled:opacity-50 disabled:pointer-events-none overflow-hidden 
@@ -178,8 +146,17 @@ exports[`CarouselSlideUnit (Diamond Snapshot) > Aktif slide görünümü snapsho
             class="absolute inset-0 shimmer-animation opacity-50"
           />
           <div
-            class="relative w-12 h-12 border-2 border-stone-200 border-t-stone-900 rounded-full animate-spin opacity-20"
-          />
+            class="flex flex-col items-center justify-center gap-3 opacity-20"
+          >
+            <div
+              class="
+          w-8 h-8 border-3 
+          border-stone-200 border-t-stone-800 
+          rounded-full
+        "
+              style="opacity: 0; transform: scale(0.8);"
+            />
+          </div>
           <div
             class="absolute inset-0 opacity-[0.03] pointer-events-none"
             style="background-image: radial-gradient(rgb(0, 0, 0) 0.5px, transparent 0.5px); background-size: 16px 16px;"
@@ -229,8 +206,17 @@ exports[`CarouselSlideUnit (Diamond Snapshot) > Pasif (Ghost) slide görünümü
             class="absolute inset-0 shimmer-animation opacity-50"
           />
           <div
-            class="relative w-12 h-12 border-2 border-stone-200 border-t-stone-900 rounded-full animate-spin opacity-20"
-          />
+            class="flex flex-col items-center justify-center gap-3 opacity-20"
+          >
+            <div
+              class="
+          w-8 h-8 border-3 
+          border-stone-200 border-t-stone-800 
+          rounded-full
+        "
+              style="opacity: 0; transform: scale(0.8);"
+            />
+          </div>
           <div
             class="absolute inset-0 opacity-[0.03] pointer-events-none"
             style="background-image: radial-gradient(rgb(0, 0, 0) 0.5px, transparent 0.5px); background-size: 16px 16px;"

@@ -9,26 +9,29 @@ export default function QuickEditModal({
   isOpen,
   onClose,
   onSave,
-  title = '',
-  subtitle = '',
   initialValue = '',
   placeholder = '',
   type = 'text',
   isStatic = false,
-}: QuickEditModalProps) {
+}: Omit<QuickEditModalProps, 'title' | 'subtitle'>) {
   const [value, setValue] = useState(initialValue);
+  const [prevInitial, setPrevInitial] = useState(initialValue);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  if (initialValue !== prevInitial) {
+    setValue(initialValue);
+    setPrevInitial(initialValue);
+  }
 
   useEffect(() => {
     if (isOpen) {
-      setValue(initialValue);
       setTimeout(() => {
         if (inputRef.current) {
           inputRef.current.focus();
         }
       }, 100);
     }
-  }, [isOpen, initialValue]);
+  }, [isOpen]);
 
   const handleSave = () => {
     onSave(value.trim());
@@ -46,7 +49,7 @@ export default function QuickEditModal({
       <div className="flex flex-col gap-6 py-2">
         <FormInput
           id="quick-edit-input"
-          ref={inputRef as any}
+          ref={inputRef}
           type={type}
           value={value}
           onChange={(e) => setValue(e.target.value)}

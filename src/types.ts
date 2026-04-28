@@ -118,7 +118,7 @@ export interface CompanySettings {
     enabled: boolean;
     message: string;
   };
-  visitor_leads?: any;
+  visitor_leads?: unknown;
   exchangeRates: {
     usd: number;
     eur: number;

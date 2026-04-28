@@ -23,13 +23,16 @@ export default function OffHoursNotice({
   const [isSuccess, setIsSuccess] = useState(false);
   const { addVisitorLead } = useSettings(false);
 
+  const [prevForceVisible, setPrevForceVisible] = useState(forceVisible);
+  if (forceVisible !== prevForceVisible) {
+    setPrevForceVisible(forceVisible);
+    if (forceVisible) setIsVisible(true);
+  }
+
   useEffect(() => {
     if (isDismissed && !forceVisible) return;
 
-    if (forceVisible) {
-      setIsVisible(true);
-      return;
-    }
+    if (forceVisible) return;
 
     const currentHour = new Date().getHours();
     const isOffHours =

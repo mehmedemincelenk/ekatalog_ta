@@ -332,7 +332,7 @@ export default function AddProductModal({
                       newValues[idx] = e.target.value;
                       handleFormInputChange({
                         target: { name: 'productDescription', value: newValues.join('\n') }
-                      } as any);
+                      } as unknown as React.ChangeEvent<HTMLInputElement>);
                     }}
                     placeholder={item.placeholder}
                     className={`${theme.inputField} pt-4 pb-2 flex-1`}

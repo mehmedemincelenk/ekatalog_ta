@@ -1,7 +1,6 @@
 import { useState, memo } from 'react';
 import { THEME, REFERENCES } from '../data/config';
 import { useSettings } from '../hooks/useSettingsHub';
-import { reorderArray } from '../utils/core';
 import Button from './Button';
 import PlusPlaceholder from './PlusPlaceholder';
 import QuickEditModal from './QuickEditModal';
@@ -151,7 +150,7 @@ export default function References({
         </div>
 
         <div className={referencesTheme.grid}>
-          {activeReferences.map((ref, index) => (
+          {activeReferences.map((ref) => (
             <ReferenceCard
               key={ref.id}
               refData={ref}
@@ -189,8 +188,6 @@ export default function References({
         isOpen={!!activeQuickEdit}
         onClose={() => setActiveQuickEdit(null)}
         onSave={handleSaveEdit}
-        title={activeQuickEdit?.isNew ? 'YENİ REFERANS EKLE' : 'REFERANS DÜZENLE'}
-        subtitle={activeQuickEdit?.isNew ? 'İş ortağınızın veya referansınızın adını girin.' : 'Referans adını buradan güncelleyebilirsiniz.'}
         initialValue={activeQuickEdit?.name || ''}
         placeholder="Referans adı..."
       />

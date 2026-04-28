@@ -42,7 +42,7 @@ export default function GlobalAddMenuModal({
           <Button
             key={option.id}
             onClick={() => {
-              onAction(option.id as any);
+              onAction(option.id);
               onClose();
             }}
             variant="primary"

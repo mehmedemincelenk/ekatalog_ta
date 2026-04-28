@@ -21,9 +21,8 @@ const SearchFilter = memo(
     sortedList = [],
     stats = {},
     renameCategory,
-    onCategoryOrderChange,
     onAddCategory,
-  }: SearchFilterProps) => {
+  }: Omit<SearchFilterProps, 'onCategoryOrderChange'>) => {
     const {
       isAdmin,
       settings,
@@ -198,8 +197,6 @@ const SearchFilter = memo(
           onSave={(name) => {
             if (name.trim()) onAddCategory?.(name.trim());
           }}
-          title={LABELS.filter.newCategoryPrompt.toUpperCase()}
-          subtitle="Kategorinin adı müşterileriniz tarafından görülecektir."
           placeholder="Kategori adı..."
           initialValue=""
         />

@@ -2,7 +2,6 @@
 // DEPENDS ON: THEME, Product Types, Admin Sub-menus, Animation Logic
 // CONSUMED BY: ProductGrid.tsx
 import { useRef, useState, useEffect, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import Loading from './Loading';
 import Badge from './Badge';
 import { LABELS, THEME } from '../data/config';
@@ -41,7 +40,6 @@ const ProductCard = memo(
     displayCurrency = 'TRY',
     exchangeRates,
   }: ProductCardProps) => {
-    const { } = useStore();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const cardContainerRef = useRef<HTMLElement>(null);
 
@@ -392,8 +390,6 @@ const ProductCard = memo(
               );
             }
           }}
-          title={quickEdit?.title || ''}
-          subtitle={`Ürünün ${quickEdit?.title.toLowerCase()} bilgisini buradan güncelleyebilirsiniz.`}
           initialValue={quickEdit?.value || ''}
           placeholder={`${quickEdit?.title} girin...`}
           type={quickEdit?.field === 'price' ? 'text' : 'text'}

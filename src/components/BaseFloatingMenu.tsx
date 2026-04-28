@@ -19,7 +19,7 @@ export interface FloatingAction {
   label: string;
   primary?: boolean;
   className?: string;
-  variant?: string;
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'success' | 'glass' | 'whatsapp' | 'kraft';
 }
 
 interface BaseFloatingMenuProps {
@@ -79,92 +79,15 @@ export default function BaseFloatingMenu({
     };
   }, [isExpanded, autoCloseDelay, clearTimer]);
 
-  return (    <div ref={containerRef} className="z-[100]">
-      <div className={`${menuTheme.container} w-[104px] flex flex-col items-center justify-end shadow-[0_10px_40px_rgba(0,0,0,0.15)] rounded-xl sm:rounded-lg bg-white/50 backdrop-blur-2xl border border-white/50 p-1.5 sm:p-1`}>
-        {/* ACTION CLUSTER */}
-        <AnimatePresence>
-          {isExpanded && (
-            <motion.div
-              initial="closed"
-              animate="open"
-              exit="closed"
-              variants={{
-                open: {
-                  height: 'auto',
-                  opacity: 1,
-                  marginBottom: 5,
-                  transition: { height: { type: 'spring', stiffness: 300, damping: 30 }, staggerChildren: 0.05, delayChildren: 0.1 }
-                },
-                closed: {
-                  height: 0,
-                  opacity: 0,
-                  marginBottom: 0,
-                  transition: { height: { type: 'spring', stiffness: 300, damping: 35 }, staggerChildren: 0.03, staggerDirection: -1 }
-                }
-              }}
-              className="flex flex-col gap-2 sm:gap-1 items-center w-full"
-              style={{ transformOrigin: 'bottom' }}
-            >
-              {/* LABELED ACTIONS (Full Width) */}
-              <div className="flex flex-col gap-2 sm:gap-1 items-center w-full">
-                {actions.filter(a => a.label).map((btn) => (
-                  <motion.div
-                    key={btn.id}
-                    variants={{
-                      open: { opacity: 1, y: 0, scale: 1 },
-                      closed: { opacity: 0, y: 15, scale: 0.5 }
-                    }}
-                    className="w-[92px]"
-                  >
-                    <Button
-                      onClick={() => handleAction(btn.action)}
-                      icon={btn.icon}
-                      variant={(btn.variant as any) || (btn.primary ? 'primary' : 'secondary')}
-                      size="sm"
-                      mode="rectangle"
-                      className={`shrink-0 shadow-md rounded-xl sm:rounded-lg ${btn.className || ''} w-full !justify-start px-2 gap-2 h-[42px]`}
-                      aria-label={btn.label}
-                    >
-                      <div className="flex-1 min-w-0 overflow-hidden">
-                        <MarqueeText
-                          text={btn.label}
-                          textClass="text-[8px] font-black uppercase tracking-tighter"
-                          isAdmin={false}
-                        />
-                      </div>
-                    </Button>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* ICON-ONLY ACTIONS (2x2 Grid) */}
-              <div className="grid grid-cols-2 gap-2 sm:gap-1 justify-items-center w-full max-w-[92px]">
-                {actions.filter(a => !a.label).map((btn) => (
-                  <motion.div
-                    key={btn.id}
-                    variants={{
-                      open: { opacity: 1, y: 0, scale: 1 },
-                      closed: { opacity: 0, y: 15, scale: 0.5 }
-                    }}
-                    className="w-[42px]"
-                  >
-                    <Button
-                      onClick={() => handleAction(btn.action)}
-                      icon={btn.icon}
-                      variant={(btn.variant as any) || (btn.primary ? 'primary' : 'secondary')}
-                      size="sm"
-                      mode="circle"
-                      className={`shrink-0 shadow-md rounded-full sm:rounded-lg ${btn.className || ''} w-[42px] h-[42px] !p-0`}
-                    />
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* MASTER TOGGLE */}
-        <div className="flex items-center justify-center w-full">
+  return (
+    <div ref={containerRef} className="z-[100]">
+      <motion.div 
+        layout
+        className={`${menuTheme.container} w-[104px] flex flex-col-reverse items-center shadow-[0_10px_40px_rgba(0,0,0,0.15)] bg-white/50 backdrop-blur-2xl border border-white/50 p-1 sm:p-1 rounded-2xl sm:rounded-lg overflow-hidden`}
+        transition={{ layout: { type: 'spring', stiffness: 500, damping: 40 } }}
+      >
+        {/* MASTER TOGGLE (Pinned at bottom of container) */}
+        <div className="w-full">
           <Button
             onClick={() => {
               clearTimer();
@@ -173,7 +96,7 @@ export default function BaseFloatingMenu({
             variant={isPrimaryToggle && !isExpanded ? 'secondary' : 'primary'}
             size="sm"
             mode="rectangle"
-            className={`${isExpanded ? '!bg-white !text-stone-900 border-2 border-stone-100' : '!bg-stone-900 !text-white'} hover:scale-105 active:scale-95 transition-all h-11 sm:h-8 w-[92px] shadow-lg rounded-xl sm:rounded-lg relative overflow-hidden`}
+            className={`${isExpanded ? '!bg-white !text-stone-900 border-2 border-stone-100' : '!bg-stone-900 !text-white'} hover:scale-105 active:scale-95 transition-all h-11 sm:h-8 w-full shadow-none rounded-lg relative overflow-hidden`}
             aria-label={isExpanded ? 'Menüyü Kapat' : 'Menüyü Aç'}
           >
             <div className="flex flex-row items-center justify-center gap-1.5 w-full h-full">
@@ -186,7 +109,90 @@ export default function BaseFloatingMenu({
             </div>
           </Button>
         </div>
-      </div>
+
+        {/* ACTION CLUSTER (Above toggle, no gap) */}
+        <AnimatePresence mode="popLayout">
+          {isExpanded && (
+            <motion.div
+              key="action-cluster"
+              layout
+              initial={{ height: 0, opacity: 0, marginBottom: 0 }}
+              animate={{ height: 'auto', opacity: 1, marginBottom: 8 }}
+              exit={{ height: 0, opacity: 0, marginBottom: 0 }}
+              transition={{ 
+                height: { type: 'spring', stiffness: 500, damping: 40 },
+                opacity: { duration: 0.15 }
+              }}
+              className="w-full flex flex-col items-center overflow-hidden"
+            >
+              <motion.div
+                initial="closed"
+                animate="open"
+                exit="closed"
+                variants={{
+                  open: { transition: { staggerChildren: 0.04, delayChildren: 0.05 } },
+                  closed: { transition: { staggerChildren: 0.02, staggerDirection: -1 } }
+                }}
+                className="flex flex-col gap-2 sm:gap-1 items-center w-full py-1"
+              >
+                {/* LABELED ACTIONS */}
+                <div className="flex flex-col gap-2 sm:gap-1 items-center w-full px-1">
+                  {actions.filter(a => a.label).map((btn) => (
+                    <motion.div
+                      key={btn.id}
+                      variants={{
+                        open: { opacity: 1, y: 0, scale: 1 },
+                        closed: { opacity: 0, y: 10, scale: 0.8 }
+                      }}
+                      className="w-full"
+                    >
+                      <Button
+                        onClick={() => handleAction(btn.action)}
+                        icon={btn.icon}
+                        variant={btn.variant || (btn.primary ? 'primary' : 'secondary')}
+                        size="sm"
+                        mode="rectangle"
+                        className={`shrink-0 shadow-md rounded-xl sm:rounded-lg ${btn.className || ''} w-full !justify-start px-2 gap-2 h-[42px]`}
+                      >
+                        <div className="flex-1 min-w-0 overflow-hidden">
+                          <MarqueeText
+                            text={btn.label}
+                            textClass="text-[8px] font-black uppercase tracking-tighter"
+                            isAdmin={false}
+                          />
+                        </div>
+                      </Button>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* ICON ACTIONS */}
+                <div className="grid grid-cols-2 gap-2 sm:gap-1 justify-items-center w-full px-1">
+                  {actions.filter(a => !a.label).map((btn) => (
+                    <motion.div
+                      key={btn.id}
+                      variants={{
+                        open: { opacity: 1, y: 0, scale: 1 },
+                        closed: { opacity: 0, y: 10, scale: 0.8 }
+                      }}
+                      className="w-full flex justify-center"
+                    >
+                      <Button
+                        onClick={() => handleAction(btn.action)}
+                        icon={btn.icon}
+                        variant={btn.variant || (btn.primary ? 'primary' : 'secondary')}
+                        size="sm"
+                        mode="circle"
+                        className={`shrink-0 shadow-md rounded-full sm:rounded-lg ${btn.className || ''} w-[42px] h-[42px] !p-0`}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }

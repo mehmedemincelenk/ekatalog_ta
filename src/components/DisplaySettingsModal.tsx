@@ -129,36 +129,37 @@ export default function DisplaySettingsModal({
       }
     });
 
-    // Workspace Step Sync
-    useEffect(() => {
+    const [prevInitialStep, setPrevInitialStep] = useState(initialStep);
+    if (initialStep !== prevInitialStep) {
+      setPrevInitialStep(initialStep);
       if (initialStep !== undefined) {
-        if (initialStep === 1) {
-          setHelpId(null);
-        } else if (initialStep === 2) {
-          setHelpId(null);
-        } else if (initialStep === 3) {
-          setHelpId('inline');
-        } else if (initialStep === 4) {
-          setHelpId('maintenance');
-        }
+        if (initialStep === 1) setHelpId(null);
+        else if (initialStep === 2) setHelpId(null);
+        else if (initialStep === 3) setHelpId('inline');
+        else if (initialStep === 4) setHelpId('maintenance');
       }
-    }, [initialStep]);
-
-    if (!settings) return null;
+    }
 
     // OPTIMISTIC UI: Local state to handle instant toggles
-    const [localConfig, setLocalConfig] = useState(settings.displayConfig || {});
-    const [localAnnouncement, setLocalAnnouncement] = useState(settings.announcementBar?.enabled || false);
-    const [localMaintenance, setLocalMaintenance] = useState(settings.maintenanceMode?.enabled || false);
+    const [localConfig, setLocalConfig] = useState(settings?.displayConfig || {});
+    const [localAnnouncement, setLocalAnnouncement] = useState(settings?.announcementBar?.enabled || false);
+    const [localMaintenance, setLocalMaintenance] = useState(settings?.maintenanceMode?.enabled || false);
     const [localInline, setLocalInline] = useState(isInlineEnabled);
 
     // Sync local state when props update (server response)
-    useEffect(() => {
-      setLocalConfig(settings.displayConfig || {});
-      setLocalAnnouncement(settings.announcementBar?.enabled || false);
-      setLocalMaintenance(settings.maintenanceMode?.enabled || false);
+    const [prevSettings, setPrevSettings] = useState(settings);
+    const [prevIsInline, setPrevIsInline] = useState(isInlineEnabled);
+
+    if (settings !== prevSettings || isInlineEnabled !== prevIsInline) {
+      setPrevSettings(settings);
+      setPrevIsInline(isInlineEnabled);
+      setLocalConfig(settings?.displayConfig || {});
+      setLocalAnnouncement(settings?.announcementBar?.enabled || false);
+      setLocalMaintenance(settings?.maintenanceMode?.enabled || false);
       setLocalInline(isInlineEnabled);
-    }, [settings, isInlineEnabled]);
+    }
+
+    if (!settings) return null;
 
     const toggleOption = async (key: string) => {
       const newVal = !localConfig[key as keyof DisplayConfig];

@@ -160,7 +160,7 @@ export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
 
   // TOUCH/DRIPE LOGIC: Unified swipe handler
   // GESTURE ENGINE: Drag logic that updates index
-  const handleDragEnd = (_: any, info: PanInfo) => {
+  const handleDragEnd = (_: unknown, info: PanInfo) => {
     if (isAdminModeActive || slides.length <= 1) return;
     
     const swipeDistance = info.offset.x;

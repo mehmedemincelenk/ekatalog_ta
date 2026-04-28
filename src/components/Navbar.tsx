@@ -1,7 +1,7 @@
 // FILE ROLE: Global Navigation & Brand Header
 // DEPENDS ON: THEME, CompanySettings, Image Utilities, Contact Helpers
 // CONSUMED BY: App.tsx
-import { memo, useState, useEffect } from 'react';
+import { memo, useState, useEffect, useRef } from 'react';
 import { THEME, DEFAULT_COMPANY } from '../data/config';
 import { CompanySettings } from '../types';
 import { compressVisualToDataUri } from '../utils/image';
@@ -61,17 +61,19 @@ const Navbar = memo(
       return sessionStorage.getItem('ekatalog_banner_dismissed') === 'true';
     });
 
+    const logoPressStartTimeRef = useRef<number>(0);
+
     if (!settings) return null;
 
     const handlePressStart = () => {
       setIsLogoPressed(true);
-      (window as any)._logoPressStart = Date.now();
+      logoPressStartTimeRef.current = Date.now();
       onLogoPointerDown();
     };
 
     const handlePressEnd = () => {
       setIsLogoPressed(false);
-      const holdDuration = Date.now() - (window as any)._logoPressStart;
+      const holdDuration = Date.now() - logoPressStartTimeRef.current;
       onLogoPointerUp();
       
       // Short click in Admin Mode -> Trigger Upload
@@ -422,8 +424,6 @@ const Navbar = memo(
           isOpen={!!quickEdit}
           onClose={() => setQuickEdit(null)}
           onSave={handleQuickSave}
-          title={(quickEdit?.title || '') + ' Düzenle'}
-          subtitle={`Dükkanınızdaki ${quickEdit?.title.toLowerCase()} bilgisini buradan güncelleyebilirsiniz.`}
           initialValue={quickEdit?.value || ''}
           placeholder={`${quickEdit?.title} girin...`}
         />
