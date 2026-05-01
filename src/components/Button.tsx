@@ -28,6 +28,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   showFingerprint?: boolean;
   fingerprintType?: 'standard' | 'detailed' | 'touch' | 'action';
   fingerprintRotation?: number;
+  as?: any;
 }
 
 /**
@@ -52,6 +53,7 @@ const Button: React.FC<ButtonProps> = ({
   showFingerprint,
   fingerprintType = 'standard',
   fingerprintRotation,
+  as: Component = 'button',
   ...props
 }) => {
   const isCard = !!description || selected !== undefined;
@@ -100,7 +102,7 @@ const Button: React.FC<ButtonProps> = ({
   ` : '';
 
   return (
-    <button
+    <Component
       className={`
         ${baseStyles} 
         ${variants[variant]} 
@@ -191,7 +193,7 @@ const Button: React.FC<ButtonProps> = ({
           </svg>
         </div>
       )}
-    </button>
+    </Component>
   );
 };
 

@@ -11,7 +11,6 @@ interface NumpadProps {
 
 export default function Numpad({ 
   onSubmit, 
-  title = 'Sizi Arayalım',
   maxDigits = 10,
   variant = 'light'
 }: NumpadProps) {

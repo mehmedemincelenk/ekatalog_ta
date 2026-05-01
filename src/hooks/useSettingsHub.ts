@@ -122,7 +122,7 @@ export function useSettings(isAdmin: boolean) {
     isError,
     addVisitorLead: async (phone: string) => {
       if (!settings?.id) return;
-      const currentLeads = settings.visitor_leads || [];
+      const currentLeads = Array.isArray(settings.visitor_leads) ? settings.visitor_leads : [];
       const newLead = { phone, created_at: new Date().toISOString() };
       
       const { error } = await supabase

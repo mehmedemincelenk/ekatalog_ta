@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback, ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from './Button';
 import { MarqueeText } from './MarqueeText';
-import { X, Menu } from 'lucide-react';
+import { X, LayoutGrid } from 'lucide-react';
 import { THEME } from '../data/config';
 
 /**
@@ -20,6 +20,7 @@ export interface FloatingAction {
   primary?: boolean;
   className?: string;
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'success' | 'glass' | 'whatsapp' | 'kraft';
+  closeOnClick?: boolean; // Diamond logic: Some actions (like currency) shouldn't close the menu
 }
 
 interface BaseFloatingMenuProps {
@@ -34,15 +35,13 @@ interface BaseFloatingMenuProps {
 export default function BaseFloatingMenu({
   actions,
   autoCloseDelay = 5000,
-  mainIcon = <Menu className="w-full h-full p-0.5" strokeWidth={2.5} />,
+  mainIcon = <LayoutGrid className="w-full h-full p-0.5" strokeWidth={2.5} />,
   activeMainIcon = <X className="w-full h-full p-0.5" strokeWidth={2.5} />,
-  isPrimaryToggle = true,
   labelText = 'MENÜ',
 }: BaseFloatingMenuProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const menuTheme = THEME.floatingAdminMenu;
 
   const clearTimer = useCallback(() => {
     if (timerRef.current) {
@@ -51,10 +50,17 @@ export default function BaseFloatingMenu({
     }
   }, []);
 
-  const handleAction = (callback: () => void) => {
+  const handleAction = (btn: FloatingAction) => {
     clearTimer();
-    callback();
-    setIsExpanded(false);
+    btn.action();
+    
+    // Diamond Standard: Persistent actions (like currency) stay open for UX flow
+    if (btn.closeOnClick !== false) {
+      setIsExpanded(false);
+    } else {
+      // Refresh the auto-close timer for persistent actions
+      timerRef.current = setTimeout(() => setIsExpanded(false), autoCloseDelay);
+    }
   };
 
   useEffect(() => {
@@ -80,49 +86,19 @@ export default function BaseFloatingMenu({
   }, [isExpanded, autoCloseDelay, clearTimer]);
 
   return (
-    <div ref={containerRef} className="z-[100]">
-      <motion.div 
-        layout
-        className={menuTheme.container}
-        transition={{ layout: { type: 'spring', stiffness: 500, damping: 40 } }}
+    <div ref={containerRef} className="z-[100] origin-bottom-right" style={{ transform: 'scale(0.8)' }}>
+      <div 
+        className={`flex flex-col items-center p-1 bg-white/70 backdrop-blur-3xl border border-white/40 shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-xl transition-all duration-200 ease-in-out overflow-hidden w-[125px]`}
       >
-        {/* MASTER TOGGLE (Pinned at bottom of container) */}
-        <div className="w-full">
-          <Button
-            onClick={() => {
-              clearTimer();
-              setIsExpanded((prev) => !prev);
-            }}
-            variant={isPrimaryToggle && !isExpanded ? 'secondary' : 'primary'}
-            size="sm"
-            mode="rectangle"
-            className={`${isExpanded ? '!bg-white !text-stone-900 border-2 border-stone-100' : '!bg-stone-900 !text-white'} hover:scale-105 active:scale-95 transition-all h-11 sm:h-8 w-full shadow-none rounded-lg relative overflow-hidden`}
-            aria-label={isExpanded ? 'Menüyü Kapat' : 'Menüyü Aç'}
-          >
-            <div className="flex flex-row items-center justify-center gap-1.5 w-full h-full">
-              <div className="w-4 h-4 flex items-center justify-center shrink-0">
-                {isExpanded ? activeMainIcon : mainIcon}
-              </div>
-              <span className="text-[10px] font-black uppercase tracking-widest leading-none">
-                {labelText}
-              </span>
-            </div>
-          </Button>
-        </div>
-
         {/* ACTION CLUSTER (Above toggle, no gap) */}
-        <AnimatePresence mode="popLayout">
+        <AnimatePresence>
           {isExpanded && (
             <motion.div
               key="action-cluster"
-              layout
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ 
-                height: { duration: 0.25, ease: "easeOut" },
-                opacity: { duration: 0.15 }
-              }}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
               className="w-full flex flex-col items-center overflow-hidden"
             >
               <motion.div
@@ -133,10 +109,10 @@ export default function BaseFloatingMenu({
                   open: { transition: { staggerChildren: 0.04, delayChildren: 0.05 } },
                   closed: { transition: { staggerChildren: 0.02, staggerDirection: -1 } }
                 }}
-                className="flex flex-col gap-2 sm:gap-1 items-center w-full py-1"
+                className="flex flex-col gap-1.5 items-center w-full py-1.5 px-0.5"
               >
                 {/* LABELED ACTIONS */}
-                <div className="flex flex-col gap-2 sm:gap-1 items-center w-full px-1">
+                <div className="flex flex-col gap-1.5 items-center w-full">
                   {actions.filter(a => a.label).map((btn) => (
                     <motion.div
                       key={btn.id}
@@ -147,17 +123,17 @@ export default function BaseFloatingMenu({
                       className="w-full"
                     >
                       <Button
-                        onClick={() => handleAction(btn.action)}
+                        onClick={() => handleAction(btn)}
                         icon={btn.icon}
-                        variant={btn.variant || (btn.primary ? 'primary' : 'secondary')}
+                        variant={btn.variant || 'secondary'}
                         size="sm"
                         mode="rectangle"
-                        className={`shrink-0 shadow-md rounded-xl sm:rounded-lg ${btn.className || ''} w-full !justify-start px-2 gap-2 h-[42px]`}
+                        className={`shrink-0 shadow-sm rounded-lg ${btn.className || ''} w-full !justify-start px-3 gap-3 h-[42px] !bg-stone-50/80 !border-stone-100 hover:!bg-white hover:shadow-md transition-all`}
                       >
                         <div className="flex-1 min-w-0 overflow-hidden">
                           <MarqueeText
                             text={btn.label}
-                            textClass="text-[8px] font-black uppercase tracking-tighter"
+                            textClass="text-[9px] font-black uppercase tracking-tighter text-stone-900"
                             isAdmin={false}
                           />
                         </div>
@@ -166,8 +142,8 @@ export default function BaseFloatingMenu({
                   ))}
                 </div>
 
-                {/* ICON ACTIONS */}
-                <div className="grid grid-cols-2 gap-2 sm:gap-1 justify-items-center w-full px-1">
+                {/* ICON ACTIONS GRID */}
+                <div className="grid grid-cols-2 gap-1.5 justify-items-center w-full px-0.5">
                   {actions.filter(a => !a.label).map((btn) => (
                     <motion.div
                       key={btn.id}
@@ -175,15 +151,19 @@ export default function BaseFloatingMenu({
                         open: { opacity: 1, y: 0, scale: 1 },
                         closed: { opacity: 0, y: 10, scale: 0.8 }
                       }}
-                      className="w-full flex justify-center"
+                      className="w-full"
                     >
                       <Button
-                        onClick={() => handleAction(btn.action)}
+                        onClick={() => handleAction(btn)}
                         icon={btn.icon}
-                        variant={btn.variant || (btn.primary ? 'primary' : 'secondary')}
+                        variant={btn.variant || 'secondary'}
                         size="sm"
-                        mode="circle"
-                        className={`shrink-0 shadow-md rounded-full sm:rounded-lg ${btn.className || ''} w-[42px] h-[42px] !p-0`}
+                        mode="rectangle"
+                        className={`shrink-0 shadow-sm rounded-lg ${btn.className || ''} w-full h-[46px] !p-0 transition-all ${
+                          !btn.variant || btn.variant === 'secondary' 
+                            ? '!bg-stone-50/80 !border-stone-100 hover:!bg-white hover:shadow-md' 
+                            : 'hover:scale-[1.05] hover:shadow-lg'
+                        }`}
                       />
                     </motion.div>
                   ))}
@@ -192,7 +172,34 @@ export default function BaseFloatingMenu({
             </motion.div>
           )}
         </AnimatePresence>
-      </motion.div>
+
+        {/* MASTER TOGGLE */}
+        <div className="w-full p-0.5">
+          <Button
+            onClick={() => {
+              clearTimer();
+              setIsExpanded((prev) => !prev);
+            }}
+            variant="secondary"
+            size="sm"
+            mode="rectangle"
+            className={`
+              ${isExpanded ? '!bg-white !text-stone-900 border-stone-100' : '!bg-stone-900 !text-white border-transparent'} 
+              hover:scale-[1.02] active:scale-95 transition-all h-10 w-full shadow-lg rounded-lg relative overflow-hidden
+            `}
+            aria-label={isExpanded ? 'Menüyü Kapat' : 'Menüyü Aç'}
+          >
+            <div className="flex flex-row items-center justify-center gap-2.5 w-full h-full px-1">
+              <span className="text-[11px] font-black uppercase tracking-[0.2em] leading-none">
+                {labelText}
+              </span>
+              <div className="w-4 h-4 flex items-center justify-center shrink-0">
+                {isExpanded ? activeMainIcon : mainIcon}
+              </div>
+            </div>
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

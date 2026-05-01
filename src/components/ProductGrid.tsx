@@ -52,7 +52,6 @@ const ProductGrid = memo(
 
     const showPrice = settings.displayConfig.showPrice ?? true;
     const exchangeRates = settings.exchangeRates;
-    const socialProofCards = settings.socialProofCards;
     const displayCurrency = isAdmin ? settings.activeCurrency : visitorCurrency;
 
     const visibleCategories = displayCategories.slice(0, visibleCategoryLimit);
@@ -90,7 +89,7 @@ const ProductGrid = memo(
               />
 
               {categoryProducts.length > 0 || isAdmin ? (
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-x-3 gap-y-6 sm:gap-x-6 sm:gap-y-10">
+                <div className="grid grid-cols-2 gap-x-3 gap-y-6">
                   {isAdmin && (
                     <PlusPlaceholder
                       type="PRODUCT"
@@ -159,6 +158,7 @@ const ProductGrid = memo(
               size="md"
               mode="rectangle"
               className="group !py-4 !px-8 border shadow-sm hover:shadow-md transition-all active:scale-95"
+              showFingerprint
             >
               <span className="text-[10px] font-black tracking-[0.3em] text-stone-900 uppercase">
                 DAHA FAZLA ÜRÜN GÖSTER

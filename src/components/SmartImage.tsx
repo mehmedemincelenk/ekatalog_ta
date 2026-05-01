@@ -22,10 +22,11 @@ export default function SmartImage({
   aspectRatio = 'square',
   objectFit = 'cover',
   fallbackIcon,
+  fallbackSrc,
   priority = false,
 }: SmartImageProps) {
   const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>(
-    'loading',
+    src ? 'loading' : 'error',
   );
   const resolvedSrc = resolveVisualAssetUrl(src);
 
@@ -88,16 +89,24 @@ export default function SmartImage({
       {/* ERROR / FALLBACK STATE */}
       {status === 'error' && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-stone-50 text-stone-300 p-4">
-          {fallbackIcon || (
-            <div className="w-8 h-8 opacity-20 mb-2">
-              {THEME.icons.search} {/* Fallback icon from theme */}
-            </div>
+          {fallbackSrc ? (
+            <img
+              src={resolveVisualAssetUrl(fallbackSrc) || ''}
+              alt="Logo Fallback"
+              className="max-w-[50%] max-h-[50%] object-contain opacity-20 grayscale pointer-events-none"
+            />
+          ) : fallbackIcon || (
+            <>
+              <div className="w-8 h-8 opacity-20 mb-2">
+                {THEME.icons.search}
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-widest opacity-30 text-center leading-tight">
+                Görsel
+                <br />
+                Bulunamadı
+              </span>
+            </>
           )}
-          <span className="text-[10px] font-bold uppercase tracking-widest opacity-30 text-center leading-tight">
-            Görsel
-            <br />
-            Bulunamadı
-          </span>
         </div>
       )}
     </div>

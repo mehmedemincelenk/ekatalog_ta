@@ -235,6 +235,7 @@ export default function AddProductModal({
         {currentStep === 1 && (
           <div className="flex flex-col gap-3 py-2 fade-in">
             <input
+              id="product-image-input"
               ref={fileInputRef}
               type="file"
               accept="image/*"
@@ -242,32 +243,37 @@ export default function AddProductModal({
               onChange={handleImageFileSelection}
             />
 
-            <Button
-              onClick={() => fileInputRef.current?.click()}
-              variant="secondary"
-              mode="rectangle"
-              className="w-full !h-16 !justify-start !px-8"
-              showFingerprint={true}
-              fingerprintType="detailed"
-              icon={<Lucide.ImageIcon size={24} className="text-stone-400" />}
-            >
-              <span className="text-[13px] font-black tracking-widest text-stone-900">GALERİ</span>
-            </Button>
+            <label htmlFor="product-image-input" className="cursor-pointer">
+              <Button
+                as="div"
+                variant="secondary"
+                mode="rectangle"
+                className="w-full !h-16 !justify-start !px-8"
+                showFingerprint={true}
+                fingerprintType="detailed"
+                icon={<Lucide.ImageIcon size={24} className="text-stone-400" />}
+              >
+                <span className="text-[13px] font-black tracking-widest text-stone-900">GALERİ</span>
+              </Button>
+            </label>
 
-            <Button
-              onClick={() => {
-                fileInputRef.current?.setAttribute('capture', 'environment');
-                fileInputRef.current?.click();
-              }}
-              variant="secondary"
-              mode="rectangle"
-              className="w-full !h-16 !justify-start !px-8"
-              showFingerprint={true}
-              fingerprintType="detailed"
-              icon={<Lucide.Camera size={24} className="text-stone-400" />}
+            <label 
+              htmlFor="product-image-input" 
+              className="cursor-pointer"
+              onClick={() => fileInputRef.current?.setAttribute('capture', 'environment')}
             >
-              <span className="text-[13px] font-black tracking-widest text-stone-900">KAMERA</span>
-            </Button>
+              <Button
+                as="div"
+                variant="secondary"
+                mode="rectangle"
+                className="w-full !h-16 !justify-start !px-8"
+                showFingerprint={true}
+                fingerprintType="detailed"
+                icon={<Lucide.Camera size={24} className="text-stone-400" />}
+              >
+                <span className="text-[13px] font-black tracking-widest text-stone-900">KAMERA</span>
+              </Button>
+            </label>
 
             <Button
               onClick={() => setCurrentStep(2)} 
@@ -311,38 +317,56 @@ export default function AddProductModal({
           </div>
         )}
 
-        {/* STEP 3: DETAILS (Multi-Input) */}
+        {/* STEP 3: DETAILS (Dynamic Multi-Input) */}
         {currentStep === 3 && (
-          <div className={`${theme.wizard.stepContent} relative`}>
-            {[
-              { label: '1.', placeholder: 'Örn: 20X20' },
-              { label: '2.', placeholder: 'Örn: Kırmızı, Beyaz, Mavi' },
-              { label: '3.', placeholder: 'Örn: 100ad.' }
-            ].map((item, idx) => {
+          <div className={`${theme.wizard.stepContent} relative space-y-4`}>
+            {(() => {
               const currentValues = formState.productDescription.split('\n');
+              const displayValues = currentValues.length < 3 ? [...currentValues, ...Array(3 - currentValues.length).fill('')] : currentValues;
+              
               return (
-                <div key={idx} className="flex items-center gap-4">
-                  <span className="text-[14px] font-black text-stone-400 w-4">{item.label}</span>
-                  <input
-                    type="text"
-                    value={currentValues[idx] || ''}
-                    onChange={(e) => {
-                      const newValues = [...currentValues];
-                      while (newValues.length < 3) newValues.push('');
-                      newValues[idx] = e.target.value;
+                <>
+                  <div className="space-y-1 max-h-[280px] overflow-y-auto pr-2 custom-scrollbar">
+                    {displayValues.map((val, idx) => (
+                      <div key={idx} className="flex items-center gap-4 group">
+                        <span className="text-[12px] font-black text-stone-400 w-5 text-right shrink-0">{idx + 1}.</span>
+                        <input
+                          type="text"
+                          value={val}
+                          onChange={(e) => {
+                            const newValues = [...displayValues];
+                            newValues[idx] = e.target.value;
+                            handleFormInputChange({
+                              target: { name: 'productDescription', value: newValues.join('\n') }
+                            } as unknown as React.ChangeEvent<HTMLInputElement>);
+                          }}
+                          placeholder={idx === 0 ? 'Örn: 20X20' : idx === 1 ? 'Örn: Kırmızı, Beyaz' : 'Örn: 100ad.'}
+                          className={`w-full bg-transparent border-b border-stone-100 py-4 text-[14px] font-bold text-stone-900 placeholder:text-stone-300 focus:border-stone-900 outline-none transition-colors`}
+                          autoFocus={idx === displayValues.length - 1 && idx > 2}
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* ADD NEW DETAIL BUTTON */}
+                  <Button
+                    onClick={() => {
+                      const newValues = [...displayValues, ''];
                       handleFormInputChange({
                         target: { name: 'productDescription', value: newValues.join('\n') }
                       } as unknown as React.ChangeEvent<HTMLInputElement>);
                     }}
-                    placeholder={item.placeholder}
-                    className={`${theme.inputField} pt-4 pb-2 flex-1`}
-                    autoFocus={idx === 0}
-                  />
-                </div>
+                    variant="ghost"
+                    className="!h-10 !w-full !justify-start !px-9 !-ml-1 opacity-50 hover:opacity-100"
+                    icon={<Lucide.Plus size={14} strokeWidth={3} />}
+                  >
+                    <span className="text-[10px] font-black tracking-widest uppercase">YENİ DETAY EKLE</span>
+                  </Button>
+                </>
               );
-            })}
+            })()}
 
-            <div className="flex gap-2 mt-2">
+            <div className="flex gap-2 mt-4">
               <Button onClick={prevStep} variant="secondary" mode="rectangle" className="w-20 h-16 shrink-0 shadow-sm" showFingerprint={false}>
                 <Lucide.ChevronLeft size={24} strokeWidth={3} />
               </Button>
@@ -396,7 +420,7 @@ export default function AddProductModal({
         {/* STEP 5: PRICE */}
         {currentStep === 5 && (
           <div className={`${theme.wizard.stepContent} relative flex flex-col items-center`}>
-            <div className="flex flex-col gap-6 w-full items-center">
+            <div className="flex flex-col gap-6 w-full max-w-[340px] items-center">
               <input
                 type="text"
                 inputMode="decimal"
@@ -404,7 +428,7 @@ export default function AddProductModal({
                 onChange={handleFormInputChange}
                 name="productPrice"
                 placeholder="0.00"
-                className={`${theme.inputField} text-2xl font-black py-6 text-center w-full`}
+                className={`${theme.inputField} !text-5xl font-black py-8 text-center w-full bg-transparent border-none`}
                 autoFocus
               />
               <div className="bg-stone-100 p-1 rounded-[var(--radius-button)] flex w-fit mx-auto relative overflow-hidden gap-1">
@@ -534,6 +558,7 @@ export default function AddProductModal({
       <StatusOverlay 
         status={submissionStatus} 
         message="" 
+        mode="contained"
       />
     </BaseModal>
   );

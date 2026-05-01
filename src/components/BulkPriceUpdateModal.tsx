@@ -45,11 +45,11 @@ const DeskItemRow = memo(
           opacity: state.included ? 1 : 0.6, 
           filter: state.included ? 'grayscale(0%) opacity(1)' : 'grayscale(100%) opacity(0.7)'
         }}
-        className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 p-3.5 sm:p-3 rounded-[28px] sm:rounded-[24px] border transition-all duration-500 ${state.included ? 'bg-white border-stone-100 shadow-sm' : 'bg-stone-50/30 border-transparent'}`}
+        className={`flex flex-col items-stretch gap-3 p-3.5 rounded-[28px] border transition-all duration-500 ${state.included ? 'bg-white border-stone-100 shadow-sm' : 'bg-stone-50/30 border-transparent'}`}
       >
         {/* ROW 1: PRODUCT INFO */}
-        <div className="flex items-center gap-3 sm:gap-4 flex-1">
-          <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl overflow-hidden bg-stone-100 border border-stone-100 shrink-0">
+        <div className="flex items-center gap-3 flex-1">
+          <div className="w-10 h-10 rounded-xl overflow-hidden bg-stone-100 border border-stone-100 shrink-0">
             {product.image_url ? (
               <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
             ) : (
@@ -60,11 +60,11 @@ const DeskItemRow = memo(
           </div>
 
           <div className="flex-1 min-w-0">
-            <p className="text-[11px] sm:text-[13px] font-black text-stone-900 truncate uppercase tracking-tighter leading-none">
+            <p className="text-[11px] font-black text-stone-900 truncate uppercase tracking-tighter leading-none">
               {product.name}
             </p>
             {product.description && (
-              <p className="text-[9px] sm:text-[11px] font-bold text-stone-400 truncate mt-1">
+              <p className="text-[9px] font-bold text-stone-400 truncate mt-1">
                 {product.description}
               </p>
             )}
@@ -72,13 +72,13 @@ const DeskItemRow = memo(
         </div>
 
         {/* ROW 2: PRICE & TOGGLE */}
-        <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 pt-2.5 sm:pt-0 border-t sm:border-t-0 border-stone-100 sm:border-transparent">
+        <div className="flex items-center justify-between gap-3 pt-2.5 border-t border-stone-100">
           {actionType === 'PRICE' && state.included && (
-            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-              <span className="text-[9px] sm:text-[11px] font-black text-stone-300 line-through">
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-[9px] font-black text-stone-300 line-through">
                 {product.price}
               </span>
-              <span className="text-[11px] sm:text-[14px] font-black text-emerald-600 bg-emerald-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl">
+              <span className="text-[11px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">
                 {newPriceValue.toLocaleString('tr-TR')} ₺
               </span>
             </div>
@@ -523,8 +523,8 @@ export default function BulkPriceUpdateModal({
 
         {/* STEP 3: ACTION DESK */}
         {currentStep === 3 && (
-          <div className="space-y-4 sm:space-y-6 fade-in">
-            <div className="max-h-[45vh] sm:max-h-[50vh] overflow-y-auto pr-1 space-y-5 sm:space-y-8 custom-scrollbar">
+          <div className="space-y-4 fade-in">
+            <div className="max-h-[45vh] overflow-y-auto pr-1 space-y-5 custom-scrollbar">
               {categories
                 .filter(cat => initialProductsForDesk.some(p => p.category === cat))
                 .map((cat) => (

@@ -70,7 +70,7 @@ export default function OffHoursNotice({
           initial={{ y: 50, opacity: 0, scale: 0.9 }}
           animate={{ y: 0, opacity: 1, scale: 1 }}
           exit={{ y: 50, opacity: 0, scale: 0.9 }}
-          className="fixed bottom-4 right-[116px] sm:right-[170px] z-[100] w-[calc(100%-132px)] sm:w-[360px]"
+          className="fixed bottom-4 right-[116px] z-[100] w-[calc(100%-132px)]"
         >
           <div className="relative overflow-hidden bg-stone-900/95 backdrop-blur-2xl border border-stone-800 shadow-[0_30px_70px_rgba(0,0,0,0.4)] rounded-[2rem] p-6">
             <Button

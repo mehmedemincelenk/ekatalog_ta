@@ -1,16 +1,6 @@
-import { Product } from '../types';
+import { ProductDetailModalProps } from '../types';
 import BaseModal from './BaseModal';
-
-interface ProductDetailModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  product: Product;
-  isPromotionActive: boolean;
-  originalPriceLabel: string;
-  discountedPriceLabel: string | null;
-  highDefinitionImageSource: string | null;
-  isStatic?: boolean;
-}
+import SmartImage from './SmartImage';
 
 /**
  * PRODUCT DETAIL MODAL (Diamond Standard)
@@ -35,32 +25,33 @@ export default function ProductDetailModal({
       maxWidth="max-w-lg"
       className="!p-0"
       hideCloseButton={false}
+      noPadding={true}
       isStatic={isStatic}
     >
-      <div className="flex flex-col relative bg-white">
-        {highDefinitionImageSource && (
-          <div className="relative aspect-[4/3] bg-stone-50 overflow-hidden">
-            <img
-              src={highDefinitionImageSource}
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
+      <div className="flex flex-col relative bg-white p-4">
+        {/* IMAGE SECTION - SQUARE & PADDED */}
+        <div className="relative aspect-square bg-stone-50 overflow-hidden rounded-[2rem] border border-stone-100 shadow-inner">
+          <SmartImage
+            src={highDefinitionImageSource}
+            alt={product.name}
+            aspectRatio="square"
+            className="w-full h-full"
+          />
+        </div>
 
-        {/* PRODUCT INFO & ACTIONS - LEFT ALIGNED */}
-        <div className="p-8 pb-20 space-y-6">
-          <div className="space-y-2 text-left">
-            <div className="mb-3">
-              <span className="bg-stone-100 text-stone-500 px-3 py-1.5 rounded-full text-[0.625rem] font-black uppercase tracking-widest inline-block border border-stone-200">
+        {/* PRODUCT INFO - STRICT LEFT ALIGN */}
+        <div className="pt-8 pb-24 px-4 space-y-5">
+          <div className="space-y-3 text-left">
+            <div>
+              <span className="bg-stone-50 text-stone-500 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] inline-block border border-stone-100 shadow-sm">
                 {product.category}
               </span>
             </div>
-            <h3 className="text-xl sm:text-2xl font-black text-stone-900 tracking-tighter leading-none">
+            <h3 className="text-2xl font-black text-stone-900 tracking-tighter leading-tight max-w-[80%] uppercase">
               {product.name}
             </h3>
             {product.description && (
-              <p className="text-stone-500 text-xs sm:text-sm font-medium leading-relaxed max-w-full">
+              <p className="text-stone-500 text-xs font-bold leading-relaxed max-w-[90%] uppercase">
                 {product.description}
               </p>
             )}
@@ -68,20 +59,20 @@ export default function ProductDetailModal({
         </div>
 
         {/* PRICE - PINNED TO BOTTOM LEFT */}
-        <div className="absolute bottom-8 left-8 pointer-events-none">
+        <div className="absolute bottom-10 left-8 pointer-events-none">
           <div className="flex flex-col items-start">
             {isPromotionActive ? (
-              <div className="flex items-center gap-3 bg-white/80 backdrop-blur-md p-1 rounded-lg">
+              <div className="flex flex-col items-start gap-1">
                 <span className="text-stone-300 line-through text-sm font-bold">
                   {originalPriceLabel}
                 </span>
-                <span className="text-green-600 text-2xl font-black tracking-tighter">
+                <span className="text-stone-900 text-3xl font-black tracking-tighter">
                   {discountedPriceLabel}
                 </span>
               </div>
             ) : (
-              <div className="bg-white/80 backdrop-blur-md p-1 rounded-lg">
-                <span className="text-stone-900 text-2xl font-black tracking-tighter">
+              <div className="bg-white/50 backdrop-blur-sm">
+                <span className="text-stone-900 text-3xl font-black tracking-tighter">
                   {originalPriceLabel}
                 </span>
               </div>

@@ -110,11 +110,16 @@ export const reorderArray = <T>(
 const EXCHANGE_API_URL = 'https://api.exchangerate-api.com/v4/latest/TRY';
 
 /**
- * fetchCurrentRates: Fetches real-time exchange rates.
+ * fetchCurrentRates: Fetches real-time exchange rates with a safety timeout.
  */
 export async function fetchCurrentRates(): Promise<ExchangeRates | null> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000);
+
   try {
-    const response = await fetch(EXCHANGE_API_URL);
+    const response = await fetch(EXCHANGE_API_URL, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    
     if (!response.ok) throw new Error('Currency API error');
     const data = await response.json();
     return {
@@ -123,6 +128,7 @@ export async function fetchCurrentRates(): Promise<ExchangeRates | null> {
       lastUpdate: data.time_last_updated,
     };
   } catch (error) {
+    clearTimeout(timeoutId);
     console.error('Failed to fetch currency rates:', error);
     return null;
   }

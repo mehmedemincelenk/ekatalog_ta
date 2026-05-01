@@ -92,6 +92,21 @@ export interface DisplayConfig {
 }
 
 /**
+ * ProductDetailModalProps: Ürün detay modalının sahip olması gereken veri yapısı.
+ */
+export interface ProductDetailModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  product: Product;
+  isPromotionActive?: boolean;
+  originalPriceLabel?: string;
+  discountedPriceLabel?: string;
+  highDefinitionImageSource: string;
+  isStatic?: boolean;
+}
+
+
+/**
  * CompanySettings: Mağazanın kimlik, marka ve sistem ayarları.
  */
 export interface CompanySettings {
@@ -143,6 +158,7 @@ export interface SmartImageProps {
   aspectRatio?: 'square' | 'rectangle' | 'none';
   objectFit?: 'cover' | 'contain';
   fallbackIcon?: React.ReactNode;
+  fallbackSrc?: string | null;
   priority?: boolean;
   rounded?: boolean;
 }
@@ -242,6 +258,8 @@ export interface ProductCardProps {
   onOrderChange?: (id: string, newPosition: number) => void;
   onOrderIndexChange?: (id: string, newIndex: number) => void;
   onImageUpload?: (id: string, file: File) => Promise<string | undefined>;
+  orderIndex?: number;
+  itemsInCategory?: number;
   activeDiscount?: ActiveDiscount | null;
   isPriority?: boolean;
   activeAdminProductId?: string | null;
@@ -265,6 +283,9 @@ export interface CategoryFilterChipProps {
   productCount: number;
   onSelect: (categoryName: string) => void;
   onRename: (oldName: string, newName: string) => void;
+  onOrderChange?: (categoryName: string, newPosition: number) => void;
+  orderIndex?: number;
+  totalCategories?: number;
   showFingerprint?: boolean;
 }
 
@@ -273,6 +294,9 @@ export interface CategoryHeaderProps {
   productCount: number;
   isAdmin: boolean;
   onRename: (oldName: string, newName: string) => void;
+  onOrderChange?: (categoryName: string, newPosition: number) => void;
+  currentOrder?: number;
+  totalCategories?: number;
 }
 
 export interface SearchFilterProps {
@@ -289,7 +313,7 @@ export interface ProductGridProps {
   isInlineEnabled: boolean;
   onDelete: (id: string) => void;
   onUpdate: (id: string, changes: Partial<Product>) => void;
-  onOrderUpdate: (id: string, newPosition: number) => void;
+  onOrderUpdate?: (id: string, newPosition: number) => Promise<void>;
   onOrderIndexChange?: (id: string, newIndex: number) => void;
   onImageUpload?: (id: string, file: File) => Promise<string | undefined>;
   visibleCategoryLimit: number;
@@ -437,7 +461,7 @@ export interface PriceListModalProps {
   onClose: () => void;
   products: Product[];
   categories: string[];
-  displayCurrency: 'TRY' | 'USD' | 'EUR';
+  visitorCurrency: 'TRY' | 'USD' | 'EUR';
   exchangeRates?: { usd: number; eur: number };
   activeDiscount?: { rate: number; category?: string } | null;
   storeName: string;
@@ -494,7 +518,7 @@ export interface AppModalsProps {
   applyCode: (code: string) => void;
   activeDiscount: { rate: number; category?: string } | null;
   discountError: string | null;
-  displayCurrency: 'TRY' | 'USD' | 'EUR';
+  visitorCurrency: 'TRY' | 'USD' | 'EUR';
 }
 
 export interface MaintenancePageProps {
@@ -596,6 +620,7 @@ export type ModalType =
   | 'AI_STUDIO_COMPARE'
   | 'LOCATION'
   | 'CONTACT'
+  | 'SOCIAL_EXPORT'
   | null;
 
 export interface StoreState {
@@ -612,8 +637,12 @@ export interface StoreState {
   activeCategories: string[];
   toggleCategory: (category: string) => void;
   clearCategories: () => void;
+  // Currency & Rates
   visitorCurrency: 'TRY' | 'USD' | 'EUR';
   toggleVisitorCurrency: () => void;
+  exchangeRates: { usd: number; eur: number } | null;
+  setExchangeRates: (rates: { usd: number; eur: number }) => void;
+
   activeDiscount: { code: string; rate: number; category?: string } | null;
   setActiveDiscount: (
     discount: { code: string; rate: number; category?: string } | null,

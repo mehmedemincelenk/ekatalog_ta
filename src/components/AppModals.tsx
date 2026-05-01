@@ -12,6 +12,7 @@ import AIStudioCompareModal from './AIStudioCompareModal';
 import LocationModal from './LocationModal';
 import ContactModal from './ContactModal';
 import NotificationsModal from './NotificationsModal';
+import SocialExportModal from './SocialExportModal';
 
 import { useStore } from '../store';
 import { useProducts } from '../hooks/useProductsHub';
@@ -60,9 +61,6 @@ const AppModals = memo(() => {
     toggleInlineEdit
   } = useAdminMode();
 
-  const displayCurrency = isAdmin
-    ? settings?.activeCurrency || 'TRY'
-    : visitorCurrency;
 
   const handleGlobalAddAction = (
     type: 'PRODUCT' | 'CATEGORY' | 'REFERENCE' | 'CAROUSEL',
@@ -172,35 +170,13 @@ const AppModals = memo(() => {
           onClose={closeModal}
           products={allProducts}
           categories={categoryOrder}
-          displayCurrency={displayCurrency}
+          visitorCurrency={visitorCurrency}
           exchangeRates={settings.exchangeRates}
           activeDiscount={activeDiscount}
           storeName={settings.title || 'Katalog'}
         />
       )}
 
-      <AIStudioCompareModal
-        isOpen={activeModal === 'AI_STUDIO_COMPARE'}
-        product={(modalData as { product?: Product })?.product ?? null}
-        onClose={closeModal}
-        onApply={(productId, polishedUrl) => {
-          updateProduct({
-            id: productId,
-            changes: {
-              image_url: polishedUrl,
-              polished_ready_dismissed: true,
-            },
-          });
-          closeModal();
-        }}
-        onDismiss={(productId) => {
-          updateProduct({
-            id: productId,
-            changes: { polished_ready_dismissed: true },
-          });
-          closeModal();
-        }}
-      />
 
       <LocationModal
         isOpen={activeModal === 'LOCATION'}
@@ -213,6 +189,12 @@ const AppModals = memo(() => {
         onClose={closeModal}
         phone={settings?.whatsapp || ''}
         storeName={settings?.title || 'Katalog'}
+      />
+
+      <SocialExportModal
+        isOpen={activeModal === 'SOCIAL_EXPORT'}
+        onClose={closeModal}
+        products={allProducts}
       />
     </>
   );

@@ -253,7 +253,7 @@ export default function DisplaySettingsModal({
             </div>
           }
         >
-          <div className="p-4 sm:p-6 grid grid-cols-2 gap-x-2 gap-y-2 pb-2">
+          <div className="p-4 grid grid-cols-2 gap-x-2 gap-y-2 pb-2">
             {/* ACTIVE SECTION */}
             <div className="col-span-2 px-1 flex items-baseline gap-2 mt-1 mb-1 pl-4 border-l-2 border-stone-900">
               <h5 className="text-[10px] font-black text-stone-900 uppercase tracking-[0.2em]">AÇIK</h5>

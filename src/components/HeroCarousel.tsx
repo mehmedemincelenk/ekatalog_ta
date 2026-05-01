@@ -6,6 +6,8 @@ import { getActiveStoreSlug, reorderArray } from '../utils/core';
 import CarouselSlideUnit from './CarouselSlideUnit';
 import Button from './Button';
 import PlusPlaceholder from './PlusPlaceholder';
+import { useGlobalFeedback } from '../hooks/useGlobalFeedback';
+import * as Lucide from 'lucide-react';
 
 import { HeroCarouselProps, CarouselSlide } from '../types';
 
@@ -16,28 +18,36 @@ const SWIPE_THRESHOLD = 50;
  * HERO CAROUSEL COMPONENT (DIAMOND EDITION)
  * -----------------------------------------------------------
  * Implements a centered 60% hero card flanked by 20% "ghost" previews.
- * Features: Infinite loop, Drag/Swipe support, Resize resilience.
  */
 export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
-  // --- IN-SITU HOOK: CAROUSEL ENGINE ---
+  const { showFeedback } = useGlobalFeedback();
   const [marketingSlides, setMarketingSlides] = useState<CarouselSlide[]>(CAROUSEL.slides);
   const [loading, setLoading] = useState(true);
   const activeStoreSlug = getActiveStoreSlug();
 
   const persistCarouselData = useCallback(async (updatedSlides: CarouselSlide[]) => {
-    if (!isAdminModeActive || activeStoreSlug === 'main-site') return;
+    if (!isAdminModeActive) return;
     try {
-      const { data: storeData } = await supabase.from('stores').select('carousel_data').eq('slug', activeStoreSlug).single();
-      const currentCarouselData = storeData?.carousel_data || {};
       const { error } = await supabase.from('stores').update({
-        carousel_data: { ...currentCarouselData, slides: updatedSlides },
+        carousel_data: { slides: updatedSlides },
       }).eq('slug', activeStoreSlug);
       if (error) throw error;
     } catch (err) { console.error('Carousel sync failed:', err); }
   }, [isAdminModeActive, activeStoreSlug]);
 
+  const reorderSlides = useCallback(async (slideId: number, newPosition: number) => {
+    setMarketingSlides((prev) => {
+      const oldIndex = prev.findIndex((s) => s.id === slideId);
+      if (oldIndex === -1) return prev;
+      const updated = reorderArray(prev, oldIndex, newPosition);
+      persistCarouselData(updated);
+      return updated;
+    });
+    // Slayt geçişini biraz geciktirerek state'in oturmasını sağla
+    setTimeout(() => setCurrentIndex(newPosition), 100);
+  }, [persistCarouselData]);
+
   const synchronizeCarouselSlides = useCallback(async () => {
-    if (activeStoreSlug === 'main-site') { setLoading(false); return; }
     setLoading(true);
     const { data: storeData, error: fetchError } = await supabase.from('stores').select('carousel_data').eq('slug', activeStoreSlug).single();
     if (storeData && !fetchError && storeData.carousel_data?.slides) {
@@ -67,15 +77,12 @@ export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
       const { data: { publicUrl } } = supabase.storage.from(TECH.storage.bucket).getPublicUrl(storagePath);
       const finalizedUrl = `${publicUrl}?t=${Date.now()}`;
       
-      // Only modify existing slide content if it's NOT a new slide creation flow
       if (slideId !== -1) {
         await modifySlideContent(slideId, { src: finalizedUrl });
       }
-      
       return finalizedUrl;
     } catch (err) { console.error('Hero upload failed:', err); throw err; }
   }, [activeStoreSlug, modifySlideContent]);
-
 
   const deleteSlide = useCallback(async (slideId: number) => {
     setMarketingSlides((prev) => {
@@ -85,105 +92,34 @@ export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
     });
   }, [persistCarouselData]);
 
-  const reorderSlides = useCallback(async (slideId: number, newDisplayIndex: number) => {
-    setMarketingSlides((prev) => {
-      const currentIndex = prev.findIndex((s) => s.id === slideId);
-      if (currentIndex === -1) return prev;
-      const targetedIndex = Math.max(0, Math.min(newDisplayIndex - 1, prev.length - 1));
-      if (currentIndex === targetedIndex) return prev;
-      const updated = reorderArray(prev, currentIndex, targetedIndex);
-      persistCarouselData(updated);
-      return updated;
-    });
-  }, [persistCarouselData]);
-
-  const slides = marketingSlides;
-
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isAssetUploading, setIsAssetUploading] = useState(false);
-  const [activeEditingSlideId, setActiveEditingSlideId] = useState<
-    number | null
-  >(null);
-  const [isMobile, setIsMobile] = useState(
-    typeof window !== 'undefined' ? window.innerWidth < 640 : false,
-  );
-
-  const fileUploadInputRef = useRef<HTMLInputElement>(null);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [activeEditingSlideId, setActiveEditingSlideId] = useState<number | null>(null);
+  
   const carouselTheme = THEME.heroCarousel;
   const globalIcons = THEME.icons;
 
-  // RESIZE RESILIENCE: Track screen size changes to adapt layout
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 640);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-
-
   const handleNext = useCallback(() => {
-    if (slides.length <= 1) return;
+    if (marketingSlides.length <= 1) return;
     setIsTransitioning(true);
-    setCurrentIndex((prev) => (prev + 1) % slides.length);
-  }, [slides.length]);
+    setCurrentIndex((prev) => (prev + 1) % marketingSlides.length);
+  }, [marketingSlides.length]);
 
   const handlePrev = useCallback(() => {
-    if (slides.length <= 1) return;
+    if (marketingSlides.length <= 1) return;
     setIsTransitioning(true);
-    setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
-  }, [slides.length]);
-
+    setCurrentIndex((prev) => (prev - 1 + marketingSlides.length) % marketingSlides.length);
+  }, [marketingSlides.length]);
 
   useEffect(() => {
-    if (isAdminModeActive || isAssetUploading || slides.length <= 1) return;
+    if (isAdminModeActive || isAssetUploading || marketingSlides.length <= 1) return;
     const scrollTimer = setInterval(handleNext, INTERVAL_MS);
     return () => clearInterval(scrollTimer);
-  }, [handleNext, isAdminModeActive, isAssetUploading, slides.length, currentIndex]);
+  }, [handleNext, isAdminModeActive, isAssetUploading, marketingSlides.length]);
 
-  const handleAddSlideTrigger = useCallback(async () => {
-    setActiveEditingSlideId(-1); // Special ID for new slide
-    fileUploadInputRef.current?.click();
-  }, []);
-
-  // GLOBAL SIGNAL LISTENER: Clean way to trigger slide addition from App.tsx
-  useEffect(() => {
-    if (!isAdminModeActive) return;
-    const handleGlobalTrigger = () => handleAddSlideTrigger();
-    window.addEventListener('ekatalog:add-carousel-slide', handleGlobalTrigger);
-    return () =>
-      window.removeEventListener(
-        'ekatalog:add-carousel-slide',
-        handleGlobalTrigger,
-      );
-  }, [isAdminModeActive, handleAddSlideTrigger]);
-
-  // TOUCH/DRIPE LOGIC: Unified swipe handler
-  // GESTURE ENGINE: Drag logic that updates index
-  const handleDragEnd = (_: unknown, info: PanInfo) => {
-    if (isAdminModeActive || slides.length <= 1) return;
-    
-    const swipeDistance = info.offset.x;
-    const swipeVelocity = info.velocity.x;
-
-    if (swipeDistance < -SWIPE_THRESHOLD || swipeVelocity < -500) {
-      handleNext();
-    } else if (swipeDistance > SWIPE_THRESHOLD || swipeVelocity > 500) {
-      handlePrev();
-    } else {
-      setIsTransitioning(true);
-      setCurrentIndex((prev) => prev); 
-    }
-  };
-
-  const triggerImageUpdate = useCallback((id: number) => {
-    setActiveEditingSlideId(id);
-    fileUploadInputRef.current?.click();
-  }, []);
-
-  const handleFileUploadAction = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleFileUploadAction = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || activeEditingSlideId === null) return;
     
@@ -191,179 +127,133 @@ export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
       setIsAssetUploading(true);
       
       if (activeEditingSlideId === -1) {
-        // FLOW: NEW SLIDE
-        // 1. Upload first
-        const uploadedUrl = await uploadHeroImage(-1, file); // Temp ID for upload
+        const uploadedUrl = await uploadHeroImage(-1, file);
         
-        // 2. If upload succeeded (didn't throw), create and persist the slide in ONE shot
-        setMarketingSlides(prev => {
-          const nextId = prev.length > 0 ? Math.max(...prev.map((s) => s.id)) + 1 : 1;
-          const newFullSlide: CarouselSlide = { 
-            id: nextId, 
-            src: uploadedUrl, 
-            bg: 'bg-stone-200', 
-            label: 'Yeni Başlık', 
-            sub: 'Açıklama metni buraya gelecek.' 
-          };
-          const updated = [...prev, newFullSlide];
-          persistCarouselData(updated);
-          return updated;
+        setMarketingSlides((prev) => {
+          const currentRealSlides = (prev || []).filter(s => s && s.src && s.src !== '');
+          const nextId = currentRealSlides.length > 0 ? Math.max(...currentRealSlides.map((s) => s.id)) + 1 : 1;
+          const newSlide: CarouselSlide = { id: nextId, src: uploadedUrl, bg: 'bg-stone-200', label: 'Yeni Afiş', sub: 'Düzenlemek için tıklayın.' };
+          const updatedSlides = [...currentRealSlides, newSlide];
+          persistCarouselData(updatedSlides);
+          
+          // Anında yeni slayta odaklan
+          setTimeout(() => setCurrentIndex(updatedSlides.length - 1), 50);
+          
+          return updatedSlides;
         });
-
-        // 3. Move to the end (new slide)
-        setCurrentIndex(slides.length);
       } else {
-        // FLOW: Update existing slide
         await uploadHeroImage(activeEditingSlideId, file);
       }
+      setUploadSuccess(true);
+      setTimeout(() => setUploadSuccess(false), 1500);
     } catch (err) {
-      console.error('Image deployment error:', err);
+      console.error('Hero upload error:', err);
+      showFeedback('İşlem başarısız oldu.', 'danger');
     } finally {
       setIsAssetUploading(false);
       setActiveEditingSlideId(null);
-      // Reset input
-      event.target.value = '';
+      if (event.target) event.target.value = '';
     }
   };
 
-  if (loading) {
+  const handleDragEnd = (_: unknown, info: PanInfo) => {
+    if (isAdminModeActive || marketingSlides.length <= 1) return;
+    if (info.offset.x < -SWIPE_THRESHOLD) handleNext();
+    else if (info.offset.x > SWIPE_THRESHOLD) handlePrev();
+  };
+
+  if (loading) return (
+    <div className={`${carouselTheme.container} animate-pulse`}>
+      <div className={`${carouselTheme.layout} bg-stone-100 flex items-center justify-center`}><div className={carouselTheme.slide.loadingSpinner} /></div>
+    </div>
+  );
+
+  if (marketingSlides.length === 0 && isAdminModeActive) {
     return (
-      <div className={`${carouselTheme.container} animate-pulse`}>
-        <div
-          className={`${carouselTheme.layout} bg-stone-100 flex items-center justify-center`}
-        >
-          <div className={carouselTheme.slide.loadingSpinner} />
-        </div>
+      <div className="px-6 py-10 fade-in relative">
+        <PlusPlaceholder type="CAROUSEL" />
+        <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" accept="image/*" 
+          onChange={(e) => { setActiveEditingSlideId(-1); handleFileUploadAction(e); }} />
       </div>
     );
   }
 
-  if (slides.length === 0 && isAdminModeActive) {
-    return (
-      <div className={carouselTheme.container}>
-        <PlusPlaceholder type="CAROUSEL" onClick={handleAddSlideTrigger} />
-      </div>
-    );
-  }
-
-  if (slides.length === 0) return null;
+  if (marketingSlides.length === 0) return null;
 
   return (
     <div className={carouselTheme.container}>
       <div className={carouselTheme.layout}>
-        {/* STAGED FILMSTRIP: Rasyonele Kesintisiz Kademeli Odak */}
+        {/* LOCALIZED LOADING & SUCCESS OVERLAY */}
+        {(isAssetUploading || uploadSuccess) && (
+          <div className={`${carouselTheme.slide.overlay} absolute inset-0 z-[70] flex flex-col items-center justify-center bg-white/40 backdrop-blur-sm animate-in fade-in duration-500`}>
+            {isAssetUploading ? (
+              <div className={`${carouselTheme.slide.loadingSpinner}`}></div>
+            ) : (
+              <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg animate-in zoom-in duration-300">
+                <Lucide.Check size={28} className="text-white" strokeWidth={3} />
+              </div>
+            )}
+          </div>
+        )}
         <motion.div
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.2}
           onDragEnd={handleDragEnd}
           className="flex w-full h-full touch-pan-y"
+          animate={{ x: `-${currentIndex * 100}%` }}
+          transition={isTransitioning ? { duration: 0.7, ease: [0.22, 1, 0.36, 1] } : { duration: 0 }}
           onAnimationComplete={() => setIsTransitioning(false)}
-          animate={{
-            x: isMobile 
-              ? `-${currentIndex * 100}%` 
-              : `${20 - (currentIndex * 60)}%`,
-          }}
-          transition={
-            isTransitioning
-              ? { duration: 0.7, ease: [0.22, 1, 0.36, 1] }
-              : { duration: 0 }
-          }
         >
-          {slides.map((slideItem, index) => {
-            const isVisible = index === currentIndex;
-
-            return (
-              <div
-                key={index}
-                className={`relative w-full sm:w-[60%] h-full shrink-0 ${isMobile ? 'px-0' : 'px-2'}`}
-              >
-                <CarouselSlideUnit
-                  slideData={slideItem}
-                  isCurrentlyActive={isVisible}
-                  isAdmin={isAdminModeActive}
-                  isCurrentlyUploading={isAssetUploading}
-                  isMobileView={isMobile}
-                  editingTargetSlideId={activeEditingSlideId}
-                  onImageUpdateTrigger={triggerImageUpdate}
-                  onDeleteTrigger={deleteSlide}
-                />
-              </div>
-            );
-          })}
+          {marketingSlides.map((slideItem, index) => (
+            <div key={index} className="relative w-full h-full shrink-0">
+              <CarouselSlideUnit
+                slideData={slideItem}
+                isCurrentlyActive={index === currentIndex}
+                isAdmin={isAdminModeActive}
+                isCurrentlyUploading={isAssetUploading}
+                currentIndex={index}
+                totalSlides={marketingSlides.length}
+                onOrderChange={(newPos) => reorderSlides(slideItem.id, newPos)}
+                onImageUpdateTrigger={(id) => setActiveEditingSlideId(id)}
+                onUpload={handleFileUploadAction}
+                onDeleteTrigger={deleteSlide}
+              />
+            </div>
+          ))}
         </motion.div>
 
-        {/* NAVIGATION: Panoramic Guard */}
-        {slides.length > 1 && (
-          <>
-            <div
-              className={`${carouselTheme.navigation.navBtnStyle} ${carouselTheme.navigation.prevPos} absolute top-1/2 -translate-y-1/2 z-50`}
-            >
-              <Button
-                onClick={handlePrev}
-                variant="glass"
-                mode="circle"
-                className="w-8 h-8 sm:w-14 sm:h-14 !p-0 flex items-center justify-center"
-                icon={<div className="w-3 h-3 sm:w-6 sm:h-6">{globalIcons.chevronLeft}</div>}
-              />
-            </div>
-            <div
-              className={`${carouselTheme.navigation.navBtnStyle} ${carouselTheme.navigation.nextPos} absolute top-1/2 -translate-y-1/2 z-50`}
-            >
-              <Button
-                onClick={handleNext}
-                variant="glass"
-                mode="circle"
-                className="w-8 h-8 sm:w-14 sm:h-14 !p-0 flex items-center justify-center"
-                icon={<div className="w-3 h-3 sm:w-6 sm:h-6">{globalIcons.chevronRight}</div>}
-              />
-            </div>
-          </>
-        )}
-
-        {/* PAGINATION: Circular Insight */}
-        {slides.length > 1 && (
+        {marketingSlides.length > 1 && (
           <div className={carouselTheme.navigation.dotsWrapper}>
-            {slides.map((_, dotIndex) => {
-              const isActive = currentIndex === dotIndex;
-              return (
-                <div
-                  key={dotIndex}
-                  onClick={() => {
-                    setIsTransitioning(true);
-                    setCurrentIndex(dotIndex);
-                  }}
-                  className={`
-                    ${carouselTheme.navigation.dotBase} 
-                    ${isActive ? carouselTheme.navigation.dotActive : carouselTheme.navigation.dotInactive}
-                  `}
-                />
-              );
-            })}
+            {marketingSlides.map((_, dotIndex) => (
+              <div key={dotIndex} onClick={() => { setIsTransitioning(true); setCurrentIndex(dotIndex); }}
+                className={`${carouselTheme.navigation.dotBase} ${currentIndex === dotIndex ? carouselTheme.navigation.dotActive : carouselTheme.navigation.dotInactive}`} />
+            ))}
           </div>
         )}
 
-        {/* GLOBAL ADD BUTTON (Admin Only) */}
+        {/* ADMIN: TOP-CENTER ADD BUTTON */}
         {isAdminModeActive && (
-          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-[60]">
-            <Button
-              onClick={handleAddSlideTrigger}
-              variant="glass"
-              mode="circle"
-              className="w-11 h-11 sm:w-12 sm:h-12 !bg-stone-900/80 !backdrop-blur-md border-2 border-white/10 shadow-none"
-              icon={<div className="w-5 h-5 sm:w-5 sm:h-5 text-white">{globalIcons.plus}</div>}
-              title="YENİ AFİŞ EKLE"
-            />
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[100]">
+            <div className="relative group/add">
+              <Button 
+                variant="glass" 
+                mode="circle" 
+                className="!w-10 !h-10 shadow-2xl border border-white/40 !bg-white/60 backdrop-blur-xl"
+                icon={<Lucide.Plus size={20} strokeWidth={3} className="text-stone-900" />}
+              />
+              <input 
+                type="file" 
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+                accept="image/*"
+                disabled={isAssetUploading}
+                onChange={(e) => { 
+                  setActiveEditingSlideId(-1); 
+                  handleFileUploadAction(e); 
+                }} 
+              />
+            </div>
           </div>
         )}
-
-        <input
-          type="file"
-          ref={fileUploadInputRef}
-          className="hidden"
-          accept="image/*"
-          onChange={handleFileUploadAction}
-        />
       </div>
     </div>
   );

@@ -58,7 +58,7 @@ export default function BaseModal({
   const content = (
     <AnimatePresence>
       {isOpen && (
-        <div className={isStatic ? "relative z-0" : `fixed inset-0 z-[200] flex ${position === 'bottom-right' ? 'items-end justify-end p-4 sm:p-8' : 'items-center justify-center p-4 sm:p-6'} print:p-0 print:block print:relative print:z-auto`}>
+        <div className={isStatic ? "relative z-0" : `fixed inset-0 z-[200] flex ${position === 'bottom-right' ? 'items-end justify-end p-4' : 'items-center justify-center p-4'} print:p-0 print:block print:relative print:z-auto`}>
           {/* BACKDROP */}
           {!isStatic && (
             <motion.div
@@ -78,9 +78,9 @@ export default function BaseModal({
             exit={isStatic ? undefined : { opacity: 0, scale: 0.95, y: 10 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={`
-              relative w-full ${maxWidth} 
-              rounded-[2rem] shadow-[0_20px_60px_rgba(0,0,0,0.15)] 
-              flex flex-col max-h-[90vh] 
+              relative w-full max-w-[460px] mx-auto
+              rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.3)] 
+              flex flex-col max-h-[85vh] 
               print:max-h-none print:shadow-none print:border-none print:w-full print:max-w-full print:rounded-none
               ${className}
             `}
@@ -108,7 +108,7 @@ export default function BaseModal({
 
             {/* CLOSE BUTTON (Diamond Corner Position - Outside Overflow) */}
             {!hideCloseButton && (
-              <div className="absolute -top-2 -right-2 z-[70] shrink-0 print:hidden">
+              <div className="absolute -top-4 -right-4 z-[70] shrink-0 print:hidden">
                 <Button
                   onClick={onClose}
                   variant="secondary"
@@ -174,7 +174,7 @@ export default function BaseModal({
                       </h3>
                     )}
                     {subtitle && (
-                      <p className="text-[10px] sm:text-[15px] font-bold text-stone-400 mt-2">
+                      <p className="text-[10px] font-bold text-stone-400 mt-2">
                         {subtitle}
                       </p>
                     )}
@@ -189,7 +189,7 @@ export default function BaseModal({
 
               {/* FOOTER ACTIONS */}
               {footer && (
-                <div className="p-4 sm:p-6 border-t border-stone-100 bg-stone-50/50 print:hidden shrink-0 mt-auto">
+                <div className="p-4 border-t border-stone-100 bg-stone-50/50 print:hidden shrink-0 mt-auto">
                   {footer}
                 </div>
               )}
@@ -200,5 +200,6 @@ export default function BaseModal({
     </AnimatePresence>
   );
 
-  return isStatic ? content : createPortal(content, document.body);
+  const portalTarget = (typeof document !== 'undefined' && document.getElementById('mobile-viewport')) || document.body;
+  return isStatic ? content : createPortal(content, portalTarget);
 }

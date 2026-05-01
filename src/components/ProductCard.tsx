@@ -2,6 +2,7 @@
 // DEPENDS ON: THEME, Product Types, Admin Sub-menus, Animation Logic
 // CONSUMED BY: ProductGrid.tsx
 import { useRef, useState, useEffect, memo } from 'react';
+import { motion } from 'framer-motion';
 import Loading from './Loading';
 import Badge from './Badge';
 import { LABELS, THEME } from '../data/config';
@@ -14,7 +15,7 @@ import {
 } from '../utils/core';
 import SmartImage from './SmartImage';
 import { MarqueeText } from './MarqueeText';
-import AIStudioTextModal from './AIStudioTextModal';
+
 import QuickEditModal from './QuickEditModal';
 import ProductDetailModal from './ProductDetailModal';
 import { useStore } from '../store';
@@ -26,6 +27,7 @@ import { useStore } from '../store';
  */
 
 import { ProductCardProps } from '../types';
+import * as Lucide from 'lucide-react';
 
 const ProductCard = memo(
   ({
@@ -37,14 +39,18 @@ const ProductCard = memo(
     onImageUpload,
     activeDiscount,
     setActiveAdminProductId,
-    displayCurrency = 'TRY',
-    exchangeRates,
+    orderIndex,
+    onOrderIndexChange,
+    itemsInCategory = 1,
   }: ProductCardProps) => {
+    const { settings, visitorCurrency, exchangeRates } = useStore();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const cardContainerRef = useRef<HTMLElement>(null);
 
+    const [isUpdatingOrder, setIsUpdatingOrder] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
     const [isUploadingImage, setIsUploadingImage] = useState(false);
-    const [isTextModalOpen, setIsTextModalOpen] = useState(false);
+
     const [optimisticImagePreview, setOptimisticImagePreview] = useState<
       string | null
     >(null);
@@ -62,19 +68,7 @@ const ProductCard = memo(
     const theme = THEME.productCard;
     const adminLabels = LABELS.adminActions;
 
-    const handleConfirmTextSuggestion = (newName: string, newDesc: string) => {
-      onUpdate(product.id, {
-        name: newName,
-        description: newDesc,
-        text_polished_dismissed: true,
-      });
-      setIsTextModalOpen(false);
-    };
 
-    const handleDismissTextSuggestion = () => {
-      onUpdate(product.id, { text_polished_dismissed: true });
-      setIsTextModalOpen(false);
-    };
 
     // Apple-style scroll to close behavior
     useEffect(() => {
@@ -150,32 +144,40 @@ const ProductCard = memo(
 
     const originalPriceLabel = formatNumberToCurrency(
       baseMathematicalPrice,
-      displayCurrency,
-      exchangeRates,
+      visitorCurrency,
+      exchangeRates ?? undefined,
     );
 
     const discountedPriceLabel =
       isPromotionActive && baseMathematicalPrice > 0
         ? formatNumberToCurrency(
             baseMathematicalPrice * (1 - activeDiscount.rate),
-            displayCurrency,
-            exchangeRates,
+            visitorCurrency,
+            exchangeRates ?? undefined,
           )
         : null;
 
     const primaryImageSource =
       optimisticImagePreview ||
-      (product.image_url ? resolveVisualAssetUrl(product.image_url) : null);
+      (product.image_url ? resolveVisualAssetUrl(product.image_url) : settings?.logoUrl);
     const highDefinitionImageSource = product.image_url
       ? resolveVisualAssetUrl(
           product.image_url.replace('/lq/', '/hq/').split('?')[0],
         )
-      : null;
+      : settings?.logoUrl;
 
     return (
       <>
-        <article
+        <motion.article
           ref={cardContainerRef}
+          layout
+          layoutId={product.id}
+          transition={{
+            type: "spring",
+            stiffness: 400,
+            damping: 40,
+            opacity: { duration: 0.2 }
+          }}
           data-product-id={product.id}
           className={`${theme.container} ${THEME.radius.card} h-fit flex-shrink-0 overflow-hidden ${product.out_of_stock ? theme.outOfStockBorder : theme.activeBorder} ${theme.shadow}`}
         >
@@ -196,6 +198,7 @@ const ProductCard = memo(
             <SmartImage
               src={primaryImageSource}
               alt={product.name}
+              fallbackSrc={settings?.logoUrl}
               aspectRatio="square"
               objectFit={
                 theme.image.fit === 'object-cover' ? 'cover' : 'contain'
@@ -307,7 +310,7 @@ const ProductCard = memo(
                   {isPromotionActive && !isAdmin ? (
                     <>
                       <span
-                        className={`${theme.typography.price} text-stone-400 line-through text-[0.625rem] sm:text-[0.6875rem]`}
+                        className={`${theme.typography.price} text-stone-400 line-through text-[0.625rem]`}
                       >
                         {originalPriceLabel}
                       </span>
@@ -353,7 +356,49 @@ const ProductCard = memo(
               <Badge variant="primary" size="md" className="-translate-y-4 shadow-2xl">📦</Badge>
             )}
           </div>
-        </article>
+
+          {/* ABSOLUTE ORDER INDICATOR - BOTTOM RIGHT ALIGNED WITH PRICE */}
+          {isAdmin && orderIndex !== undefined && (
+            <div 
+              className={theme.orderSelect.container}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className={theme.orderSelect.wrapper}>
+                <select
+                  value={orderIndex}
+                  disabled={isUpdatingOrder}
+                  onChange={async (e) => {
+                    e.stopPropagation();
+                    const newPos = Number(e.target.value);
+                    setIsUpdatingOrder(true);
+                    try {
+                      await onOrderIndexChange?.(product.id, newPos);
+                      setIsUpdatingOrder(false);
+                      setShowSuccess(true);
+                      setTimeout(() => setShowSuccess(false), 1500);
+                    } catch {
+                      setIsUpdatingOrder(false);
+                    }
+                  }}
+                  className={`${theme.orderSelect.select} ${isUpdatingOrder || showSuccess ? 'opacity-0' : 'opacity-100'}`}
+                >
+                  {Array.from({ length: itemsInCategory }).map((_, i) => (
+                    <option key={i + 1} value={i + 1}>{i + 1}.</option>
+                  ))}
+                </select>
+                {isUpdatingOrder ? (
+                  <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : showSuccess ? (
+                  <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex items-center justify-center">
+                    <Lucide.Check size={12} className="text-emerald-500" strokeWidth={4} />
+                  </motion.div>
+                ) : (
+                  <span className="text-white text-[11px] font-black pointer-events-none">{orderIndex}.</span>
+                )}
+              </div>
+            </div>
+          )}
+        </motion.article>
 
         <ProductDetailModal
           isOpen={isZoomDetailOpen}
@@ -361,21 +406,11 @@ const ProductCard = memo(
           product={product}
           isPromotionActive={isPromotionActive || false}
           originalPriceLabel={originalPriceLabel}
-          discountedPriceLabel={discountedPriceLabel}
-          highDefinitionImageSource={highDefinitionImageSource}
+          discountedPriceLabel={discountedPriceLabel || ''}
+          highDefinitionImageSource={highDefinitionImageSource || ''}
         />
 
-        <AIStudioTextModal
-          isOpen={isTextModalOpen}
-          onClose={() => setIsTextModalOpen(false)}
-          product={product}
-          suggestedName={product.suggested_name || ''}
-          suggestedDescription={product.suggested_description || ''}
-          onConfirm={handleConfirmTextSuggestion}
-          onDismiss={handleDismissTextSuggestion}
-          displayCurrency={displayCurrency}
-          exchangeRates={exchangeRates}
-        />
+
 
         <QuickEditModal
           isOpen={!!quickEdit}
@@ -399,4 +434,5 @@ const ProductCard = memo(
   },
 );
 
+ProductCard.displayName = 'ProductCard';
 export default ProductCard;

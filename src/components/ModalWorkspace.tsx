@@ -155,9 +155,9 @@ export default function ModalWorkspace() {
               <h2 className="text-2xl font-black text-stone-900 uppercase tracking-tighter">Diamond Atomic System</h2>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+            <div className="grid grid-cols-1 gap-16">
               {/* BUTTONS */}
-              <div className="space-y-12 p-8 bg-stone-50 rounded-[2.5rem] border border-stone-100 lg:col-span-2">
+              <div className="space-y-12 p-8 bg-stone-50 rounded-[2.5rem] border border-stone-100">
                 <div>
                   <h3 className="text-sm font-black text-stone-400 uppercase tracking-widest mb-6 border-b border-stone-200 pb-2">Master Atomic Variants</h3>
                   <div className="flex flex-wrap gap-4">
@@ -179,7 +179,7 @@ export default function ModalWorkspace() {
 
                 <div>
                   <h3 className="text-sm font-black text-stone-400 uppercase tracking-widest mb-6 border-b border-stone-200 pb-2">Exhaustive System Audit (Tüm Butonlar)</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12">
+                  <div className="grid grid-cols-1 gap-12">
                     
                     {/* CATEGORY: NAVIGATION & BRAND */}
                     <div className="space-y-4">
@@ -366,9 +366,9 @@ export default function ModalWorkspace() {
               </div>
 
               {/* INTERACTIVE ATOMS */}
-              <div className="space-y-8 p-8 bg-stone-50 rounded-[2.5rem] border border-stone-100 lg:col-span-2">
+              <div className="space-y-8 p-8 bg-stone-50 rounded-[2.5rem] border border-stone-100">
                 <h3 className="text-sm font-black text-stone-400 uppercase tracking-widest mb-4">Interactive Atoms</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div className="grid grid-cols-1 gap-12">
                    <div className="flex flex-col items-center gap-4 bg-white p-8 rounded-[2rem] border border-stone-200 shadow-sm">
                       <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest">Numpad Console</span>
                       <Numpad onSubmit={() => {}} title="Test Numpad" />
@@ -382,7 +382,7 @@ export default function ModalWorkspace() {
                          <StatusToggle label="Bakım Modu" value={false} onChange={() => {}} />
                       </div>
                    </div>
-                   <div className="flex flex-col items-center justify-center gap-8 bg-white p-8 rounded-[2rem] border border-stone-200 shadow-sm lg:col-span-2">
+                   <div className="flex flex-col items-center justify-center gap-8 bg-white p-8 rounded-[2rem] border border-stone-200 shadow-sm">
                       <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest">Diamond Status Overlay (Feedback)</span>
                       <div className="flex flex-wrap gap-4">
                          <Button onClick={() => { setTestStatus('success'); setTimeout(() => setTestStatus('idle'), 2000); }} variant="success">Test Success</Button>
@@ -445,7 +445,7 @@ export default function ModalWorkspace() {
               {/* PRODUCT CARDS */}
               <div className="space-y-6">
                  <h3 className="text-sm font-black text-stone-400 uppercase tracking-widest pl-2">Product Card Variations</h3>
-                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                 <div className="grid grid-cols-1 gap-8">
                     <div className="p-4 bg-stone-50 rounded-[2.5rem] border border-stone-100 flex flex-col items-center gap-4">
                        <span className="text-[9px] font-black text-stone-400 uppercase tracking-widest">Normal View</span>
                        <ProductCard 
@@ -529,7 +529,7 @@ export default function ModalWorkspace() {
                   <div className={`relative transition-all duration-500 border-4 border-stone-100 rounded-[3rem] shadow-2xl bg-white overflow-hidden ${viewMode === 'mobile' ? 'w-[375px] h-[667px]' : 'w-[1000px] h-[600px]'}`}>
                     <DocUnit title={item.title} />
                     <div className={`w-full h-full relative overflow-auto ${item.id === 'maintenance' ? '' : 'p-10'} flex items-center justify-center bg-stone-50/50`}>
-                      <div className={`transform-gpu ${item.id === 'maintenance' ? 'scale-[0.5] sm:scale-[0.8] origin-top h-full w-full' : ''}`} style={!item.isSpecial ? { transform: `scale(${item.scale})` } : {}}>
+                      <div className={`transform-gpu ${item.id === 'maintenance' ? 'scale-[0.5] origin-top h-full w-full' : ''}`} style={!item.isSpecial ? { transform: `scale(${item.scale})` } : {}}>
                         {item.component}
                       </div>
                     </div>

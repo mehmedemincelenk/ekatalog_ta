@@ -64,6 +64,9 @@ export const useStore = create<StoreState>((set) => ({
       return { visitorCurrency: next };
     }),
 
+  exchangeRates: null,
+  setExchangeRates: (rates: { usd: number; eur: number }) => set({ exchangeRates: rates }),
+
   // Promosyonlar
   activeDiscount: null,
   setActiveDiscount: (discount: { code: string; rate: number; category?: string } | null) =>

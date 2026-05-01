@@ -61,7 +61,7 @@ export default function LandingPage() {
         className="sticky top-0 z-[100] text-white py-3 px-4 text-center shadow-lg overflow-hidden"
         style={{ backgroundColor: THEME.colors.marketing.primary }}
       >
-        <p className="text-[10px] md:text-[12px] font-medium uppercase tracking-[0.1em] md:tracking-[0.2em] whitespace-nowrap opacity-90 flex items-center justify-center">
+        <p className="text-[10px] font-medium uppercase tracking-[0.1em] whitespace-nowrap opacity-90 flex items-center justify-center">
           domain <span className="font-black opacity-100 ml-1">hediye!</span>{' '}
           <span className="mx-2 opacity-50">→</span>
           <span className="font-black bg-black/10 px-2 py-0.5 rounded normal-case opacity-100 inline-flex items-center">
@@ -86,19 +86,19 @@ export default function LandingPage() {
 
       <section className="pt-12 pb-20 px-4 text-center">
         <div className="max-w-4xl mx-auto space-y-4">
-          <h1 className="text-5xl md:text-7xl font-black text-stone-900 tracking-tighter leading-[0.85] animate-in slide-in-from-bottom-8 duration-700">
+          <h1 className="text-5xl font-black text-stone-900 tracking-tighter leading-[0.85] animate-in slide-in-from-bottom-8 duration-700">
             sade. basit.
             <br />
             ekatalog.
           </h1>
 
-          <p className="max-w-2xl mx-auto text-base md:text-lg text-stone-500 font-medium leading-relaxed">
+          <p className="max-w-2xl mx-auto text-base text-stone-500 font-medium leading-relaxed">
             Fiyatlar zamlandığında kataloglarınızı saniyeler içinde güncelleyin.
             Angaryaya değil, işinize odaklanın.
           </p>
 
           <div className="pt-4 flex justify-center relative">
-            <div className="max-w-[280px] md:max-w-[320px] rounded-2xl overflow-hidden shadow-2xl border-4 border-green-600 bg-white ring-8 ring-green-600/5 relative">
+            <div className="max-w-[280px] rounded-2xl overflow-hidden shadow-2xl border-4 border-green-600 bg-white ring-8 ring-green-600/5 relative">
               <img
                 src="/images/catalog_preview.png"
                 alt="E-Katalog Önizleme"
@@ -108,43 +108,43 @@ export default function LandingPage() {
           </div>
 
           {/* THE ROADMAP - Transparent Backdrop Panel */}
-          <div className="pt-10 md:pt-16 max-w-3xl mx-auto">
-            <div className="grid grid-cols-3 gap-2 md:gap-4 bg-white/60 backdrop-blur-md p-4 md:p-8 rounded-xl border border-stone-100 shadow-xl shadow-stone-200/50">
-              <div className="space-y-1 md:space-y-4 p-2">
-                <div className="w-8 h-8 md:w-12 md:h-12 bg-stone-900 rounded-xl md:rounded-2xl flex items-center justify-center text-white mx-auto text-sm md:text-xl font-black">
+          <div className="pt-10 max-w-3xl mx-auto">
+            <div className="grid grid-cols-3 gap-2 bg-white/60 backdrop-blur-md p-4 rounded-xl border border-stone-100 shadow-xl shadow-stone-200/50">
+              <div className="space-y-1 p-2">
+                <div className="w-8 h-8 bg-stone-900 rounded-xl flex items-center justify-center text-white mx-auto text-sm font-black">
                   1
                 </div>
-                <h3 className="text-[10px] md:text-xl font-black tracking-tight text-stone-900 leading-tight">
+                <h3 className="text-[10px] font-black tracking-tight text-stone-900 leading-tight">
                   Listenizi Atın
                 </h3>
-                <p className="text-stone-500 text-[10px] md:text-sm leading-tight font-medium hidden md:block">
+                <p className="text-stone-500 text-[10px] leading-tight font-medium hidden">
                   WhatsApp'tan gönderin.
                 </p>
               </div>
-              <div className="space-y-1 md:space-y-4 p-2">
-                <div className="w-8 h-8 md:w-12 md:h-12 bg-stone-900 rounded-xl md:rounded-2xl flex items-center justify-center text-white mx-auto text-sm md:text-xl font-black">
+              <div className="space-y-1 p-2">
+                <div className="w-8 h-8 bg-stone-900 rounded-xl flex items-center justify-center text-white mx-auto text-sm font-black">
                   2
                 </div>
-                <h3 className="text-[10px] md:text-xl font-black tracking-tight text-stone-900 leading-tight">
+                <h3 className="text-[10px] font-black tracking-tight text-stone-900 leading-tight">
                   Biz Kuralım
                 </h3>
-                <p className="text-stone-500 text-[10px] md:text-sm leading-tight font-medium hidden md:block">
+                <p className="text-stone-500 text-[10px] leading-tight font-medium hidden">
                   Aynı gün teslim.
                 </p>
               </div>
-              <div className="space-y-1 md:space-y-4 p-2">
+              <div className="space-y-1 p-2">
                 <div 
-                  className="w-8 h-8 md:w-12 md:h-12 rounded-xl md:rounded-2xl flex items-center justify-center text-white mx-auto text-sm md:text-xl font-black shadow-lg shadow-green-500/20"
+                  className="w-8 h-8 rounded-xl flex items-center justify-center text-white mx-auto text-sm font-black shadow-lg shadow-green-500/20"
                   style={{ backgroundColor: THEME.colors.marketing.primary }}
                 >
-                  <div className="w-4 h-4 md:w-6 md:h-6">
+                  <div className="w-4 h-4">
                     {THEME.icons.check}
                   </div>
                 </div>
-                <h3 className="text-[10px] md:text-xl font-black tracking-tight text-stone-900 leading-tight">
+                <h3 className="text-[10px] font-black tracking-tight text-stone-900 leading-tight">
                   Siz Yönetin
                 </h3>
-                <p className="text-stone-500 text-[10px] md:text-sm leading-tight font-medium hidden md:block italic">
+                <p className="text-stone-500 text-[10px] leading-tight font-medium hidden italic">
                   Fiyatları anında güncelleyin.
                 </p>
               </div>
@@ -169,16 +169,16 @@ export default function LandingPage() {
                 TEMMUZ'A KADAR %20 İNDİRİM 🏷️
               </div>
 
-              <p className="text-[10px] md:text-sm font-black text-stone-300 uppercase tracking-[0.3em] line-through mb-1">
+              <p className="text-[10px] font-black text-stone-300 uppercase tracking-[0.3em] line-through mb-1">
                 ₺500 / AY
               </p>
-              <p className="text-7xl md:text-9xl font-black text-stone-900 tracking-tighter leading-none pr-1">
+              <p className="text-7xl font-black text-stone-900 tracking-tighter leading-none pr-1">
                 ₺399
                 <span className="text-xl font-bold opacity-30 ml-2">
                   &nbsp;/&nbsp;ay&nbsp;
                 </span>
               </p>
-              <div className="relative h-4 md:h-6 w-full mt-2 overflow-visible">
+              <div className="relative h-4 w-full mt-2 overflow-visible">
                 <AnimatePresence mode="wait">
                   <motion.p
                     key={PRICING_PHRASES[index]}
@@ -189,7 +189,7 @@ export default function LandingPage() {
                       duration: 0.3,
                       ease: 'easeInOut',
                     }}
-                    className="font-black text-[8px] md:text-[11px] uppercase tracking-[0.4em] md:tracking-[0.6em] text-center whitespace-nowrap absolute inset-0 flex items-center justify-center"
+                    className="font-black text-[8px] uppercase tracking-[0.4em] text-center whitespace-nowrap absolute inset-0 flex items-center justify-center"
                     style={{ color: THEME.colors.marketing.primary }}
                   >
                     {PRICING_PHRASES[index]}
@@ -202,13 +202,13 @@ export default function LandingPage() {
       </section>
 
       {/* FINAL CTA */}
-      <section className="pb-20 px-4 -mt-6 md:-mt-12">
+      <section className="pb-20 px-4 -mt-6">
         <div 
-          className="max-w-2xl mx-auto rounded-[2.5rem] pt-8 pb-10 md:pt-12 md:pb-14 px-6 md:px-10 text-center space-y-8 shadow-3xl relative overflow-hidden w-full"
+          className="max-w-2xl mx-auto rounded-[2.5rem] pt-8 pb-10 px-6 text-center space-y-8 shadow-3xl relative overflow-hidden w-full"
           style={{ backgroundColor: THEME.colors.marketing.brand }}
         >
           <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent"></div>
-          <h2 className="text-4xl md:text-7xl font-black text-white tracking-tighter leading-none relative z-10 w-full text-center">
+          <h2 className="text-4xl font-black text-white tracking-tighter leading-none relative z-10 w-full text-center">
             Şimdi Ürünlerinizi Gönderin
           </h2>
           <div className="relative z-20 flex justify-center w-full">
@@ -228,17 +228,17 @@ export default function LandingPage() {
                   variant="primary"
                   mode="rectangle"
                   size="lg"
-                  className="!text-white flex items-center justify-center transition-all active:scale-95 group border-none !p-8 md:!p-10 !rounded-full"
+                  className="!text-white flex items-center justify-center transition-all active:scale-95 group border-none !p-8 !rounded-full"
                   style={{ backgroundColor: '#25D366' }}
                 >
-                  <div className="w-12 h-12 md:w-14 md:h-14 fill-white drop-shadow-sm group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-12 h-12 fill-white drop-shadow-sm group-hover:scale-110 transition-transform duration-300">
                     {THEME.icons.whatsapp}
                   </div>
                 </Button>
               </motion.div>
             </a>
           </div>
-          <p className="text-white/40 text-[10px] md:text-sm font-bold uppercase tracking-[0.2em] relative z-10 w-full text-center">
+          <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] relative z-10 w-full text-center">
             Taahhüt yok, cayma bedeli yok.
           </p>
         </div>

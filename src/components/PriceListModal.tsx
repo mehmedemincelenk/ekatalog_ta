@@ -12,9 +12,12 @@ import {
 import { TECH } from '../data/config';
 import html2canvas from 'html2canvas';
 import * as Lucide from 'lucide-react';
+import { motion } from 'framer-motion';
 
 import { useStore } from '../store';
 import { PriceListModalProps } from '../types';
+import SmartImage from './SmartImage';
+import { resolveVisualAssetUrl } from '../utils/image';
 
 /**
  * PRICE LIST MODAL (Diamond Standard)
@@ -27,7 +30,7 @@ export default function PriceListModal({
   onClose,
   products,
   categories,
-  displayCurrency,
+  visitorCurrency,
   exchangeRates,
   activeDiscount,
   storeName,
@@ -130,13 +133,13 @@ export default function PriceListModal({
     if (isPromotionActive && baseMathPrice > 0) {
       return formatNumberToCurrency(
         baseMathPrice * (1 - activeDiscount.rate),
-        displayCurrency,
+        visitorCurrency,
         exchangeRates,
       );
     }
     return formatNumberToCurrency(
       baseMathPrice,
-      displayCurrency,
+      visitorCurrency,
       exchangeRates,
     );
   };
@@ -158,9 +161,27 @@ export default function PriceListModal({
         const pages = targetRef.current.querySelectorAll('[data-story-page="true"]');
         for (let i = 0; i < pages.length; i++) {
           const canvas = await html2canvas(pages[i] as HTMLElement, {
-            scale: 2,
+            scale: 3, // Full HD Story Quality (1080x1920)
             useCORS: true,
             backgroundColor: storyTheme === 'DARK' ? '#1d1d1f' : '#f9fafb',
+            logging: false,
+            scrollX: 0,
+            scrollY: 0,
+            windowWidth: 360,
+            windowHeight: 640,
+            onclone: (clonedDoc) => {
+              // Target only the story product text containers to fix the upward shift
+              const textContainers = clonedDoc.querySelectorAll('[data-story-text="true"]');
+              textContainers.forEach((el) => {
+                const htmlEl = el as HTMLElement;
+                htmlEl.style.paddingTop = '8px'; // Compensate for the canvas offset
+              });
+              const priceContainers = clonedDoc.querySelectorAll('[data-story-price="true"]');
+              priceContainers.forEach((el) => {
+                const htmlEl = el as HTMLElement;
+                htmlEl.style.paddingTop = '6px';
+              });
+            }
           });
           const image = canvas.toDataURL('image/jpeg', 0.95);
           const link = document.createElement('a');
@@ -171,13 +192,22 @@ export default function PriceListModal({
           await new Promise((r) => setTimeout(r, 400));
         }
       } else {
+        // Dynamic scale adjustment based on product count to prevent canvas limits
+        const productCount = selectedCategories.reduce((acc, cat) => acc + (groupedProducts[cat]?.length || 0), 0);
+        const dynamicScale = productCount > 100 ? 0.8 : productCount > 50 ? 1.0 : 1.5;
+
         const canvas = await html2canvas(listContainerRef.current!, {
-          scale: 1.5,
+          scale: dynamicScale,
           useCORS: true,
           backgroundColor: storyTheme === 'DARK' ? '#1d1d1f' : '#ffffff',
+          logging: false,
+          scrollX: 0,
+          scrollY: 0,
+          windowWidth: listContainerRef.current!.scrollWidth,
+          windowHeight: listContainerRef.current!.scrollHeight,
           onclone: (clonedDoc) => {
             const el = clonedDoc.querySelector('[data-capture-area="true"]');
-            if (el) (el as HTMLElement).style.display = 'block';
+            if (el) (el as HTMLElement).style.opacity = '1';
           },
         });
         const image = canvas.toDataURL('image/jpeg', 0.9);
@@ -269,13 +299,14 @@ export default function PriceListModal({
               size="md"
               disabled={step === 1 && selectedCategories.length === 0}
               onClick={() => {
-                setStep((prev) => (prev + 1) as 0 | 1 | 2 | 3 | 4);
+                // If we are at step 2 (Orientation), skip step 3 (Theme) and go to 4 (Preview)
+                setStep((prev) => (prev === 2 ? 4 : prev + 1) as 0 | 1 | 2 | 3 | 4);
               }}
               className="flex-1 h-16 !rounded-[24px]"
               mode="rectangle"
               showFingerprint={true}
             >
-              {step === 3 ? 'ÖNİZLEME' : 'DEVAM'}
+              {step === 2 ? 'ÖNİZLEME' : 'DEVAM'}
             </Button>
           )}
         </div>
@@ -324,16 +355,16 @@ export default function PriceListModal({
       <div className="print:p-0">
         {step === 0 ? (
           <div className="py-2 px-1 flex flex-col items-center">
-            <div className="w-full grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+            <div className="w-full grid grid-cols-1 gap-3 mb-6">
               {[
                 { id: 1, img: '/assets/onboarding/step1.png', text: 'İndirmek istediğiniz ürün kategorilerini seçin.' },
                 { id: 2, img: '/assets/onboarding/step2.png', text: 'Formatınızı seçin ve indir butonuna basın.' },
                 { id: 3, img: '/assets/onboarding/step3.png', text: "Tüm ürünler galerinizde! WhatsApp'ta paylaşın." }
               ].map((card) => (
-                <div key={card.id} className="relative bg-stone-50/50 p-3 rounded-[2rem] border border-stone-100 flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-4 text-left group hover:bg-white hover:shadow-xl transition-all duration-500 overflow-hidden">
+                <div key={card.id} className="relative bg-stone-50/50 p-3 rounded-[2rem] border border-stone-100 flex flex-row items-center gap-4 text-left group hover:bg-white hover:shadow-xl transition-all duration-500 overflow-hidden">
                   {/* Image Unit (Hardened Square 1:1) */}
                   <div 
-                    className="w-24 h-24 sm:w-full aspect-square rounded-3xl overflow-hidden shadow-sm border border-white shrink-0 group-hover:scale-105 transition-transform duration-500 relative bg-stone-100"
+                    className="w-24 h-24 aspect-square rounded-3xl overflow-hidden shadow-sm border border-white shrink-0 group-hover:scale-105 transition-transform duration-500 relative bg-stone-100"
                   >
                     <img src={card.img} alt="" className="w-full h-full object-cover" />
                     {/* Sequence Number Overlay */}
@@ -343,7 +374,7 @@ export default function PriceListModal({
                   </div>
 
                   {/* Text Unit */}
-                  <p className="text-[10px] font-bold text-stone-500 leading-relaxed flex-1 sm:px-2 pb-2">
+                  <p className="text-[10px] font-bold text-stone-500 leading-relaxed flex-1 pb-2">
                     {card.text}
                   </p>
                 </div>
@@ -394,79 +425,76 @@ export default function PriceListModal({
             </div>
           </div>
         ) : step === 2 ? (
-          <div className="p-2 space-y-6">
+          <div className="p-2 space-y-8">
+            <div className="text-center">
+              <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-stone-300 mb-2">KATALOG BİÇİMİ</h4>
+              <p className="text-stone-400 text-[11px] font-bold">Sayfalarınızın nasıl görüneceğini seçin.</p>
+            </div>
+            
             <div className="grid grid-cols-2 gap-4">
               <Button
                 layout="vertical"
-                selected={exportMode === 'LIST'}
-                onClick={() => setExportMode('LIST')}
-                className="!h-auto !py-10 !rounded-[2.5rem]"
+                onClick={() => setListOrientation('VERTICAL')}
+                className={`!h-auto !py-12 !rounded-[2.5rem] transition-all duration-500 border-2 ${
+                  listOrientation === 'VERTICAL' 
+                    ? '!bg-white border-stone-900 shadow-2xl scale-[1.02]' 
+                    : '!bg-stone-50 border-stone-100 opacity-60'
+                }`}
                 showFingerprint={false}
                 icon={
-                  <div className="w-16 h-24 bg-stone-50 border-2 border-stone-200 rounded-lg flex flex-col gap-1 p-2 group-hover:border-stone-400 transition-colors">
-                    <div className="grid grid-cols-3 gap-1">
-                      {[1,2,3,4,5,6,7,8,9].map(i => (
-                        <div key={i} className="aspect-square bg-stone-200 rounded-[2px]" />
+                  <div className={`w-16 h-24 rounded-lg flex flex-col gap-1.5 p-2 transition-all duration-500 border-2 ${
+                    listOrientation === 'VERTICAL' 
+                      ? 'bg-stone-900 border-stone-900 shadow-lg' 
+                      : 'bg-stone-50 border-stone-200'
+                  }`}>
+                    <div className="w-full h-2 bg-white/20 rounded-sm mb-2" />
+                    <div className="grid grid-cols-2 gap-1 flex-1">
+                      {[1,2,3,4].map(i => (
+                        <div key={i} className="bg-white/10 rounded-[1px]" />
                       ))}
                     </div>
                   </div>
                 }
               >
-                <span className="text-[11px] font-black uppercase tracking-widest mt-2">TEKTE HEPSİ</span>
+                <span className={`text-[11px] font-black uppercase tracking-widest mt-4 transition-colors ${
+                  listOrientation === 'VERTICAL' ? 'text-stone-900' : 'text-stone-400'
+                }`}>DİKEY (A4)</span>
               </Button>
 
               <Button
                 layout="vertical"
-                selected={exportMode === 'STORY'}
-                onClick={() => setExportMode('STORY')}
-                className="!h-auto !py-10 !rounded-[2.5rem]"
+                onClick={() => setListOrientation('HORIZONTAL')}
+                className={`!h-auto !py-12 !rounded-[2.5rem] transition-all duration-500 border-2 ${
+                  listOrientation === 'HORIZONTAL' 
+                    ? '!bg-white border-stone-900 shadow-2xl scale-[1.02]' 
+                    : '!bg-stone-50 border-stone-100 opacity-60'
+                }`}
                 showFingerprint={false}
                 icon={
-                  <div className="grid grid-cols-2 gap-1.5 p-2">
-                    {[1,2,3,4].map(i => (
-                      <div key={i} className="w-6 h-10 bg-stone-50 border border-stone-200 rounded-sm flex flex-col gap-0.5 p-0.5 group-hover:border-stone-400 transition-colors">
-                        <div className="grid grid-cols-2 gap-0.5">
-                           <div className="w-full h-1.5 bg-stone-200 rounded-[1px]" />
-                           <div className="w-full h-1.5 bg-stone-200 rounded-[1px]" />
-                        </div>
-                      </div>
-                    ))}
+                  <div className={`w-24 h-16 rounded-lg flex flex-col gap-1.5 p-2 transition-all duration-500 border-2 ${
+                    listOrientation === 'HORIZONTAL' 
+                      ? 'bg-stone-900 border-stone-900 shadow-lg' 
+                      : 'bg-stone-50 border-stone-200'
+                  }`}>
+                    <div className="w-1/2 h-2 bg-white/20 rounded-sm mb-1" />
+                    <div className="grid grid-cols-3 gap-1 flex-1">
+                      {[1,2,3,4,5,6].map(i => (
+                        <div key={i} className="bg-white/10 rounded-[1px]" />
+                      ))}
+                    </div>
                   </div>
                 }
               >
-                <span className="text-[11px] font-black uppercase tracking-widest mt-2">SOSYAL MEDYA</span>
+                <span className={`text-[11px] font-black uppercase tracking-widest mt-4 transition-colors ${
+                  listOrientation === 'HORIZONTAL' ? 'text-stone-900' : 'text-stone-400'
+                }`}>YATAY (B2B)</span>
               </Button>
             </div>
 
-            {/* CONDITIONAL ORIENTATION CHOICE */}
-            {exportMode === 'LIST' && (
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="grid grid-cols-2 gap-3 pt-2"
-              >
-                <Button
-                  onClick={() => setListOrientation('VERTICAL')}
-                  selected={listOrientation === 'VERTICAL'}
-                  variant="secondary"
-                  mode="rectangle"
-                  className="!h-16 !rounded-2xl flex flex-col items-center justify-center gap-1 border-2"
-                  showFingerprint={false}
-                >
-                  <span className="text-[10px] font-black uppercase tracking-widest">DİKEY</span>
-                </Button>
-                <Button
-                  onClick={() => setListOrientation('HORIZONTAL')}
-                  selected={listOrientation === 'HORIZONTAL'}
-                  variant="secondary"
-                  mode="rectangle"
-                  className="!h-16 !rounded-2xl flex flex-col items-center justify-center gap-1 border-2"
-                  showFingerprint={false}
-                >
-                  <span className="text-[10px] font-black uppercase tracking-widest">YATAY</span>
-                </Button>
-              </motion.div>
-            )}
+            {/* HIDDEN STORY MODE - CODE PRESERVED */}
+            <div className="hidden">
+              <Button onClick={() => setExportMode('STORY')}>STORY</Button>
+            </div>
           </div>
         ) : step === 3 ? (
           <div className="p-2">
@@ -494,13 +522,34 @@ export default function PriceListModal({
           </div>
         ) : (
           <div className={`py-4 ${storyTheme === 'DARK' ? 'bg-[#121212]' : 'bg-stone-50/30'} print:bg-white print:p-0`}>
+            {/* LARGE CATALOG TIP */}
+            {selectedCategories.reduce((acc, cat) => acc + (groupedProducts[cat]?.length || 0), 0) > 50 && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mx-6 mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-100 flex items-start gap-3 print:hidden"
+              >
+                <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+                  <Lucide.Info size={18} className="text-amber-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-[11px] font-black text-amber-900 uppercase tracking-tight mb-1">DİAMOND İPUCU</p>
+                  <p className="text-[10px] font-bold text-amber-700 leading-relaxed">
+                    Kataloğunuzda 50'den fazla ürün var. En yüksek kalite ve jilet gibi netlik için 
+                    <span className="font-black text-amber-900 mx-1">YAZDIR (PDF)</span> 
+                    seçeneğini kullanmanızı öneririz.
+                  </p>
+                </div>
+              </motion.div>
+            )}
+
             {exportMode === 'LIST' ? (
               <div
                 ref={listContainerRef}
                 data-capture-area="true"
                 className={`
                   ${storyTheme === 'DARK' ? 'bg-[#1d1d1f] text-white' : 'bg-white text-stone-900'} 
-                  px-8 sm:px-12 py-10 rounded-[40px] shadow-sm border border-stone-100 
+                  px-8 py-10 rounded-[40px] shadow-sm border border-stone-100 
                   print:shadow-none print:border-none print:p-0 overflow-hidden mx-auto
                   ${listOrientation === 'HORIZONTAL' ? 'max-w-none w-full' : 'max-w-4xl'}
                 `}
@@ -513,7 +562,7 @@ export default function PriceListModal({
                     </span>
                   </div>
 
-                  <h1 className="text-3xl sm:text-4xl font-black tracking-tighter mt-12 uppercase px-4 leading-none">
+                  <h1 className="text-3xl font-black tracking-tighter mt-12 uppercase px-4 leading-none">
                     {storeName}
                   </h1>
                   <p className={`text-[10px] font-black uppercase tracking-[0.5em] mt-4 ${storyTheme === 'DARK' ? 'text-stone-500' : 'text-stone-300'}`}>
@@ -540,12 +589,12 @@ export default function PriceListModal({
                     if (!categoryProducts || categoryProducts.length === 0) return null;
 
                     return (
-                      <div key={cat} className={`break-inside-avoid p-6 sm:p-8 rounded-[2.5rem] border ${storyTheme === 'DARK' ? 'bg-stone-900/50 border-white/5' : 'bg-stone-50 border-stone-100'}`}>
+                      <div key={cat} className="break-inside-avoid-page space-y-6">
                         <div className="flex items-center gap-4 mb-8">
-                          <h2 className="text-lg font-black uppercase tracking-tight shrink-0">
+                          <h2 className={`text-lg font-black uppercase tracking-tight shrink-0 ${storyTheme === 'DARK' ? 'text-white' : 'text-stone-900'}`}>
                             {cat}
                           </h2>
-                          <div className={`h-1 flex-1 rounded-full ${storyTheme === 'DARK' ? 'bg-white/5' : 'bg-white'}`}></div>
+                          <div className={`h-[1px] flex-1 ${storyTheme === 'DARK' ? 'bg-white/10' : 'bg-stone-200'}`}></div>
                           <span className="text-[10px] font-black opacity-40 uppercase tracking-widest">
                             {categoryProducts.length} ÜRÜN
                           </span>
@@ -553,36 +602,31 @@ export default function PriceListModal({
 
                         <div className={`
                           grid gap-4
-                          ${listOrientation === 'VERTICAL' ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'}
+                          ${listOrientation === 'VERTICAL' ? 'grid-cols-2' : 'grid-cols-2'}
+                          print:grid-cols-2
                         `}>
                           {categoryProducts.map((product) => (
                             <div
                               key={product.id}
                               className={`
-                                flex flex-col p-3 rounded-3xl border transition-all duration-500 group
-                                ${storyTheme === 'DARK' ? 'bg-black/20 border-white/5 hover:bg-black/40' : 'bg-white border-white hover:border-stone-200 hover:shadow-xl'}
+                                flex flex-col p-3 rounded-3xl border transition-all duration-500 group break-inside-avoid
+                                ${storyTheme === 'DARK' ? 'bg-black/20 border-white/5' : 'bg-white border-stone-100 shadow-sm'}
                               `}
                             >
-                              <div className="aspect-square w-full rounded-2xl overflow-hidden mb-3 bg-stone-100 relative group-hover:scale-[1.02] transition-transform duration-500">
-                                {product.image_url ? (
-                                  <img
-                                    src={product.image_url}
-                                    alt={product.name}
-                                    className="w-full h-full object-cover"
-                                    crossOrigin="anonymous"
-                                  />
-                                ) : (
-                                  <div className="w-full h-full flex items-center justify-center opacity-20">
-                                    <Lucide.Layers3 size={24} />
-                                  </div>
-                                )}
+                              <div className="aspect-square w-full rounded-2xl overflow-hidden mb-3 bg-stone-100 relative shadow-sm">
+                                <SmartImage
+                                  src={resolveVisualAssetUrl(product.image_url)}
+                                  alt={product.name}
+                                  aspectRatio="square"
+                                  className="w-full h-full"
+                                />
                               </div>
                               <div className="flex flex-col flex-1 px-1">
-                                <h4 className="font-black text-[10px] sm:text-[11px] leading-tight uppercase line-clamp-2 mb-2 min-h-[2.2em]">
+                                <h4 className="font-black text-[10px] leading-tight uppercase line-clamp-2 mb-2 min-h-[2.2em]">
                                   {product.name}
                                 </h4>
                                 <div className="mt-auto pt-2 border-t border-stone-100/50 flex items-center justify-between">
-                                  <span className="text-[12px] sm:text-[13px] font-black tracking-tighter">
+                                  <span className="text-[12px] font-black tracking-tighter">
                                     {calculateFinalPrice(product)}
                                   </span>
                                 </div>
@@ -626,7 +670,7 @@ export default function PriceListModal({
                       </div>
                     </div>
 
-                    {/* STORY PRODUCTS (HORIZONTAL LIST) */}
+                    {/* STORY PRODUCTS (TABLE BASED ALIGNMENT - DIAMOND STANDARD) */}
                     <div className="w-full flex flex-col gap-2 overflow-hidden">
                       {page.products.map((product) => {
                         const description = product.description || 'Standart Ürün';
@@ -638,34 +682,47 @@ export default function PriceListModal({
                           <div
                             key={product.id}
                             className={`
-                              flex items-center gap-3 p-2 rounded-xl border transition-all
+                              w-full h-[60px] rounded-xl border transition-all overflow-hidden
                               ${storyTheme === 'DARK' ? 'bg-stone-900/40 border-stone-800/50' : 'bg-stone-50/50 border-stone-100 shadow-sm'}
                             `}
+                            style={{ display: 'table', borderCollapse: 'separate', borderSpacing: '8px 0' }}
                           >
-                            <div className={`w-12 h-12 rounded-lg overflow-hidden border shadow-sm shrink-0 bg-white ${storyTheme === 'DARK' ? 'border-stone-800' : 'border-white'}`}>
-                              {product.image_url ? (
-                                <img
-                                  src={product.image_url}
-                                  alt=""
-                                  className="w-full h-full object-cover"
-                                  crossOrigin="anonymous"
+                            <div className="shrink-0" style={{ display: 'table-cell', verticalAlign: 'middle', width: '48px' }}>
+                              <div className={`w-12 h-12 rounded-lg overflow-hidden border shadow-sm bg-white ${storyTheme === 'DARK' ? 'border-stone-800' : 'border-white'}`}>
+                                <SmartImage
+                                  src={resolveVisualAssetUrl(product.image_url)}
+                                  alt={product.name}
+                                  aspectRatio="square"
+                                  className="w-full h-full"
                                 />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center text-stone-200">
-                                  <Lucide.Layers3 size={20} />
-                                </div>
-                              )}
+                                {product.out_of_stock && (
+                                  <div className="absolute inset-0 bg-stone-900/40 backdrop-blur-[2px] flex items-center justify-center">
+                                    <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-lg">
+                                      <span className="text-[10px]">🚫</span>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <h4 className={`text-[10px] font-black leading-tight uppercase line-clamp-1 ${storyTheme === 'DARK' ? 'text-white' : 'text-stone-900'}`}>
+
+                            <div 
+                              style={{ display: 'table-cell', verticalAlign: 'middle', paddingLeft: '8px' }}
+                              data-story-text="true"
+                            >
+                              <h4 className={`text-[10px] font-black uppercase line-clamp-1 m-0 p-0 ${storyTheme === 'DARK' ? 'text-white' : 'text-stone-900'}`} style={{ lineHeight: '1.2' }}>
                                 {product.name}
                               </h4>
-                              <p className={`text-[8px] font-bold mt-0.5 line-clamp-2 break-words leading-[1.3] ${storyTheme === 'DARK' ? 'text-stone-500' : 'text-stone-400'}`}>
+                              <p className={`text-[8px] font-bold line-clamp-1 break-words m-0 p-0 ${storyTheme === 'DARK' ? 'text-stone-500' : 'text-stone-400'}`} style={{ lineHeight: '1.2' }}>
                                 {truncatedDesc}
                               </p>
                             </div>
-                            <div className="shrink-0 text-right">
-                              <span className={`text-[11px] font-black tracking-tighter ${storyTheme === 'DARK' ? 'text-white' : 'text-stone-900'}`}>
+
+                            <div 
+                              className="text-right"
+                              style={{ display: 'table-cell', verticalAlign: 'middle', paddingRight: '8px' }}
+                              data-story-price="true"
+                            >
+                              <span className={`text-[11px] font-black tracking-tighter ${storyTheme === 'DARK' ? 'text-white' : 'text-stone-900'}`} style={{ lineHeight: '1' }}>
                                 {calculateFinalPrice(product)}
                               </span>
                             </div>

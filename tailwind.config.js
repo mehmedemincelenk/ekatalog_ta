@@ -11,7 +11,7 @@ export default {
       'lg': '9999px',
       'xl': '9999px',
       '2xl': '9999px',
-      'desktop': '640px',
+      'desktop': '1024px',
     },
     extend: {
       colors: {

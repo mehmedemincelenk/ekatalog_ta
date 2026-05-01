@@ -18,9 +18,13 @@ const CategoryFilterChip = memo(
     productCount,
     onSelect,
     onRename,
+    onOrderChange,
+    orderIndex,
+    totalCategories = 0,
     showFingerprint = true,
   }: CategoryFilterChipProps) => {
     const chipTheme = THEME.searchFilter.categoryList.chip;
+    const [isUpdatingOrder, setIsUpdatingOrder] = useState(false);
     const longPressTimer = useRef<NodeJS.Timeout | null>(null);
     const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
 
@@ -42,7 +46,7 @@ const CategoryFilterChip = memo(
     return (
       <div
         className={`
-        ${chipTheme.container} ${THEME.radius.chip} items-center shrink-0 select-none cursor-pointer transition-all active:scale-95 overflow-hidden relative
+        ${chipTheme.container} ${THEME.radius.chip} items-stretch shrink-0 select-none cursor-pointer transition-all overflow-hidden relative h-8 flex
         ${isItemSelected ? chipTheme.active : chipTheme.inactive}
       `}
         onPointerDown={handlePointerDown}
@@ -69,15 +73,49 @@ const CategoryFilterChip = memo(
           </div>
         )}
 
-        <div className="relative h-full shrink-0 overflow-hidden flex items-center z-10">
+        <div 
+          className="relative shrink-0 flex items-stretch z-10"
+          onClick={(e) => e.stopPropagation()}
+        >
           <AnimatePresence mode="wait">
-            {!isAdminMode && (
+            {isAdminMode ? (
+              <div className={`${chipTheme.adminSelectWrapper} flex-none h-full`}>
+                <select
+                  value={orderIndex}
+                  disabled={isUpdatingOrder}
+                  onChange={async (e) => {
+                    e.stopPropagation();
+                    const newPos = Number(e.target.value);
+                    setIsUpdatingOrder(true);
+                    try {
+                      await onOrderChange?.(categoryName, newPos);
+                    } finally {
+                      setIsUpdatingOrder(false);
+                    }
+                  }}
+                  className={chipTheme.adminSelect}
+                >
+                  {Array.from({ length: totalCategories }).map((_, i) => (
+                    <option key={i} value={i}>
+                      {i + 1}.
+                    </option>
+                  ))}
+                </select>
+                {isUpdatingOrder ? (
+                  <div className="w-3 h-3 border-2 border-stone-900/30 border-t-stone-900 rounded-full animate-spin" />
+                ) : (
+                  <span className={`text-[11px] font-black text-stone-900 h-full flex items-center justify-center`}>
+                    {(orderIndex ?? 0) + 1}.
+                  </span>
+                )}
+              </div>
+            ) : (
               <motion.span
                 key="guest-count"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
-                className={`${chipTheme.counter.base} ${isItemSelected ? chipTheme.counter.active : chipTheme.counter.inactive}`}
+                className={`${chipTheme.counter.base} ${isItemSelected ? chipTheme.counter.active : chipTheme.counter.inactive} h-full`}
               >
                 {productCount}
               </motion.span>
@@ -85,7 +123,7 @@ const CategoryFilterChip = memo(
           </AnimatePresence>
         </div>
         <div
-          className={`${chipTheme.textButton} ${isAdminMode ? 'pl-4' : 'pl-4'} pr-4 pointer-events-none`}
+          className={`${chipTheme.textButton} flex-1 flex items-center pointer-events-none px-4 active:scale-95 transition-transform`}
         >
           <span
             className={

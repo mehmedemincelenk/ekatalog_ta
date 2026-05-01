@@ -17,7 +17,8 @@ const CategoryHeader = memo(
     productCount,
     isAdmin,
     onRename,
-  }: CategoryHeaderProps) => {
+    currentOrder,
+  }: CategoryHeaderProps & { currentOrder?: number }) => {
     const theme = THEME.productGrid.header;
     const longPressTimer = useRef<NodeJS.Timeout | null>(null);
     const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
@@ -46,6 +47,9 @@ const CategoryHeader = memo(
       >
         <div className="flex items-center gap-3 shrink-0">
           <h2 className={`${theme.title} ${isAdmin ? 'cursor-edit' : ''}`}>
+            {isAdmin && currentOrder !== undefined && (
+              <span className="opacity-30 mr-1">{currentOrder}.</span>
+            )}
             {categoryName}
           </h2>
         </div>

@@ -37,6 +37,13 @@
     scroll-behavior: smooth;
   }
 
+  /* MASAÜSTÜ KİLİDİ: PC'de telefon çerçevesi içindeki içerik, mobil boyutlarda kalmalı. */
+  @media (min-width: 768px) {
+    html {
+      font-size: 14px !important;
+    }
+  }
+
   body {
     /* Sitenin genel zemin rengi ve ana yazı tipi */
     background-color: var(--bg-main);
@@ -152,6 +159,16 @@
   }
 
   /* GİZLİ SCROLLBAR: Kaydırma işlevini bozmadan görsel kalabalığı engeller. */
+  @media (min-width: 1024px) {
+    .phone-frame-container {
+      width: 360px !important;
+      height: 720px !important;
+      min-height: 0 !important;
+      border-radius: 0.75rem !important;
+      overflow: hidden !important;
+    }
+  }
+
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }

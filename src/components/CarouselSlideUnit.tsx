@@ -1,59 +1,55 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { THEME } from '../data/config';
 import SmartImage from './SmartImage';
-import Button from './Button';
-
-import { CarouselSlideUnitProps } from '../types';
 import { resolveVisualAssetUrl } from '../utils/image';
+import Button from './Button';
+import * as Lucide from 'lucide-react';
 
 /**
- * CAROUSEL SLIDE UNIT (DIAMOND EDITION)
+ * CAROUSEL SLIDE UNIT (Admin Optimized)
  * -----------------------------------------------------------
- * An autonomous cinematic slide unit that manages its own visual
- * state (Active vs Ghost) to ensure layout purity.
+ * Renders a single banner slide with administrative overlays.
  */
+
+import {
+  CarouselSlide,
+} from '../types';
+
 const CarouselSlideUnit = memo(
   ({
     slideData,
-    isCurrentlyActive,
+    currentIndex,
+    totalSlides,
     isAdmin,
+    isCurrentlyActive,
     isCurrentlyUploading,
     editingTargetSlideId,
-    isMobileView,
-    onImageUpdateTrigger,
     onDeleteTrigger,
-  }: CarouselSlideUnitProps) => {
+    onUpload,
+    onOrderChange,
+  }: {
+    slideData: CarouselSlide;
+    currentIndex: number;
+    totalSlides: number;
+    isAdmin: boolean;
+    isCurrentlyActive: boolean;
+    isCurrentlyUploading: boolean;
+    editingTargetSlideId: number | null;
+    onDeleteTrigger: (id: number) => void;
+    onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onOrderChange?: (newPos: number) => void;
+  }) => {
+    const [isUpdatingOrder, setIsUpdatingOrder] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
+
     const carouselTheme = THEME.heroCarousel;
     const globalIcons = THEME.icons;
 
-    const onAction = () => {
-      if (isAdmin && !isCurrentlyUploading) {
-        onImageUpdateTrigger(slideData.id);
-      }
-    };
-
     return (
-      <motion.div
-        initial={false}
-        animate={{
-          opacity: isMobileView ? 1 : (isCurrentlyActive ? 1 : 0.35),
-          scale: isMobileView ? 1 : (isCurrentlyActive ? 1 : 0.95),
-          filter: isMobileView ? 'blur(0px)' : (isCurrentlyActive ? 'blur(0px)' : 'blur(2px)'),
-          zIndex: isCurrentlyActive ? 10 : 0,
-        }}
-        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className={`
-        ${carouselTheme.slide.base} 
-        rounded-lg overflow-hidden relative w-full h-full
-        ${isCurrentlyActive ? 'pointer-events-auto' : 'pointer-events-none'} 
-        ${slideData.bg}
-      `}
-      >
-        <div
-          className={`relative w-full h-full overflow-hidden ${isAdmin ? 'cursor-pointer' : ''}`}
-          onClick={onAction}
-        >
+      <div className={`${carouselTheme.slide.container} overflow-hidden rounded-none relative`}>
+        {/* VISUAL ASSET LAYER */}
+        <div className="relative w-full h-full">
           <SmartImage
             src={resolveVisualAssetUrl(slideData.src)}
             alt={slideData.label}
@@ -67,41 +63,97 @@ const CarouselSlideUnit = memo(
         </div>
 
         <AnimatePresence>
-          {isAdmin && isCurrentlyActive && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="absolute top-4 right-4 z-[50] flex items-center gap-2"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onDeleteTrigger?.(slideData.id);
-                }}
-                variant="danger"
-                mode="circle"
-                className="w-8 h-8 sm:w-10 sm:h-10 shadow-xl border-2 border-white/20"
-                icon={<div className="w-3.5 h-3.5 sm:w-5 sm:h-5">{globalIcons.trash}</div>}
-                title="AFİŞİ SİL"
-              />
-            </motion.div>
+          {isAdmin && (
+            <div className="absolute inset-0 pointer-events-none z-[999]">
+              {/* INTERACTIVE SEQUENCE BADGE - TOP LEFT */}
+              <div 
+                className={`${carouselTheme.slide.changeBadge} !top-4 !left-4 !right-auto !pointer-events-auto flex items-center relative w-fit h-fit transition-opacity duration-500 ${isCurrentlyActive ? 'opacity-100' : 'opacity-40'}`}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <select
+                  value={currentIndex}
+                  disabled={isUpdatingOrder}
+                  onChange={async (e) => {
+                    e.stopPropagation();
+                    const newPos = Number(e.target.value);
+                    setIsUpdatingOrder(true);
+                    try {
+                      await onOrderChange?.(newPos);
+                      setIsUpdatingOrder(false);
+                      setShowSuccess(true);
+                      setTimeout(() => setShowSuccess(false), 1500);
+                    } finally {
+                      setIsUpdatingOrder(false);
+                    }
+                  }}
+                  className={`absolute inset-0 cursor-pointer z-10 ${isUpdatingOrder || showSuccess ? 'opacity-0' : 'opacity-0'}`}
+                >
+                  {Array.from({ length: totalSlides }).map((_, i) => (
+                    <option key={i} value={i}>{i + 1}.</option>
+                  ))}
+                </select>
+                {isUpdatingOrder ? (
+                  <div className="w-3 h-3 border-2 border-stone-900/30 border-t-stone-900 rounded-full animate-spin mx-2" />
+                ) : showSuccess ? (
+                  <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex items-center justify-center mx-1">
+                    <Lucide.Check size={12} className="text-emerald-500" strokeWidth={4} />
+                  </motion.div>
+                ) : (
+                  <span className="text-white text-[11px] font-black">{currentIndex + 1}.</span>
+                )}
+              </div>
+
+              {/* DELETE BUTTON - TOP RIGHT */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className={`absolute top-4 right-4 !pointer-events-auto transition-opacity duration-500 ${isCurrentlyActive ? 'opacity-100' : 'opacity-40'}`}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onDeleteTrigger?.(slideData.id);
+                  }}
+                  variant="danger"
+                  mode="circle"
+                  className="w-8 h-8 shadow-xl border-2 border-white/20"
+                  icon={<div className="w-3.5 h-3.5">{globalIcons.trash}</div>}
+                  title="AFİŞİ SİL"
+                />
+              </motion.div>
+            </div>
           )}
         </AnimatePresence>
 
-        {/* UPLOAD PROGRESS VISUAL */}
-        {isCurrentlyUploading &&
-          editingTargetSlideId === slideData.id &&
-          isCurrentlyActive && (
-            <div className={carouselTheme.slide.overlay}>
-              <div className={carouselTheme.slide.loadingSpinner}></div>
-            </div>
-          )}
-      </motion.div>
+        {/* FILE INPUT OVERLAY - ADMIN ONLY */}
+        {isAdmin && isCurrentlyActive && (
+          <div className="absolute inset-0 z-20 cursor-pointer group">
+            <input
+              type="file"
+              accept="image/*"
+              className="absolute inset-0 opacity-0 cursor-pointer z-30"
+              onChange={(e) => {
+                onUpload(e);
+              }}
+              onClick={(e) => e.stopPropagation()}
+            />
+            
+            {/* LOCAL LOADING SPINNER WITHIN IMAGE BOUNDS */}
+            {isCurrentlyUploading && editingTargetSlideId === slideData.id && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-stone-900/10 backdrop-blur-[2px] transition-all duration-500 z-40">
+                <div className={carouselTheme.slide.loadingSpinner} />
+                <span className="mt-4 text-[10px] font-black text-white tracking-[0.2em] animate-pulse">LÜTFEN BEKLEYİN...</span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     );
-  },
+  }
 );
 
+CarouselSlideUnit.displayName = 'CarouselSlideUnit';
 export default CarouselSlideUnit;

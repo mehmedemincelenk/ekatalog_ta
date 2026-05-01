@@ -20,9 +20,10 @@ const SearchFilter = memo(
   ({
     sortedList = [],
     stats = {},
+    onCategoryOrderChange,
     renameCategory,
     onAddCategory,
-  }: Omit<SearchFilterProps, 'onCategoryOrderChange'>) => {
+  }: SearchFilterProps) => {
     const {
       isAdmin,
       settings,
@@ -56,14 +57,13 @@ const SearchFilter = memo(
     const showAll = displayConfig.showSearch || displayConfig.showCategories;
     if (!showAll && !isAdmin) return null;
 
-    // Diamond Logic: On PC, always show everything. On Mobile, respect the panel toggle.
-    const pcInitialLimit = 5;
-    const isPC = typeof window !== 'undefined' && window.innerWidth >= 640;
-    const hasMoreThanLimit = sortedList.length > pcInitialLimit;
+    // Diamond Logic: Always follow mobile interaction rules.
+    const mobileInitialLimit = 5;
+    const hasMoreThanLimit = sortedList.length > mobileInitialLimit;
     
-    const visibleList = (isPC || isPanelOpen || !hasMoreThanLimit) 
+    const visibleList = (isPanelOpen || !hasMoreThanLimit) 
       ? sortedList 
-      : sortedList.slice(0, pcInitialLimit);
+      : sortedList.slice(0, mobileInitialLimit);
 
     const isAllSelected = activeCategories.length === 0;
     const chipTheme = THEME.searchFilter.categoryList.chip;
@@ -75,7 +75,7 @@ const SearchFilter = memo(
           <PlusPlaceholder
             type="CATEGORY"
             onClick={() => setIsAddingCategory(true)}
-            className="shrink-0 min-h-[28px] sm:min-h-[42px] !py-0"
+            className="shrink-0 min-h-[28px] !py-0"
           />
         )}
 
@@ -85,11 +85,11 @@ const SearchFilter = memo(
             onCategoryToggle('ALL_PRODUCTS'); // This special key will be handled by store
           }}
           className={`
-            ${chipTheme.container} ${THEME.radius.chip} items-stretch shrink-0 select-none cursor-pointer transition-all active:scale-95 min-h-[28px] sm:min-h-[42px] px-4 sm:px-6 flex
+            ${chipTheme.container} ${THEME.radius.chip} items-stretch shrink-0 select-none cursor-pointer transition-all active:scale-95 h-8 px-4 flex
             ${isAllSelected ? chipTheme.active : chipTheme.inactive}
           `}
         >
-          <div className={`${chipTheme.textButton} !py-0 w-full flex items-center justify-center pointer-events-none sm:text-[12px] min-w-[60px] sm:min-w-[100px]`}>
+          <div className={`${chipTheme.textButton} !py-0 w-full flex items-center justify-center pointer-events-none min-w-[60px]`}>
             <span className={isAllSelected ? chipTheme.activeText : chipTheme.inactiveText}>
               {LABELS.filter.allCategories}
             </span>
@@ -105,16 +105,19 @@ const SearchFilter = memo(
             productCount={stats[cat] || 0}
             onSelect={onCategoryToggle}
             onRename={renameCategory}
+            onOrderChange={onCategoryOrderChange}
+            orderIndex={sortedList.indexOf(cat)}
+            totalCategories={sortedList.length}
           />
         ))}
         
-        {/* MOBILE ONLY "MORE" CHIP */}
-        {!isPanelOpen && hasMoreThanLimit && !isPC && (
+        {/* MOBILE "MORE" CHIP */}
+        {!isPanelOpen && hasMoreThanLimit && (
           <Button
             onClick={() => setIsPanelOpen(true)}
             variant="secondary"
             mode="rectangle"
-            className="flex sm:hidden px-5 py-2.5 text-[10px] font-black uppercase tracking-widest shrink-0 !rounded-xl border-stone-200 border-dashed border-2 hover:border-stone-900 transition-all text-stone-400 hover:text-stone-900"
+            className="flex px-5 py-2.5 text-[10px] font-black uppercase tracking-widest shrink-0 !rounded-xl border-stone-200 border-dashed border-2 hover:border-stone-900 transition-all text-stone-400 hover:text-stone-900"
           >
             + DAHA FAZLA
           </Button>
@@ -125,14 +128,14 @@ const SearchFilter = memo(
 
     return (
       <div
-        className={`w-full bg-stone-50 border-b border-stone-200 sm:border-b-0 pt-3 pb-1 relative z-40 ${!showAll ? 'opacity-50 grayscale' : ''}`}
+        className={`w-full bg-stone-50 border-b border-stone-200 pt-3 pb-1 relative z-40 ${!showAll ? 'opacity-50 grayscale' : ''}`}
       >
         <div className={`${filterTheme.container} !flex-col !items-stretch`}>
-          {/* TOP BAR: Search (Mobile Only) & Interaction */}
+          {/* TOP BAR: Search & Interaction */}
           <div className="flex flex-row items-center gap-2 w-full">
             {displayConfig.showSearch && (
               <div
-                className={`${filterTheme.searchArea.inputWrapper} ${THEME.radius.input} flex-1 h-11 sm:hidden !max-w-none w-full flex items-center`}
+                className={`${filterTheme.searchArea.inputWrapper} ${THEME.radius.input} flex-1 h-11 !max-w-none w-full flex items-center`}
               >
                 <div className={filterTheme.searchArea.iconSize}>
                   {globalIcons.search}
@@ -150,12 +153,12 @@ const SearchFilter = memo(
             )}
 
             {displayConfig.showCategories && (
-              <div className="flex-none flex items-center justify-start gap-2 overflow-hidden sm:hidden">
+              <div className="flex-none flex items-center justify-start gap-2 overflow-hidden">
                 <Button
                   onClick={() => setIsPanelOpen(!isPanelOpen)}
                   variant="primary"
                   mode="rectangle"
-                  className="h-11 px-3 flex-none !text-[10px]"
+                  className="h-11 px-3 flex-none !text-[10px] !rounded-lg"
                 >
                   {LABELS.filter.categoryBtn}
                 </Button>
@@ -163,11 +166,11 @@ const SearchFilter = memo(
             )}
           </div>
 
-          {/* EXPANDED PANEL (PC & MOBILE) */}
+          {/* EXPANDED PANEL */}
           {displayConfig.showCategories && (
-            <div className="mt-3 sm:mt-0">
+            <div className="mt-3">
               <AnimatePresence mode="wait">
-                {(isPanelOpen || (typeof window !== 'undefined' && window.innerWidth >= 640)) ? (
+                {isPanelOpen ? (
                   <motion.div
                     key="expanded-categories"
                     initial={{ height: 0, opacity: 0 }}

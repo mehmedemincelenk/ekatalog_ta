@@ -40,7 +40,7 @@ const AIStudioCompareModal = ({
       <div className="flex flex-col gap-5 py-4">
         {/* EXPLANATION */}
         <div className="bg-stone-50 border border-stone-100 p-5 rounded-2xl">
-          <p className="text-stone-500 text-xs sm:text-sm leading-relaxed font-medium">
+          <p className="text-stone-500 text-xs leading-relaxed font-medium">
             Ürününüzün arkaplanı temizlendi, profesyonel bir ışık derinliği
             eklendi ve tam merkeze hizalandı. Daha elit bir duruş için bu yeni
             görünümü kullanmanızı öneririz.
@@ -48,7 +48,7 @@ const AIStudioCompareModal = ({
         </div>
 
         {/* COMPARISON GRID */}
-        <div className="grid grid-cols-2 gap-4 sm:gap-10">
+        <div className="grid grid-cols-2 gap-4">
           {/* ORIGINAL */}
           <div className="space-y-3">
             <div className="flex items-center justify-between px-1">

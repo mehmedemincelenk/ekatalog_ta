@@ -14,7 +14,7 @@ const AIStudioTextModal: React.FC<AIStudioTextModalProps> = ({
   suggestedDescription,
   onConfirm,
   onDismiss,
-  displayCurrency = 'TRY',
+  visitorCurrency = 'TRY',
   exchangeRates,
   isStatic = false,
 }) => {
@@ -29,14 +29,14 @@ const AIStudioTextModal: React.FC<AIStudioTextModalProps> = ({
     >
       <div className="flex flex-col items-center">
         {/* COMPARISON - FORCED 2 COLUMNS */}
-        <div className="grid grid-cols-2 gap-4 sm:gap-10 w-full items-start mt-6">
+        <div className="grid grid-cols-2 gap-4 w-full items-start mt-6">
           {/* ORIGINAL PREVIEW */}
           <ProductCardUI
             product={product}
             isDimmed={false}
-            displayCurrency={displayCurrency}
+            visitorCurrency={visitorCurrency}
             exchangeRates={exchangeRates}
-            className="w-full scale-90 sm:scale-100 origin-top"
+            className="w-full scale-90 origin-top"
             labelOverride="MEVCUT DURUM"
           />
 
@@ -46,9 +46,9 @@ const AIStudioTextModal: React.FC<AIStudioTextModalProps> = ({
             nameOverride={suggestedName}
             descriptionOverride={suggestedDescription}
             isHighlighted={true}
-            displayCurrency={displayCurrency}
+            visitorCurrency={visitorCurrency}
             exchangeRates={exchangeRates}
-            className="w-full scale-90 sm:scale-100 origin-top"
+            className="w-full scale-90 origin-top"
             labelOverride="YENİ TAVSİYE"
           />
         </div>

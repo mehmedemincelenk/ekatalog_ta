@@ -31,7 +31,7 @@ const ReferenceCard = memo(({
 
   return (
     <div
-      className={`${referencesTheme.card.base} relative group flex items-center justify-center p-8 text-center border-stone-100 bg-white shadow-[0_2px_15px_-5px_rgba(0,0,0,0.08)] hover:shadow-xl hover:shadow-stone-200/50 transition-all duration-300 rounded-[32px] overflow-hidden`}
+      className={`${referencesTheme.card.base} relative group flex items-center justify-center p-8 text-center border-stone-100 bg-white shadow-[0_2px_15px_-5px_rgba(0,0,0,0.08)] hover:shadow-xl hover:shadow-stone-200/50 transition-all duration-300 rounded-xl overflow-hidden`}
     >
       <span
         contentEditable={isAdmin && isInlineEnabled}
@@ -143,7 +143,7 @@ export default function References({
       <div className={referencesTheme.container}>
         {/* CENTERED HEADER SECTION */}
         <div className="flex flex-col items-center justify-center mb-10 text-center">
-          <h2 className="text-2xl sm:text-3xl font-black text-stone-900 tracking-tighter uppercase leading-none">
+          <h2 className="text-2xl font-black text-stone-900 tracking-tighter uppercase leading-none">
             REFERANSLARIMIZ
           </h2>
           <div className="w-12 h-1 bg-stone-900 mt-4 mb-2 rounded-full opacity-10"></div>
@@ -169,7 +169,7 @@ export default function References({
           )}
 
           {isAdmin && activeReferences.length === 0 && (
-            <div className="col-span-full border-2 border-dashed border-stone-100 rounded-[40px] py-16 flex flex-col items-center justify-center gap-3 text-stone-300 bg-stone-50/50">
+            <div className="col-span-full border-2 border-dashed border-stone-100 rounded-xl py-16 flex flex-col items-center justify-center gap-3 text-stone-300 bg-stone-50/50">
               <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm border border-stone-100 mb-2">
                 <span className="text-xl">🤝</span>
               </div>

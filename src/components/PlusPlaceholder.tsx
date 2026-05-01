@@ -16,7 +16,8 @@ const PlusPlaceholder = memo(
     category,
     className = '',
     label,
-  }: PlusPlaceholderProps) => {
+    as,
+  }: PlusPlaceholderProps & { as?: any }) => {
     const globalIcons = THEME.icons;
 
     // VARIANT CONFIGURATION ENGINE
@@ -24,9 +25,9 @@ const PlusPlaceholder = memo(
       PRODUCT: {
         aria: category ? `Add product to ${category}` : 'Add product',
         wrapperClass: `relative flex flex-col items-center justify-center border-2 border-dashed border-stone-200 hover:border-stone-400 !bg-stone-50/50 hover:!bg-stone-50 aspect-square h-auto`,
-        iconSize: 'w-10 h-10 sm:w-12 sm:h-12',
+        iconSize: 'w-10 h-10',
         label: (
-          <span className="mt-4 font-black uppercase text-[0.625rem] sm:text-[0.7rem] tracking-[0.2em] text-stone-400 group-hover/plus:text-stone-900 transition-colors leading-tight">
+          <span className="mt-4 font-black uppercase text-[0.625rem] tracking-[0.2em] text-stone-400 group-hover/plus:text-stone-900 transition-colors leading-tight">
             Bu Kategoriye
             <br />
             Ürün Ekle
@@ -36,9 +37,9 @@ const PlusPlaceholder = memo(
       },
       CATEGORY: {
         aria: 'Add category',
-        wrapperClass: `px-3 !py-0 !border-2 !border-dashed !border-stone-300 text-stone-400 font-black uppercase tracking-widest hover:!border-stone-900 hover:!text-stone-900 !rounded-full bg-stone-50/30 flex items-center justify-center !min-h-[28px] sm:!min-h-[42px] h-full !shadow-none`,
+        wrapperClass: `px-3 !py-0 !border-2 !border-dashed !border-stone-300 text-stone-400 font-black uppercase tracking-widest hover:!border-stone-900 hover:!text-stone-900 !rounded-full bg-stone-50/30 flex items-center justify-center h-8 !shadow-none`,
         iconSize: 'w-4 h-4',
-        label: <span className="ml-2 text-[0.5rem] sm:text-[12px]">{label || 'KATEGORİ EKLE'}</span>,
+        label: <span className="ml-2 text-[0.5rem]">{label || 'KATEGORİ EKLE'}</span>,
         showCorners: false,
       },
       REFERENCE: {
@@ -55,12 +56,12 @@ const PlusPlaceholder = memo(
       },
       CAROUSEL: {
         aria: 'Add carousel slide',
-        wrapperClass: `w-full aspect-[21/9] sm:aspect-[21/7] border-2 border-dashed border-stone-200 hover:border-stone-400 !bg-stone-50/50 hover:!bg-stone-50 !rounded-[2rem] flex items-center justify-center gap-4 group/carousel`,
+        wrapperClass: `w-full aspect-[21/9] border-2 border-dashed border-stone-200 hover:border-stone-400 !bg-stone-50/50 hover:!bg-stone-50 !rounded-[2rem] flex items-center justify-center gap-4 group/carousel`,
         iconSize:
           'w-12 h-12 !rounded-full bg-white shadow-lg border border-stone-100',
         label: (
           <div className="text-left">
-            <span className="block font-black text-[10px] sm:text-xs uppercase tracking-widest text-stone-400 group-hover/carousel:text-stone-900">
+            <span className="block font-black text-[10px] uppercase tracking-widest text-stone-400 group-hover/carousel:text-stone-900">
               Yeni Afiş Ekle
             </span>
             <span className="block text-[8px] text-stone-300 font-medium italic">
@@ -76,6 +77,7 @@ const PlusPlaceholder = memo(
 
     return (
       <Button
+        as={as}
         onClick={() => (type === 'PRODUCT' ? onClick(category) : onClick())}
         variant={type === 'CATEGORY' ? 'secondary' : 'ghost'}
         mode={type === 'REFERENCE' ? 'circle' : 'rectangle'}
