@@ -229,6 +229,36 @@ export default function AddProductModal({
       disableClickOutside={isSubmittingData}
       hideCloseButton={isSubmittingData}
       isStatic={isStatic}
+      footer={(
+        <div className="flex gap-2 w-full">
+          {currentStep > 1 && (
+            <Button onClick={prevStep} variant="secondary" mode="rectangle" className="w-20 h-16 shrink-0" showFingerprint={false}>
+              <Lucide.ChevronLeft size={24} strokeWidth={3} />
+            </Button>
+          )}
+          {currentStep < 7 ? (
+            <Button
+              onClick={nextStep}
+              disabled={!isStepValid()}
+              variant="primary"
+              className={`flex-1 h-16 !rounded-[24px] ${currentStep === 1 ? 'hidden' : ''}`}
+              showFingerprint={true}
+            >
+              <span className="font-black tracking-widest text-[11px] uppercase">DEVAM</span>
+            </Button>
+          ) : (
+            <Button 
+              onClick={handleProductSubmission} 
+              variant="action" 
+              className="flex-1 h-16 !rounded-[24px]" 
+              showFingerprint={true}
+              disabled={isSubmittingData}
+            >
+              <span className="font-black tracking-[0.2em] text-[15px] uppercase">TAMAM</span>
+            </Button>
+          )}
+        </div>
+      )}
     >
       <div className="flex flex-col">
         {/* STEP 1: PHOTO CHOICE */}
@@ -300,20 +330,6 @@ export default function AddProductModal({
               placeholder="Örn: Türk Kahvesi"
               autoFocus
             />
-            <div className="flex gap-2 mt-1">
-              <Button onClick={prevStep} variant="secondary" mode="rectangle" className="w-20 h-16 shrink-0" showFingerprint={false}>
-                <Lucide.ChevronLeft size={24} strokeWidth={3} />
-              </Button>
-              <Button
-                onClick={nextStep}
-                disabled={!formState.productName.trim()}
-                variant="primary"
-                className="flex-1 h-16 !rounded-[24px]"
-                showFingerprint={true}
-              >
-                <span className="font-black tracking-widest text-[11px] uppercase">DEVAM</span>
-              </Button>
-            </div>
           </div>
         )}
 
@@ -365,15 +381,6 @@ export default function AddProductModal({
                 </>
               );
             })()}
-
-            <div className="flex gap-2 mt-4">
-              <Button onClick={prevStep} variant="secondary" mode="rectangle" className="w-20 h-16 shrink-0 shadow-sm" showFingerprint={false}>
-                <Lucide.ChevronLeft size={24} strokeWidth={3} />
-              </Button>
-              <Button onClick={nextStep} variant="primary" className="flex-1 h-16 !rounded-[24px]" showFingerprint={true}>
-                <span className="font-black tracking-widest text-[11px] uppercase">DEVAM</span>
-              </Button>
-            </div>
           </div>
         )}
 
@@ -404,15 +411,6 @@ export default function AddProductModal({
                 onChange={handleFormInputChange}
                 placeholder="Yeni kategori adı..."
               />
-            </div>
-
-            <div className="flex gap-2 mt-1">
-              <Button onClick={prevStep} variant="secondary" mode="rectangle" className="w-20 h-16 shrink-0 shadow-sm" showFingerprint={false}>
-                <Lucide.ChevronLeft size={24} strokeWidth={3} />
-              </Button>
-              <Button onClick={nextStep} disabled={!isStepValid()} variant="primary" className="flex-1 h-16 !rounded-[24px]" showFingerprint={true}>
-                <span className="font-black tracking-widest text-[11px] uppercase">DEVAM</span>
-              </Button>
             </div>
           </div>
         )}
@@ -447,14 +445,6 @@ export default function AddProductModal({
                 ))}
               </div>
             </div>
-            <div className="flex gap-2 mt-8 w-full">
-              <Button onClick={prevStep} variant="secondary" mode="rectangle" className="w-20 h-16 shrink-0" showFingerprint={false}>
-                <Lucide.ChevronLeft size={24} strokeWidth={3} />
-              </Button>
-              <Button onClick={nextStep} variant="primary" className="flex-1 h-16 !rounded-[24px]" showFingerprint={true}>
-                <span className="font-black tracking-widest text-[11px] uppercase">DEVAM</span>
-              </Button>
-            </div>
           </div>
         )}
 
@@ -481,15 +471,6 @@ export default function AddProductModal({
                   showFingerprint={false}
                 >
                   <span className="text-[10px] font-black whitespace-nowrap">STOKTA</span>
-                </Button>
-              </div>
-              
-              <div className="flex gap-2 w-full mt-2">
-                <Button onClick={prevStep} variant="secondary" mode="rectangle" className="w-20 h-16 shrink-0" showFingerprint={false}>
-                  <Lucide.ChevronLeft size={24} strokeWidth={3} />
-                </Button>
-                <Button onClick={nextStep} variant="primary" className="flex-1 h-16 !rounded-[24px]" showFingerprint={true}>
-                  <span className="font-black tracking-widest text-[11px] uppercase">DEVAM</span>
                 </Button>
               </div>
             </div>
@@ -536,20 +517,6 @@ export default function AddProductModal({
                 {formErrorMessage}
               </div>
             )}
-
-            <div className="flex gap-2 w-full pt-4">
-              <Button onClick={prevStep} variant="secondary" mode="rectangle" className="w-20 h-16 shrink-0" showFingerprint={false}>
-                <Lucide.ChevronLeft size={24} strokeWidth={3} />
-              </Button>
-              <Button 
-                onClick={handleProductSubmission} 
-                variant="action" 
-                className="flex-1 h-16 !rounded-[24px]" 
-                showFingerprint={true}
-              >
-                <span className="font-black tracking-[0.2em] text-[15px] uppercase">TAMAM</span>
-              </Button>
-            </div>
           </div>
         )}
       </div>

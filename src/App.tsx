@@ -178,17 +178,23 @@ function CatalogView() {
         
         {!isAdmin && (
           <div className="fixed inset-0 pointer-events-none z-[400] print:hidden">
-            <div className="absolute bottom-10 right-4 pointer-events-auto">
+            <div className="absolute bottom-6 right-4 pointer-events-auto">
               <FloatingGuestMenu
                 onCouponClick={() => openModal('COUPON')}
                 onExcelClick={() => openModal('PRICE_LIST')}
                 onSearchClick={() => {
                   const scrollArea = document.getElementById('mobile-viewport-scroll');
-                  if (scrollArea) scrollArea.scrollTo({ top: 0, behavior: 'smooth' });
+                  if (scrollArea) {
+                    scrollArea.scrollTo({ top: 0, behavior: 'auto' });
+                  }
                   setTimeout(() => {
                     const searchInput = document.getElementById('mobile-search-input') as HTMLInputElement;
-                    if (searchInput) searchInput.focus({ preventScroll: true });
-                  }, 400);
+                    if (searchInput) {
+                      searchInput.focus();
+                      // Force visual scroll just in case
+                      searchInput.scrollIntoView({ block: 'center' });
+                    }
+                  }, 50);
                 }}
                 onQRClick={() => openModal('QR')}
               />
@@ -203,7 +209,7 @@ function CatalogView() {
                 initial={{ opacity: 0, y: 20 }} 
                 animate={{ opacity: 1, y: 0 }} 
                 exit={{ opacity: 0, y: 20 }} 
-                className="absolute bottom-10 right-4 pointer-events-auto"
+                className="absolute bottom-6 right-4 pointer-events-auto"
               >
                 <FloatingAdminMenu 
                   onProductAddTrigger={() => openModal('GLOBAL_ADD_MENU')} 

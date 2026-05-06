@@ -22,15 +22,15 @@ export default function ProductDetailModal({
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      maxWidth="max-w-lg"
+      maxWidth="max-w-sm"
       className="!p-0"
       hideCloseButton={false}
       noPadding={true}
       isStatic={isStatic}
     >
       <div className="flex flex-col relative bg-white p-4">
-        {/* IMAGE SECTION - SQUARE & PADDED */}
-        <div className="relative aspect-square bg-stone-50 overflow-hidden rounded-[2rem] border border-stone-100 shadow-inner">
+        {/* IMAGE SECTION - COMPACT & PADDED */}
+        <div className="relative aspect-square bg-stone-50 overflow-hidden rounded-2xl border border-stone-100 shadow-inner">
           <SmartImage
             src={highDefinitionImageSource}
             alt={product.name}
@@ -39,19 +39,19 @@ export default function ProductDetailModal({
           />
         </div>
 
-        {/* PRODUCT INFO - STRICT LEFT ALIGN */}
-        <div className="pt-8 pb-24 px-4 space-y-5">
-          <div className="space-y-3 text-left">
+        {/* PRODUCT INFO - COMPACT LEFT ALIGN */}
+        <div className="pt-6 pb-20 px-4 space-y-4">
+          <div className="space-y-2 text-left">
             <div>
-              <span className="bg-stone-50 text-stone-500 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] inline-block border border-stone-100 shadow-sm">
+              <span className="bg-stone-50 text-stone-500 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.1em] inline-block border border-stone-100 shadow-sm">
                 {product.category}
               </span>
             </div>
-            <h3 className="text-2xl font-black text-stone-900 tracking-tighter leading-tight max-w-[80%] uppercase">
+            <h3 className="text-lg font-black text-stone-900 tracking-tighter leading-tight max-w-[85%] uppercase">
               {product.name}
             </h3>
             {product.description && (
-              <p className="text-stone-500 text-xs font-bold leading-relaxed max-w-[90%] uppercase">
+              <p className="text-stone-500 text-[10px] font-bold leading-relaxed max-w-[95%] uppercase">
                 {product.description}
               </p>
             )}
@@ -66,13 +66,13 @@ export default function ProductDetailModal({
                 <span className="text-stone-300 line-through text-sm font-bold">
                   {originalPriceLabel}
                 </span>
-                <span className="text-stone-900 text-3xl font-black tracking-tighter">
+                <span className="text-stone-900 text-2xl font-black tracking-tighter">
                   {discountedPriceLabel}
                 </span>
               </div>
             ) : (
               <div className="bg-white/50 backdrop-blur-sm">
-                <span className="text-stone-900 text-3xl font-black tracking-tighter">
+                <span className="text-stone-900 text-2xl font-black tracking-tighter">
                   {originalPriceLabel}
                 </span>
               </div>

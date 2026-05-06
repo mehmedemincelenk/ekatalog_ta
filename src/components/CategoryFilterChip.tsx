@@ -101,12 +101,8 @@ const CategoryFilterChip = memo(
                     </option>
                   ))}
                 </select>
-                {isUpdatingOrder ? (
+                {isUpdatingOrder && (
                   <div className="w-3 h-3 border-2 border-stone-900/30 border-t-stone-900 rounded-full animate-spin" />
-                ) : (
-                  <span className={`text-[11px] font-black text-stone-900 h-full flex items-center justify-center`}>
-                    {(orderIndex ?? 0) + 1}.
-                  </span>
                 )}
               </div>
             ) : (

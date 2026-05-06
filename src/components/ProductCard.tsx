@@ -356,13 +356,13 @@ const ProductCard = memo(
             )}
           </div>
 
-          {/* ABSOLUTE ORDER INDICATOR - BOTTOM RIGHT ALIGNED WITH PRICE */}
+          {/* ABSOLUTE ORDER INDICATOR - HIDDEN PER REQUEST TO PREVENT DOUBLE NUMBERING */}
           {isAdmin && orderIndex !== undefined && (
             <div 
-              className={theme.orderSelect.container}
+              className="absolute top-2 right-2 z-30 pointer-events-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className={theme.orderSelect.wrapper}>
+              <div className="relative group">
                 <select
                   value={orderIndex}
                   disabled={isUpdatingOrder}
@@ -379,21 +379,25 @@ const ProductCard = memo(
                       setIsUpdatingOrder(false);
                     }
                   }}
-                  className={`${theme.orderSelect.select} ${isUpdatingOrder || showSuccess ? 'opacity-0' : 'opacity-100'}`}
+                  className="absolute inset-0 opacity-0 cursor-pointer z-10 w-8 h-8"
                 >
                   {Array.from({ length: itemsInCategory }).map((_, i) => (
                     <option key={i + 1} value={i + 1}>{i + 1}.</option>
                   ))}
                 </select>
-                {isUpdatingOrder ? (
-                  <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : showSuccess ? (
-                  <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex items-center justify-center">
-                    <Lucide.Check size={12} className="text-emerald-500" strokeWidth={4} />
-                  </motion.div>
-                ) : (
-                  <span className="text-white text-[11px] font-black pointer-events-none">{orderIndex}.</span>
-                )}
+                
+                <div className={`
+                  w-8 h-8 rounded-lg flex items-center justify-center transition-all
+                  ${isUpdatingOrder ? 'bg-stone-900' : showSuccess ? 'bg-emerald-500' : 'bg-stone-900/10 hover:bg-stone-900/20'}
+                `}>
+                  {isUpdatingOrder ? (
+                    <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : showSuccess ? (
+                    <Lucide.Check size={14} className="text-white" strokeWidth={4} />
+                  ) : (
+                    <Lucide.ArrowUpDown size={14} className="text-stone-600 group-hover:text-stone-900" />
+                  )}
+                </div>
               </div>
             </div>
           )}
