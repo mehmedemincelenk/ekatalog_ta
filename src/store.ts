@@ -12,9 +12,8 @@ import { STORAGE, TECH, LABELS } from './data/config';
 let errorTimer: NodeJS.Timeout | null = null;
 
 export const useStore = create<StoreState>((set) => ({
-  // Admin Modu (Oturum kontrolü ile başla)
-  isAdmin: typeof window !== 'undefined' ? 
-    sessionStorage.getItem(STORAGE.adminSession) === TECH.auth.sessionActiveValue : false,
+  // Admin Modu (Sayfa yenilendiğinde sıfırlanması için direkt false başlar)
+  isAdmin: false,
   setIsAdmin: (status: boolean) => set({ isAdmin: status }),
 
   adminPin: typeof window !== 'undefined' ? 

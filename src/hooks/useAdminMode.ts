@@ -101,7 +101,6 @@ export function useAdminMode() {
   const logout = useCallback(() => {
     setIsAdmin(false);
     setAdminPin(null);
-    sessionStorage.removeItem(STORAGE.adminSession);
     if (timeoutTimer.current) clearTimeout(timeoutTimer.current);
   }, [setIsAdmin, setAdminPin]);
 
@@ -186,7 +185,6 @@ export function useAdminMode() {
 
   const onPinSuccess = useCallback(() => {
     setIsAdmin(true);
-    sessionStorage.setItem(STORAGE.adminSession, TECH.auth.sessionActiveValue);
     closeModal();
     // Reset click counts for hygiene
     clickCount.current = 0;
