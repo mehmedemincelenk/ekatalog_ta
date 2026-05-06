@@ -91,7 +91,7 @@ export default function MaintenancePage({ onLogoPointerDown, onLogoPointerUp }: 
                   <p className="text-[10px] text-stone-400 font-bold uppercase mt-1 opacity-60">Açılışta haber vermek için numaranızı bırakın</p>
                 </div>
                 
-                <div className="max-w-[280px] mx-auto bg-white rounded-[2.5rem] p-6 shadow-xl shadow-stone-200/20 border border-stone-100">
+                <div className="max-w-[280px] mx-auto bg-white rounded-3xl p-6 shadow-xl shadow-stone-200/20 border border-stone-100">
                   <Numpad onSubmit={handleLeadSubmit} maxDigits={10} />
                 </div>
               </div>

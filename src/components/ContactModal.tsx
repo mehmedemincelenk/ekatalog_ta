@@ -31,7 +31,7 @@ export default function ContactModal({ isOpen, onClose, phone, storeName, isStat
       maxWidth="max-w-xs"
       noPadding
     >
-      <div className="flex flex-col bg-stone-50 border-b border-stone-100 rounded-[2.5rem] shadow-sm overflow-hidden p-10">
+      <div className="flex flex-col bg-stone-50 border-b border-stone-100 rounded-3xl shadow-sm overflow-hidden p-10">
         {/* Main Action Group: Phone & WhatsApp Side-by-Side */}
         <div className="flex items-center justify-center gap-8 w-full">
           {/* Phone Button */}

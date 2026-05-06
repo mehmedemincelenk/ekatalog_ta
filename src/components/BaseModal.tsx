@@ -79,7 +79,7 @@ export default function BaseModal({
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={`
               relative w-full ${maxWidth} mx-auto
-              rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.3)] 
+              rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.3)] 
               flex flex-col max-h-[85vh] 
               print:max-h-none print:shadow-none print:border-none print:w-full print:max-w-full print:rounded-none
               ${className}
@@ -108,7 +108,7 @@ export default function BaseModal({
 
             {/* CLOSE BUTTON (Diamond Corner Position - Outside Overflow) */}
             {!hideCloseButton && (
-              <div className="absolute -top-4 -right-4 z-[70] shrink-0 print:hidden">
+              <div className="absolute -top-2 -right-2 z-[70] shrink-0 print:hidden">
                 <Button
                   onClick={onClose}
                   variant="secondary"
@@ -122,7 +122,7 @@ export default function BaseModal({
             )}
 
             {/* CONTENT WRAPPER (Preserves Corner Masking) */}
-            <div className="bg-white rounded-[2rem] overflow-hidden flex flex-col flex-1 border border-stone-100 relative">
+            <div className="bg-white rounded-3xl overflow-hidden flex flex-col flex-1 border border-stone-100 relative">
               {/* HEADER AREA */}
               {(title || icon) && !progress && (
                 <div className="flex flex-col items-start mt-6 px-6 text-left shrink-0 print:hidden">
