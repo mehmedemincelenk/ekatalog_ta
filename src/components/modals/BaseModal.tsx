@@ -77,6 +77,7 @@ export default function BaseModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={isStatic ? undefined : { opacity: 0, scale: 0.95, y: 10 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            onClick={(e) => e.stopPropagation()}
             className={`
               relative w-full ${maxWidth} mx-auto
               rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.3)] 

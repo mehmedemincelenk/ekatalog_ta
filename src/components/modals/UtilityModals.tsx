@@ -143,16 +143,18 @@ export function CouponModal({ isOpen, onClose, onApplyDiscount, discountError, a
 // ---------------------------------------------------------------------------
 // 5. QUICK EDIT MODAL
 // ---------------------------------------------------------------------------
-export function QuickEditModal({ isOpen, onClose, onSave, initialValue = '', placeholder = '', type = 'text', isStatic = false }: Omit<QuickEditModalProps, 'title' | 'subtitle'>) {
+export function QuickEditModal({ isOpen, onClose, onSave, title, subtitle, initialValue = '', placeholder = '', type = 'text', isStatic = false }: QuickEditModalProps) {
   const [value, setValue] = useState(initialValue);
   const [prevInitial, setPrevInitial] = useState(initialValue);
   const inputRef = useRef<HTMLInputElement>(null);
+  
   if (initialValue !== prevInitial) { setValue(initialValue); setPrevInitial(initialValue); }
   useEffect(() => { if (isOpen) setTimeout(() => inputRef.current?.focus(), 100); }, [isOpen]);
+  
   const handleSave = () => { onSave(value.trim()); onClose(); };
 
   return (
-    <BaseModal isOpen={isOpen} onClose={onClose} maxWidth="max-w-sm" isStatic={isStatic}>
+    <BaseModal isOpen={isOpen} onClose={onClose} maxWidth="max-w-sm" isStatic={isStatic} title={title} subtitle={subtitle}>
       <div className="flex flex-col gap-6 py-2">
         <FormInput id="quick-edit-input" ref={inputRef} type={type} value={value} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)} onKeyDown={(e: React.KeyboardEvent) => e.key === 'Enter' && handleSave()} placeholder={placeholder} className="!text-center !py-6 focus:!border-emerald-500 !text-sm !rounded-3xl shadow-inner" />
         <div className="flex gap-3 w-full">

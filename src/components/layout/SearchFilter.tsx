@@ -1,4 +1,5 @@
 import { useState, memo, useEffect } from 'react';
+import * as Lucide from 'lucide-react';
 import { THEME, LABELS } from '../../data/config';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../ui/Button';
@@ -9,6 +10,7 @@ import FormInput from '../ui/FormInput';
 import { useDebounce } from '../../hooks/useCommon';
 import { useStore } from '../../store';
 import { SearchFilterProps } from '../../types';
+import { useProducts } from '../../hooks/useProductsHub';
 
 /**
  * SEARCH FILTER COMPONENT (DIAMOND EDITION)
@@ -31,11 +33,18 @@ const SearchFilter = memo(
       setSearchQuery: onSearchChange,
       activeCategories,
       toggleCategory: onCategoryToggle,
+      updateSetting,
+      showFeedback,
     } = useStore();
+
+    const { allProducts, executeGranularBulkActions, reorderCategories } = useProducts(search, activeCategories, isAdmin, settings);
 
     const [internalSearch, setInternalSearch] = useState(search);
     const [isPanelOpen, setIsPanelOpen] = useState(false);
     const [isAddingCategory, setIsAddingCategory] = useState(false);
+    
+    // NEW: Category Management State
+    const [adminAction, setAdminAction] = useState<'IDLE' | 'EDIT' | 'DELETE'>('IDLE');
 
     const displayConfig = settings?.displayConfig || {
       showSearch: true,
@@ -65,18 +74,41 @@ const SearchFilter = memo(
       ? sortedList 
       : sortedList.slice(0, mobileInitialLimit);
 
-    const isAllSelected = activeCategories.length === 0;
-    const chipTheme = THEME.searchFilter.categoryList.chip;
-
     const renderCategoryList = (list: string[]) => (
       <>
-        {/* ADMIN: KATEGORİ EKLE CHIP (Moved to the very beginning) */}
+        {/* ADMIN: KATEGORİ YÖNETİM GRUBU */}
         {isAdmin && (
-          <PlusPlaceholder
-            type="CATEGORY"
-            onClick={() => setIsAddingCategory(true)}
-            className="shrink-0 min-h-[28px] !py-0"
-          />
+          <div className="flex items-center gap-1 shrink-0">
+            {/* EKLE (+) */}
+            <PlusPlaceholder
+              type="CATEGORY"
+              onClick={() => {
+                setAdminAction('IDLE');
+                setIsAddingCategory(true);
+              }}
+              className="!py-0"
+            />
+            
+            {/* DÜZENLE (Pencil) */}
+            <Button
+              variant="glass"
+              mode="square"
+              className={`w-8 h-8 !bg-stone-900/60 backdrop-blur-md border border-white/20 text-white shadow-xl !rounded-lg !p-0 transition-all ${adminAction === 'EDIT' ? '!bg-amber-500 ring-2 ring-amber-400' : ''}`}
+              icon={<Lucide.Pencil size={14} strokeWidth={3} />}
+              onClick={() => setAdminAction(prev => prev === 'EDIT' ? 'IDLE' : 'EDIT')}
+              title="Kategoriyi Düzenle (Tıkla ve Chip'e Bas)"
+            />
+
+            {/* SİL (Trash) */}
+            <Button
+              variant="glass"
+              mode="square"
+              className={`w-8 h-8 !bg-stone-900/60 backdrop-blur-md border border-white/20 text-white shadow-xl !rounded-lg !p-0 transition-all ${adminAction === 'DELETE' ? '!bg-red-600 ring-2 ring-red-500' : ''}`}
+              icon={<Lucide.Trash2 size={14} strokeWidth={3} />}
+              onClick={() => setAdminAction(prev => prev === 'DELETE' ? 'IDLE' : 'DELETE')}
+              title="Kategoriyi Sil (Tıkla ve Chip'e Bas)"
+            />
+          </div>
         )}
 
         {list.map((cat) => (
@@ -91,6 +123,29 @@ const SearchFilter = memo(
             onOrderChange={onCategoryOrderChange}
             orderIndex={sortedList.indexOf(cat)}
             totalCategories={sortedList.length}
+            adminActionOverride={adminAction}
+            onDelete={async (name) => {
+              // Diamond Standard: Ürünleri silmek yerine 'Arşiv' kategorisine taşıyoruz.
+              const catProds = allProducts?.filter(p => p.category === name) || [];
+              
+              if (catProds.length > 0) {
+                const actions = catProds.map(p => ({ productId: p.id, category: 'Arşiv' }));
+                await executeGranularBulkActions(actions);
+              }
+              
+              // Kategoriyi listeden kaldır ve Arşiv'i ekle (yoksa)
+              let newOrder = (settings?.categoryOrder || []).filter(c => c !== name);
+              if (!newOrder.includes('Arşiv')) {
+                newOrder = [...newOrder, 'Arşiv'];
+              }
+              
+              // Local & Remote Update
+              updateSetting('categoryOrder', newOrder);
+              await reorderCategories(newOrder);
+              
+              showFeedback('success', `Kategori silindi, ${catProds.length} ürün Arşiv'e taşındı.`);
+              setAdminAction('IDLE');
+            }}
           />
         ))}
         
@@ -105,7 +160,6 @@ const SearchFilter = memo(
             + DAHA FAZLA
           </Button>
         )}
-
       </>
     );
 
@@ -185,6 +239,7 @@ const SearchFilter = memo(
           }}
           placeholder="Kategori adı..."
           initialValue=""
+          title="YENİ KATEGORİ EKLE"
         />
       </div>
     );

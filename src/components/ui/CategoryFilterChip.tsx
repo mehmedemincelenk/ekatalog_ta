@@ -18,41 +18,40 @@ const CategoryFilterChip = memo(
     productCount,
     onSelect,
     onRename,
+    onDelete,
     onOrderChange,
     orderIndex,
     totalCategories = 0,
     showFingerprint = true,
-  }: CategoryFilterChipProps) => {
+    adminActionOverride = 'IDLE', // NEW
+  }: CategoryFilterChipProps & { 
+    onDelete?: (name: string) => void;
+    adminActionOverride?: 'IDLE' | 'EDIT' | 'DELETE';
+  }) => {
     const chipTheme = THEME.searchFilter.categoryList.chip;
     const [isUpdatingOrder, setIsUpdatingOrder] = useState(false);
-    const longPressTimer = useRef<NodeJS.Timeout | null>(null);
     const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
+    const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
-    // LONG PRESS LOGIC: Elegant way to trigger rename for admins
-    const handlePointerDown = useCallback(() => {
-      if (!isAdminMode) return;
-      longPressTimer.current = setTimeout(() => {
+    const handleChipClick = () => {
+      if (adminActionOverride === 'EDIT') {
         setIsRenameModalOpen(true);
-      }, 600); // 600ms is the "Diamond Standard" for long press
-    }, [isAdminMode]);
-
-    const handlePointerUp = useCallback(() => {
-      if (longPressTimer.current) {
-        clearTimeout(longPressTimer.current);
-        longPressTimer.current = null;
+      } else if (adminActionOverride === 'DELETE') {
+        setIsDeleteConfirmOpen(true);
+      } else {
+        onSelect(categoryName);
       }
-    }, []);
+    };
 
     return (
       <div
         className={`
         ${chipTheme.container} ${THEME.radius.chip} items-stretch shrink-0 select-none cursor-pointer transition-all overflow-hidden relative h-8 flex
-        ${isItemSelected ? chipTheme.active : chipTheme.inactive}
+        ${adminActionOverride === 'EDIT' ? 'ring-2 ring-amber-400 border-amber-500' : ''}
+        ${adminActionOverride === 'DELETE' ? 'ring-2 ring-red-400 border-red-500 opacity-80 hover:opacity-100' : ''}
+        ${adminActionOverride === 'IDLE' ? (isItemSelected ? chipTheme.active : chipTheme.inactive) : ''}
       `}
-        onPointerDown={handlePointerDown}
-        onPointerUp={handlePointerUp}
-        onPointerLeave={handlePointerUp} // Safety: Clear if finger slides away
-        onClick={() => onSelect(categoryName)}
+        onClick={handleChipClick}
       >
         {/* FINGERPRINT WATERMARK (DIAMOND SEAL) */}
         {showFingerprint && (
@@ -140,6 +139,22 @@ const CategoryFilterChip = memo(
           }}
           initialValue={categoryName}
           placeholder="Yeni kategori adı girin..."
+          title="KATEGORİ İSMİNİ DÜZENLE"
+        />
+
+        <QuickEditModal
+          isOpen={isDeleteConfirmOpen}
+          onClose={() => setIsDeleteConfirmOpen(false)}
+          onSave={() => {
+            onDelete?.(categoryName);
+            setIsDeleteConfirmOpen(false);
+          }}
+          initialValue="sil"
+          title="Kategori silinecek"
+          subtitle='Kategoriyi silmek için aşağıya "sil" yazınız..'
+          placeholder="buraya yazın"
+          confirmLabel="ONAYLA"
+          variant="danger"
         />
       </div>
     );
