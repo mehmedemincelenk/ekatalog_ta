@@ -112,7 +112,7 @@ export default function ShowroomPage() {
     { id: 'global', title: 'KISAYOL HÜCRESİ', component: <GlobalAddMenuModal isOpen={true} onClose={() => toggleModalVisibility('global')} onAction={() => {}} isStatic={true} />, scale: 0.9 },
     { id: 'detail', title: 'VİTRİN HÜCRESİ', component: <ProductDetailModal isOpen={true} onClose={() => toggleModalVisibility('detail')} product={MOCK_PRODUCT} isStatic={true} isPromotionActive={false} originalPriceLabel="100 ₺" discountedPriceLabel={undefined} highDefinitionImageSource="" />, scale: 0.9 },
     { id: 'edit', title: 'YÖNETİM HÜCRESİ', component: <EditProdCard product={MOCK_PRODUCT} categories={MOCK_CATEGORIES} onDelete={() => {}} onUpdate={() => {}} isOpen={true} setIsOpen={() => toggleModalVisibility('edit')} isStatic={true} initialStep={editProdStep} />, steps: [1, 2, 3, 4], stepLabels: ['Edit', 'Sil Op.', 'S.Ürün', 'S.Resim'], currentStep: editProdStep, setStep: setEditProdStep, scale: 0.8 },
-    { id: 'quick', title: 'SÜRAT HÜCRESİ', component: <QuickEditModal isOpen={true} onClose={() => toggleModalVisibility('quick')} onSave={() => {}} initialValue="150,00 ₺" isStatic={true} />, scale: 0.9 }
+    { id: 'quick', title: 'SÜRAT HÜCRESİ', component: <QuickEditModal isOpen={true} onClose={() => toggleModalVisibility('quick')} onSave={() => {}} initialValue="150,00 ₺" isStatic={true} title="HIZLI DÜZENLE" />, scale: 0.9 }
   ];
 
   const pageSections = [

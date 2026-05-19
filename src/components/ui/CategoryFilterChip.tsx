@@ -1,4 +1,4 @@
-import { memo, useRef, useCallback, useState } from 'react';
+import { memo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { THEME } from '../../data/config';
 import { QuickEditModal } from '../modals/UtilityModals';
@@ -80,10 +80,10 @@ const CategoryFilterChip = memo(
             {isAdminMode ? (
               <div className="relative w-9 h-full flex-none">
                 <div className="absolute inset-0 bg-stone-900/60 backdrop-blur-md border-r border-white/10 flex items-center justify-center pointer-events-none">
-                  <span className="text-white text-[10px] font-black">{orderIndex + 1}.</span>
+                  <span className="text-white text-[10px] font-black">{(orderIndex ?? 0) + 1}.</span>
                 </div>
                 <select
-                  value={orderIndex}
+                  value={orderIndex ?? 0}
                   disabled={isUpdatingOrder}
                   onChange={async (e) => {
                     e.stopPropagation();
@@ -156,8 +156,6 @@ const CategoryFilterChip = memo(
           title="Kategori silinecek"
           subtitle='Kategoriyi silmek için aşağıya "sil" yazınız..'
           placeholder="buraya yazın"
-          confirmLabel="ONAYLA"
-          variant="danger"
         />
       </div>
     );

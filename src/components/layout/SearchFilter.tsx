@@ -3,7 +3,6 @@ import * as Lucide from 'lucide-react';
 import { THEME, LABELS } from '../../data/config';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../ui/Button';
-import PlusPlaceholder from '../ui/PlusPlaceholder';
 import CategoryFilterChip from '../ui/CategoryFilterChip';
 import { QuickEditModal } from '../modals/UtilityModals';
 import FormInput from '../ui/FormInput';
@@ -155,7 +154,7 @@ const SearchFilter = memo(
 
     return (
       <div
-        className={`w-full bg-stone-50 border-b border-stone-200 pt-3 pb-1 relative z-40 ${!showAll ? 'opacity-50 grayscale' : ''}`}
+        className={`w-full bg-stone-50 border-b border-stone-200 py-2 relative z-40 ${!showAll ? 'opacity-50 grayscale' : ''}`}
       >
         <div className={`${filterTheme.container} !flex-col !items-stretch`}>
           {/* TOP BAR: Search & Interaction */}
@@ -194,22 +193,20 @@ const SearchFilter = memo(
           </div>
 
           {/* EXPANDED PANEL */}
-          {displayConfig.showCategories && (
+          {displayConfig.showCategories && isPanelOpen && (
             <div className="mt-3">
               <AnimatePresence mode="wait">
-                {isPanelOpen ? (
-                  <motion.div
-                    key="expanded-categories"
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="flex flex-wrap justify-start items-center gap-2 py-1 w-full">
-                      {renderCategoryList(visibleList)}
-                    </div>
-                  </motion.div>
-                ) : null}
+                <motion.div
+                  key="expanded-categories"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="flex flex-wrap justify-start items-center gap-2 py-1 w-full">
+                    {renderCategoryList(visibleList)}
+                  </div>
+                </motion.div>
               </AnimatePresence>
             </div>
           )}

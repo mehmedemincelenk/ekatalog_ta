@@ -1,5 +1,5 @@
 import { useStore } from '../../store';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import Button from '../ui/Button';
 import BaseModal from './BaseModal';
 import StatusToggle from '../ui/StatusToggle';
@@ -118,16 +118,25 @@ export default function DisplaySettingsModal({
     const [localAnnouncement, setLocalAnnouncement] = useState(settings?.announcementBar?.enabled || false);
     const [localMaintenance, setLocalMaintenance] = useState(settings?.maintenanceMode?.enabled || false);
     const [localInline, setLocalInline] = useState(isInlineEnabled);
+    const [quickEdit, setQuickEdit] = useState<{
+      key: string;
+      value: string;
+      title: string;
+    } | null>(null);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    useEffect(() => {
-      if (!isOpen) return;
-      setLocalConfig(settings?.displayConfig || {});
-      setLocalAnnouncement(settings?.announcementBar?.enabled || false);
-      setLocalMaintenance(settings?.maintenanceMode?.enabled || false);
-      setLocalInline(isInlineEnabled);
-    }, [settings, isInlineEnabled, isOpen]);
+    // Adjusting state during render instead of useEffect to avoid sync setState warning
+    const [prevOpen, setPrevOpen] = useState(isOpen);
+    if (isOpen !== prevOpen) {
+      setPrevOpen(isOpen);
+      if (isOpen && settings) {
+        setLocalConfig(settings.displayConfig || {});
+        setLocalAnnouncement(settings.announcementBar?.enabled || false);
+        setLocalMaintenance(settings.maintenanceMode?.enabled || false);
+        setLocalInline(isInlineEnabled);
+      }
+    }
 
     if (!settings) return null;
 
@@ -212,62 +221,6 @@ export default function DisplaySettingsModal({
       setHelpId(null);
     };
 
-    const groups = [
-      {
-        id: 'floating',
-        title: 'YÜZEN MENÜ BİLEŞENLERİ',
-        options: [
-          { key: 'showWhatsapp', label: 'WhatsApp', isOn: getOptionState('showWhatsapp'), onToggle: () => toggleOption('showWhatsapp') },
-          { key: 'showInstagram', label: 'Instagram', isOn: getOptionState('showInstagram'), onToggle: () => toggleOption('showInstagram') },
-          { key: 'showAddress', label: 'Adres Bilgisi', isOn: getOptionState('showAddress'), onToggle: () => toggleOption('showAddress') },
-          { key: 'showCurrency', label: 'Döviz Çevirici', isOn: getOptionState('showCurrency'), onToggle: () => toggleOption('showCurrency') },
-          { key: 'showPriceList', label: 'Fiyat Listesi', isOn: getOptionState('showPriceList'), onToggle: () => toggleOption('showPriceList') },
-          { key: 'showCoupons', label: 'İndirim Kuponu', isOn: getOptionState('showCoupons'), onToggle: () => toggleOption('showCoupons') },
-        ]
-      },
-      {
-        id: 'branding',
-        title: 'VİTRİN VE TASARIM',
-        options: [
-          { key: 'showLogo', label: 'Mağaza Logosu', isOn: getOptionState('showLogo'), onToggle: () => toggleOption('showLogo') },
-          { key: 'showSubtitle', label: 'Slogan / Alt Başlık', isOn: getOptionState('showSubtitle'), onToggle: () => toggleOption('showSubtitle') },
-          { key: 'showCarousel', label: 'Ana Sayfa Afişleri', isOn: getOptionState('showCarousel'), onToggle: () => toggleOption('showCarousel') },
-          { key: 'showReferences', label: 'Referans Logoları', isOn: getOptionState('showReferences'), onToggle: () => toggleOption('showReferences') },
-          { key: 'showPrice', label: 'Ürün Fiyatları', isOn: getOptionState('showPrice'), onToggle: () => toggleOption('showPrice') },
-          { key: 'announcement', label: 'Duyuru Panosu', isOn: localAnnouncement, onToggle: toggleAnnouncement },
-        ]
-      },
-      {
-        id: 'system',
-        title: 'SİSTEM YÖNETİMİ',
-        options: [
-          { key: 'showSearch', label: 'Arama Çubuğu', isOn: getOptionState('showSearch'), onToggle: () => toggleOption('showSearch') },
-          { key: 'showCategories', label: 'Kategori Filtreleri', isOn: getOptionState('showCategories'), onToggle: () => toggleOption('showCategories') },
-          { key: 'inline', label: 'Hızlı Düzenleme', isOn: localInline, onToggle: handleToggleInline, hasHelp: true },
-          { key: 'maintenance', label: 'Bakım Modu', isOn: localMaintenance, onToggle: toggleMaintenance, hasHelp: true },
-        ]
-      },
-      {
-        id: 'identity',
-        title: 'MAĞAZA KİMLİĞİ',
-        isIdentity: true,
-        options: [
-          { key: 'logo', label: 'Mağaza Logosu', value: settings.logoUrl ? 'GÖRSEL AYARLANDI' : 'GÖRSEL EKSİK', icon: <Lucide.Camera size={14} />, isLogo: true },
-          { key: 'title', label: 'Mağaza Adı', value: settings.title, icon: <Lucide.Settings2 size={14} /> },
-          { key: 'subtitle', label: 'Alt Başlık / Slogan', value: settings.subtitle, icon: <Lucide.Tags size={14} /> },
-          { key: 'whatsapp', label: 'WhatsApp Hattı', value: settings.whatsapp, icon: <Lucide.Phone size={14} /> },
-          { key: 'instagram', label: 'Instagram Kullanıcı Adı', value: settings.instagram?.split('/').pop() || '', icon: <Lucide.Camera size={14} /> },
-          { key: 'address', label: 'Mağaza Adresi', value: settings.address, icon: <Lucide.MapPin size={14} /> },
-        ]
-      }
-    ];
-
-    const [quickEdit, setQuickEdit] = useState<{
-      key: string;
-      value: string;
-      title: string;
-    } | null>(null);
-
     const handleIdentityClick = (option: any) => {
       if (option.isLogo) {
         fileInputRef.current?.click();
@@ -290,6 +243,56 @@ export default function DisplaySettingsModal({
       }
       setQuickEdit(null);
     };
+
+    const groups = [
+      {
+        id: 'floating',
+        title: 'YÜZEN MENÜ BİLEŞENLERİ',
+        options: [
+          { key: 'showWhatsapp', label: 'WhatsApp', isOn: getOptionState('showWhatsapp' as keyof DisplayConfig), onToggle: () => toggleOption('showWhatsapp' as keyof DisplayConfig) },
+          { key: 'showInstagram', label: 'Instagram', isOn: getOptionState('showInstagram' as keyof DisplayConfig), onToggle: () => toggleOption('showInstagram' as keyof DisplayConfig) },
+          { key: 'showAddress', label: 'Adres Bilgisi', isOn: getOptionState('showAddress' as keyof DisplayConfig), onToggle: () => toggleOption('showAddress' as keyof DisplayConfig) },
+          { key: 'showCurrency', label: 'Döviz Çevirici', isOn: getOptionState('showCurrency' as keyof DisplayConfig), onToggle: () => toggleOption('showCurrency' as keyof DisplayConfig) },
+          { key: 'showPriceList', label: 'Fiyat Listesi', isOn: getOptionState('showPriceList' as keyof DisplayConfig), onToggle: () => toggleOption('showPriceList' as keyof DisplayConfig) },
+          { key: 'showCoupons', label: 'İndirim Kuponu', isOn: getOptionState('showCoupons' as keyof DisplayConfig), onToggle: () => toggleOption('showCoupons' as keyof DisplayConfig) },
+        ]
+      },
+      {
+        id: 'branding',
+        title: 'VİTRİN VE TASARIM',
+        options: [
+          { key: 'showLogo', label: 'Mağaza Logosu', isOn: getOptionState('showLogo' as keyof DisplayConfig), onToggle: () => toggleOption('showLogo' as keyof DisplayConfig) },
+          { key: 'showSubtitle', label: 'Slogan / Alt Başlık', isOn: getOptionState('showSubtitle' as keyof DisplayConfig), onToggle: () => toggleOption('showSubtitle' as keyof DisplayConfig) },
+          { key: 'showCarousel', label: 'Ana Sayfa Afişleri', isOn: getOptionState('showCarousel' as keyof DisplayConfig), onToggle: () => toggleOption('showCarousel' as keyof DisplayConfig) },
+          { key: 'showReferences', label: 'Referans Logoları', isOn: getOptionState('showReferences' as keyof DisplayConfig), onToggle: () => toggleOption('showReferences' as keyof DisplayConfig) },
+          { key: 'showPrice', label: 'Ürün Fiyatları', isOn: getOptionState('showPrice' as keyof DisplayConfig), onToggle: () => toggleOption('showPrice' as keyof DisplayConfig) },
+          { key: 'announcement', label: 'Duyuru Panosu', isOn: localAnnouncement, onToggle: toggleAnnouncement },
+        ]
+      },
+      {
+        id: 'system',
+        title: 'SİSTEM YÖNETİMİ',
+        options: [
+          { key: 'showSearch', label: 'Arama Çubuğu', isOn: getOptionState('showSearch' as keyof DisplayConfig), onToggle: () => toggleOption('showSearch' as keyof DisplayConfig) },
+          { key: 'showCategories', label: 'Kategori Filtreleri', isOn: getOptionState('showCategories' as keyof DisplayConfig), onToggle: () => toggleOption('showCategories' as keyof DisplayConfig) },
+          { key: 'inline', label: 'Hızlı Düzenleme', isOn: localInline, onToggle: handleToggleInline, hasHelp: true },
+          { key: 'maintenance', label: 'Bakım Modu', isOn: localMaintenance, onToggle: toggleMaintenance, hasHelp: true },
+        ]
+      },
+      {
+        id: 'identity',
+        title: 'MAĞAZA KİMLİĞİ',
+        isIdentity: true,
+        options: [
+          { key: 'logo', label: 'Mağaza Logosu', value: settings.logoUrl ? 'GÖRSEL AYARLANDI' : 'GÖRSEL EKSİK', icon: <Lucide.Camera size={14} />, isLogo: true },
+          { key: 'title', label: 'Mağaza Adı', value: settings.title, icon: <Lucide.Settings2 size={14} /> },
+          { key: 'subtitle', label: 'Alt Başlık / Slogan', value: settings.subtitle, icon: <Lucide.Tags size={14} /> },
+          { key: 'whatsapp', label: 'WhatsApp Hattı', value: settings.whatsapp, icon: <Lucide.Phone size={14} /> },
+          { key: 'instagram', label: 'Instagram Kullanıcı Adı', value: settings.instagram?.split('/').pop() || '', icon: <Lucide.Camera size={14} /> },
+          { key: 'address', label: 'Mağaza Adresi', value: settings.address, icon: <Lucide.MapPin size={14} /> },
+        ]
+      }
+    ];
 
     return (
       <>

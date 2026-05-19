@@ -304,7 +304,7 @@ export const THEME = {
 
   productGrid: {
     layout: 'w-full flex flex-col min-h-[400px]',
-    sectionSpacing: 'mt-12 first:mt-4',
+    sectionSpacing: 'mt-12 first:mt-2',
     header: {
       wrapper:
         'flex items-center gap-3 mb-6 px-1',

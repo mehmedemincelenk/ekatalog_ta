@@ -183,11 +183,20 @@ export function PinModal({ onVerify, onAuthenticationSuccess, onModalClose, isLo
   const theme = THEME.pinModal;
   const globalIcons = THEME.icons;
 
-  useEffect(() => {
-    if (initialStep === 1) { setOverrideIsLockedOut(false); setOverrideFailedAttempts(0); }
-    else if (initialStep === 2) { setOverrideIsLockedOut(false); setOverrideFailedAttempts(2); }
-    else if (initialStep === 3) { setOverrideIsLockedOut(true); setOverrideFailedAttempts(0); }
-  }, [initialStep]);
+  const [prevInitialStep, setPrevInitialStep] = useState(initialStep);
+  if (initialStep !== prevInitialStep) {
+    setPrevInitialStep(initialStep);
+    if (initialStep === 1) {
+      setOverrideIsLockedOut(false);
+      setOverrideFailedAttempts(0);
+    } else if (initialStep === 2) {
+      setOverrideIsLockedOut(false);
+      setOverrideFailedAttempts(2);
+    } else if (initialStep === 3) {
+      setOverrideIsLockedOut(true);
+      setOverrideFailedAttempts(0);
+    }
+  }
 
   const handleDigitEntry = async (digit: string) => {
     if (isInputDisabled || currentPinAttempt.length >= 4) return;

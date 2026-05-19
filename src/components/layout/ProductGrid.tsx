@@ -4,7 +4,6 @@
 import { memo, Fragment } from 'react';
 import { THEME, LABELS } from '../../data/config';
 import ProductCard from './ProductCard';
-import PlusPlaceholder from '../ui/PlusPlaceholder';
 import Button from '../ui/Button';
 import { EditProdCard } from './EditProdCard';
 import CategoryHeader from './CategoryHeader';
@@ -30,7 +29,6 @@ const ProductGrid = memo(
     onImageUpload,
     visibleCategoryLimit,
     onLoadMore,
-    onAddClick,
     activeAdminProductId,
     setActiveAdminProductId,
     visitorCurrency = 'TRY',

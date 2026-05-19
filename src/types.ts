@@ -577,7 +577,7 @@ export interface QuickEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (value: string) => void;
-  title: string;
+  title?: string;
   subtitle?: string;
   initialValue: string;
   placeholder?: string;
@@ -617,9 +617,6 @@ export type ModalType =
   | 'COUPON'
   | 'PRICE_LIST'
   | 'GLOBAL_ADD_MENU'
-  | 'AI_STUDIO_TEXT'
-  | 'AI_STUDIO_COMPARE'
-  | 'AI_STUDIO_BG'
   | 'LOCATION'
   | 'CONTACT'
   | 'SOCIAL_EXPORT'
@@ -676,26 +673,4 @@ export interface StoreState {
     duration?: number,
   ) => void;
   hideFeedback: () => void;
-}
-
-export interface AIStudioTextModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  product: Product;
-  suggestedName: string;
-  suggestedDescription: string;
-  onConfirm: (newName: string, newDesc: string) => void;
-  onDismiss: () => void;
-  displayCurrency?: 'TRY' | 'USD' | 'EUR';
-  exchangeRates?: { usd: number; eur: number };
-  isStatic?: boolean;
-}
-
-export interface AIStudioCompareModalProps {
-  product: Product | null;
-  isOpen: boolean;
-  onClose: () => void;
-  onApply: (productId: string, polishedUrl: string) => void;
-  onDismiss: (productId: string) => void;
-  isStatic?: boolean;
 }

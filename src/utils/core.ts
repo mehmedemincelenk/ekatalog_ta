@@ -11,30 +11,7 @@ export * from './price';
  */
 
 // --- 0. DATA CONVERTERS ---
-
-/**
- * fileToBase64: Universal converter for files/blobs.
- */
-export async function fileToBase64(file: File | Blob): Promise<string> {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
-    reader.readAsDataURL(file);
-  });
-}
-
-/**
- * base64ToBlob: Reconstructs images from API responses.
- */
-export function base64ToBlob(base64: string, mime: string): Blob {
-  const byteCharacters = atob(base64);
-  const byteNumbers = new Array(byteCharacters.length);
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i);
-  }
-  const byteArray = new Uint8Array(byteNumbers);
-  return new Blob([byteArray], { type: mime });
-}
+// (Defunct converters deleted)
 
 // --- 1. UI HELPERS ---
 

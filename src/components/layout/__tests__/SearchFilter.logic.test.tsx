@@ -1,5 +1,4 @@
 import { describe, it, expect, vi } from 'vitest';
-import { renderHook } from '@testing-library/react';
 
 // Mocking useStore and useProducts to test the logic in SearchFilter
 // Since SearchFilter is a memoized component, we will test the logic by mocking the hooks it uses.

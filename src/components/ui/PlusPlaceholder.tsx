@@ -15,7 +15,6 @@ const PlusPlaceholder = memo(
     onClick,
     category,
     className = '',
-    label,
     as,
   }: PlusPlaceholderProps & { as?: any }) => {
     const globalIcons = THEME.icons;

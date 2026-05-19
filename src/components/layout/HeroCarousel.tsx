@@ -6,7 +6,6 @@ import { supabase } from '../../supabase';
 import { getActiveStoreSlug, reorderArray } from '../../utils/core';
 import CarouselSlideUnit from './CarouselSlideUnit';
 import Button from '../ui/Button';
-import PlusPlaceholder from '../ui/PlusPlaceholder';
 
 import * as Lucide from 'lucide-react';
 
