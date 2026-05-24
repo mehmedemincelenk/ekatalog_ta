@@ -378,7 +378,13 @@ export default function DisplaySettingsModal({
                   ) : (
                     <SettingCard
                       key={option.key}
-                      option={option as any}
+                      option={{
+                        key: option.key,
+                        label: option.label,
+                        isOn: option.isOn,
+                        onToggle: option.onToggle,
+                        hasHelp: option.hasHelp,
+                      }}
                       onHelpTrigger={flow.setHelpId}
                       isHiddenHelp={flow.hiddenHelpIds.includes(option.key)}
                     />
