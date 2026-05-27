@@ -31,7 +31,7 @@ const AdminReferenceCard = memo(
             <img
               src={refData.logo}
               alt={refData.name}
-              className="h-6 w-auto object-contain grayscale opacity-80"
+              className="h-6 w-auto object-contain opacity-90"
             />
             <span className="text-[8px] font-black tracking-[0.1em] text-stone-400 uppercase">
               {refData.name}
@@ -119,6 +119,8 @@ export default function References({
   useEffect(() => {
     const track = trackRef.current;
     if (!track || activeReferences.length === 0 || isAdmin) return;
+
+    let animationFrameId: number;
 
     const animate = (time: number) => {
       if (!lastTime.current) {
@@ -306,7 +308,7 @@ export default function References({
           <div
             ref={trackRef}
             style={{ transform: 'translate3d(0px, 0, 0)' }}
-            className="flex gap-10 py-1.5 items-center justify-center mx-auto shrink-0 w-max"
+            className="flex gap-10 py-1.5 items-center shrink-0 w-max"
           >
             {marqueeItems.map((ref, idx) => (
               <div
@@ -318,14 +320,13 @@ export default function References({
                     src={ref.logo}
                     alt={ref.name}
                     decoding="async"
-                    draggable={false}
-                    className="h-10 sm:h-12 w-auto object-contain grayscale opacity-50 contrast-[0.85] hover:grayscale-0 hover:opacity-100 hover:scale-105 active:scale-95 transition-all duration-300 select-none cursor-pointer ease-out"
+                    className="h-12 sm:h-14 w-auto object-contain opacity-85 hover:opacity-100 transition-all duration-300 pointer-events-none select-none"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
                     }}
                   />
                 ) : (
-                  <span className="text-[12px] font-black uppercase tracking-[0.2em] text-stone-400 hover:text-stone-900 hover:scale-105 active:scale-95 transition-all duration-300 select-none cursor-pointer ease-out">
+                  <span className="text-[12px] font-black uppercase tracking-[0.2em] text-stone-500 hover:text-stone-900 transition-colors pointer-events-none select-none">
                     {ref.name}
                   </span>
                 )}

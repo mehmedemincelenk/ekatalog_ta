@@ -265,7 +265,8 @@ def main():
             "firsat", "fırsat", "kampanya", "indirim", "discount", "promo", "banner", "reklam", "ad-", "adsense", 
             "slider", "vitrin", "pop-up", "popup", "tel", "phone", "adres", "address", "iletisim", "contact", 
             "ulas", "ulaş", "hakkimizda", "hakkımızda", "about", "default", "widget", "sidebar", "theme", "plugin", 
-            "yazfirsati", "yazfırsatı", "kategori", "category", "urun-kategori", "product-category", "tag", "etiket"
+            "yazfirsati", "yazfırsatı", "kategori", "category", "urun-kategori", "product-category", "tag", "etiket",
+            "referanslarimiz", "referanslar", "referans-banner", "reference-banner", "references-header", "references-banner"
         ]
         if any(k in url_l or k in alt_l for k in ui_and_promo_keywords):
             return False
