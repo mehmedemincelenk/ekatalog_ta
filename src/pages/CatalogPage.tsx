@@ -167,7 +167,7 @@ export default function CatalogPage() {
               }
               onAddCategory={addCategory}
             />
-            <div className="px-4">
+            <div className="px-4 pb-20">
               {productsFetching && products.length === 0 ? (
                 <div className="py-20 flex justify-center">
                   <Loading size="md" />
