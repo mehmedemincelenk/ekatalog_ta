@@ -60,68 +60,58 @@ const AdminReferenceCard = memo(
           className="w-9 h-full flex flex-col justify-between items-center py-0.5 shrink-0 ml-2.5"
           onClick={(e) => e.stopPropagation()}
         >
-          {!isDeleteConfirming ? (
-            <>
-              {/* SLOT 1: SEQUENCE BUTTON (TOP) */}
-              <div className="relative w-9 h-9 rounded-xl bg-white border border-stone-200/80 hover:border-stone-300 hover:bg-stone-50 flex flex-col items-center justify-center shadow-xs transition-all duration-200 cursor-pointer group/seq">
-                <select
-                  value={currentIndex}
-                  onChange={(e) => {
-                    const newPos = Number(e.target.value);
-                    onOrderChange(refData.id, newPos);
-                  }}
-                  className="absolute inset-0 cursor-pointer opacity-0 z-10"
-                >
-                  {Array.from({ length: totalItems }).map((_, i) => (
-                    <option key={i} value={i}>
-                      {i + 1}. Sıra
-                    </option>
-                  ))}
-                </select>
-                <span className="text-[11px] font-black text-stone-800 leading-none">
-                  {currentIndex + 1}
-                </span>
-                <span className="text-[6px] font-bold uppercase tracking-tight text-stone-400 mt-0.5 leading-none">
-                  SIRA
-                </span>
-              </div>
+          {/* SLOT 1: SEQUENCE BUTTON (TOP) */}
+          <div className="relative w-9 h-9 rounded-xl bg-white border border-stone-200/80 hover:border-stone-300 hover:bg-stone-50 flex flex-col items-center justify-center shadow-xs transition-all duration-200 cursor-pointer group/seq">
+            <select
+              value={currentIndex}
+              onChange={(e) => {
+                const newPos = Number(e.target.value);
+                onOrderChange(refData.id, newPos);
+              }}
+              className="absolute inset-0 cursor-pointer opacity-0 z-10"
+            >
+              {Array.from({ length: totalItems }).map((_, i) => (
+                <option key={i} value={i}>
+                  {i + 1}. Sıra
+                </option>
+              ))}
+            </select>
+            <span className="text-[11px] font-black text-stone-800 leading-none">
+              {currentIndex + 1}
+            </span>
+            <span className="text-[6px] font-bold uppercase tracking-tight text-stone-400 mt-0.5 leading-none">
+              SIRA
+            </span>
+          </div>
 
-              {/* SLOT 2: DELETE BUTTON (BOTTOM) */}
-              <button
-                type="button"
-                onClick={() => setIsDeleteConfirming(true)}
-                className="w-9 h-9 rounded-xl bg-white border border-stone-200/80 hover:border-red-100 hover:bg-red-50 text-stone-400 hover:text-red-500 flex items-center justify-center shadow-xs transition-all duration-200 cursor-pointer"
-                title="Referansı Sil"
-              >
-                <Lucide.Trash2 size={13} strokeWidth={2.2} />
-              </button>
-            </>
-          ) : (
-            <>
-              {/* SLOT 1: EMERALD CONFIRM BUTTON (TOP) */}
-              <button
-                type="button"
-                onClick={() => {
-                  onDelete(refData.id);
+          {/* SLOT 2: TWO-STEP / DOUBLE-TAP DELETE BUTTON (BOTTOM) */}
+          <button
+            type="button"
+            onClick={() => {
+              if (!isDeleteConfirming) {
+                setIsDeleteConfirming(true);
+                // Safety auto-disarm timer after 3 seconds
+                const timer = setTimeout(() => {
                   setIsDeleteConfirming(false);
-                }}
-                className="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-sm hover:bg-emerald-600 transition-colors cursor-pointer animate-in fade-in zoom-in-95 duration-150"
-                title="Onayla"
-              >
-                <Lucide.Check size={13} strokeWidth={3.5} />
-              </button>
-
-              {/* SLOT 2: STONE CANCEL BUTTON (BOTTOM) */}
-              <button
-                type="button"
-                onClick={() => setIsDeleteConfirming(false)}
-                className="w-9 h-9 rounded-xl bg-stone-200 text-stone-600 flex items-center justify-center hover:bg-stone-300 transition-colors cursor-pointer animate-in fade-in zoom-in-95 duration-150"
-                title="İptal"
-              >
-                <Lucide.X size={13} strokeWidth={2.5} />
-              </button>
-            </>
-          )}
+                }, 3000);
+                (window as any)[`delTimer_${refData.id}`] = timer;
+              } else {
+                // Clear active timer and delete
+                const activeTimer = (window as any)[`delTimer_${refData.id}`];
+                if (activeTimer) clearTimeout(activeTimer);
+                onDelete(refData.id);
+                setIsDeleteConfirming(false);
+              }
+            }}
+            className={`w-9 h-9 rounded-xl border shadow-xs transition-all duration-200 cursor-pointer flex items-center justify-center ${
+              isDeleteConfirming
+                ? 'bg-red-500 border-red-600 text-white animate-pulse'
+                : 'bg-white border-stone-200/80 hover:border-red-100 hover:bg-red-50 text-stone-400 hover:text-red-500'
+            }`}
+            title={isDeleteConfirming ? "Silmek için tekrar dokun" : "Referansı Sil"}
+          >
+            <Lucide.Trash2 size={13} strokeWidth={isDeleteConfirming ? 2.5 : 2.2} />
+          </button>
         </div>
       </div>
     );
