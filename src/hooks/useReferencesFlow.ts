@@ -76,6 +76,21 @@ export function useReferencesFlow(isAdmin: boolean = false) {
     }
   };
 
+  const handleOrderChange = async (id: number, newIndex: number) => {
+    const showFeedback = useStore.getState().showFeedback;
+    const itemToMove = activeReferences.find((r) => r.id === id);
+    if (!itemToMove) return;
+
+    const remaining = activeReferences.filter((r) => r.id !== id);
+    const updated = [
+      ...remaining.slice(0, newIndex),
+      itemToMove,
+      ...remaining.slice(newIndex),
+    ];
+    await updateSetting('referencesData', updated);
+    showFeedback('success', 'Sıralama güncellendi');
+  };
+
   return {
     activeReferences,
     activeQuickEdit,
@@ -83,6 +98,7 @@ export function useReferencesFlow(isAdmin: boolean = false) {
     handleDelete,
     handleSaveEdit,
     handleUploadLogo,
+    handleOrderChange,
     isUploading,
   };
 }
