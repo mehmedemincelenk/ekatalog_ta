@@ -26,97 +26,103 @@ const AdminReferenceCard = memo(
 
     return (
       <div
-        className="relative group flex flex-col items-center justify-center p-4 pt-10 pb-4 border border-stone-100 bg-white hover:border-stone-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_24px_-6px_rgba(0,0,0,0.06)] hover:-translate-y-0.5 transition-all duration-300 rounded-2xl w-full h-32 select-none overflow-hidden"
+        className="relative group flex flex-row items-center justify-between p-2.5 border border-stone-200 bg-stone-50/20 hover:bg-white hover:border-stone-300 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_24px_-6px_rgba(0,0,0,0.06)] hover:-translate-y-0.5 transition-all duration-300 rounded-2xl w-full h-28 select-none overflow-hidden"
       >
-        {/* SEQUENCE SELECTION BADGE (TOP-LEFT) */}
-        {!isDeleteConfirming && (
-          <div 
-            className="absolute top-3 left-3 z-20 flex items-center justify-center px-2 py-0.5 rounded-full border border-stone-200/60 bg-stone-50/80 hover:bg-stone-100/90 text-stone-600 shadow-xs transition-colors cursor-pointer"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <select
-              value={currentIndex}
-              onChange={(e) => {
-                const newPos = Number(e.target.value);
-                onOrderChange(refData.id, newPos);
-              }}
-              className="absolute inset-0 cursor-pointer opacity-0 z-10"
-            >
-              {Array.from({ length: totalItems }).map((_, i) => (
-                <option key={i} value={i}>
-                  {i + 1}. Sıra
-                </option>
-              ))}
-            </select>
-            <span className="text-[10px] font-bold tracking-tight">
-              {currentIndex + 1}. Sıra
-            </span>
-          </div>
-        )}
+        {/* LEFT SIDE: LOGO CONTAINER (LARGE SQUARE AREA) */}
+        <div className="flex-1 h-full bg-white border border-stone-100/80 rounded-xl flex flex-col items-center justify-center p-2 shadow-[inset_0_1px_3px_rgba(0,0,0,0.01)] min-w-0">
+          {refData.logo && (refData.logo.startsWith('/') || refData.logo.startsWith('http')) ? (
+            <div className="flex flex-col items-center justify-center w-full h-full">
+              <div className="h-9 flex items-center justify-center w-full">
+                <img
+                  src={refData.logo}
+                  alt={refData.name}
+                  className="h-full w-auto max-w-[90%] object-contain"
+                />
+              </div>
+              <span className="text-[8px] font-black tracking-widest text-stone-400 uppercase mt-1.5 leading-none truncate w-full text-center px-1">
+                {refData.name}
+              </span>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center w-full h-full gap-1.5">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-stone-50 to-stone-100 border border-stone-200/50 flex items-center justify-center text-[9px] font-bold text-stone-600 uppercase shadow-inner">
+                {refData.name.slice(0, 2)}
+              </div>
+              <span className="text-[9px] font-black text-stone-700 uppercase tracking-widest leading-none truncate w-full text-center px-1">
+                {refData.name}
+              </span>
+            </div>
+          )}
+        </div>
 
-        {/* DELETE BUTTON (TOP-RIGHT) */}
+        {/* RIGHT SIDE: CONTROLS COLUMN (STACKED VERTICALLY) */}
         <div 
-          className="absolute top-2.5 right-2.5 z-20 flex items-center gap-1"
+          className="w-9 h-full flex flex-col justify-between items-center py-0.5 shrink-0 ml-2.5"
           onClick={(e) => e.stopPropagation()}
         >
           {!isDeleteConfirming ? (
-            <button
-              type="button"
-              onClick={() => setIsDeleteConfirming(true)}
-              className="w-6 h-6 rounded-full flex items-center justify-center text-stone-400 hover:text-red-500 hover:bg-red-50/80 border border-transparent hover:border-red-100/60 transition-all duration-200 cursor-pointer"
-              title="Referansı Sil"
-            >
-              <Lucide.Trash2 size={13} strokeWidth={2.2} />
-            </button>
+            <>
+              {/* SLOT 1: SEQUENCE BUTTON (TOP) */}
+              <div className="relative w-9 h-9 rounded-xl bg-white border border-stone-200/80 hover:border-stone-300 hover:bg-stone-50 flex flex-col items-center justify-center shadow-xs transition-all duration-200 cursor-pointer group/seq">
+                <select
+                  value={currentIndex}
+                  onChange={(e) => {
+                    const newPos = Number(e.target.value);
+                    onOrderChange(refData.id, newPos);
+                  }}
+                  className="absolute inset-0 cursor-pointer opacity-0 z-10"
+                >
+                  {Array.from({ length: totalItems }).map((_, i) => (
+                    <option key={i} value={i}>
+                      {i + 1}. Sıra
+                    </option>
+                  ))}
+                </select>
+                <span className="text-[11px] font-black text-stone-800 leading-none">
+                  {currentIndex + 1}
+                </span>
+                <span className="text-[6px] font-bold uppercase tracking-tight text-stone-400 mt-0.5 leading-none">
+                  SIRA
+                </span>
+              </div>
+
+              {/* SLOT 2: DELETE BUTTON (BOTTOM) */}
+              <button
+                type="button"
+                onClick={() => setIsDeleteConfirming(true)}
+                className="w-9 h-9 rounded-xl bg-white border border-stone-200/80 hover:border-red-100 hover:bg-red-50 text-stone-400 hover:text-red-500 flex items-center justify-center shadow-xs transition-all duration-200 cursor-pointer"
+                title="Referansı Sil"
+              >
+                <Lucide.Trash2 size={13} strokeWidth={2.2} />
+              </button>
+            </>
           ) : (
-            <div className="flex gap-1.5 items-center bg-stone-50 border border-stone-200/60 p-0.5 rounded-full shadow-xs animate-in slide-in-from-right-1 duration-200">
+            <>
+              {/* SLOT 1: EMERALD CONFIRM BUTTON (TOP) */}
               <button
                 type="button"
                 onClick={() => {
                   onDelete(refData.id);
                   setIsDeleteConfirming(false);
                 }}
-                className="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-xs hover:bg-emerald-600 transition-colors cursor-pointer"
+                className="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-sm hover:bg-emerald-600 transition-colors cursor-pointer animate-in fade-in zoom-in-95 duration-150"
                 title="Onayla"
               >
-                <Lucide.Check size={11} strokeWidth={4} />
+                <Lucide.Check size={13} strokeWidth={3.5} />
               </button>
+
+              {/* SLOT 2: STONE CANCEL BUTTON (BOTTOM) */}
               <button
                 type="button"
                 onClick={() => setIsDeleteConfirming(false)}
-                className="w-6 h-6 rounded-full bg-stone-200 text-stone-600 flex items-center justify-center hover:bg-stone-300 transition-colors cursor-pointer"
+                className="w-9 h-9 rounded-xl bg-stone-200 text-stone-600 flex items-center justify-center hover:bg-stone-300 transition-colors cursor-pointer animate-in fade-in zoom-in-95 duration-150"
                 title="İptal"
               >
-                <Lucide.X size={11} strokeWidth={3} />
+                <Lucide.X size={13} strokeWidth={2.5} />
               </button>
-            </div>
+            </>
           )}
         </div>
-
-        {/* LOGO IMAGE OR TEXT PLACEHOLDER */}
-        {refData.logo && (refData.logo.startsWith('/') || refData.logo.startsWith('http')) ? (
-          <div className="flex flex-col items-center justify-center w-full h-full pt-2">
-            <div className="h-10 flex items-center justify-center w-full">
-              <img
-                src={refData.logo}
-                alt={refData.name}
-                className="h-full w-auto max-w-[85%] object-contain"
-              />
-            </div>
-            <span className="text-[9px] font-black tracking-widest text-stone-400 uppercase mt-2 leading-none">
-              {refData.name}
-            </span>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center w-full h-full pt-2 gap-2">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-stone-50 to-stone-100 border border-stone-200/50 flex items-center justify-center text-[10px] font-bold text-stone-600 uppercase shadow-inner">
-              {refData.name.slice(0, 2)}
-            </div>
-            <span className="text-[10px] font-black text-stone-700 uppercase tracking-widest leading-none">
-              {refData.name}
-            </span>
-          </div>
-        )}
       </div>
     );
   },
