@@ -117,7 +117,7 @@ export function FloatingGuestMenu({
       icon: <Lucide.MapPin className="w-5 h-5" strokeWidth={2.5} />,
       action: () => useStore.getState().openModal('LOCATION'),
       label: '',
-      variant: 'kraft',
+      variant: 'secondary',
     },
     {
       id: 'currency',
@@ -153,7 +153,7 @@ export function FloatingGuestMenu({
       ),
       action: () => openInstagram(settings?.instagram || ''),
       label: '',
-      variant: 'instagram',
+      variant: 'secondary',
     },
     {
       id: 'qr',
@@ -177,7 +177,7 @@ export function FloatingGuestMenu({
           'Merhaba, ürünleriniz hakkında bilgi almak istiyorum.',
         ),
       label: '',
-      variant: 'whatsapp',
+      variant: 'secondary',
     },
     {
       id: 'search',
@@ -191,7 +191,7 @@ export function FloatingGuestMenu({
       icon: <Lucide.Phone className="w-5 h-5" strokeWidth={2.5} />,
       action: () => callPhone(callingNumber),
       label: '',
-      variant: 'phone',
+      variant: 'secondary',
     },
   ];
 

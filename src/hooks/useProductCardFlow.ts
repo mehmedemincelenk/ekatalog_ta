@@ -127,7 +127,10 @@ export function useProductCardFlow(
   const highDefinitionImageSource =
     (product.image_url
       ? resolveVisualAssetUrl(
-          product.image_url.replace('/lq/', '/hq/').split('?')[0],
+          product.image_url
+            .replace('/lq/', '/hq/')
+            .replace('/small/', '/large/')
+            .split('?')[0],
         )
       : null) ?? null;
 

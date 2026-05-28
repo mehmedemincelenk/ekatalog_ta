@@ -85,8 +85,8 @@ def main():
  
     products = try_wp_rest_extract(base_url, args.name)
     
-    if products is not None:
-        print(f"🚀 WordPress REST API ile tüm ürünler başarıyla çekildi. Standart crawling atlanıyor.")
+    if products is not None and len(products) >= 5:
+        print(f"🚀 WordPress REST API ile {len(products)} adet ürün başarıyla çekildi. Standart crawling atlanıyor.")
         # İletişim veya Hakkımızda sayfalarını keşfedip indirerek meta verileri zenginleştiriyoruz (Diamond Standard 💎)
         print("📞 [Meta Veri Zenginleştirme] İletişim ve Hakkımızda sayfaları aranıyor...")
         contact_urls = []
@@ -316,8 +316,12 @@ def main():
             if is_navbar_footer_or_logo(img_url, alt, logo_url=logo_url, company_slug=args.slug, company_name=args.name):
                 continue
                 
+            # Ürün resimlerini ve küçük önizleme görsellerini kesinlikle carousel slide yapma (Diamond Standard 💎)
+            if any(k in img_url.lower() for k in ["/uploads/products/", "/products/", "/product/", "/urun/", "/urunler/", "/shop/", "/small/"]):
+                continue
+                
             # Eğer zaten 5 veya daha fazla slayt bulduysak, yeni network istekleri yapıp vakit kaybetmeyelim
-            is_slider_or_bg = any(k in alt.lower() or k in img_url.lower() for k in ["banner", "slider", "slayt", "vitrin", "promo"]) or img_url in bg_slides or "bg" in img_url.lower()
+            is_slider_or_bg = any(k in alt.lower() or k in img_url.lower() for k in ["banner", "slider", "slayt", "vitrin", "promo"]) or img_url in bg_slides or any(k in img_url.lower() for k in ["bg-", "-bg", "bg.", "/bg/"])
             
             if not is_slider_or_bg and len(carousel_slides) < 5:
                 # Sadece 5 slayttan az olduğunda canlı genişlik testi yap

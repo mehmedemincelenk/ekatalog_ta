@@ -24,6 +24,72 @@ def make_neutral_lower(s):
     s = s.replace("i̇", "i") # combining dot temizle
     return s.strip()
 
+def generate_premium_fallback_description(product_name, category_name, brand_name):
+    """
+    Ürün ismi, kategori ve mağaza adı kullanarak tamamen profesyonel, sektörel ve 
+    akıcı pazarlama açıklamaları üretir (Diamond Standard 💎).
+    Aynı kategorideki ürünlerin birbirini tekrar etmemesi için deterministik varyasyon kullanır.
+    """
+    if not product_name:
+        return ""
+        
+    # Başlıktaki parantez içlerini veya gereksiz kodları temizle (örn. "Barkod 8..." veya boyutlar)
+    clean_name = re.sub(r'\(.*?\)', '', product_name)
+    clean_name = re.sub(r'\s+', ' ', clean_name).strip()
+    
+    # Deterministik varyasyon için isim karakterlerinin toplamını kullan
+    h = sum(ord(c) for c in product_name)
+    var_idx = h % 3
+    
+    # Arama terimlerini normalize et
+    search_text = make_neutral_lower(product_name + " " + (category_name or ""))
+    
+    # Grup Tanımları ve Anahtar Kelimeler
+    paper_keywords = ["kagit", "havlu", "pecete", "tuvalet", "rulo", "katli", "peçete", "kağıt", "non-stop", "jumbo", "dispenser havlu"]
+    tool_keywords = ["mop", "aparat", "firca", "süpürge", "supurge", "sap", "teleskop", "fırça", "cekcek", "squeegee", "teldokme", "orlon", "pelus", "peluş"]
+    chemical_keywords = ["deterjan", "sivi", "sabun", "kimyasal", "dezenfektan", "camasir", "çamaşır", "asit", "cozucu", "çözücü", "parlatici", "parlatıcı", "oda kokusu"]
+    trolley_keywords = ["araba", "trolley", "kova", "bucket", "pres", "wringer", "cop", "çöp", "sepet", "ayakli", "makina standi"]
+    dispenser_keywords = ["dispenser", "aparat", "makina", "sensörlü", "fotoselli", "askili", "askılı", "askı", "aski"]
+    
+    if any(k in search_text for k in paper_keywords):
+        templates = [
+            f"{clean_name}, yüksek emiş gücü ve dayanıklı çift katlı yapısıyla endüstriyel ve evsel alanlar için mükemmel bir hijyen çözümüdür. Cilde dost, yumuşak dokusuyla maksimum konfor sunar.",
+            f"Profesyonel kullanım için özel olarak tasarlanan {clean_name}, üstün emiciliği sayesinde minimum sarfiyatla maksimum kurulama sağlar. {brand_name} güvencesiyle yüksek kalite standartlarındadır.",
+            f"Ekonomik ve hijyenik yapısıyla öne çıkan {clean_name}, dispenser uyumlu tasarımıyla toplu kullanım alanlarında tasarruf ve hijyeni bir arada sunar. Dayanıklı ve yumuşaktır."
+        ]
+    elif any(k in search_text for k in tool_keywords):
+        templates = [
+            f"{clean_name}, profesyonel temizlik standartlarına uygun olarak tasarlanmıştır. Ergonomik gövdesi ve üstün malzeme kalitesiyle geniş alanlarda zahmetsiz ve pratik bir temizlik deneyimi sunar.",
+            f"Yoğun kullanıma ve kimyasallara karşı yüksek dayanıklılık gösteren {clean_name}, mikrofiber/pamuklu dokusuyla yüzeydeki toz ve kiri anında hapseder. Zeminlerde iz ve leke bırakmaz.",
+            f"Zorlu alanlarda yüksek manevra kabiliyeti sağlayan {clean_name}, tüm standart sap ve aparatlarla tam uyumludur. Endüstriyel temizlik süreçlerinde yüksek performans sağlar."
+        ]
+    elif any(k in search_text for k in chemical_keywords):
+        templates = [
+            f"Zorlu kir, yağ ve lekeleri derinlemesine temizlemek için özel olarak formüle edilen {clean_name}, en hassas yüzeylerde bile güvenle kullanılabilir. Yüksek etken madde oranıyla ekonomik bir kullanım sunar.",
+            f"Güçlü hijyen formülü ile hijyen standartlarını en üst seviyeye taşıyan {clean_name}, kötü kokuları yok ederek ferah ve temiz bir ortam bırakır. Kurumsal kullanım için idealdir.",
+            f"Çevre ve kullanıcı dostu özel formülü ile mükemmel parlaklık ve hijyen sağlayan {clean_name}, minimum sarfiyatla maksimum temizleme gücü gösterir. Kalıcı ferahlık sağlar."
+        ]
+    elif any(k in search_text for k in trolley_keywords):
+        templates = [
+            f"Dayanıklı şasisi, darbelere karşı dirençli gövdesi ve sessiz tekerlek yapısıyla {clean_name}, otel, hastane ve kurumsal tesislerde günlük temizlik işlerini büyük ölçüde kolaylaştırır.",
+            f"Profesyonel temizlik ekipleri için ergonomik ve pratik bir tasarıma sahip olan {clean_name}, ekipman bölmeleri ve geniş iç hacmiyle iş gücü ve zamandan tasarruf sağlar.",
+            f"Yüksek taşıma kapasitesi ve sızdırmaz gövdesi ile hijyen standartlarını koruyan {clean_name}, endüstriyel kullanıma uygun olarak birinci sınıf malzemelerden üretilmiştir."
+        ]
+    elif any(k in search_text for k in dispenser_keywords):
+        templates = [
+            f"Modern ve estetik tasarımıyla banyo ve ortak alanlarınıza şıklık katan {clean_name}, kontrollü tüketim mekanizması sayesinde kağıt sarfiyatını azaltarak tasarruf sağlar.",
+            f"Darbelere dayanıklı sert malzemeden üretilen {clean_name}, kolay dolum ve temizlenebilir yapısıyla yoğun trafikli alanlarda uzun yıllar güvenle kullanılabilir.",
+            f"Hijyenik ve temassız kullanım prensibine uygun olarak geliştirilen {clean_name}, şık duruşu ve kolay montaj özellikleriyle işletmelerin bir numaralı tercihidir."
+        ]
+    else:
+        templates = [
+            f"{clean_name}, kurumsal ve endüstriyel ihtiyaçlarınız için en yüksek kalite standartlarında üretilmiştir. Dayanıklı yapısı ve kullanım kolaylığıyla {brand_name} kalitesini yansıtır.",
+            f"Profesyonel standartlarda uzun ömürlü kullanım amacıyla geliştirilen {clean_name}, işletmenizin verimliliğini artırmak için tasarlanmıştır. Güvenilir ve pratik bir çözümdür.",
+            f"Sektörün öncüsü {brand_name} güvencesiyle üretilen {clean_name}, yüksek performansı ve dayanıklı yapısıyla temizlik ve hijyen süreçlerinize değer katar."
+        ]
+        
+    return templates[var_idx]
+
 def clean_product_name_from_url(url):
     """Resim URL'sinden temiz, anlaşılır bir ürün ismi türetir (percent-encoding'i çözer)."""
     url = urllib.parse.unquote(url)
@@ -65,6 +131,48 @@ def extract_category_from_breadcrumbs(page_md):
     """Markdown içeriğinden ekmek kırıntılarını (breadcrumbs) tarayarak en derin kategori ismini bulur."""
     if not page_md:
         return None
+    # 1. Önce çok satırlı (list item veya ardışık satırlardaki) breadcrumb bloklarını bulalım
+    # Genellikle "Ana Sayfa" / "Home" ile başlar ve takip eden satırlarda "/" veya ">" veya list öğeleri vardır.
+    lines = page_md.split("\n")
+    breadcrumb_lines = []
+    found_start = False
+    
+    for line in lines:
+        line_clean = line.strip()
+        line_lower = make_neutral_lower(line_clean)
+        
+        if not found_start:
+            if line_lower in ["anasayfa", "ana sayfa", "home", "[anasayfa]", "[ana sayfa]", "[home]"] or \
+               (line_clean.startswith("[") and any(k in line_lower for k in ["[anasayfa](", "[ana sayfa](", "[home]("])):
+                found_start = True
+                breadcrumb_lines.append(line_clean)
+        else:
+            is_separator = line_clean in [">", "/", "»", "|", "chevron"] or line_clean.startswith("/") or line_clean.startswith(">")
+            is_link = line_clean.startswith("*") or line_clean.startswith("-") or (line_clean.startswith("[") and "](" in line_clean)
+            is_word = len(line_clean) > 0 and len(line_clean) < 50
+            
+            if (is_separator or is_link or is_word) and len(breadcrumb_lines) < 12:
+                breadcrumb_lines.append(line_clean)
+            else:
+                break
+                
+    if found_start and len(breadcrumb_lines) > 1:
+        candidates = []
+        for line in breadcrumb_lines:
+            links = re.findall(r'\[([^\]]+)\]\([^)]+\)', line)
+            if links:
+                candidates.extend(links)
+            else:
+                cleaned = line.strip("*/-> »|\\").strip()
+                if cleaned and cleaned.lower() not in ["anasayfa", "ana sayfa", "home", "chevron"]:
+                    candidates.append(cleaned)
+                    
+        for cand in reversed(candidates):
+            cand_clean = cand.strip()
+            if is_valid_category_name(cand_clean) and cand_clean.lower() not in ["anasayfa", "ana sayfa", "home"]:
+                return cand_clean
+
+    # 2. Tek satırlı breadcrumb şablonları için fallback
     breadcrumb_patterns = [
         r'(?:\[Ana\s*Sayfa\]|\[Home\]|\[Anasayfa\])\([^)]+\)(.*?)(?:\n|$)',
         r'(?:Ana\s*Sayfa|Home|Anasayfa)\s*>\s*(.*?)(?:\n|$)',
@@ -73,7 +181,6 @@ def extract_category_from_breadcrumbs(page_md):
     for pat in breadcrumb_patterns:
         match = re.search(pat, page_md, re.I)
         if match:
-            # URL'lerin bir parçasıysa (örn. http.../home/) veya link içindeki dil seçeneğiyse es geç
             match_start = match.start()
             pre_text = page_md[max(0, match_start-15):match_start].lower()
             if "http" in pre_text or "www" in pre_text or ".tr" in pre_text or ".com" in pre_text or "/" in pre_text:
@@ -232,7 +339,7 @@ def extract_description_from_markdown(page_md, target_name):
 def parse_products_from_markdown(pages, base_url, brand_name=""):
     """Ürünleri ve resimleri markdown çıktısından tamamen ÜCRETSİZ ve yüksek doğrulukla süzen regex parser."""
     products = []
-    seen_prods = set()
+    seen_prods = {}
     
     outer_pattern_1 = re.compile(r'\[\s*!\[([^\]]*)\]\((https?://[^\s\(\)]+(?:\([^\s\(\)]*\)[^\s\(\)]*)*)\)\s*([^\]\n]+)\s*\]\((https?://[^\s\(\)]+(?:\([^\s\(\)]*\)[^\s\(\)]*)*)\)')
     outer_pattern_2 = re.compile(r'\[\s*([^\]\n]+)\s*!\[([^\]]*)\]\((https?://[^\s\(\)]+(?:\([^\s\(\)]*\)[^\s\(\)]*)*)\)\s*\]\((https?://[^\s\(\)]+(?:\([^\s\(\)]*\)[^\s\(\)]*)*)\)')
@@ -387,15 +494,27 @@ def parse_products_from_markdown(pages, base_url, brand_name=""):
                 return
             prod_name_lower = prod_name_clean.lower()
             if prod_name_lower not in seen_prods:
-                seen_prods.add(prod_name_lower)
                 abs_img_url = resolve_url(base_url, img_url_clean)
-                products.append({
+                desc = extract_description_from_markdown(page_md, prod_name_clean)
+                if not desc or len(desc.strip()) < 10:
+                    desc = generate_premium_fallback_description(prod_name_clean, category_name, brand_name)
+                new_prod = {
                     "name": prod_name_clean,
                     "image_url": abs_img_url,
                     "category": category_name,
                     "price": "0",
-                    "description": extract_description_from_markdown(page_md, prod_name_clean)
-                })
+                    "description": desc
+                }
+                products.append(new_prod)
+                seen_prods[prod_name_lower] = new_prod
+            else:
+                existing_prod = seen_prods[prod_name_lower]
+                if existing_prod["category"] == "Genel" and category_name != "Genel":
+                    existing_prod["category"] = category_name
+                    # Also regenerate description if it was a fallback to use the new category
+                    if existing_prod.get("description", "").startswith(existing_prod["name"] + ", kurumsal ve endüstriyel") or \
+                       existing_prod.get("description", "").startswith(existing_prod["name"] + ", profesyonel temizlik"):
+                        existing_prod["description"] = generate_premium_fallback_description(prod_name_clean, category_name, brand_name)
 
         # A. ÖNCE DIŞ LİNK + İÇ RESİM KALIPLARINI TARA
         matches_outer_1 = outer_pattern_1.findall(page_md)
@@ -424,22 +543,16 @@ def parse_products_from_markdown(pages, base_url, brand_name=""):
             if prod_name_lower in ["start", "giriş", "üye girişi", "üye ol", "sepetim", "sepetiniz", "menü", "anasayfa", "profil"]:
                 continue
                 
-            if prod_name_lower not in seen_prods:
-                seen_prods.add(prod_name_lower)
-                abs_img_url = resolve_url(base_url, img_url_clean)
-                products.append({
-                    "name": prod_name,
-                    "image_url": abs_img_url,
-                    "category": category_name,
-                    "price": "0",
-                    "description": extract_description_from_markdown(page_md, prod_name)
-                })
-                
+            add_product_if_valid(prod_name, img_url_clean)
+
         # C. GALERİ / BÜYÜTÜLEBİLİR RESİM ETİKETLERİNİ TARA
         matches_gallery = gallery_pattern.findall(page_md)
         for alt, placeholder_url, target_img_url in matches_gallery:
             target_img_clean = target_img_url.strip()
             if is_invalid_url_or_text(target_img_clean) or target_img_clean.lower().endswith(".gif"):
+                continue
+                
+            if any(ext in target_img_clean.lower() for ext in [".aspx", ".html", ".php", ".htm"]) or target_img_clean.endswith("/"):
                 continue
                 
             prod_name = alt.strip()
@@ -454,19 +567,13 @@ def parse_products_from_markdown(pages, base_url, brand_name=""):
             if not prod_name or len(prod_name) < 4:
                 continue
                 
+            if is_invalid_product(prod_name, target_img_clean):
+                continue
+                
             prod_name_lower = prod_name.lower()
             if prod_name_lower in ["start", "giriş", "üye girişi", "üye ol", "sepetim", "sepetiniz", "menü", "anasayfa", "profil"]:
                 continue
                 
-            if prod_name_lower not in seen_prods:
-                seen_prods.add(prod_name_lower)
-                abs_img_url = resolve_url(base_url, target_img_clean)
-                products.append({
-                    "name": prod_name,
-                    "image_url": abs_img_url,
-                    "category": category_name,
-                    "price": "0",
-                    "description": extract_description_from_markdown(page_md, prod_name)
-                })
+            add_product_if_valid(prod_name, target_img_clean)
                  
     return products

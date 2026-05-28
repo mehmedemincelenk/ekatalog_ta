@@ -12,6 +12,8 @@ parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if parent_dir not in sys.path:
     sys.path.append(parent_dir)
 
+from core.parser import generate_premium_fallback_description
+
 def build_wp_category_map(base_url, context):
     """
     WordPress sitemap veya kategori sayfalarını tarayarak, 
@@ -348,12 +350,14 @@ def try_wp_rest_extract(base_url, store_name):
             if len(clean_content) > 10:
                 desc = clean_content
 
-        # Karakter limiti koruması
+        # Karakter limiti koruması ve boş/kısa açıklamalar için Premium Fallback (Diamond Standard 💎)
         if desc:
             if len(desc) > 300:
                 desc = desc[:297] + "..."
+            elif len(desc.strip()) < 10:
+                desc = generate_premium_fallback_description(title, category, brand_name)
         else:
-            desc = ""
+            desc = generate_premium_fallback_description(title, category, brand_name)
 
         title_norm = title.lower()
         if title_norm not in seen_prods:

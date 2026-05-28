@@ -116,16 +116,33 @@ def discover_pages(homepage_md, base_url):
         if any(url_lower.endswith(ext) for ext in [".pdf", ".png", ".jpg", ".jpeg", ".zip", ".docx"]):
             continue
 
-        if any(kw in url_lower for kw in ["iletisim", "iletişim", "contact", "hakkimizda", "hakkımızda", "about", "referans", "reference", "brand", "marka", "partner", "sponsor", "bayi", "musteri", "müşteri", "customer", "isortag", "is-ortak"]) or (any(kw in url_lower for kw in ["/ulas/", "/ulaş/", "/ulasim/", "/ulaşim/", "-ulas-", "-ulaş-", "/ulas-bize", "/ulaş-bize"]) or url_lower.endswith("/ulas") or url_lower.endswith("/ulaş") or url_lower.endswith("ulasim") or url_lower.endswith("ulaşim")):
-            high_priority.insert(0, url)
+        parsed_path = urlparse(url_clean).path.strip('/')
+        path_segments = [p for p in parsed_path.split('/') if p]
+
+        is_corp_or_spam = any(kw in url_lower for kw in [
+            "iletisim", "iletişim", "contact", "hakkimizda", "hakkımızda", "about", 
+            "referans", "reference", "brand", "marka", "partner", "sponsor", "bayi", 
+            "musteri", "müşteri", "customer", "isortag", "is-ortak", "blog", "news", 
+            "haber", "duyuru", "kvkk", "gizlilik", "politika", "sozlesme", "sartlar",
+            "sepet", "cart", "checkout", "account", "login", "register", "uye", "üye",
+            "search", "arama", "odeme", "siparis", "sipariş"
+        ])
+
+        if is_corp_or_spam:
+            if any(kw in url_lower for kw in ["iletisim", "iletişim", "contact", "hakkimizda", "hakkımızda", "about"]):
+                high_priority.insert(0, url)
+            else:
+                low_priority.append(url)
         elif any(kw in url_lower for kw in ["urunler", "products", "shop", "katalog", "catalog", "urunlerimiz", "magaza"]):
             high_priority.append(url)
         elif any(kw in url_lower for kw in ["kategori", "category", "urun-kategori", "product-category"]):
             medium_priority.append(url)
+        elif len(path_segments) == 1:
+            medium_priority.append(url)
         else:
-            low_priority.append(url)
+            medium_priority.append(url)
             
-    return (high_priority + medium_priority + low_priority)[:50]
+    return (high_priority + medium_priority + low_priority)[:150]
 
 def get_sitemap_categories(base_url):
     """Sitemap üzerinden B2B kategori index sayfalarını bulur."""
