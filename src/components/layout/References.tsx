@@ -1,4 +1,4 @@
-import { useState, useRef, memo } from 'react';
+import { useState, memo } from 'react';
 import { THEME } from '../../data/config';
 import { useReferencesFlow } from '../../hooks/useReferencesFlow';
 import { useMarqueePhysics } from '../../hooks/useMarqueePhysics';
@@ -16,50 +16,21 @@ const AdminReferenceCard = memo(
     totalItems,
     onOrderChange,
     onDelete,
-    onEdit,
-    onUploadLogo,
-    isUploading,
   }: {
     refData: Reference;
     currentIndex: number;
     totalItems: number;
     onOrderChange: (id: number, newIndex: number) => void;
     onDelete: (id: number) => void;
-    onEdit: (id: number, name: string) => void;
-    onUploadLogo: (id: number, file: File) => void;
-    isUploading: boolean;
   }) => {
-    const fileInputRef = useRef<HTMLInputElement>(null);
     const [isDeleteConfirming, setIsDeleteConfirming] = useState(false);
-
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (file) {
-        onUploadLogo(refData.id, file);
-      }
-    };
 
     return (
       <div
         className="relative flex flex-col items-center justify-center p-4 pt-8 border border-stone-200/80 bg-stone-50/50 hover:bg-white hover:border-stone-300 shadow-[0_2px_8px_-3px_rgba(0,0,0,0.03)] hover:shadow-lg hover:shadow-stone-200/60 transition-all duration-300 rounded-xl overflow-hidden w-full h-28 select-none"
       >
-        {/* LOADING SPINNER OVERLAY */}
-        {isUploading && (
-          <div className="absolute inset-0 bg-white/85 backdrop-blur-xs flex items-center justify-center z-30">
-            <Lucide.Loader2 size={16} className="text-stone-900 animate-spin" />
-          </div>
-        )}
-
         {/* STANDARDIZED ADMINISTRATIVE CONTROLS OVERLAY */}
         <div className="absolute top-2 right-2 flex items-center gap-1 z-20" onClick={(e) => e.stopPropagation()}>
-          <input
-            type="file"
-            ref={fileInputRef}
-            className="hidden"
-            accept="image/*"
-            onChange={handleFileChange}
-          />
-
           {/* INTERACTIVE SEQUENCE BADGE (SELECT OVERLAY) */}
           <div className="relative w-6 h-6 flex items-center justify-center rounded-md border border-white/20 shadow-sm bg-stone-900/60 backdrop-blur-md">
             <select
@@ -82,37 +53,15 @@ const AdminReferenceCard = memo(
           </div>
 
           {!isDeleteConfirming ? (
-            <>
-              {/* CHANGE LOGO */}
-              <Button
-                onClick={() => fileInputRef.current?.click()}
-                variant="glass"
-                mode="square"
-                className="!w-6 !h-6 !bg-stone-900/60 backdrop-blur-md border border-white/20 text-white shadow-sm !rounded-md !p-0 cursor-pointer"
-                icon={<Lucide.ImagePlus size={11} strokeWidth={2.5} />}
-                title="Logo Yükle/Değiştir"
-              />
-
-              {/* EDIT NAME */}
-              <Button
-                onClick={() => onEdit(refData.id, refData.name)}
-                variant="glass"
-                mode="square"
-                className="!w-6 !h-6 !bg-stone-900/60 backdrop-blur-md border border-white/20 text-white shadow-sm !rounded-md !p-0 cursor-pointer"
-                icon={<Lucide.Pencil size={11} strokeWidth={2.5} />}
-                title="İsmi Düzenle"
-              />
-
-              {/* DELETE */}
-              <Button
-                onClick={() => setIsDeleteConfirming(true)}
-                variant="glass"
-                mode="square"
-                className="!w-6 !h-6 !bg-stone-900/60 backdrop-blur-md border border-white/20 text-white shadow-sm !rounded-md !p-0 cursor-pointer hover:!bg-red-500/80"
-                icon={<Lucide.Trash2 size={12} strokeWidth={2.5} />}
-                title="Referansı Sil"
-              />
-            </>
+            /* DELETE */
+            <Button
+              onClick={() => setIsDeleteConfirming(true)}
+              variant="glass"
+              mode="square"
+              className="!w-6 !h-6 !bg-stone-900/60 backdrop-blur-md border border-white/20 text-white shadow-sm !rounded-md !p-0 cursor-pointer hover:!bg-red-500/80"
+              icon={<Lucide.Trash2 size={12} strokeWidth={2.5} />}
+              title="Referansı Sil"
+            />
           ) : (
             <div className="flex gap-1 animate-in slide-in-from-right-1 duration-200">
               <Button
@@ -172,9 +121,7 @@ export default function References({
     setActiveQuickEdit,
     handleDelete,
     handleSaveEdit,
-    handleUploadLogo,
     handleOrderChange,
-    isUploading,
   } = useReferencesFlow(isAdmin);
 
   const {
@@ -219,9 +166,6 @@ export default function References({
                 totalItems={activeReferences.length}
                 onOrderChange={handleOrderChange}
                 onDelete={handleDelete}
-                onEdit={(id, name) => setActiveQuickEdit({ id, name })}
-                onUploadLogo={handleUploadLogo}
-                isUploading={isUploading === ref.id}
               />
             ))}
 
