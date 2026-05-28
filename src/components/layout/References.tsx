@@ -26,7 +26,7 @@ const AdminReferenceCard = memo(
 
     return (
       <div
-        className="relative group flex flex-row items-center justify-between p-2.5 border border-stone-200 bg-stone-50/20 hover:bg-white hover:border-stone-300 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_24px_-6px_rgba(0,0,0,0.06)] hover:-translate-y-0.5 transition-all duration-300 rounded-2xl w-full h-28 select-none overflow-hidden"
+        className="relative group flex flex-row items-center justify-between p-2 border border-stone-200 bg-stone-50/20 hover:bg-white hover:border-stone-300 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_24px_-6px_rgba(0,0,0,0.06)] hover:-translate-y-0.5 transition-all duration-300 rounded-2xl w-full h-24 select-none overflow-hidden"
       >
         {/* LEFT SIDE: LOGO CONTAINER (LARGE SQUARE AREA) */}
         <div className="flex-1 h-full bg-white border border-stone-100/80 rounded-xl flex flex-col items-center justify-center p-2 shadow-[inset_0_1px_3px_rgba(0,0,0,0.01)] min-w-0">
@@ -163,7 +163,7 @@ export default function References({
             <div className="w-12 h-1 bg-stone-900 mt-4 mb-2 rounded-full opacity-10"></div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 items-center justify-items-center w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full">
             {activeReferences.map((ref, idx) => (
               <AdminReferenceCard
                 key={ref.id}
