@@ -1,20 +1,3 @@
-// Static list of Turkey's 81 cities
-export const TURKEY_CITIES = [
-  'Adana', 'Adıyaman', 'Afyonkarahisar', 'Ağrı', 'Aksaray', 'Amasya', 'Ankara', 'Antalya', 'Ardahan', 'Artvin',
-  'Aydın', 'Balıkesir', 'Bartın', 'Batman', 'Bayburt', 'Bilecik', 'Bingöl', 'Bitlis', 'Bolu', 'Burdur',
-  'Bursa', 'Çanakkale', 'Çankırı', 'Çorum', 'Denizli', 'Diyarbakır', 'Düzce', 'Edirne', 'Elazığ', 'Erzincan',
-  'Erzurum', 'Eskişehir', 'Gaziantep', 'Giresun', 'Gümüşhane', 'Hakkari', 'Hatay', 'Iğdır', 'Isparta', 'İstanbul',
-  'İzmir', 'Kahramanmaraş', 'Karabük', 'Karaman', 'Kars', 'Kastamonu', 'Kayseri', 'Kırıkkale', 'Kırklareli', 'Kırşehir',
-  'Kilis', 'Kocaeli', 'Konya', 'Kütahya', 'Malatya', 'Manisa', 'Mardin', 'Mersin', 'Muğla', 'Muş',
-  'Nevşehir', 'Niğde', 'Ordu', 'Osmaniye', 'Rize', 'Sakarya', 'Samsun', 'Şanlıurfa', 'Siirt', 'Sinop',
-  'Sivas', 'Şırnak', 'Tekirdağ', 'Tokat', 'Trabzon', 'Tunceli', 'Uşak', 'Van', 'Yalova', 'Yozgat', 'Zonguldak'
-];
-
-// Static list of Iraq's 10 cities
-export const IRAQ_CITIES = [
-  'Anbar', 'Baghdad', 'Basra', 'Duhok', 'Erbil', 'Karbala', 'Kirkuk', 'Najaf', 'Nineveh (Mosul)', 'Sulaymaniyah'
-];
-
 // Helper to fetch cache from localStorage
 const getCache = <T>(key: string): T | null => {
   if (typeof window === 'undefined') return null;
@@ -41,10 +24,49 @@ const setCache = (key: string, data: any, ttl = 1000 * 60 * 60 * 24) => {
   );
 };
 
-/** Fetch unique cities instantly from static list to ensure zero network latency and 100% availability */
+// Helper to get target API base URLs (attempts local backend first in development)
+const getApiUrls = (): string[] => {
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    return ['http://localhost:3000', 'https://portfoys.pro'];
+  }
+  return ['https://portfoys.pro'];
+};
+
+/** Fetch unique cities dynamically from the official Portfoys location API with local caching */
 export async function fetchCities(country: string): Promise<string[]> {
-  if (country === 'Türkiye') return TURKEY_CITIES;
-  if (country === 'Irak') return IRAQ_CITIES;
+  const cacheKey = `cities_${country}`;
+  const cached = getCache<string[]>(cacheKey);
+  
+  // Turkey has 81, Iraq has 18 cities. A cache with <= 5 items is corrupted/stale and must be bypassed.
+  if (cached && Array.isArray(cached) && cached.length > 5) {
+    return cached;
+  }
+  
+  if (cached) {
+    console.warn(`[locations] Tiny/corrupted cache detected for ${country} (${cached.length} items). Clearing cache...`);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(`cache_loc_${cacheKey}`);
+    }
+  }
+
+  const baseUrls = getApiUrls();
+  for (const baseUrl of baseUrls) {
+    try {
+      const res = await fetch(`${baseUrl}/api/locations?type=cities&country=${encodeURIComponent(country)}`);
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const data = await res.json();
+      if (data.success && Array.isArray(data.cities)) {
+        // Only cache if we got a substantial/valid city list
+        if (data.cities.length > 5) {
+          setCache(cacheKey, data.cities);
+        }
+        return data.cities;
+      }
+    } catch (err) {
+      console.warn(`[locations] fetchCities failed on ${baseUrl}, trying next...`, err);
+    }
+  }
+
   return [];
 }
 
@@ -53,18 +75,32 @@ export async function fetchDistricts(country: string, city: string): Promise<str
   if (!city) return [];
   const cacheKey = `districts_${country}_${city}`;
   const cached = getCache<string[]>(cacheKey);
-  if (cached) return cached;
-
-  try {
-    const res = await fetch(`https://portfoys.pro/api/locations?type=districts&country=${encodeURIComponent(country)}&city=${encodeURIComponent(city)}`);
-    if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-    const data = await res.json();
-    if (data.success && Array.isArray(data.districts)) {
-      setCache(cacheKey, data.districts);
-      return data.districts;
+  
+  if (cached && Array.isArray(cached) && cached.length > 0) {
+    return cached;
+  }
+  
+  if (cached) {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(`cache_loc_${cacheKey}`);
     }
-  } catch (err) {
-    console.error('[locations] fetchDistricts API error:', err);
+  }
+
+  const baseUrls = getApiUrls();
+  for (const baseUrl of baseUrls) {
+    try {
+      const res = await fetch(`${baseUrl}/api/locations?type=districts&country=${encodeURIComponent(country)}&city=${encodeURIComponent(city)}`);
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const data = await res.json();
+      if (data.success && Array.isArray(data.districts)) {
+        if (data.districts.length > 0) {
+          setCache(cacheKey, data.districts);
+        }
+        return data.districts;
+      }
+    } catch (err) {
+      console.warn(`[locations] fetchDistricts failed on ${baseUrl}, trying next...`, err);
+    }
   }
 
   return [];

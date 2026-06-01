@@ -49,6 +49,14 @@ export default function PortfoysLeadModal({ isOpen, onClose, initialTab }: Portf
     }
   }, [isOpen, initialTab]);
 
+  // When search finishes successfully, transition to directory tab and reset search modal
+  useEffect(() => {
+    if (status === 'completed') {
+      setActiveTab('directory');
+      clearScan();
+    }
+  }, [status, clearScan]);
+
   // Reset search when modal closes
   const handleClose = () => {
     clearScan();
