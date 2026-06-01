@@ -86,6 +86,7 @@ serve(async (req: Request) => {
           keyword,
           city,
           district: district || undefined,
+          country: country || undefined,
         }),
       });
 

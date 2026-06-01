@@ -13,10 +13,6 @@ interface PortfoysSearchViewProps {
   apiError: string | null;
   startScan: (params: { storeId: string; country: string; city: string; district?: string; keyword: string }) => Promise<void>;
   clearScan: () => void;
-  
-  // Keep interface compatibility
-  showConfirm: boolean;
-  setShowConfirm: (show: boolean) => void;
 }
 
 export default function PortfoysSearchView({
@@ -30,7 +26,7 @@ export default function PortfoysSearchView({
   clearScan,
 }: PortfoysSearchViewProps) {
   // Wizard state
-  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+  const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1);
 
   // Form states
   const [keyword, setKeyword] = useState<string>('');
@@ -43,7 +39,6 @@ export default function PortfoysSearchView({
 
   const [districts, setDistricts] = useState<string[]>([]);
   const [loadingDistricts, setLoadingDistricts] = useState<boolean>(false);
-  const [districtSearch, setDistrictSearch] = useState<string>('');
 
   // Fetch cities when country changes
   useEffect(() => {
@@ -132,19 +127,17 @@ export default function PortfoysSearchView({
   // Scanning radar view
   if (status === 'scanning') {
     return (
-      <div className="flex flex-col items-center justify-center py-16 space-y-6">
-        <div className="relative flex items-center justify-center">
-          <div className="w-24 h-24 rounded-full border-4 border-emerald-500/20 border-t-emerald-500 animate-spin" />
-          <div className="absolute w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
-            <Lucide.Search className="text-emerald-500 animate-pulse" size={28} />
-          </div>
-        </div>
-        <div className="text-center space-y-2">
-          <h4 className="text-xs font-black uppercase tracking-wider text-stone-900">
-            Dükkanlar Aranıyor
+      <div className="flex flex-col items-center justify-center py-20 space-y-4">
+        {/* Minimalist Spinner */}
+        <div className="w-8 h-8 border-2 border-stone-950 border-t-transparent rounded-full animate-spin" />
+        
+        {/* Simple Text */}
+        <div className="text-center space-y-1">
+          <h4 className="text-[10px] font-black uppercase tracking-widest text-stone-950 animate-pulse">
+            ARANIYOR
           </h4>
-          <p className="text-[10px] font-bold text-stone-400 max-w-xs leading-relaxed">
-            {city} {district ? `- ${district}` : ''} bölgesindeki "{keyword}" dükkanları aranıyor. Lütfen bekleyin...
+          <p className="text-[9px] font-medium text-stone-400 max-w-xs leading-normal">
+            {city} {district ? `(${district})` : ''} • {keyword}
           </p>
         </div>
       </div>
@@ -232,60 +225,89 @@ export default function PortfoysSearchView({
     );
   }
 
-  // Filtered lists for locations
-  const filteredDistricts = districts.filter((d) =>
-    d.toLowerCase().includes(districtSearch.toLowerCase())
-  );
+
+
+  const getStepTitle = () => {
+    switch (step) {
+      case 1:
+        return 'Sektör Seç';
+      case 2:
+        return 'Ülke Seç';
+      case 3:
+        return 'Şehir Seç';
+      case 4:
+        return 'İlçe Seç';
+      case 5:
+        return 'Arama Onayı';
+      default:
+        return '';
+    }
+  };
 
   const popularCities = country === 'Türkiye' ? ['İstanbul', 'Ankara', 'İzmir', 'Bursa', 'Antalya', 'Adana'] : [];
 
   return (
-    <div className="space-y-5 animate-in fade-in duration-300">
-      {/* Sleek Step Indicator Progress Bar */}
-      <div className="w-full flex items-center justify-between gap-1.5 px-1 pb-1">
-        {[1, 2, 3, 4].map((s) => (
-          <div
-            key={s}
-            className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
-              step >= s ? 'bg-stone-900 shadow-sm' : 'bg-stone-150'
-            }`}
-          />
-        ))}
+    <div className="space-y-6 animate-in fade-in duration-300">
+      {/* Centered Step Title & Minimalist Indicator */}
+      <div className="text-center space-y-3 pb-3 border-b border-stone-100/60">
+        <h3 className="text-xl font-bold text-stone-900 tracking-tight">
+          {getStepTitle()}
+        </h3>
+        
+        {/* Step Indicator (Centered, narrow progress bar) */}
+        <div className="flex items-center justify-center gap-1.5 max-w-[120px] mx-auto">
+          {[1, 2, 3, 4, 5].map((s) => (
+            <div
+              key={s}
+              className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
+                step >= s ? 'bg-stone-900 shadow-sm' : 'bg-stone-150'
+              }`}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Step 1: Sector / Keyword */}
       {step === 1 && (
         <div className="space-y-4 animate-in slide-in-from-right-4 duration-300">
-          <div className="space-y-1.5">
-            <label className="text-[9px] font-black uppercase tracking-widest text-stone-400">
-              Ne Arıyorsunuz? (Sektör)
-            </label>
+          <div className="space-y-4">
+            {/* Popüler Sektörler (Chips) */}
+            <div className="flex flex-wrap justify-center gap-1.5 pt-1">
+              {PRESET_CATEGORIES.map((cat) => (
+                <button
+                  type="button"
+                  key={cat}
+                  onClick={() => setKeyword(cat)}
+                  className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-200 border ${
+                    keyword.toLowerCase() === cat.toLowerCase()
+                      ? 'bg-stone-900 text-white border-stone-900 shadow-sm'
+                      : 'bg-stone-50 text-stone-500 border-stone-100 hover:bg-stone-100 hover:text-stone-700'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* "veya yaz" Divider */}
+            <div className="flex items-center justify-center gap-3">
+              <div className="h-px bg-stone-100 flex-1" />
+              <span className="text-[9px] font-black uppercase tracking-widest text-stone-400 shrink-0">
+                veya yaz
+              </span>
+              <div className="h-px bg-stone-100 flex-1" />
+            </div>
+
+            {/* Input Field */}
             <div className="relative">
               <input
                 type="text"
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
                 placeholder="Örn: Kuaför, Butik, Otel, Kafe..."
-                className="w-full px-4 py-3 bg-stone-50 border border-stone-150 rounded-2xl text-xs font-bold text-stone-900 placeholder:text-stone-350 focus:outline-none focus:border-stone-900 focus:bg-white transition-all"
+                className="w-full px-4 py-3 bg-stone-50 border border-stone-150 rounded-2xl text-xs font-bold text-stone-900 placeholder:text-stone-350 focus:outline-none focus:border-stone-900 focus:bg-white transition-all text-center"
               />
               <Lucide.Search size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-450" />
-            </div>
-            
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {PRESET_CATEGORIES.map((cat) => (
-                <button
-                  type="button"
-                  key={cat}
-                  onClick={() => setKeyword(cat)}
-                  className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-200 ${
-                    keyword.toLowerCase() === cat.toLowerCase()
-                      ? 'bg-stone-900 text-white shadow-sm'
-                      : 'bg-stone-50 text-stone-500 hover:bg-stone-100 hover:text-stone-700'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
             </div>
           </div>
 
@@ -306,9 +328,6 @@ export default function PortfoysSearchView({
       {step === 2 && (
         <div className="space-y-4 animate-in slide-in-from-right-4 duration-300">
           <div className="space-y-2">
-            <label className="text-[9px] font-black uppercase tracking-widest text-stone-400">
-              Müşterilerin Bulunduğu Ülke
-            </label>
             <div className="space-y-2">
               {PORTFOYS_COUNTRIES.map((c) => (
                 <button
@@ -365,14 +384,10 @@ export default function PortfoysSearchView({
       {step === 3 && (
         <div className="space-y-4 animate-in slide-in-from-right-4 duration-300">
           <div className="space-y-3">
-            <label className="text-[9px] font-black uppercase tracking-widest text-stone-400">
-              Hangi Şehirde?
-            </label>
-            
             {popularCities.length > 0 && (
               <div className="space-y-1.5">
                 <span className="text-[8px] font-black uppercase tracking-widest text-stone-400">Popüler Şehirler</span>
-                <div className="grid grid-cols-3 gap-1.5">
+                <div className="grid grid-cols-2 gap-1.5">
                   {popularCities.map((pc) => (
                     <button
                       key={pc}
@@ -381,10 +396,10 @@ export default function PortfoysSearchView({
                         setCity(pc);
                         setStep(4);
                       }}
-                      className={`px-2 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-200 border ${
+                      className={`text-left px-3.5 py-2.5 text-[10px] font-bold uppercase rounded-xl transition-all border ${
                         city === pc
-                          ? 'bg-stone-900 text-white border-stone-900 shadow-sm'
-                          : 'bg-stone-50 text-stone-600 border-stone-100 hover:bg-stone-100 hover:border-stone-200'
+                          ? 'bg-stone-900 text-white border-stone-900 shadow-sm font-black'
+                          : 'text-stone-600 bg-white border-stone-100/70 hover:bg-stone-100 hover:border-stone-200'
                       }`}
                     >
                       {pc}
@@ -398,7 +413,7 @@ export default function PortfoysSearchView({
               <span className="text-[8px] font-black uppercase tracking-widest text-stone-400">
                 Tüm Şehirler
               </span>
-              <div className="max-h-[190px] overflow-y-auto border border-stone-100 rounded-2xl p-2 bg-stone-50/50 space-y-1 custom-scrollbar">
+              <div className="max-h-[190px] overflow-y-auto pr-1 custom-scrollbar">
                 {cities.length === 0 ? (
                   <div className="text-center py-6 text-[9px] font-black uppercase tracking-widest text-stone-400">
                     Şehir bulunamadı
@@ -450,76 +465,91 @@ export default function PortfoysSearchView({
         </div>
       )}
 
-      {/* Step 4: District Selection & Confirmation */}
+      {/* Step 4: District Selection */}
       {step === 4 && (
         <div className="space-y-4 animate-in slide-in-from-right-4 duration-300">
           <div className="space-y-3">
-            <label className="text-[9px] font-black uppercase tracking-widest text-stone-400">
-              Hangi Semt / İlçede?
-            </label>
-            
-            <div className="relative">
-              <input
-                type="text"
-                value={districtSearch}
-                onChange={(e) => setDistrictSearch(e.target.value)}
-                placeholder="İlçe/Semt adı arayın (Örn: Kadıköy)..."
-                className="w-full px-4 py-3 bg-stone-50 border border-stone-150 rounded-2xl text-xs font-bold text-stone-900 placeholder:text-stone-350 focus:outline-none focus:border-stone-900 focus:bg-white transition-all"
-              />
-              <Lucide.Search size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-450" />
+            <div className="space-y-1.5">
+              <span className="text-[8px] font-black uppercase tracking-widest text-stone-400">
+                Tüm İlçeler
+              </span>
+              <div className="max-h-[190px] overflow-y-auto pr-1 custom-scrollbar">
+                {loadingDistricts ? (
+                  <div className="flex flex-col items-center justify-center py-12 gap-2">
+                    <div className="w-4 h-4 border-2 border-stone-900 border-t-transparent rounded-full animate-spin" />
+                    <span className="text-[9px] font-black uppercase tracking-wider text-stone-400">İlçeler Yükleniyor...</span>
+                  </div>
+                ) : districts.length === 0 ? (
+                  <div className="text-center py-6 text-[9px] font-black uppercase tracking-widest text-stone-400">
+                    İlçe bulunamadı
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {districts.map((d) => (
+                      <button
+                        key={d}
+                        type="button"
+                        onClick={() => {
+                          setDistrict(d);
+                          setStep(5);
+                        }}
+                        className={`text-left px-3.5 py-2.5 text-[10px] font-bold uppercase rounded-xl transition-all border ${
+                          district === d
+                            ? 'bg-stone-900 text-white border-stone-900 shadow-sm font-black'
+                            : 'text-stone-600 bg-white border-stone-100/70 hover:bg-stone-100 hover:border-stone-200'
+                        }`}
+                      >
+                        {d}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-
-            {loadingDistricts ? (
-              <div className="flex items-center justify-center py-6 gap-2">
-                <div className="w-4 h-4 border-2 border-stone-900 border-t-transparent rounded-full animate-spin" />
-                <span className="text-[9px] font-black uppercase tracking-wider text-stone-400">İlçeler Yükleniyor...</span>
-              </div>
-            ) : (
-              <div className="space-y-1.5">
-                <div className="max-h-[140px] overflow-y-auto border border-stone-100 rounded-2xl p-1.5 bg-stone-50/50 space-y-0.5 custom-scrollbar">
-                  <button
-                    type="button"
-                    onClick={() => setDistrict('')}
-                    className={`w-full text-left px-3.5 py-2 text-[10px] font-bold uppercase rounded-xl transition-all ${
-                      district === ''
-                        ? 'bg-stone-900 text-white shadow-sm font-black'
-                        : 'text-stone-500 hover:bg-stone-100 hover:text-stone-700'
-                    }`}
-                  >
-                    ✨ TÜMÜ (İLÇE FARKETMEZ)
-                  </button>
-
-                  {filteredDistricts.map((d) => (
-                    <button
-                      key={d}
-                      type="button"
-                      onClick={() => setDistrict(d)}
-                      className={`w-full text-left px-3.5 py-2 text-[10px] font-bold uppercase rounded-xl transition-all ${
-                        district === d
-                          ? 'bg-stone-900 text-white shadow-sm font-black'
-                          : 'text-stone-600 hover:bg-stone-100'
-                      }`}
-                    >
-                      {d}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
-          {/* Minimalist Premium Confirmation Card */}
-          <div className="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl text-center animate-in zoom-in duration-200">
-            <p className="text-[10px] font-bold text-stone-500 leading-relaxed uppercase tracking-wide">
-              <strong>{city}{district ? ` (${district})` : ''}</strong>, <strong>{country}</strong> bölgesindeki <strong>"{keyword}"</strong> araması, 1 kullanım kredinizi tüketecektir. <span className="block text-[9px] text-stone-400 mt-1 font-semibold normal-case">yıllık arama hakkınız 2 adettir. (kalan: {credits}/2)</span>
-            </p>
-          </div>
-
-          <div className="flex gap-2">
+          <div className="flex gap-2 pt-1">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setStep(3)}
+              className="flex-1"
+            >
+              GERİ
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              disabled={!district}
+              onClick={() => setStep(5)}
+              className="flex-1"
+            >
+              DEVAM
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Step 5: Confirmation & Action */}
+      {step === 5 && (
+        <div className="space-y-4 animate-in slide-in-from-right-4 duration-300">
+          <div className="space-y-3">
+            {/* Minimalist Premium Confirmation Card */}
+            <div className="p-5 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl text-center">
+              <p className="text-[11px] font-bold text-stone-500 leading-relaxed uppercase tracking-wide">
+                <strong>{city} ({district})</strong>, <strong>{country}</strong> bölgesindeki <strong>"{keyword}"</strong> araması, 1 kullanım kredinizi tüketecektir.
+              </p>
+              <span className="block text-[9px] text-stone-400 mt-2 font-semibold normal-case">
+                yıllık arama hakkınız 2 adettir. (kalan: {credits}/2)
+              </span>
+            </div>
+          </div>
+
+          <div className="flex gap-2 pt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setStep(4)}
               className="flex-1"
             >
               GERİ

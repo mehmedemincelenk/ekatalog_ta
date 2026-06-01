@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import * as Lucide from 'lucide-react';
 import Button from '../ui/Button';
 import Loading from '../ui/Loading';
@@ -7,13 +7,24 @@ import { SavedLead } from '../../hooks/usePortfoysScraper';
 interface PortfoysDirectoryViewProps {
   savedDirectory: SavedLead[];
   loadingDirectory: boolean;
+  lastSearchKey?: string | null;
 }
 
 export default function PortfoysDirectoryView({
   savedDirectory,
   loadingDirectory,
+  lastSearchKey,
 }: PortfoysDirectoryViewProps) {
   const [expandedGroups, setExpandedGroups] = useState<{ [key: string]: boolean }>({});
+
+  useEffect(() => {
+    if (lastSearchKey) {
+      setExpandedGroups((prev) => ({
+        ...prev,
+        [lastSearchKey]: true,
+      }));
+    }
+  }, [lastSearchKey]);
 
   if (loadingDirectory) {
     return (
