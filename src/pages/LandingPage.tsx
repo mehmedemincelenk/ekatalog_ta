@@ -115,74 +115,100 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* THE 5 SUPERPOWERS (Kazanacaklarınız) */}
-          <div className="pt-20 max-w-4xl mx-auto space-y-6">
+          {/* THE SUPERPOWERS (Kazanacaklarınız) - Flat typographic minimalist design */}
+          <div className="pt-16 max-w-4xl mx-auto space-y-8">
             <p className="text-[10px] font-black text-stone-300 uppercase tracking-[0.4em]">
               kazanacaklarınız
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6 text-left px-4">
               {/* Pillar 1: Web Sitesi */}
-              <div className="bg-stone-50 border border-stone-100 rounded-3xl p-6 hover:shadow-xl hover:border-stone-200 transition-all duration-300">
-                <div className="w-10 h-10 rounded-2xl bg-stone-900 text-white flex items-center justify-center mb-4">
-                  <Lucide.Globe size={20} />
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Lucide.Globe size={16} className="text-stone-900 shrink-0" />
+                  <h3 className="text-sm font-black text-stone-900 tracking-tight">
+                    kendi website adresiniz
+                  </h3>
                 </div>
-                <h3 className="text-base font-black text-stone-900 tracking-tight mb-2">
-                  kendi website adresiniz
-                </h3>
                 <p className="text-xs text-stone-500 font-medium leading-relaxed">
-                  PDF veya görsel değil. <span className="text-stone-900 font-bold">www.firmaniz.com</span> veya <span className="text-stone-900 font-bold">markaniz.ekatalog.site</span> adresinde, müşterilerinizin 7/24 inceleyebileceği hızlı bir web sitesi.
+                  www.firmaniz.com veya markaniz.ekatalog.site ile 7/24 yayında prestijli bir dükkan.
                 </p>
               </div>
 
               {/* Pillar 2: Yönetim Paneli */}
-              <div className="bg-stone-50 border border-stone-100 rounded-3xl p-6 hover:shadow-xl hover:border-stone-200 transition-all duration-300">
-                <div className="w-10 h-10 rounded-2xl bg-stone-900 text-white flex items-center justify-center mb-4">
-                  <Lucide.Smartphone size={20} />
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Lucide.Smartphone size={16} className="text-stone-900 shrink-0" />
+                  <h3 className="text-sm font-black text-stone-900 tracking-tight">
+                    telefondan düzenle
+                  </h3>
                 </div>
-                <h3 className="text-base font-black text-stone-900 tracking-tight mb-2">
-                  telefondan düzenle
-                </h3>
                 <p className="text-xs text-stone-500 font-medium leading-relaxed">
-                  Bilgisayara gerek yok. Fiyat mı değişti? Telefonunuzdan dilediğiniz ürüne dokunun, yeni fiyatı yazıp kaydedin. Müşterilerinizde anında güncellensin.
+                  Bilgisayarsız, saniyeler içinde doğrudan telefonunuzdan fiyatları güncelleyin.
                 </p>
               </div>
 
               {/* Pillar 3: Ana Ekranda Logonuz */}
-              <div className="bg-stone-50 border border-stone-100 rounded-3xl p-6 hover:shadow-xl hover:border-stone-200 transition-all duration-300">
-                <div className="w-10 h-10 rounded-2xl bg-stone-900 text-white flex items-center justify-center mb-4">
-                  <Lucide.LayoutGrid size={20} />
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Lucide.LayoutGrid size={16} className="text-stone-900 shrink-0" />
+                  <h3 className="text-sm font-black text-stone-900 tracking-tight">
+                    ana ekranda logo
+                  </h3>
                 </div>
-                <h3 className="text-base font-black text-stone-900 tracking-tight mb-2">
-                  ana ekranda logonuz
-                </h3>
                 <p className="text-xs text-stone-500 font-medium leading-relaxed">
-                  Müşterileriniz ekataloğunuzu telefonlarına tek tıkla kaydeder. Link arama derdi biter, logonuz her an telefon ekranlarında bir uygulama gibi yer alır.
+                  Müşterilerinizin telefonuna tek tıkla uygulama gibi kurulan akıllı kısayol.
                 </p>
               </div>
 
-              {/* Pillar 4: Özel İndirim & Fiyat */}
-              <div className="bg-stone-50 border border-stone-100 rounded-3xl p-6 hover:shadow-xl hover:border-stone-200 transition-all duration-300">
-                <div className="w-10 h-10 rounded-2xl bg-stone-900 text-white flex items-center justify-center mb-4">
-                  <Lucide.Percent size={20} />
+              {/* Pillar 4: WhatsApp Siparişi */}
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Lucide.MessageSquare size={16} className="text-stone-900 shrink-0" />
+                  <h3 className="text-sm font-black text-stone-900 tracking-tight">
+                    whatsapp siparişi
+                  </h3>
                 </div>
-                <h3 className="text-base font-black text-stone-900 tracking-tight mb-2">
-                  müşteriye özel indirim
-                </h3>
                 <p className="text-xs text-stone-500 font-medium leading-relaxed">
-                  Dilediğiniz müşteriye özel indirim kuponları veya özel fiyatlar tanımlayın. Müşterileriniz kendilerine özel indirimli fiyatları görerek sipariş versin.
+                  Müşteri sepetini doldursun, sipariş listeniz WhatsApp'ınıza tek tıkla gelsin.
                 </p>
               </div>
 
-              {/* Pillar 5: Portföy Genişletici */}
-              <div className="bg-stone-50 border border-stone-100 rounded-3xl p-6 hover:shadow-xl hover:border-stone-200 transition-all duration-300">
-                <div className="w-10 h-10 rounded-2xl bg-stone-900 text-white flex items-center justify-center mb-4">
-                  <Lucide.Compass size={20} />
+              {/* Pillar 5: Özel İndirim & Fiyat */}
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Lucide.Percent size={16} className="text-stone-900 shrink-0" />
+                  <h3 className="text-sm font-black text-stone-900 tracking-tight">
+                    müşteriye özel fiyat
+                  </h3>
                 </div>
-                <h3 className="text-base font-black text-stone-900 tracking-tight mb-2">
-                  portfoys.pro ile yeni müşteriler
-                </h3>
                 <p className="text-xs text-stone-500 font-medium leading-relaxed">
-                  portfoys.pro entegrasyonu sayesinde hedeflediğiniz konumdaki (örn: Şişli'deki tüm çiçekçiler) potansiyel dükkan müşterilerini yılda 2 kez otomatik bulun, portföyünüzü katlayın.
+                  Dilediğiniz müşteriye özel indirim kuponları veya özel fiyatlar tanımlayın.
+                </p>
+              </div>
+
+              {/* Pillar 6: Portföy Genişletici */}
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Lucide.Compass size={16} className="text-stone-900 shrink-0" />
+                  <h3 className="text-sm font-black text-stone-900 tracking-tight">
+                    portfoys.pro ile b2b portföy
+                  </h3>
+                </div>
+                <p className="text-xs text-stone-500 font-medium leading-relaxed">
+                  Konumunuzdaki potansiyel alıcı dükkanları yılda 2 kez otomatik bulun.
+                </p>
+              </div>
+
+              {/* Pillar 7: Hızlı Kurulum */}
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Lucide.Zap size={16} className="text-stone-900 shrink-0" />
+                  <h3 className="text-sm font-black text-stone-900 tracking-tight">
+                    1 dakikada hazır
+                  </h3>
+                </div>
+                <p className="text-xs text-stone-500 font-medium leading-relaxed">
+                  Excel veya PDF listenizi atın, dükkanınızı biz kuralım, anında yayına geçin.
                 </p>
               </div>
             </div>
