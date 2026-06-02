@@ -207,6 +207,32 @@ export default function LandingPage() {
                   Konumunuzdaki potansiyel alıcı dükkanları yılda 2 kez otomatik bulun.
                 </p>
               </div>
+
+              {/* Pillar 8: Sosyal Medyaya Hazır Fiyat Listesi */}
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Lucide.Image size={16} className="text-stone-900 shrink-0" />
+                  <h3 className="text-sm font-black text-stone-900 tracking-tight">
+                    sosyal medyaya hazır fiyat listesi
+                  </h3>
+                </div>
+                <p className="text-xs text-stone-500 font-medium leading-relaxed">
+                  Seçtiğiniz kategorileri tek tıkla 9:16 Hikaye formatında görsel fiyat listesine dönüştürüp indirin.
+                </p>
+              </div>
+
+              {/* Pillar 9: Toplu Fiyat Güncelleme */}
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Lucide.TrendingUp size={16} className="text-stone-900 shrink-0" />
+                  <h3 className="text-sm font-black text-stone-900 tracking-tight">
+                    toplu fiyat güncelleme
+                  </h3>
+                </div>
+                <p className="text-xs text-stone-500 font-medium leading-relaxed">
+                  Maliyetler mi değişti? Tüm kategorideki fiyatları yüzde (%) bazlı tek tıkla toplu olarak artırın ya da düşürün.
+                </p>
+              </div>
             </div>
           </div>
 
