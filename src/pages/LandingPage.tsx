@@ -231,23 +231,6 @@ export default function LandingPage() {
           </div>
 
 
-          {/* PRICING & TRUST SECTION - Clean Modernist Layout */}
-          <div className="text-center flex flex-col items-center pt-20">
-            <div className="flex flex-col items-center space-y-2">
-              <div className="space-y-1">
-                <p className="text-[10px] font-black text-stone-300 uppercase tracking-[0.3em] line-through">
-                  ₺499 / AY
-                </p>
-                <p className="text-7xl font-black text-stone-900 tracking-tighter leading-none pr-1">
-                  ₺199
-                  <span className="text-lg font-bold opacity-30 ml-2">
-                    / ay
-                  </span>
-                </p>
-              </div>
-            </div>
-          </div>
-
         </div>
       </section>
 
@@ -326,6 +309,23 @@ export default function LandingPage() {
               </span>
             </Button>
           </a>
+
+          {/* PRICING & TRUST SECTION - Clean Modernist Layout */}
+          <div className="text-center flex flex-col items-center pt-10">
+            <div className="flex flex-col items-center space-y-2">
+              <div className="space-y-1">
+                <p className="text-[10px] font-black text-stone-300 uppercase tracking-[0.3em] line-through">
+                  ₺499 / AY
+                </p>
+                <p className="text-7xl font-black text-stone-900 tracking-tighter leading-none pr-1">
+                  ₺199
+                  <span className="text-lg font-bold opacity-30 ml-2">
+                    / ay
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
