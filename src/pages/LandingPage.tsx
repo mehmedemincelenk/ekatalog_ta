@@ -118,75 +118,112 @@ export default function LandingPage() {
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6 text-left px-4">
               {/* Pillar 1: Web Sitesi */}
-              <div className="flex items-center gap-2.5 py-1">
-                <Lucide.Globe size={15} className="text-stone-900 shrink-0" />
-                <span className="text-xs font-bold text-stone-600 lowercase tracking-tight">
-                  kendi alan adınızla 7/24 açık kalın
-                </span>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Lucide.Globe size={16} className="text-stone-900 shrink-0" />
+                  <h3 className="text-sm font-black text-stone-900 tracking-tight">
+                    kendi website adresiniz
+                  </h3>
+                </div>
+                <p className="text-xs text-stone-500 font-medium leading-relaxed">
+                  www.firmaniz.com veya markaniz.ekatalog.site ile 7/24 yayında prestijli bir dükkan.
+                </p>
               </div>
 
               {/* Pillar 2: Yönetim Paneli */}
-              <div className="flex items-center gap-2.5 py-1">
-                <Lucide.Smartphone size={15} className="text-stone-900 shrink-0" />
-                <span className="text-xs font-bold text-stone-600 lowercase tracking-tight">
-                  fiyatları telefondan anında güncelleyin
-                </span>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Lucide.Smartphone size={16} className="text-stone-900 shrink-0" />
+                  <h3 className="text-sm font-black text-stone-900 tracking-tight">
+                    telefondan düzenle
+                  </h3>
+                </div>
+                <p className="text-xs text-stone-500 font-medium leading-relaxed">
+                  Doğrudan dükkandaki ürün fiyatlarına dokunarak cepten anında güncelleyin.
+                </p>
               </div>
 
               {/* Pillar 3: Ana Ekranda Logonuz */}
-              <div className="flex items-center gap-2.5 py-1">
-                <Lucide.LayoutGrid size={15} className="text-stone-900 shrink-0" />
-                <span className="text-xs font-bold text-stone-600 lowercase tracking-tight">
-                  dükkanınızı müşteri telefonuna indirtin
-                </span>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Lucide.LayoutGrid size={16} className="text-stone-900 shrink-0" />
+                  <h3 className="text-sm font-black text-stone-900 tracking-tight">
+                    ana ekranda logo
+                  </h3>
+                </div>
+                <p className="text-xs text-stone-500 font-medium leading-relaxed">
+                  Müşterilerinizin telefonuna tek tıkla uygulama gibi kurulan akıllı kısayol.
+                </p>
               </div>
 
               {/* Pillar 4: Özel İndirim & Fiyat */}
-              <div className="flex items-center gap-2.5 py-1">
-                <Lucide.Percent size={15} className="text-stone-900 shrink-0" />
-                <span className="text-xs font-bold text-stone-600 lowercase tracking-tight">
-                  müşteriye özel indirim kuponu tanımlayın
-                </span>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Lucide.Percent size={16} className="text-stone-900 shrink-0" />
+                  <h3 className="text-sm font-black text-stone-900 tracking-tight">
+                    müşteriye özel fiyat
+                  </h3>
+                </div>
+                <p className="text-xs text-stone-500 font-medium leading-relaxed">
+                  Dilediğiniz müşteriye özel indirim kuponları veya özel fiyatlar tanımlayın.
+                </p>
               </div>
 
               {/* Pillar 5: Döviz Çevirici */}
-              <div className="flex items-center gap-2.5 py-1">
-                <Lucide.Coins size={15} className="text-stone-900 shrink-0" />
-                <span className="text-xs font-bold text-stone-600 lowercase tracking-tight">
-                  fiyatları tek tıkla dolar/euroya çevirin
-                </span>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Lucide.Coins size={16} className="text-stone-900 shrink-0" />
+                  <h3 className="text-sm font-black text-stone-900 tracking-tight">
+                    döviz çevirici
+                  </h3>
+                </div>
+                <p className="text-xs text-stone-500 font-medium leading-relaxed">
+                  Müşterileriniz dükkanınızdaki tüm fiyatları TL, USD veya EUR cinsine tek tıkla çevirsin.
+                </p>
               </div>
 
               {/* Pillar 6: Telefon Kilidi Gibi Giriş */}
-              <div className="flex items-center gap-2.5 py-1">
-                <Lucide.Lock size={15} className="text-stone-900 shrink-0" />
-                <span className="text-xs font-bold text-stone-600 lowercase tracking-tight">
-                  4 haneli pin koduyla hızlıca girin
-                </span>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Lucide.Lock size={16} className="text-stone-900 shrink-0" />
+                  <h3 className="text-sm font-black text-stone-900 tracking-tight">
+                    telefon kilidi gibi giriş
+                  </h3>
+                </div>
+                <p className="text-xs text-stone-500 font-medium leading-relaxed">
+                  Şifre yazma derdi olmadan, 4 haneli PIN kodu ile dükkanınıza güvenli ve hızlı erişin.
+                </p>
               </div>
 
               {/* Pillar 7: Portföy Genişletici */}
-              <div className="flex items-center gap-2.5 py-1">
-                <Lucide.Compass size={15} className="text-stone-900 shrink-0" />
-                <span className="text-xs font-bold text-stone-600 lowercase tracking-tight">
-                  çevrenizdeki alıcı esnafları bulun
-                </span>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Lucide.Compass size={16} className="text-stone-900 shrink-0" />
+                  <h3 className="text-sm font-black text-stone-900 tracking-tight">
+                    portfoys.pro ile b2b portföy
+                  </h3>
+                </div>
+                <p className="text-xs text-stone-500 font-medium leading-relaxed">
+                  Konumunuzdaki potansiyel alıcı dükkanları yılda 2 kez otomatik bulun.
+                </p>
               </div>
 
               {/* Pillar 8: Sosyal Medya Gönderi Tasarımı */}
-              <div className="flex items-center gap-2.5 py-1">
-                <Lucide.Image size={15} className="text-stone-900 shrink-0" />
-                <span className="text-xs font-bold text-stone-600 lowercase tracking-tight">
-                  ürünleri tek tıkla reklam afişi yapın
-                </span>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Lucide.Image size={16} className="text-stone-900 shrink-0" />
+                  <h3 className="text-sm font-black text-stone-900 tracking-tight">sosyal medya gönderi tasarımı</h3>
+                </div>
+                <p className="text-xs text-stone-500 font-medium leading-relaxed">Ürünlerinizi tek tıkla Instagram ve WhatsApp için hazır reklam görsellerine dönüştürün.</p>
               </div>
 
               {/* Pillar 9: Toplu Fiyat Güncelleme */}
-              <div className="flex items-center gap-2.5 py-1">
-                <Lucide.TrendingUp size={15} className="text-stone-900 shrink-0" />
-                <span className="text-xs font-bold text-stone-600 lowercase tracking-tight">
-                  fiyatları toplu artırın veya düşürün
-                </span>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Lucide.TrendingUp size={16} className="text-stone-900 shrink-0" />
+                  <h3 className="text-sm font-black text-stone-900 tracking-tight">toplu fiyat güncelleme</h3>
+                </div>
+                <p className="text-xs text-stone-500 font-medium leading-relaxed">Maliyetler mi değişti? Tüm dükkandaki fiyatları ister yüzde ister tutar bazlı tek tıkla toplu güncelleyin.</p>
               </div>
             </div>
           </div>
