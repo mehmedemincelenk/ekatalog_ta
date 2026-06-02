@@ -55,26 +55,11 @@ export default function LandingPage() {
             ekatalog
           </h1>
 
-          <div className="space-y-2">
-            <p className="max-w-2xl mx-auto text-lg text-stone-500 font-medium leading-relaxed">
-              sahada/ofiste <span className="font-black text-stone-900">hız ve kolaylık.</span>
-            </p>
+          <p className="max-w-2xl mx-auto text-lg text-stone-500 font-medium leading-relaxed">
+            sahada/ofiste <span className="font-black text-stone-900">hız ve kolaylık.</span>
+          </p>
 
-            <div>
-              <a
-                href="https://wa.me/905373420161"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-block hover:scale-105 active:scale-95 transition-transform duration-200"
-              >
-                <Button variant="primary" size="sm" className="!rounded-full shadow-md">
-                  whatsapp ile başlayın
-                </Button>
-              </a>
-            </div>
-          </div>
-
-          <div className="pt-8 flex flex-col items-center justify-center relative z-20">
+          <div className="pt-8 flex flex-col items-center justify-center relative z-20 space-y-4">
             {/* Premium Phone Frame Mockup */}
             <div className="relative w-[300px] h-[600px] bg-stone-950 rounded-[1.75rem] p-2 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.45),0_0_0_1px_rgba(255,255,255,0.1)] border border-stone-850 ring-4 ring-stone-900/5">
               {/* Screen Container */}
@@ -85,6 +70,19 @@ export default function LandingPage() {
                   title="E-Katalog Canlı Demo"
                 />
               </div>
+            </div>
+
+            <div className="pt-2">
+              <a
+                href="https://wa.me/905373420161"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-block hover:scale-105 active:scale-95 transition-transform duration-200"
+              >
+                <Button variant="primary" size="sm" className="!rounded-full shadow-md">
+                  whatsapp ile başlayın
+                </Button>
+              </a>
             </div>
           </div>
 
