@@ -55,21 +55,23 @@ export default function LandingPage() {
             ekatalog
           </h1>
 
-          <p className="max-w-2xl mx-auto text-lg text-stone-500 font-medium leading-relaxed">
-            sahada/ofiste <span className="font-black text-stone-900">hız ve kolaylık.</span>
-          </p>
+          <div className="space-y-2">
+            <p className="max-w-2xl mx-auto text-lg text-stone-500 font-medium leading-relaxed">
+              sahada/ofiste <span className="font-black text-stone-900">hız ve kolaylık.</span>
+            </p>
 
-          <div className="pt-2">
-            <a
-              href="https://wa.me/905373420161"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-block hover:scale-105 active:scale-95 transition-transform duration-200"
-            >
-              <Button variant="primary" size="md" className="!rounded-full shadow-lg">
-                whatsapp ile başlayın
-              </Button>
-            </a>
+            <div>
+              <a
+                href="https://wa.me/905373420161"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-block hover:scale-105 active:scale-95 transition-transform duration-200"
+              >
+                <Button variant="primary" size="sm" className="!rounded-full shadow-md">
+                  whatsapp ile başlayın
+                </Button>
+              </a>
+            </div>
           </div>
 
           <div className="pt-8 flex flex-col items-center justify-center relative z-20">
