@@ -116,7 +116,7 @@ export default function LandingPage() {
             <p className="text-[10px] font-black text-stone-300 uppercase tracking-[0.4em]">
               kazanacaklarınız
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6 text-left px-4">
+            <div className="grid grid-cols-1 gap-y-6 max-w-xl mx-auto text-left px-4">
               {/* Pillar 1: Web Sitesi */}
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
