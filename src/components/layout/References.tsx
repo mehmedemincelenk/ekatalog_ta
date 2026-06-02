@@ -183,7 +183,7 @@ export default function References({
   if (activeReferences.length === 0) {
     if (isAdmin) {
       return (
-        <section className="w-full max-w-full overflow-hidden select-none py-6 bg-white border border-stone-100/50 rounded-2xl flex flex-col items-center justify-center gap-2 text-stone-300">
+        <section className="w-full max-w-full overflow-hidden select-none py-4 bg-transparent border border-stone-100/50 rounded-2xl flex flex-col items-center justify-center gap-2 text-stone-300">
           <span className="text-xl">🤝</span>
           <span className="text-[10px] font-black uppercase tracking-[0.2em]">HENÜZ REFERANS EKLENMEMİŞ</span>
         </section>
@@ -202,11 +202,11 @@ export default function References({
   marqueeItems.push(...baseItems, ...baseItems);
 
   return (
-    <section className="w-full max-w-full overflow-hidden select-none py-4 bg-white relative">
+    <section className="w-full max-w-full overflow-hidden select-none py-1.5 bg-transparent relative">
       <div className="w-full max-w-full overflow-hidden relative">
         {/* Subtle premium edge fades */}
-        <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+        <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-stone-50 to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-stone-50 to-transparent z-10 pointer-events-none" />
 
         <div
           onPointerDown={handlePointerDown}

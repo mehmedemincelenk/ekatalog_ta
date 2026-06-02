@@ -18,6 +18,14 @@ export default function LandingPage() {
     };
   }, []);
 
+  useEffect(() => {
+    document.title = "ekatalog | Akıllı B2B Dijital Katalog Sistemi";
+    const link: HTMLLinkElement | null = document.querySelector("link[rel*='icon']");
+    if (link) {
+      link.href = "/favicon.svg";
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-white font-sans selection:bg-stone-900 selection:text-white">
       {/* STICKY PROMO BAR */}

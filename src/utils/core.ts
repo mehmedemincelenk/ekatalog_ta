@@ -92,6 +92,9 @@ export const getActiveStoreSlug = (): string => {
 
   // 4. Default Dev Shop fallback if on localhost / dev mode
   if (isDevHost || isDevMode) {
+    if (pathname === '/' || pathname === '') {
+      return 'landing';
+    }
     const envSlug = import.meta.env.VITE_STORE_SLUG;
     if (envSlug && envSlug !== 'mainsite' && envSlug !== 'landing')
       return envSlug;

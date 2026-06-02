@@ -282,15 +282,15 @@ export const THEME = {
 
   productGrid: {
     layout: 'w-full flex flex-col min-h-[400px]',
-    sectionSpacing: 'mt-12 first:mt-2',
+    sectionSpacing: 'mt-8 first:mt-2',
     header: {
-      wrapper: 'flex items-center gap-3 mb-6 px-1',
+      wrapper: 'flex items-center gap-3 mb-3 px-1',
       title: `${FS.base} font-black text-stone-900 tracking-tighter`,
       line: 'flex-1 h-px bg-stone-200',
       count: `${FS.xs} font-bold text-stone-400`,
     },
     cols: 'grid grid-cols-2',
-    gap: 'gap-4',
+    gap: 'gap-3',
     emptyState: {
       wrapper: 'flex flex-col items-center justify-center py-20 text-stone-400',
       iconSize: 'w-16 h-16 mb-4 opacity-20',
