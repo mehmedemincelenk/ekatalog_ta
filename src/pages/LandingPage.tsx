@@ -304,11 +304,6 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Footer outside the card */}
-        <p className="text-stone-400 text-[10px] font-bold uppercase tracking-[0.2em] text-center mt-4">
-          Taahhüt yok, cayma bedeli yok.
-        </p>
-
         {/* SECONDARY CONTACT (Direct Line for Trust) */}
         <div className="mt-8 flex flex-col items-center animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-700">
           <a
