@@ -59,6 +59,19 @@ export default function LandingPage() {
             sahada/ofiste <span className="font-black text-stone-900">hız ve kolaylık.</span>
           </p>
 
+          <div className="pt-2">
+            <a
+              href="https://wa.me/905373420161"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-block hover:scale-105 active:scale-95 transition-transform duration-200"
+            >
+              <Button variant="primary" size="md" className="!rounded-full shadow-lg">
+                whatsapp ile başlayın
+              </Button>
+            </a>
+          </div>
+
           <div className="pt-8 flex flex-col items-center justify-center relative z-20">
             {/* Premium Phone Frame Mockup */}
             <div className="relative w-[300px] h-[600px] bg-stone-950 rounded-[1.75rem] p-2 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.45),0_0_0_1px_rgba(255,255,255,0.1)] border border-stone-850 ring-4 ring-stone-900/5">
@@ -200,6 +213,38 @@ export default function LandingPage() {
             </div>
           </div>
 
+          {/* THE PLAN (Nasıl Çalışır) - Minimalist 3-Step road map */}
+          <div className="pt-20 max-w-4xl mx-auto space-y-8">
+            <p className="text-[10px] font-black text-stone-300 uppercase tracking-[0.4em]">
+              nasıl çalışır
+            </p>
+            <div className="grid grid-cols-1 gap-y-6 max-w-xl mx-auto text-left px-4">
+              <div className="flex gap-3 items-start">
+                <span className="text-xs font-black text-stone-900 shrink-0 bg-stone-100 w-5 h-5 rounded-full flex items-center justify-center mt-0.5">1</span>
+                <div className="space-y-0.5">
+                  <h3 className="text-sm font-black text-stone-900 tracking-tight">listenizi gönderin</h3>
+                  <p className="text-xs text-stone-500 font-medium leading-relaxed">Mevcut PDF, Excel veya fotoğraf listenizi WhatsApp'tan atın.</p>
+                </div>
+              </div>
+
+              <div className="flex gap-3 items-start">
+                <span className="text-xs font-black text-stone-900 shrink-0 bg-stone-100 w-5 h-5 rounded-full flex items-center justify-center mt-0.5">2</span>
+                <div className="space-y-0.5">
+                  <h3 className="text-sm font-black text-stone-900 tracking-tight">ücretsiz kuralım</h3>
+                  <p className="text-xs text-stone-500 font-medium leading-relaxed">Dükkanınızı aynı gün içinde yayına hazırlayalım.</p>
+                </div>
+              </div>
+
+              <div className="flex gap-3 items-start">
+                <span className="text-xs font-black text-stone-900 shrink-0 bg-stone-100 w-5 h-5 rounded-full flex items-center justify-center mt-0.5">3</span>
+                <div className="space-y-0.5">
+                  <h3 className="text-sm font-black text-stone-900 tracking-tight">anında paylaşın</h3>
+                  <p className="text-xs text-stone-500 font-medium leading-relaxed">Telefonunuzdan fiyatları güncelleyip müşterilerinizle paylaşın.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* PRICING & TRUST SECTION - Clean Modernist Layout */}
           <div className="text-center flex flex-col items-center pt-20">
             <div className="flex flex-col items-center space-y-2">
@@ -215,6 +260,13 @@ export default function LandingPage() {
                 </p>
               </div>
             </div>
+          </div>
+
+          {/* THE GUIDE (Rehber İmzası) */}
+          <div className="pt-16 pb-8 text-center max-w-md mx-auto">
+            <p className="text-xs font-bold text-stone-400 italic leading-relaxed px-4">
+              "Listenizi dijitalleştirmekle uğraşmayın, bize bırakın. Siz sadece dükkanınızı yönetmeye odaklanın."
+            </p>
           </div>
         </div>
       </section>
