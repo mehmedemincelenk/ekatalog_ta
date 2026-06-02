@@ -118,129 +118,75 @@ export default function LandingPage() {
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6 text-left px-4">
               {/* Pillar 1: Web Sitesi */}
-              <div className="flex items-center gap-2 py-0.5">
+              <div className="flex items-center gap-2.5 py-1">
                 <Lucide.Globe size={15} className="text-stone-900 shrink-0" />
-                <div className="flex items-baseline gap-1.5 flex-wrap">
-                  <span className="text-xs font-black text-stone-900 tracking-tight lowercase">
-                    adres
-                  </span>
-                  <span className="text-stone-400 font-medium select-none text-[10px]">—</span>
-                  <span className="text-xs text-stone-500 font-bold lowercase">
-                    7/24 yayında dükkan
-                  </span>
-                </div>
+                <span className="text-xs font-bold text-stone-600 lowercase tracking-tight">
+                  kendi alan adınızla 7/24 açık kalın
+                </span>
               </div>
 
               {/* Pillar 2: Yönetim Paneli */}
-              <div className="flex items-center gap-2 py-0.5">
+              <div className="flex items-center gap-2.5 py-1">
                 <Lucide.Smartphone size={15} className="text-stone-900 shrink-0" />
-                <div className="flex items-baseline gap-1.5 flex-wrap">
-                  <span className="text-xs font-black text-stone-900 tracking-tight lowercase">
-                    düzenleme
-                  </span>
-                  <span className="text-stone-400 font-medium select-none text-[10px]">—</span>
-                  <span className="text-xs text-stone-500 font-bold lowercase">
-                    cepten anında güncelleme
-                  </span>
-                </div>
+                <span className="text-xs font-bold text-stone-600 lowercase tracking-tight">
+                  fiyatları telefondan anında güncelleyin
+                </span>
               </div>
 
               {/* Pillar 3: Ana Ekranda Logonuz */}
-              <div className="flex items-center gap-2 py-0.5">
+              <div className="flex items-center gap-2.5 py-1">
                 <Lucide.LayoutGrid size={15} className="text-stone-900 shrink-0" />
-                <div className="flex items-baseline gap-1.5 flex-wrap">
-                  <span className="text-xs font-black text-stone-900 tracking-tight lowercase">
-                    kısayol
-                  </span>
-                  <span className="text-stone-400 font-medium select-none text-[10px]">—</span>
-                  <span className="text-xs text-stone-500 font-bold lowercase">
-                    telefona uygulama gibi
-                  </span>
-                </div>
+                <span className="text-xs font-bold text-stone-600 lowercase tracking-tight">
+                  dükkanınızı müşteri telefonuna indirtin
+                </span>
               </div>
 
               {/* Pillar 4: Özel İndirim & Fiyat */}
-              <div className="flex items-center gap-2 py-0.5">
+              <div className="flex items-center gap-2.5 py-1">
                 <Lucide.Percent size={15} className="text-stone-900 shrink-0" />
-                <div className="flex items-baseline gap-1.5 flex-wrap">
-                  <span className="text-xs font-black text-stone-900 tracking-tight lowercase">
-                    indirim
-                  </span>
-                  <span className="text-stone-400 font-medium select-none text-[10px]">—</span>
-                  <span className="text-xs text-stone-500 font-bold lowercase">
-                    müşteriye özel kupon
-                  </span>
-                </div>
+                <span className="text-xs font-bold text-stone-600 lowercase tracking-tight">
+                  müşteriye özel indirim kuponu tanımlayın
+                </span>
               </div>
 
               {/* Pillar 5: Döviz Çevirici */}
-              <div className="flex items-center gap-2 py-0.5">
+              <div className="flex items-center gap-2.5 py-1">
                 <Lucide.Coins size={15} className="text-stone-900 shrink-0" />
-                <div className="flex items-baseline gap-1.5 flex-wrap">
-                  <span className="text-xs font-black text-stone-900 tracking-tight lowercase">
-                    döviz
-                  </span>
-                  <span className="text-stone-400 font-medium select-none text-[10px]">—</span>
-                  <span className="text-xs text-stone-500 font-bold lowercase">
-                    anlık kur çevirisi
-                  </span>
-                </div>
+                <span className="text-xs font-bold text-stone-600 lowercase tracking-tight">
+                  fiyatları tek tıkla dolar/euroya çevirin
+                </span>
               </div>
 
               {/* Pillar 6: Telefon Kilidi Gibi Giriş */}
-              <div className="flex items-center gap-2 py-0.5">
+              <div className="flex items-center gap-2.5 py-1">
                 <Lucide.Lock size={15} className="text-stone-900 shrink-0" />
-                <div className="flex items-baseline gap-1.5 flex-wrap">
-                  <span className="text-xs font-black text-stone-900 tracking-tight lowercase">
-                    giriş
-                  </span>
-                  <span className="text-stone-400 font-medium select-none text-[10px]">—</span>
-                  <span className="text-xs text-stone-500 font-bold lowercase">
-                    4 haneli PIN
-                  </span>
-                </div>
+                <span className="text-xs font-bold text-stone-600 lowercase tracking-tight">
+                  4 haneli pin koduyla hızlıca girin
+                </span>
               </div>
 
               {/* Pillar 7: Portföy Genişletici */}
-              <div className="flex items-center gap-2 py-0.5">
+              <div className="flex items-center gap-2.5 py-1">
                 <Lucide.Compass size={15} className="text-stone-900 shrink-0" />
-                <div className="flex items-baseline gap-1.5 flex-wrap">
-                  <span className="text-xs font-black text-stone-900 tracking-tight lowercase">
-                    portföy
-                  </span>
-                  <span className="text-stone-400 font-medium select-none text-[10px]">—</span>
-                  <span className="text-xs text-stone-500 font-bold lowercase">
-                    alıcı esnaf bulma
-                  </span>
-                </div>
+                <span className="text-xs font-bold text-stone-600 lowercase tracking-tight">
+                  çevrenizdeki alıcı esnafları bulun
+                </span>
               </div>
 
               {/* Pillar 8: Sosyal Medya Gönderi Tasarımı */}
-              <div className="flex items-center gap-2 py-0.5">
+              <div className="flex items-center gap-2.5 py-1">
                 <Lucide.Image size={15} className="text-stone-900 shrink-0" />
-                <div className="flex items-baseline gap-1.5 flex-wrap">
-                  <span className="text-xs font-black text-stone-900 tracking-tight lowercase">
-                    tasarım
-                  </span>
-                  <span className="text-stone-400 font-medium select-none text-[10px]">—</span>
-                  <span className="text-xs text-stone-500 font-bold lowercase">
-                    sosyal medya afişi
-                  </span>
-                </div>
+                <span className="text-xs font-bold text-stone-600 lowercase tracking-tight">
+                  ürünleri tek tıkla reklam afişi yapın
+                </span>
               </div>
 
               {/* Pillar 9: Toplu Fiyat Güncelleme */}
-              <div className="flex items-center gap-2 py-0.5">
+              <div className="flex items-center gap-2.5 py-1">
                 <Lucide.TrendingUp size={15} className="text-stone-900 shrink-0" />
-                <div className="flex items-baseline gap-1.5 flex-wrap">
-                  <span className="text-xs font-black text-stone-900 tracking-tight lowercase">
-                    fiyat
-                  </span>
-                  <span className="text-stone-400 font-medium select-none text-[10px]">—</span>
-                  <span className="text-xs text-stone-500 font-bold lowercase">
-                    yüzde/tutar toplu güncelleme
-                  </span>
-                </div>
+                <span className="text-xs font-bold text-stone-600 lowercase tracking-tight">
+                  fiyatları toplu artırın veya düşürün
+                </span>
               </div>
             </div>
           </div>
