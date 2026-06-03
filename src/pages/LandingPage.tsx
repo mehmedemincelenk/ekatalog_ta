@@ -89,7 +89,7 @@ export default function LandingPage() {
               <div className="w-full h-full rounded-[1.25rem] overflow-hidden bg-stone-50 border border-stone-900 relative">
                 <iframe
                   src="https://ornek.ekatalog.site"
-                  className="w-[120%] h-[120%] border-none origin-top-left scale-[0.8333]"
+                  className="w-[120%] h-[120%] border-none origin-top-left scale-[0.8333] pointer-events-none md:pointer-events-auto"
                   title="E-Katalog Canlı Demo"
                 />
               </div>
