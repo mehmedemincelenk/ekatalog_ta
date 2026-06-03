@@ -14,10 +14,16 @@ import { useHeroCarouselFlow } from '../../hooks/useHeroCarouselFlow';
  * -----------------------------------------------------------
  * Implements a centered 60% hero card flanked by 20% "ghost" previews.
  */
-export default function HeroCarousel({ isAdminModeActive }: HeroCarouselProps) {
+export default function HeroCarousel({ isAdminModeActive, isStatic = false }: HeroCarouselProps & { isStatic?: boolean }) {
   const flow = useHeroCarouselFlow(isAdminModeActive);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isStatic) {
+      flow.setIsPaused(true);
+    }
+  }, [isStatic, flow.setIsPaused]);
 
   const [activeHeight, setActiveHeight] = useState<number | 'auto'>('auto');
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);

@@ -542,8 +542,8 @@ export default function DisplaySettingsModal({
 
           {/* İŞLETME BİLGİLERİ */}
           <div className="flex flex-col gap-3">
-            <div className="px-1 flex items-baseline gap-2 mt-4 mb-2 pl-2">
-              <h5 className="font-black text-stone-900 text-lg font-serif italic">
+            <div className="w-full flex justify-center gap-2 mt-4 mb-2">
+              <h5 className="font-black text-stone-900 text-lg font-serif italic text-center">
                 İşletme Bilgileri
               </h5>
             </div>
@@ -665,8 +665,8 @@ export default function DisplaySettingsModal({
 
           {/* TABELA */}
           <div className="flex flex-col gap-3">
-            <div className="px-1 flex items-baseline gap-2 mt-4 mb-1 pl-2">
-              <h5 className="text-[10px] uppercase tracking-[0.2em] font-black text-stone-900">
+            <div className="w-full flex justify-center gap-2 mt-4 mb-1">
+              <h5 className="text-[10px] uppercase tracking-[0.2em] font-black text-stone-900 text-center">
                 TABELA (NAVBAR BİLEŞENLERİ)
               </h5>
             </div>
@@ -697,21 +697,21 @@ export default function DisplaySettingsModal({
 
           {/* YÜZEN MENÜ BİLEŞENLERİ */}
           <div className="flex flex-col gap-3">
-            <div className="px-1 flex items-baseline gap-2 mt-4 pl-2">
-              <h5 className="text-[10px] uppercase tracking-[0.2em] font-black text-stone-900">
+            <div className="w-full flex justify-center gap-2 mt-4">
+              <h5 className="text-[10px] uppercase tracking-[0.2em] font-black text-stone-900 text-center">
                 YÜZEN MENÜ BİLEŞENLERİ
               </h5>
             </div>
 
             <div 
               style={{ gridTemplateColumns: `${menuLayout.width}px 1fr` }}
-              className="grid gap-6 my-2 px-2 items-center"
+              className="grid gap-6 my-2 px-2 items-start"
             >
               {/* Sol Taraf: Live Preview */}
               <div 
                 ref={menuRef}
                 style={{ transform: `scale(${menuLayout.scale})` }} 
-                className="origin-left shrink-0 select-none transition-transform duration-300 pointer-events-none -translate-y-1"
+                className="origin-top-left shrink-0 select-none transition-transform duration-300 pointer-events-none"
               >
                 <BaseFloatingMenu actions={guestActions} forceExpanded={true} isPreview={true} />
               </div>
@@ -737,15 +737,15 @@ export default function DisplaySettingsModal({
 
           {/* VİTRİN VE TASARIM */}
           <div className="flex flex-col gap-3">
-            <div className="px-1 flex items-baseline gap-2 mt-4 pl-2">
-              <h5 className="text-[10px] uppercase tracking-[0.2em] font-black text-stone-900">
+            <div className="w-full flex justify-center gap-2 mt-4">
+              <h5 className="text-[10px] uppercase tracking-[0.2em] font-black text-stone-900 text-center">
                 VİTRİN VE TASARIM
               </h5>
             </div>
 
             <div className="flex flex-col gap-4 bg-stone-50/30 border border-stone-100 rounded-3xl p-4 my-1">
               {/* Live Vitrin Preview */}
-              <div className="w-full flex flex-col gap-2 p-3 bg-stone-100/30 rounded-2xl border border-stone-200/60 relative overflow-hidden select-none">
+              <div className="w-full flex flex-col gap-2 relative overflow-hidden select-none pointer-events-none">
                 <AnimatePresence initial={false} mode="popLayout">
                   {flow.getOptionState('showCarousel') && (
                     <motion.div
@@ -754,9 +754,9 @@ export default function DisplaySettingsModal({
                       animate={{ height: 'auto', opacity: 1, scale: 1, y: 0 }}
                       exit={{ height: 0, opacity: 0, scale: 0.95, y: -10 }}
                       transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
-                      className="w-full overflow-hidden rounded-xl border border-stone-200/60 shadow-sm bg-white shrink-0 origin-top"
+                      className="w-full overflow-hidden shrink-0 origin-top"
                     >
-                      <HeroCarousel isAdminModeActive={false} />
+                      <HeroCarousel isAdminModeActive={false} isStatic={true} />
                     </motion.div>
                   )}
 
@@ -767,9 +767,9 @@ export default function DisplaySettingsModal({
                       animate={{ height: 'auto', opacity: 1, scale: 1, y: 0 }}
                       exit={{ height: 0, opacity: 0, scale: 0.95, y: -10 }}
                       transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
-                      className="w-full overflow-hidden rounded-xl border border-stone-200/60 shadow-sm bg-white shrink-0 origin-top"
+                      className="w-full overflow-hidden shrink-0 origin-top"
                     >
-                      <References isInlineEnabled={false} isAdmin={false} />
+                      <References isInlineEnabled={false} isAdmin={false} isPaused={true} />
                     </motion.div>
                   )}
 
@@ -780,7 +780,7 @@ export default function DisplaySettingsModal({
                       animate={{ height: 'auto', opacity: 1, scale: 1 }}
                       exit={{ height: 0, opacity: 0, scale: 0.95 }}
                       transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
-                      className="w-full py-8 rounded-xl border border-stone-200/60 border-dashed bg-stone-50/50 flex flex-col items-center justify-center select-none text-[10px] font-black tracking-wider text-stone-400 uppercase origin-center"
+                      className="w-full py-4 flex flex-col items-center justify-center select-none text-[10px] font-black tracking-wider text-stone-400 uppercase origin-center"
                     >
                       Vitrin Bileşenleri Kapalı
                     </motion.div>
@@ -809,8 +809,8 @@ export default function DisplaySettingsModal({
 
           {/* SİSTEM YÖNETİMİ */}
           <div className="flex flex-col gap-3">
-            <div className="px-1 flex items-baseline gap-2 mt-4 mb-2 pl-2">
-              <h5 className="text-[10px] uppercase tracking-[0.2em] font-black text-stone-900">
+            <div className="w-full flex justify-center gap-2 mt-4 mb-2">
+              <h5 className="text-[10px] uppercase tracking-[0.2em] font-black text-stone-900 text-center">
                 SİSTEM YÖNETİMİ
               </h5>
             </div>
@@ -834,8 +834,8 @@ export default function DisplaySettingsModal({
 
           {/* GÜVENLİK */}
           <div className="flex flex-col gap-3">
-            <div className="px-1 flex items-baseline gap-2 mt-4 mb-2 pl-2">
-              <h5 className="text-[10px] uppercase tracking-[0.2em] font-black text-stone-900">
+            <div className="w-full flex justify-center gap-2 mt-4 mb-2">
+              <h5 className="text-[10px] uppercase tracking-[0.2em] font-black text-stone-900 text-center">
                 GÜVENLİK
               </h5>
             </div>

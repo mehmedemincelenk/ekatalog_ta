@@ -113,8 +113,8 @@ export default function BaseFloatingMenu({
   return (
     <div
       ref={containerRef}
-      className="z-[100] origin-bottom-right"
-      style={{ transform: 'scale(0.95)' }}
+      className={`z-[100] ${isPreview ? 'origin-top-left' : 'origin-bottom-right'}`}
+      style={isPreview ? undefined : { transform: 'scale(0.95)' }}
     >
       <div
         className={`flex flex-col items-center rounded-2xl overflow-hidden bg-black/55 border border-white/10 ${

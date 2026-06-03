@@ -164,7 +164,8 @@ const ReferenceItem = memo(
 
 export default function References({
   isAdmin = false,
-}: ReferencesProps) {
+  isPaused = false,
+}: ReferencesProps & { isPaused?: boolean }) {
   const {
     activeReferences,
     handleDelete,
@@ -178,7 +179,7 @@ export default function References({
     handlePointerDown,
     handlePointerMove,
     handlePointerUp,
-  } = useMarqueePhysics(activeReferences.length, isAdmin, isAnyCardActive);
+  } = useMarqueePhysics(activeReferences.length, isAdmin, isPaused || isAnyCardActive);
 
   if (activeReferences.length === 0) {
     if (isAdmin) {

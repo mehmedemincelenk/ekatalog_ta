@@ -71,6 +71,11 @@ export function useMarqueePhysics(activeReferencesLength: number, _isAdmin: bool
       }
     };
 
+    if (isPaused) {
+      updateHighlights();
+      return;
+    }
+
     const animate = (time: number) => {
       if (!lastTime.current) {
         lastTime.current = time;
@@ -94,7 +99,7 @@ export function useMarqueePhysics(activeReferencesLength: number, _isAdmin: bool
 
       const baseSpeed = baseSpeedRef.current;
 
-      if (!isDown.current && !isPaused) {
+      if (!isDown.current) {
         // INERTIA DECELERATION & AUTO-SCROLL PHYSICS
         if (Math.abs(velocity.current) > Math.abs(baseSpeed)) {
           // Decelerate with time-independent exponential friction
