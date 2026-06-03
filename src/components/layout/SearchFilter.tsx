@@ -114,7 +114,7 @@ const SearchFilter = memo(
       <div
         className={`w-full bg-stone-50 py-2 relative z-40 ${!showAll ? 'opacity-50 grayscale' : ''}`}
       >
-        <div className={`${filterTheme.container} !flex-col !items-stretch`}>
+        <div className={`${filterTheme.container} !flex-col !items-stretch !gap-0`}>
           {/* TOP BAR: Search & Interaction */}
           <div className="flex flex-row items-center gap-2 w-full">
             {displayConfig.showSearch && (
