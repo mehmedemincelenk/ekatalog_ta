@@ -96,12 +96,16 @@ const SearchFilter = memo(
             )}
 
             {displayConfig.showCategories && (
-              <div className="flex-none flex items-center justify-start gap-2 overflow-hidden">
+              <div className={`flex-none flex items-center justify-start gap-2 overflow-hidden ${
+                !displayConfig.showSearch ? 'w-full' : ''
+              }`}>
                 <Button
                   onClick={() => flow.setIsPanelOpen(!flow.isPanelOpen)}
                   variant="glass"
-                  mode="square"
-                  className="h-11 w-11 flex-none !rounded-lg !bg-stone-900/60 backdrop-blur-md border-white/20 text-white shadow-xl hover:!bg-stone-900/80 transition-all !p-0"
+                  mode={!displayConfig.showSearch ? 'rectangle' : 'square'}
+                  className={`h-11 flex-none !rounded-lg !bg-stone-900/60 backdrop-blur-md border-white/20 text-white shadow-xl hover:!bg-stone-900/80 transition-all !p-0 ${
+                    !displayConfig.showSearch ? 'w-full gap-2 px-4' : 'w-11'
+                  }`}
                   icon={
                     flow.isPanelOpen ? (
                       <Lucide.ChevronUp size={20} strokeWidth={2.2} />
@@ -110,7 +114,13 @@ const SearchFilter = memo(
                     )
                   }
                   aria-label={LABELS.filter.categoryBtn}
-                />
+                >
+                  {!displayConfig.showSearch && (
+                    <span className="text-[11px] font-black uppercase tracking-widest text-white leading-none">
+                      KATEGORİLER
+                    </span>
+                  )}
+                </Button>
               </div>
             )}
           </div>

@@ -117,12 +117,13 @@ const TABELA_OPTIONS = [
 
 const BRANDING_OPTIONS = [
   { key: 'showCarousel', label: 'Ana Sayfa Afişleri' },
-  { key: 'showReferences', label: 'Referans Logoları' }
+  { key: 'showReferences', label: 'Referans Logoları' },
+  { key: 'showSearch', label: 'Arama Çubuğu' },
+  { key: 'showCategories', label: 'Kategori Filtreleri' }
 ] as const;
 
 const SYSTEM_OPTIONS = [
   { key: 'showPrice', label: 'Ürün Fiyatları' },
-  { key: 'showCategories', label: 'Kategori Filtreleri' },
   { key: 'inline', label: 'Hızlı Düzenleme', hasHelp: true },
   { key: 'maintenance', label: 'Bakım Modu', hasHelp: true }
 ] as const;
@@ -773,18 +774,55 @@ export default function DisplaySettingsModal({
                     </motion.div>
                   )}
 
-                  {!flow.getOptionState('showCarousel') && !flow.getOptionState('showReferences') && (
+                  {(flow.getOptionState('showSearch') || flow.getOptionState('showCategories')) && (
                     <motion.div
-                      key="preview-empty"
-                      initial={{ height: 0, opacity: 0, scale: 0.95 }}
-                      animate={{ height: 'auto', opacity: 1, scale: 1 }}
-                      exit={{ height: 0, opacity: 0, scale: 0.95 }}
+                      key="preview-search-filter"
+                      initial={{ height: 0, opacity: 0, scale: 0.95, y: -10 }}
+                      animate={{ height: 'auto', opacity: 1, scale: 1, y: 0 }}
+                      exit={{ height: 0, opacity: 0, scale: 0.95, y: -10 }}
                       transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
-                      className="w-full py-4 flex flex-col items-center justify-center select-none text-[10px] font-black tracking-wider text-stone-400 uppercase origin-center"
+                      className="w-full flex flex-row items-center gap-2 shrink-0 origin-top py-0.5"
                     >
-                      Vitrin Bileşenleri Kapalı
+                      {flow.getOptionState('showSearch') && (
+                        <div className="relative flex-1 h-11 flex items-center border-2 border-stone-200 bg-white rounded-md overflow-hidden select-none">
+                          <Lucide.Search className="absolute left-3 w-4 h-4 text-stone-400" strokeWidth={2} />
+                          <input
+                            type="text"
+                            disabled
+                            placeholder="Ürün ara..."
+                            className="w-full h-full pl-9 pr-8 border-none bg-transparent text-xs font-bold text-stone-900 placeholder:text-stone-400 select-none outline-none"
+                          />
+                        </div>
+                      )}
+
+                      {flow.getOptionState('showCategories') && (
+                        <div className={`h-11 flex-none flex items-center justify-center rounded-lg bg-stone-900/60 backdrop-blur-md border border-white/20 text-white shadow-xl select-none transition-all ${
+                          !flow.getOptionState('showSearch') ? 'w-full gap-2 px-4' : 'w-11'
+                        }`}>
+                          {!flow.getOptionState('showSearch') && (
+                            <span className="text-[11px] font-black uppercase tracking-widest">KATEGORİLER</span>
+                          )}
+                          <Lucide.ChevronDown size={20} strokeWidth={2.2} />
+                        </div>
+                      )}
                     </motion.div>
                   )}
+
+                  {!flow.getOptionState('showCarousel') &&
+                    !flow.getOptionState('showReferences') &&
+                    !flow.getOptionState('showSearch') &&
+                    !flow.getOptionState('showCategories') && (
+                      <motion.div
+                        key="preview-empty"
+                        initial={{ height: 0, opacity: 0, scale: 0.95 }}
+                        animate={{ height: 'auto', opacity: 1, scale: 1 }}
+                        exit={{ height: 0, opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
+                        className="w-full py-4 flex flex-col items-center justify-center select-none text-[10px] font-black tracking-wider text-stone-400 uppercase origin-center"
+                      >
+                        Vitrin Bileşenleri Kapalı
+                      </motion.div>
+                    )}
                 </AnimatePresence>
               </div>
 
