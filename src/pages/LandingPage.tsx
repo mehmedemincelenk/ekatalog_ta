@@ -19,7 +19,7 @@ export default function LandingPage() {
   }, []);
 
   useEffect(() => {
-    document.title = "ekatalog | Akıllı B2B Dijital Katalog Sistemi";
+    document.title = "ekatalog";
     const link: HTMLLinkElement | null = document.querySelector("link[rel*='icon']");
     if (link) {
       link.href = "/favicon.svg?v=2";
