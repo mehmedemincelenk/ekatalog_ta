@@ -295,9 +295,9 @@ export default function LandingPage() {
 
       <footer className="border-t border-stone-100 pt-8 flex items-center justify-between gap-4 px-6 pb-8 max-w-3xl mx-auto w-full">
         <img 
-          src="/images/parsomen_x.svg" 
-          alt="Parsomen Logo" 
-          className="h-7 w-auto object-contain select-none"
+          src="/images/parsomen.svg" 
+          alt="ekatalog" 
+          className="h-7 w-auto object-contain select-none" 
         />
         <div className="flex items-center gap-3 text-xs font-bold text-stone-600">
           <a
