@@ -22,7 +22,7 @@ export default function LandingPage() {
     document.title = "ekatalog";
     const link: HTMLLinkElement | null = document.querySelector("link[rel*='icon']");
     if (link) {
-      link.href = "/favicon.svg?v=2";
+      link.href = "/favicon.svg?v=4";
     }
 
     // Body arkaplanını beyaza set ederek tarayıcı kaydırma taşmalarındaki gri rengi önlüyoruz
@@ -84,12 +84,12 @@ export default function LandingPage() {
 
           <div className="pt-8 flex flex-col items-center justify-center relative z-20 space-y-4">
             {/* Premium Phone Frame Mockup */}
-            <div className="relative w-[300px] h-[600px] bg-stone-950 rounded-[1.75rem] p-2 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.45),0_0_0_1px_rgba(255,255,255,0.1)] border border-stone-850 ring-4 ring-stone-900/5">
+            <div className="relative w-[260px] h-[520px] sm:w-[300px] sm:h-[600px] bg-stone-950 rounded-[1.75rem] p-2 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.45),0_0_0_1px_rgba(255,255,255,0.1)] border border-stone-850 ring-4 ring-stone-900/5">
               {/* Screen Container */}
               <div className="w-full h-full rounded-[1.25rem] overflow-hidden bg-stone-50 border border-stone-900 relative">
                 <iframe
                   src="https://ornek.ekatalog.site"
-                  className="w-[120%] h-[120%] border-none origin-top-left scale-[0.8333] pointer-events-none md:pointer-events-auto"
+                  className="w-[120%] h-[120%] border-none origin-top-left scale-[0.8333]"
                   title="E-Katalog Canlı Demo"
                 />
               </div>
@@ -300,25 +300,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="relative border-t border-stone-100 pt-8 flex items-center justify-end gap-4 px-6 pb-8 max-w-3xl mx-auto w-full">
-        <img 
-          src="/images/parsomen.svg" 
-          alt="ekatalog" 
-          className="absolute left-6 bottom-0 h-32 w-auto object-contain select-none z-10" 
-        />
+      <footer className="relative border-t border-stone-100 pt-8 flex items-center justify-between gap-4 px-6 pb-8 max-w-3xl mx-auto w-full">
+        <div className="flex items-center select-none">
+          <img src="/images/logo.svg" alt="ekatalog" className="w-6 h-6" />
+        </div>
         <div className="flex items-center gap-3 text-xs font-bold text-stone-600">
-          <a
-            href="https://wa.me/905373420161"
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center justify-center hover:scale-110 active:scale-95 transition-transform"
-            title="WhatsApp"
-          >
-            <div className="w-4 h-4 fill-stone-600 hover:fill-emerald-500 transition-colors">
-              {THEME.icons.whatsapp}
-            </div>
-          </a>
-
           <a
             href="tel:905373420161"
             className="hover:text-stone-900 transition-colors font-black tracking-tight"
