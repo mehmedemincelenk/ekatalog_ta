@@ -61,7 +61,7 @@ const CategoryFilterChip = memo(
           className="relative shrink-0 flex items-stretch z-10"
           onClick={(e) => e.stopPropagation()}
         >
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" initial={false}>
             {isAdminMode ? (
               <div className="relative w-9 h-full flex-none">
                 <div className="absolute inset-0 bg-stone-900/60 backdrop-blur-md border-r border-white/10 flex items-center justify-center pointer-events-none">
