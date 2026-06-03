@@ -122,7 +122,7 @@ export const TECH = {
     lqFolder: 'lq',
     hqFolder: 'hq',
     cacheControl: '2592000',
-    heroWidth: 1920,
+    heroWidth: 1280,
     productHqWidth: 1200,
     productLqWidth: 400,
     hqQuality: 0.85,

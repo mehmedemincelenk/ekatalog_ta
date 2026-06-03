@@ -4,7 +4,6 @@ import { THEME, LABELS } from '../../data/config';
 import { motion, AnimatePresence } from 'motion/react';
 import Button from '../ui/Button';
 import CategoryFilterChip from '../ui/CategoryFilterChip';
-import { QuickEditModal } from '../modals/UtilityModals';
 import FormInput from '../ui/FormInput';
 import { SearchFilterProps } from '../../types';
 import { useSearchFilterFlow } from '../../hooks/useSearchFilterFlow';
@@ -19,9 +18,6 @@ const SearchFilter = memo(
   ({
     sortedList = [],
     stats = {},
-    onCategoryOrderChange,
-    renameCategory,
-    onAddCategory,
   }: SearchFilterProps) => {
     const flow = useSearchFilterFlow();
 
@@ -46,53 +42,14 @@ const SearchFilter = memo(
 
     const renderCategoryList = (list: string[]) => (
       <>
-        {/* ADMIN: KATEGORİ YÖNETİM GRUBU */}
-        {flow.isAdmin && (
-          <div className="flex items-center gap-1 shrink-0">
-            {/* DÜZENLE (Pencil) */}
-            <Button
-              variant="glass"
-              mode="square"
-              className={`w-8 h-8 !bg-stone-900/60 backdrop-blur-md border border-white/20 text-white shadow-xl !rounded-lg !p-0 transition-all ${flow.adminAction === 'EDIT' ? '!bg-amber-500 ring-2 ring-amber-400' : ''}`}
-              icon={<Lucide.Pencil size={14} strokeWidth={3} />}
-              onClick={() =>
-                flow.setAdminAction((prev) =>
-                  prev === 'EDIT' ? 'IDLE' : 'EDIT',
-                )
-              }
-              title="Kategoriyi Düzenle (Tıkla ve Chip'e Bas)"
-            />
-
-            {/* SİL (Trash) */}
-            <Button
-              variant="glass"
-              mode="square"
-              className={`w-8 h-8 !bg-stone-900/60 backdrop-blur-md border border-white/20 text-white shadow-xl !rounded-lg !p-0 transition-all ${flow.adminAction === 'DELETE' ? '!bg-red-600 ring-2 ring-red-500' : ''}`}
-              icon={<Lucide.Trash2 size={14} strokeWidth={3} />}
-              onClick={() =>
-                flow.setAdminAction((prev) =>
-                  prev === 'DELETE' ? 'IDLE' : 'DELETE',
-                )
-              }
-              title="Kategoriyi Sil (Tıkla ve Chip'e Bas)"
-            />
-          </div>
-        )}
-
         {list.map((cat) => (
           <CategoryFilterChip
             key={cat}
             categoryName={cat}
             isItemSelected={flow.activeCategories.includes(cat)}
-            isAdminMode={flow.isAdmin}
+            isAdminMode={false}
             productCount={stats[cat] || 0}
             onSelect={flow.onCategoryToggle}
-            onRename={renameCategory}
-            onOrderChange={onCategoryOrderChange}
-            orderIndex={sortedList.indexOf(cat)}
-            totalCategories={sortedList.length}
-            adminActionOverride={flow.adminAction}
-            onDelete={flow.handleDeleteCategory}
           />
         ))}
 
@@ -184,17 +141,6 @@ const SearchFilter = memo(
             </div>
           )}
         </div>
-
-        <QuickEditModal
-          isOpen={flow.isAddingCategory}
-          onClose={() => flow.setIsAddingCategory(false)}
-          onSave={(name: string) => {
-            if (name.trim()) onAddCategory?.(name.trim());
-          }}
-          placeholder="Kategori adı..."
-          initialValue=""
-          title="YENİ KATEGORİ EKLE"
-        />
       </div>
     );
   },

@@ -43,6 +43,8 @@ interface BaseFloatingMenuProps {
   theme?: 'light' | 'dark'; // Diamond: Support multiple visual identities
   onPointerDown?: () => void;
   onPointerUp?: () => void;
+  forceExpanded?: boolean;
+  isPreview?: boolean;
 }
 
 export default function BaseFloatingMenu({
@@ -50,8 +52,11 @@ export default function BaseFloatingMenu({
   autoCloseDelay = 5000,
   onPointerDown,
   onPointerUp,
+  forceExpanded = false,
+  isPreview = false,
 }: BaseFloatingMenuProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpandedState, setIsExpandedState] = useState(false);
+  const isExpanded = forceExpanded || isExpandedState;
   const containerRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const pointerDownTime = useRef(0);
@@ -69,27 +74,31 @@ export default function BaseFloatingMenu({
 
     // Diamond Standard: Persistent actions (like currency) stay open for UX flow
     if (btn.closeOnClick !== false) {
-      setIsExpanded(false);
+      setIsExpandedState(false);
     } else {
       // Refresh the auto-close timer for persistent actions
-      timerRef.current = setTimeout(() => setIsExpanded(false), autoCloseDelay);
+      if (!forceExpanded) {
+        timerRef.current = setTimeout(() => setIsExpandedState(false), autoCloseDelay);
+      }
     }
   };
 
   useEffect(() => {
+    if (forceExpanded) return;
+
     const handleClickOutside = (event: PointerEvent) => {
       if (
         containerRef.current &&
         !containerRef.current.contains(event.target as Node)
       ) {
-        setIsExpanded(false);
+        setIsExpandedState(false);
       }
     };
 
-    if (isExpanded) {
+    if (isExpandedState) {
       document.addEventListener('pointerdown', handleClickOutside);
       clearTimer();
-      timerRef.current = setTimeout(() => setIsExpanded(false), autoCloseDelay);
+      timerRef.current = setTimeout(() => setIsExpandedState(false), autoCloseDelay);
     } else {
       document.removeEventListener('pointerdown', handleClickOutside);
       clearTimer();
@@ -99,7 +108,7 @@ export default function BaseFloatingMenu({
       document.removeEventListener('pointerdown', handleClickOutside);
       clearTimer();
     };
-  }, [isExpanded, autoCloseDelay, clearTimer]);
+  }, [isExpandedState, autoCloseDelay, clearTimer, forceExpanded]);
 
   return (
     <div
@@ -108,7 +117,9 @@ export default function BaseFloatingMenu({
       style={{ transform: 'scale(0.95)' }}
     >
       <div
-        className="flex flex-col items-center rounded-2xl overflow-hidden bg-black/55 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.4)]"
+        className={`flex flex-col items-center rounded-2xl overflow-hidden bg-black/55 border border-white/10 ${
+          isPreview ? '' : 'shadow-[0_20px_50px_rgba(0,0,0,0.4)]'
+        }`}
         style={{
           width: '110px',
           padding: '5px',
@@ -178,9 +189,9 @@ export default function BaseFloatingMenu({
                           icon={btn.icon}
                           variant={btn.variant === 'secondary' ? 'ghost' : (btn.variant || 'ghost')}
                           size="sm"
-                          mode="rectangle"
+                          mode="square"
                           className={`
-                          shrink-0 !rounded-lg ${btn.className || ''} w-full h-[46px] !p-0 !text-white [transition-property:transform] backdrop-blur-md !shadow-none
+                          shrink-0 !rounded-lg ${btn.className || ''} w-full aspect-square h-auto !p-0 !text-white [transition-property:transform] backdrop-blur-md !shadow-none
                           ${
                             !btn.variant || btn.variant === 'secondary' || btn.variant === 'ghost'
                               ? '!bg-white/10 !border-white/10 hover:!bg-white/20'
@@ -206,7 +217,7 @@ export default function BaseFloatingMenu({
                 // It was a long press, ignore the normal click toggle!
                 return;
               }
-              setIsExpanded((prev) => !prev);
+              setIsExpandedState((prev) => !prev);
             }}
             onPointerDown={() => {
               pointerDownTime.current = Date.now();
@@ -227,7 +238,7 @@ export default function BaseFloatingMenu({
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 clearTimer();
-                setIsExpanded((prev) => !prev);
+                setIsExpandedState((prev) => !prev);
               }
             }}
           />

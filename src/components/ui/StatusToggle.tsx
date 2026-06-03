@@ -1,7 +1,4 @@
 import { memo } from 'react';
-import * as Lucide from 'lucide-react';
-import Button from './Button';
-import { THEME } from '../../data/config';
 import { motion } from 'motion/react';
 
 interface StatusToggleProps {
@@ -20,49 +17,54 @@ const StatusToggle = memo(
     value,
     onChange,
     disabled = false,
-    activeColor = THEME.statusState.active,
-    inactiveColor = THEME.statusState.danger,
+    activeColor = 'bg-emerald-500',
+    inactiveColor = 'bg-stone-800',
     variant = 'default',
   }: StatusToggleProps) => {
     const isCompact = variant === 'compact';
+
+    // Premium iOS Toggle Dimensions
+    const toggleWidth = isCompact ? 'w-[36px]' : 'w-[44px]';
+    const toggleHeight = isCompact ? 'h-[20px]' : 'h-[24px]';
+    const knobSize = isCompact ? 'w-[16px] h-[16px]' : 'w-[20px] h-[20px]';
+
+    // Helper to safely extract background color classes from compound color definitions
+    const getBgColorClass = (colorStr: string, fallback: string) => {
+      if (!colorStr) return fallback;
+      const bgClass = colorStr.split(' ').find((c) => c.includes('bg-'));
+      return bgClass || fallback;
+    };
+
+    const resolvedActiveBg = getBgColorClass(activeColor, 'bg-emerald-500');
+    const resolvedInactiveBg = getBgColorClass(inactiveColor, 'bg-stone-800');
+
     return (
-      <div
-        className={`flex items-center justify-between bg-white rounded-xl border border-stone-100/50 shadow-sm ${isCompact ? 'px-1.5 py-1' : 'px-2.5 py-2'}`}
-      >
+      <div className="flex items-center justify-between select-none">
         {label && (
           <span
-            className={`${isCompact ? 'text-[8px]' : 'text-[10px]'} font-black text-stone-400 uppercase tracking-tight pr-2`}
+            className={`${
+              isCompact ? 'text-[8px]' : 'text-[10px]'
+            } font-black text-stone-400 uppercase tracking-tight pr-2`}
           >
             {label}
           </span>
         )}
-        <div className={`flex ${isCompact ? 'gap-1' : 'gap-1.5'}`}>
-          <motion.div whileTap={{ scale: 0.9 }} whileHover={{ scale: 1.05 }}>
-            <Button
-              onClick={(e) => {
-                e.stopPropagation();
-                onChange(true);
-              }}
-              disabled={disabled}
-              mode="square"
-              size="sm"
-              className={`${isCompact ? '!w-6 !h-6' : '!w-7 !h-7'} !p-0 !rounded-lg transition-all ${value ? activeColor : THEME.statusState.inactive}`}
-              icon={<Lucide.Check size={isCompact ? 10 : 14} strokeWidth={4} />}
-            />
-          </motion.div>
-          <motion.div whileTap={{ scale: 0.9 }} whileHover={{ scale: 1.05 }}>
-            <Button
-              onClick={(e) => {
-                e.stopPropagation();
-                onChange(false);
-              }}
-              disabled={disabled}
-              mode="square"
-              size="sm"
-              className={`${isCompact ? '!w-6 !h-6' : '!w-7 !h-7'} !p-0 !rounded-lg transition-all ${!value ? inactiveColor : THEME.statusState.inactive}`}
-              icon={<Lucide.X size={isCompact ? 10 : 14} strokeWidth={4} />}
-            />
-          </motion.div>
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!disabled) onChange(!value);
+          }}
+          className={`relative ${toggleWidth} ${toggleHeight} rounded-full transition-colors duration-300 p-[2px] flex items-center shrink-0 ${
+            value ? 'justify-end' : 'justify-start'
+          } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${
+            value ? resolvedActiveBg : resolvedInactiveBg
+          }`}
+        >
+          <motion.div
+            layout
+            transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+            className={`${knobSize} bg-white rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.2)]`}
+          />
         </div>
       </div>
     );

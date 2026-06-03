@@ -1,41 +1,27 @@
-import { memo, useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { memo } from 'react';
 import { THEME } from '../../data/config';
-import { QuickEditModal } from '../modals/UtilityModals';
 import { CategoryFilterChipProps } from '../../types';
 
+/**
+ * CATEGORY FILTER CHIP (DIAMOND EDITION)
+ * -----------------------------------------------------------
+ * Ultra-minimalist display chip for category navigation.
+ * Standardized to have zero administrative state - actions moved to CategoryHeader.
+ */
 const CategoryFilterChip = memo(
   ({
     categoryName,
     isItemSelected,
-    isAdminMode,
     productCount,
     onSelect,
-    onRename,
-    onDelete,
-    onOrderChange,
-    orderIndex,
-    totalCategories = 0,
     showFingerprint = true,
-    adminActionOverride = 'IDLE',
-  }: CategoryFilterChipProps & {
-    onDelete?: (name: string) => void;
-    adminActionOverride?: 'IDLE' | 'EDIT' | 'DELETE';
-  }) => {
+  }: CategoryFilterChipProps) => {
     const theme = THEME.searchFilter.categoryList.chip;
-    const [isUpdatingOrder, setIsUpdatingOrder] = useState(false);
-    const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const handleChipClick = () =>
-      adminActionOverride === 'EDIT'
-        ? setIsRenameModalOpen(true)
-        : adminActionOverride === 'DELETE'
-          ? setIsDeleteModalOpen(true)
-          : onSelect(categoryName);
+
     return (
       <div
-        className={`${theme.container} ${THEME.radius.chip} items-stretch shrink-0 select-none cursor-pointer transition-all overflow-hidden relative h-10 flex ${adminActionOverride === 'EDIT' ? 'ring-2 ring-amber-400 border-amber-500' : ''} ${adminActionOverride === 'DELETE' ? 'ring-2 ring-red-400 border-red-500 opacity-80 hover:opacity-100' : ''} ${adminActionOverride === 'IDLE' ? (isItemSelected ? theme.active : theme.inactive) : ''}`}
-        onClick={handleChipClick}
+        className={`${theme.container} ${THEME.radius.chip} items-stretch shrink-0 select-none cursor-pointer transition-all overflow-hidden relative h-10 flex ${isItemSelected ? theme.active : theme.inactive}`}
+        onClick={() => onSelect(categoryName)}
       >
         {showFingerprint && (
           <div
@@ -57,63 +43,12 @@ const CategoryFilterChip = memo(
             </svg>
           </div>
         )}
-        <div
-          className="relative shrink-0 flex items-stretch z-10"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <AnimatePresence mode="wait" initial={false}>
-            {isAdminMode ? (
-              <div className="relative w-9 h-full flex-none">
-                <div className="absolute inset-0 bg-stone-900/60 backdrop-blur-md border-r border-white/10 flex items-center justify-center pointer-events-none">
-                  <span className="text-white text-[10px] font-black">
-                    {(orderIndex ?? 0) + 1}.
-                  </span>
-                </div>
-                <select
-                  value={orderIndex ?? 0}
-                  disabled={isUpdatingOrder}
-                  onChange={async (e) => {
-                    e.stopPropagation();
-                    setIsUpdatingOrder(true);
-                    try {
-                      await onOrderChange?.(
-                        categoryName,
-                        Number(e.target.value),
-                      );
-                    } finally {
-                      setIsUpdatingOrder(false);
-                    }
-                  }}
-                  className="absolute inset-0 w-full h-full bg-transparent text-transparent appearance-none cursor-pointer z-10 border-none outline-none"
-                >
-                  {Array.from({ length: totalCategories }).map((_, i) => (
-                    <option
-                      key={i}
-                      value={i}
-                      className="text-stone-900 bg-white"
-                    >
-                      {i + 1}.
-                    </option>
-                  ))}
-                </select>
-                {isUpdatingOrder && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-stone-900/40 z-20">
-                    <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  </div>
-                )}
-              </div>
-            ) : (
-              <motion.span
-                key="guest-count"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                className={`${theme.counter.base} ${isItemSelected ? theme.counter.active : theme.counter.inactive} h-full !text-[10px] !font-black`}
-              >
-                {productCount}
-              </motion.span>
-            )}
-          </AnimatePresence>
+        <div className="relative shrink-0 flex items-stretch z-10">
+          <span
+            className={`${theme.counter.base} ${isItemSelected ? theme.counter.active : theme.counter.inactive} h-full !text-[10px] !font-black`}
+          >
+            {productCount}
+          </span>
         </div>
         <div
           className={`${theme.textButton} flex-1 flex items-center pointer-events-none px-4 active:scale-95 transition-transform !text-[10px]`}
@@ -124,29 +59,6 @@ const CategoryFilterChip = memo(
             {categoryName}
           </span>
         </div>
-        <QuickEditModal
-          isOpen={isRenameModalOpen}
-          onClose={() => setIsRenameModalOpen(false)}
-          onSave={(name: string) => {
-            if (name?.trim() && name !== categoryName)
-              onRename(categoryName, name.trim());
-          }}
-          initialValue={categoryName}
-          placeholder="Yeni kategori adı girin..."
-          title="KATEGORİ İSMİNİ DÜZENLE"
-        />
-        <QuickEditModal
-          isOpen={isDeleteModalOpen}
-          onClose={() => setIsDeleteModalOpen(false)}
-          onSave={() => {
-            onDelete?.(categoryName);
-            setIsDeleteModalOpen(false);
-          }}
-          initialValue="sil"
-          title="Kategori silinecek"
-          subtitle='Kategoriyi silmek için aşağıya "sil" yazınız..'
-          placeholder="buraya yazın"
-        />
       </div>
     );
   },

@@ -37,8 +37,9 @@ const Navbar = memo(
     const config = flow.settings.displayConfig;
     const isRightSideVisible =
       config.showInstagram || config.showAddress || config.showWhatsapp;
+    const showTitle = config.showTitle !== false;
     const isTitleOnly =
-      !isRightSideVisible && !config.showLogo && !config.showSubtitle;
+      !isRightSideVisible && !config.showLogo && !config.showSubtitle && showTitle;
 
     const announcementBarTheme = THEME.announcementBar;
     const announcementConfig = flow.settings.announcementBar ?? {
@@ -152,39 +153,41 @@ const Navbar = memo(
                   <div
                     className={`${theme.brand.textWrapper} relative z-[30] pointer-events-none`}
                   >
-                    <div className="flex items-center">
-                      <span
-                        contentEditable={flow.isAdmin && isInlineEnabled}
-                        suppressContentEditableWarning
-                        onBlur={(e) =>
-                          flow.updateSetting(
-                            'title',
-                            e.currentTarget.textContent || '',
-                          )
-                        }
-                        onKeyDown={(e) =>
-                          e.key === 'Enter' &&
-                          (e.preventDefault(), e.currentTarget.blur())
-                        }
-                        onClick={(e) => {
-                          if (!flow.isAdmin) return;
-                          e.stopPropagation();
-                          flow.handleTextEdit(
-                            'title',
-                            flow.settings!.title ||
-                              flow.settings!.name ||
-                              DEFAULT_COMPANY.name,
-                            'Mağaza Adı',
-                          );
-                        }}
-                        style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.4)' }}
-                        className={`!text-[0.85rem] font-black tracking-tighter text-white ${editStyle} ${flow.isAdmin ? 'pointer-events-auto' : ''}`}
-                      >
-                        {flow.settings.title ||
-                          flow.settings.name ||
-                          DEFAULT_COMPANY.name}
-                      </span>
-                    </div>
+                    {showTitle && (
+                      <div className="flex items-center">
+                        <span
+                          contentEditable={flow.isAdmin && isInlineEnabled}
+                          suppressContentEditableWarning
+                          onBlur={(e) =>
+                            flow.updateSetting(
+                              'title',
+                              e.currentTarget.textContent || '',
+                            )
+                          }
+                          onKeyDown={(e) =>
+                            e.key === 'Enter' &&
+                            (e.preventDefault(), e.currentTarget.blur())
+                          }
+                          onClick={(e) => {
+                            if (!flow.isAdmin) return;
+                            e.stopPropagation();
+                            flow.handleTextEdit(
+                              'title',
+                              flow.settings!.title ||
+                                flow.settings!.name ||
+                                DEFAULT_COMPANY.name,
+                              'Mağaza Adı',
+                            );
+                          }}
+                          style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.4)' }}
+                          className={`!text-[0.85rem] font-black tracking-tighter text-white ${editStyle} ${flow.isAdmin ? 'pointer-events-auto' : ''}`}
+                        >
+                          {flow.settings.title ||
+                            flow.settings.name ||
+                            DEFAULT_COMPANY.name}
+                        </span>
+                      </div>
+                    )}
                     {flow.settings.displayConfig.showSubtitle && (
                       <span
                         contentEditable={flow.isAdmin && isInlineEnabled}

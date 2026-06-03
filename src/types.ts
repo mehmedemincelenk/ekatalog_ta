@@ -82,12 +82,14 @@ export interface DisplayConfig {
   showPrice: boolean;
   showCarousel: boolean;
   showCoupons: boolean;
-  showPriceList: boolean;
   showCurrency: boolean;
   showSearch: boolean;
   showCategories: boolean;
   showLogo: boolean;
   showSubtitle: boolean;
+  showQR?: boolean;
+  showPhone?: boolean;
+  showTitle?: boolean;
   [key: string]: boolean | string | number | undefined | null;
 }
 
@@ -287,7 +289,7 @@ export interface CategoryFilterChipProps {
   isAdminMode: boolean;
   productCount: number;
   onSelect: (categoryName: string) => void;
-  onRename: (oldName: string, newName: string) => void;
+  onRename?: (oldName: string, newName: string) => void;
   onOrderChange?: (categoryName: string, newPosition: number) => void;
   orderIndex?: number;
   totalCategories?: number;
@@ -300,18 +302,20 @@ export interface CategoryHeaderProps {
   isAdmin: boolean;
   onRename: (oldName: string, newName: string) => void;
   onOrderChange?: (categoryName: string, newPosition: number) => void;
+  onDelete?: (categoryName: string) => void;
   currentOrder?: number;
   totalCategories?: number;
+  isInlineEnabled?: boolean;
 }
 
 export interface SearchFilterProps {
   sortedList: string[];
   stats: Record<string, number>;
-  onCategoryOrderChange: (
+  onCategoryOrderChange?: (
     categoryName: string,
     newPosition: number,
   ) => Promise<void>;
-  renameCategory: (oldName: string, newName: string) => Promise<void>;
+  renameCategory?: (oldName: string, newName: string) => Promise<void>;
   onAddCategory?: (name: string) => void;
 }
 
@@ -331,6 +335,7 @@ export interface ProductGridProps {
   setActiveAdminProductId?: (id: string | null) => void;
   visitorCurrency?: 'TRY' | 'USD' | 'EUR';
   renameCategory: (oldName: string, newName: string) => void;
+  onDeleteCategory?: (categoryName: string) => void;
 }
 
 export interface SearchLog {
@@ -543,7 +548,6 @@ export interface GlobalAddMenuModalProps {
 
 export interface FloatingGuestMenuProps {
   onCouponClick: () => void;
-  onExcelClick: () => void;
   onSearchClick: () => void;
   onQRClick: () => void;
   onPointerDown?: () => void;

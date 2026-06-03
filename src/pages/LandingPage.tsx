@@ -118,7 +118,7 @@ export default function LandingPage() {
               {/* Screen Container */}
               <div className="w-full h-full rounded-[1.25rem] overflow-hidden bg-stone-50 border border-stone-900 relative">
                 <iframe
-                  src="https://ornek.ekatalog.site"
+                  src="/landingpage"
                   className="w-[120%] h-[120%] border-none origin-top-left scale-[0.8333]"
                   title="E-Katalog Canlı Demo"
                 />

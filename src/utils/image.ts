@@ -4,6 +4,7 @@
 import { TECH, LABELS, THEME } from '../data/config';
 import { supabase } from '../supabase';
 import { slugify } from './core';
+import imageCompression from 'browser-image-compression';
 
 /**
  * resolveVisualAssetUrl: Harmonizes raw storage paths into valid public URLs.
@@ -72,71 +73,28 @@ export async function processDualQualityVisuals(
   visualFile: File,
   hqMaxWidth?: number,
 ): Promise<{ hq: Blob; lq: Blob }> {
-  const visualElement = await transformFileToVisualElement(visualFile);
+  const hqLimit = hqMaxWidth || TECH.storage.productHqWidth;
 
-  /**
-   * generateOptimizedBlob: Resizes and compresses the image into a specific Blob tier.
-   */
-  const generateOptimizedBlob = (
-    maximumDimension: number,
-    compressionQuality: number,
-  ): Promise<Blob> => {
-    return new Promise((resolve) => {
-      const drawingCanvas = document.createElement('canvas');
-      let { width: originalWidth, height: originalHeight } = visualElement;
-
-      // Aspect-Ratio Preserving Downscaling Logic
-      if (originalWidth > originalHeight && originalWidth > maximumDimension) {
-        originalHeight = Math.round(
-          (originalHeight * maximumDimension) / originalWidth,
-        );
-        originalWidth = maximumDimension;
-      } else if (originalHeight > maximumDimension) {
-        originalWidth = Math.round(
-          (originalWidth * maximumDimension) / originalHeight,
-        );
-        originalHeight = maximumDimension;
-      }
-
-      drawingCanvas.width = originalWidth;
-      drawingCanvas.height = originalHeight;
-      const drawingContext = drawingCanvas.getContext('2d');
-
-      if (drawingContext) {
-        // Fallback Background: Prevents transparency issues in JPEGs
-        drawingContext.fillStyle = THEME.colors.visualFallback;
-        drawingContext.fillRect(0, 0, originalWidth, originalHeight);
-        drawingContext.drawImage(
-          visualElement,
-          0,
-          0,
-          originalWidth,
-          originalHeight,
-        );
-      }
-
-      drawingCanvas.toBlob(
-        (optimizedBlob) => resolve(optimizedBlob!),
-        'image/jpeg',
-        compressionQuality,
-      );
-    });
+  const hqOptions = {
+    maxSizeMB: 0.5,
+    maxWidthOrHeight: hqLimit,
+    useWebWorker: true,
+    fileType: 'image/jpeg',
   };
 
-  // Tier 1: High-Definition Asset for Zoom/Detail views
-  const hqLimit = hqMaxWidth || TECH.storage.productHqWidth;
-  const highDefinitionAsset = await generateOptimizedBlob(
-    hqLimit,
-    TECH.storage.hqQuality,
-  );
+  const lqOptions = {
+    maxSizeMB: 0.03,
+    maxWidthOrHeight: TECH.storage.productLqWidth,
+    useWebWorker: true,
+    fileType: 'image/jpeg',
+  };
 
-  // Tier 2: Lightweight Preview Asset for Catalog/Grid views
-  const previewLightweightAsset = await generateOptimizedBlob(
-    TECH.storage.productLqWidth,
-    TECH.storage.lqQuality,
-  );
+  const [hqFile, lqFile] = await Promise.all([
+    imageCompression(visualFile, hqOptions),
+    imageCompression(visualFile, lqOptions),
+  ]);
 
-  return { hq: highDefinitionAsset, lq: previewLightweightAsset };
+  return { hq: hqFile, lq: lqFile };
 }
 
 /**
@@ -181,6 +139,24 @@ export async function compressVisualToDataUri(
 
   return drawingCanvas.toDataURL('image/jpeg', compressionQuality);
 }
+
+/**
+ * compressVisualToBlob: Legacy helper for specific binary exports.
+ */
+export async function compressVisualToBlob(
+  visualFile: File,
+  maximumDimension: number,
+  _compressionQuality?: number,
+): Promise<Blob> {
+  const options = {
+    maxSizeMB: 0.5,
+    maxWidthOrHeight: maximumDimension,
+    useWebWorker: true,
+    fileType: 'image/jpeg',
+  };
+  return imageCompression(visualFile, options);
+}
+
 
 /**
  * resizeImageForAI: Downscales image to AI-friendly dimensions to prevent 413 errors.
@@ -361,8 +337,13 @@ export async function secureUploadVisualAsset({
     return `${publicUrl}?t=${Date.now()}`;
   } else {
     // Single quality upload (e.g. Logo, Hero slide)
-    const optimized = await compressVisualToDataUri(file, maxDimension, 0.85);
-    const blob = await (await fetch(optimized)).blob();
+    const compressionOptions = {
+      maxSizeMB: folder === TECH.storage.heroFolder ? 0.6 : 0.2,
+      maxWidthOrHeight: maxDimension,
+      useWebWorker: true,
+      fileType: 'image/jpeg',
+    };
+    const blob = await imageCompression(file, compressionOptions);
     const filePath = `${folder}/${storageFileName}`;
 
     await supabase.rpc('authorize_storage_op', {

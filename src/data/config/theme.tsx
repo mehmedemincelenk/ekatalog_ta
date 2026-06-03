@@ -216,7 +216,7 @@ export const THEME = {
 
   heroCarousel: {
     layout: `relative w-full group/carousel overflow-hidden rounded-none`,
-    container: 'max-w-7xl mx-auto px-0 mt-2',
+    container: 'max-w-7xl mx-auto px-0 mt-0',
     slide: {
       base: 'transition-opacity duration-700 ease-in-out',
       image: 'w-full h-full object-cover',

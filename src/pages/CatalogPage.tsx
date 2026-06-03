@@ -73,7 +73,7 @@ export default function CatalogPage() {
     reorderCategory: updateCategoryOrder,
     reorderProductsInCategory,
     renameCategory,
-    addCategory,
+    deleteCategory,
     uploadImage,
     loading: productsFetching,
   } = useProducts(search, [], isAdmin, storeSettings);
@@ -154,8 +154,8 @@ export default function CatalogPage() {
                 height:
                   storeSettings?.announcementBar?.enabled &&
                   (storeSettings?.announcementBar?.text || isAdmin)
-                    ? '89px'
-                    : '65px',
+                    ? '84px'
+                    : '64px',
               }}
               className="shrink-0"
             />
@@ -168,13 +168,8 @@ export default function CatalogPage() {
             <SearchFilter
               sortedList={sortedList}
               stats={stats}
-              onCategoryOrderChange={updateCategoryOrder}
-              renameCategory={(oldName, newName) =>
-                renameCategory({ oldName, newName })
-              }
-              onAddCategory={addCategory}
             />
-            <div className="px-4 pb-20">
+            <div className="px-4 pb-6">
               {productsFetching && products.length === 0 ? (
                 <div className="py-20 flex justify-center">
                   <Loading size="md" />
@@ -200,6 +195,7 @@ export default function CatalogPage() {
                   renameCategory={(oldName, newName) =>
                     renameCategory({ oldName, newName })
                   }
+                  onDeleteCategory={deleteCategory}
                 />
               )}
             </div>
@@ -211,10 +207,10 @@ export default function CatalogPage() {
             href="https://ekatalog.site"
             target="_blank"
             rel="noreferrer"
-            className="block w-full bg-[#FFD700] hover:bg-[#FFC800] transition-colors py-3 px-6 text-center cursor-pointer"
+            className="block w-full bg-[#FFD700] hover:bg-[#FFC800] transition-colors py-3 px-6 text-left cursor-pointer"
           >
             <span className="text-[10px] font-black text-black uppercase tracking-[0.2em]">
-              ekataloğunuzu ücretsiz oluşturmak için tıklayın
+              ekataloğunu al
             </span>
           </a>
         </div>
@@ -230,7 +226,6 @@ export default function CatalogPage() {
               onPointerDown={handleMenuPointerDown}
               onPointerUp={handleMenuPointerUp}
               onCouponClick={() => openModal('COUPON')}
-              onExcelClick={() => openModal('PRICE_LIST')}
               onSearchClick={() => {
                 const scrollArea = document.getElementById(
                   'mobile-viewport-scroll',

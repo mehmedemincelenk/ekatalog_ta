@@ -33,6 +33,7 @@ const ProductGrid = memo(
     setActiveAdminProductId,
     visitorCurrency = 'TRY',
     renameCategory,
+    onDeleteCategory,
   }: ProductGridProps) => {
     const { isAdmin, settings, activeDiscount, activeCategories } = useStore();
 
@@ -82,8 +83,10 @@ const ProductGrid = memo(
                 isAdmin={isAdmin}
                 onRename={renameCategory}
                 onOrderChange={onOrderUpdate}
+                onDelete={onDeleteCategory}
                 currentOrder={categoryOrder.indexOf(category) + 1}
                 totalCategories={categoryOrder.length}
+                isInlineEnabled={isInlineEnabled}
               />
 
               {categoryProducts.length > 0 || isAdmin ? (
@@ -132,16 +135,15 @@ const ProductGrid = memo(
         })}
 
         {onLoadMore && displayCategories.length > visibleCategoryLimit && (
-          <div className="flex flex-col items-center justify-center pt-8 pb-16 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+          <div className="flex flex-col items-center justify-center pt-6 pb-2 animate-in fade-in slide-in-from-bottom-4 duration-1000">
             <Button
               onClick={onLoadMore}
-              variant="secondary"
+              variant="primary"
               size="md"
               mode="rectangle"
-              className="group !py-4 !px-8 border shadow-sm hover:shadow-md transition-all active:scale-95"
-              showFingerprint
+              className="px-8 py-3.5 shadow-sm hover:shadow-md transition-all active:scale-95 !rounded-xl border-none"
             >
-              <span className="text-[10px] font-black tracking-[0.3em] text-stone-900 uppercase">
+              <span className="text-[10px] font-black tracking-[0.3em] text-white uppercase">
                 DAHA FAZLA ÜRÜN GÖSTER
               </span>
             </Button>

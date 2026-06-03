@@ -394,5 +394,23 @@ export function useProducts(
         await actions.reorderCategories(updatedOrder);
       }
     },
+    deleteCategory: async (name: string) => {
+      const catProds = allProducts?.filter((p) => p.category === name) || [];
+
+      if (catProds.length > 0) {
+        const bulkActions = catProds.map((p) => ({
+          productId: p.id,
+          category: 'Arşiv',
+        }));
+        await actions.executeGranularBulkActions(bulkActions);
+      }
+
+      let newOrder = (categoryOrder || []).filter((c) => c !== name);
+      if (!newOrder.includes('Arşiv')) {
+        newOrder = [...newOrder, 'Arşiv'];
+      }
+
+      await actions.reorderCategories(newOrder);
+    },
   };
 }
