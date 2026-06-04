@@ -33,26 +33,7 @@ export default defineConfig({
           },
         ],
       },
-      manifest: {
-        name: 'Toptan Ambalajcım',
-        short_name: 'Toptan Ambalaj',
-        description: 'Ambalajda Güvenilir Çözüm Ortağınız',
-        theme_color: '#ffffff',
-        background_color: '#f7f5f2',
-        display: 'standalone',
-        icons: [
-          {
-            src: 'logo-favicon.svg',
-            sizes: '192x192',
-            type: 'image/svg+xml',
-          },
-          {
-            src: 'logo-favicon.svg',
-            sizes: '512x512',
-            type: 'image/svg+xml',
-          },
-        ],
-      },
+      manifest: false,
     }),
   ],
   optimizeDeps: {
