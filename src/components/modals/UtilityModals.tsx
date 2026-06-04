@@ -441,19 +441,19 @@ export function PinModal({
               exit={{ opacity: 0, scale: 1.1 }}
               className="flex flex-col items-center justify-center min-h-[320px] w-full"
             >
-              <span className="text-[10px] font-black tracking-[0.4em] text-white/40 uppercase mb-10">
+              <span className="text-[10px] font-black tracking-[0.4em] text-stone-500 uppercase mb-10">
                 GÜVENLİK DOĞRULAMASI
               </span>
-              <div className="bg-white/5 backdrop-blur-md p-6 rounded-[2.5rem] border border-white/10 shadow-2xl">
+              <div className="bg-stone-900/5 backdrop-blur-md p-6 rounded-[2.5rem] border border-stone-900/10 shadow-2xl">
                 <Turnstile
                   onVerify={() => flow.setIsRobotVerified(true)}
-                  options={{ theme: 'dark', size: 'compact' }}
+                  options={{ theme: 'light', size: 'compact' }}
                 />
               </div>
               <Button
                 onClick={onModalClose}
                 variant="ghost"
-                className="mt-10 text-white/30 hover:text-white font-black text-[10px] tracking-[0.2em] uppercase"
+                className="mt-10 text-stone-400 hover:text-stone-700 font-black text-[10px] tracking-[0.2em] uppercase"
               >
                 İPTAL ET
               </Button>
@@ -466,9 +466,9 @@ export function PinModal({
               exit={{ opacity: 0 }}
               className="w-full"
             >
-              <div className="flex items-center justify-center h-12 mb-6 w-full">
+              <div className="flex items-center justify-center h-12 mb-4 w-full">
                 {flow.isVerifying ? (
-                  <div className={THEME.loading.spinner + ' w-5 h-5'} />
+                  <div className="border-2 border-stone-300 border-t-stone-900 rounded-full animate-spin w-5 h-5" />
                 ) : flow.activeIsLockedOut ? (
                   <span className="text-base">⏳</span>
                 ) : (
