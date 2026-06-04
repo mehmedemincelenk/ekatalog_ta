@@ -498,7 +498,7 @@ export function PinModal({
                 <Button
                   onClick={onModalClose}
                   variant="ghost"
-                  mode="circle"
+                  mode="rectangle"
                   className={theme.cancelButton}
                 >
                   İPTAL
@@ -512,10 +512,9 @@ export function PinModal({
                   <span className={theme.typography.keyText}>0</span>
                 </Button>
                 <Button
-                  onClick={() => {
-                    if (flow.isInputDisabled) return;
-                    flow.setCurrentPinAttempt((prev) => prev.slice(0, -1));
-                  }}
+                  onClick={() =>
+                    flow.setCurrentPinAttempt((prev) => prev.slice(0, -1))
+                  }
                   variant="ghost"
                   mode="circle"
                   className={theme.deleteButton}
