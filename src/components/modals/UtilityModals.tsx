@@ -466,7 +466,7 @@ export function PinModal({
               exit={{ opacity: 0 }}
               className="w-full"
             >
-              <div className="flex items-center justify-center h-12 mb-4 w-full">
+              <div className="flex items-center justify-center h-12 mb-6 w-full">
                 {flow.isVerifying ? (
                   <div className={THEME.loading.spinner + ' w-5 h-5'} />
                 ) : flow.activeIsLockedOut ? (
@@ -492,7 +492,9 @@ export function PinModal({
                     className={theme.keyButton}
                     variant="secondary"
                     mode="circle"
-                  />
+                  >
+                    <span className={theme.typography.keyText}>{num}</span>
+                  </Button>
                 ))}
                 <Button
                   onClick={onModalClose}
@@ -507,7 +509,9 @@ export function PinModal({
                   className={theme.keyButton}
                   variant="secondary"
                   mode="circle"
-                />
+                >
+                  <span className={theme.typography.keyText}>0</span>
+                </Button>
                 <Button
                   onClick={() =>
                     flow.setCurrentPinAttempt((prev) => prev.slice(0, -1))

@@ -487,7 +487,7 @@ export const THEME = {
     dotInactive: 'bg-transparent border-white/40',
     dotError: 'bg-red-500 border-red-500',
     keyboardGrid: 'grid grid-cols-3 gap-x-2 gap-y-2 w-full',
-    keyButton: `group relative w-12 h-12 rounded-full bg-white/20 hover:bg-white/30 active:bg-white/40 border border-white/10 backdrop-blur-md transition-all flex items-center justify-center mx-auto overflow-hidden active:scale-90 shadow-xl`,
+    keyButton: `group relative w-12 h-12 rounded-full bg-transparent hover:bg-white/5 active:bg-white/10 border border-transparent transition-all flex items-center justify-center mx-auto overflow-hidden active:scale-90 shadow-none`,
     cancelButton: `w-12 h-12 rounded-full flex items-center justify-center mx-auto text-white/50 hover:text-white transition-colors text-[9px] font-bold active:scale-95`,
     deleteButton: `w-12 h-12 rounded-full flex items-center justify-center mx-auto text-white/70 hover:text-white active:scale-90 transition-all`,
     deleteIconSize: 'w-5 h-5',
