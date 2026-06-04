@@ -6,7 +6,7 @@ const corsHeaders = {
   'Content-Type': 'application/json; charset=utf-8',
 };
 
-Deno.serve(async (req) => {
+Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -82,7 +82,8 @@ Deno.serve(async (req) => {
       headers: corsHeaders,
     });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: corsHeaders,
     });
