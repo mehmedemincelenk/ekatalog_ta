@@ -40,6 +40,7 @@ interface BaseFloatingMenuProps {
   mainIcon?: ReactNode;
   activeMainIcon?: ReactNode;
   isPrimaryToggle?: boolean;
+  labelText?: string;
   theme?: 'light' | 'dark'; // Diamond: Support multiple visual identities
   onPointerDown?: () => void;
   onPointerUp?: () => void;
@@ -53,6 +54,7 @@ export default function BaseFloatingMenu({
   autoCloseDelay = 5000,
   mainIcon,
   activeMainIcon,
+  labelText,
   onPointerDown,
   onPointerUp,
   forceExpanded = false,
@@ -171,7 +173,7 @@ export default function BaseFloatingMenu({
                             size="sm"
                             mode="rectangle"
                             className={`
-                            shrink-0 !rounded-lg ${btn.className || ''} w-full !justify-center px-1 gap-2 h-[40px] !text-white [transition-property:transform] backdrop-blur-md !shadow-none
+                            shrink-0 !rounded-lg ${btn.className || ''} w-full !justify-center px-1 gap-2 h-[47px] !text-white [transition-property:transform] backdrop-blur-md !shadow-none
                             ${
                               !btn.variant ||
                               btn.variant === 'secondary' ||
@@ -198,35 +200,37 @@ export default function BaseFloatingMenu({
                 )}
 
                 {/* ICON ACTIONS GRID */}
-                <div className="grid grid-cols-2 gap-1.5 justify-items-center w-full">
-                  {actions
-                    .filter((a) => !a.label)
-                    .map((btn) => (
-                      <div key={btn.id} className="w-full">
-                        <Button
-                          onClick={() => handleAction(btn)}
-                          icon={btn.icon}
-                          variant={
-                            btn.variant === 'secondary'
-                              ? 'ghost'
-                              : btn.variant || 'ghost'
-                          }
-                          size="sm"
-                          mode="square"
-                          className={`
-                          shrink-0 !rounded-lg ${btn.className || ''} w-full aspect-square h-auto !p-0 !text-white [transition-property:transform] backdrop-blur-md !shadow-none
-                          ${
-                            !btn.variant ||
-                            btn.variant === 'secondary' ||
-                            btn.variant === 'ghost'
-                              ? '!bg-white/10 !border-white/10 hover:!bg-white/20'
-                              : 'hover:scale-[1.05]'
-                          }
-                        `}
-                        />
-                      </div>
-                    ))}
-                </div>
+                {actions.some((a) => !a.label) && (
+                  <div className="grid grid-cols-2 gap-1.5 justify-items-center w-full">
+                    {actions
+                      .filter((a) => !a.label)
+                      .map((btn) => (
+                        <div key={btn.id} className="w-full">
+                          <Button
+                            onClick={() => handleAction(btn)}
+                            icon={btn.icon}
+                            variant={
+                              btn.variant === 'secondary'
+                                ? 'ghost'
+                                : btn.variant || 'ghost'
+                            }
+                            size="sm"
+                            mode="square"
+                            className={`
+                            shrink-0 !rounded-lg ${btn.className || ''} w-full aspect-square h-auto !p-0 !text-white [transition-property:transform] backdrop-blur-md !shadow-none
+                            ${
+                              !btn.variant ||
+                              btn.variant === 'secondary' ||
+                              btn.variant === 'ghost'
+                                ? '!bg-white/10 !border-white/10 hover:!bg-white/20'
+                                : 'hover:scale-[1.05]'
+                            }
+                          `}
+                          />
+                        </div>
+                      ))}
+                  </div>
+                )}
               </div>
             </motion.div>
           )}
@@ -287,6 +291,11 @@ export default function BaseFloatingMenu({
             ) : (
               <div className="flex items-center gap-1 text-stone-900 justify-center w-full h-full">
                 {mainIcon}
+                {labelText && (
+                  <span className="text-[10px] font-black tracking-wider uppercase leading-none truncate max-w-[65px]">
+                    {labelText}
+                  </span>
+                )}
               </div>
             )}
           </div>

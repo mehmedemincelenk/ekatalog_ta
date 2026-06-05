@@ -53,17 +53,6 @@ export const getActiveStoreSlug = (): string => {
   if (storeParam) return storeParam;
   if (urlParams.get('main') === '1') return 'landing';
 
-  // 3. Dev Override Check (Explicitly skip if it's the landing domain)
-  const isDevHost =
-    hostname === 'localhost' ||
-    hostname === '127.0.0.1' ||
-    hostname === '::1' ||
-    hostname.startsWith('192.168.') ||
-    hostname.startsWith('172.') ||
-    hostname.startsWith('10.');
-
-  const isDevMode = import.meta.env && import.meta.env.DEV;
-
   // Even in local dev / dev host, if they request the landing page domain, show landing
   if (
     hostname === 'ekatalog.site' ||
@@ -92,15 +81,6 @@ export const getActiveStoreSlug = (): string => {
     return subdomain;
   }
 
-  // 4. Default Dev Shop fallback if on localhost / dev mode
-  if (isDevHost || isDevMode) {
-    if (pathname === '/' || pathname === '') {
-      return 'landing';
-    }
-    const envSlug = import.meta.env.VITE_STORE_SLUG;
-    if (envSlug && envSlug !== 'mainsite' && envSlug !== 'landing')
-      return envSlug;
-  }
 
   // 5. Fallback for custom domains or other hosting platforms
   const parts = hostname.split('.');

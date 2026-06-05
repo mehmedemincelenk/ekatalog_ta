@@ -4,6 +4,7 @@ import Navbar from '../layout/Navbar';
 import Button from '../ui/Button';
 import BaseModal from './BaseModal';
 import StatusToggle from '../ui/StatusToggle';
+import ToggleButton from '../ui/ToggleButton';
 import Loading from '../ui/Loading';
 import { DisplaySettingsModalProps } from '../../types';
 import { THEME } from '../../data/config';
@@ -868,6 +869,24 @@ export default function DisplaySettingsModal({
             </div>
 
             <div className="grid grid-cols-1 gap-2">
+              <motion.div
+                layout="position"
+                className="relative flex items-center justify-between p-3 rounded-2xl border border-stone-100 bg-stone-50 text-stone-900 h-12 shadow-sm overflow-hidden hover:border-stone-200 transition-all"
+              >
+                <span className="text-[10px] font-black uppercase tracking-tight leading-none truncate">
+                  TEMA (NAVBAR)
+                </span>
+                <ToggleButton
+                  options={[
+                    { value: 'light', label: 'BEYAZ' },
+                    { value: 'dark', label: 'SİYAH' },
+                  ]}
+                  value={settings.displayConfig.navbarTheme || 'dark'}
+                  onChange={(val) => flow.setOptionValue('navbarTheme', val)}
+                  className="w-40"
+                  size="sm"
+                />
+              </motion.div>
               {TABELA_OPTIONS.map((opt) => (
                 <SettingCard
                   key={opt.key}
@@ -901,9 +920,10 @@ export default function DisplaySettingsModal({
             <div className="flex flex-col gap-4 bg-stone-50/30 border border-stone-100 rounded-3xl p-4 my-1">
               {/* Live Vitrin Preview */}
               <div className="w-full flex flex-col gap-2 relative overflow-hidden select-none pointer-events-none">
-                <AnimatePresence initial={false} mode="popLayout">
+                <AnimatePresence initial={false}>
                   {flow.getOptionState('showCarousel') && (
                     <motion.div
+                      layout
                       key="preview-carousel"
                       initial={{ height: 0, opacity: 0, scale: 0.95, y: -10 }}
                       animate={{ height: 'auto', opacity: 1, scale: 1, y: 0 }}
@@ -917,6 +937,7 @@ export default function DisplaySettingsModal({
 
                   {flow.getOptionState('showReferences') && (
                     <motion.div
+                      layout
                       key="preview-references"
                       initial={{ height: 0, opacity: 0, scale: 0.95, y: -10 }}
                       animate={{ height: 'auto', opacity: 1, scale: 1, y: 0 }}
@@ -935,6 +956,7 @@ export default function DisplaySettingsModal({
                   {(flow.getOptionState('showSearch') ||
                     flow.getOptionState('showCategories')) && (
                     <motion.div
+                      layout
                       key="preview-search-filter"
                       initial={{ height: 0, opacity: 0, scale: 0.95, y: -10 }}
                       animate={{ height: 'auto', opacity: 1, scale: 1, y: 0 }}
@@ -981,6 +1003,7 @@ export default function DisplaySettingsModal({
                     !flow.getOptionState('showSearch') &&
                     !flow.getOptionState('showCategories') && (
                       <motion.div
+                        layout
                         key="preview-empty"
                         initial={{ height: 0, opacity: 0, scale: 0.95 }}
                         animate={{ height: 'auto', opacity: 1, scale: 1 }}
@@ -1072,7 +1095,27 @@ export default function DisplaySettingsModal({
                 SİSTEM YÖNETİMİ
               </h5>
             </div>
+            
             <div className="grid grid-cols-1 gap-2">
+              <motion.div
+                layout="position"
+                className="relative flex items-center justify-between p-3 rounded-2xl border border-stone-100 bg-stone-50 text-stone-900 h-12 shadow-sm overflow-hidden hover:border-stone-200 transition-all"
+              >
+                <span className="text-[10px] font-black uppercase tracking-tight leading-none truncate">
+                  VARSAYILAN PARA BİRİMİ
+                </span>
+                <ToggleButton
+                  options={[
+                    { value: 'TRY', label: '₺' },
+                    { value: 'USD', label: '$' },
+                    { value: 'EUR', label: '€' },
+                  ]}
+                  value={settings.activeCurrency || 'TRY'}
+                  onChange={(val) => updateSetting('activeCurrency', val as 'TRY' | 'USD' | 'EUR')}
+                  className="w-40"
+                  size="sm"
+                />
+              </motion.div>
               {SYSTEM_OPTIONS.map((opt) => (
                 <SettingCard
                   key={opt.key}

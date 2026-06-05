@@ -90,6 +90,7 @@ export interface DisplayConfig {
   showQR?: boolean;
   showPhone?: boolean;
   showTitle?: boolean;
+  navbarTheme?: 'light' | 'dark';
   [key: string]: boolean | string | number | undefined | null;
 }
 
@@ -588,7 +589,7 @@ export interface OffHoursNoticeProps {
   forceVisible?: boolean;
 }
 
-export interface BulkPriceUpdateModalProps {
+export interface AdminOperationsModalProps {
   isOpen: boolean;
   onClose: () => void;
   allProducts: Product[];
@@ -602,13 +603,16 @@ export interface BulkPriceUpdateModalProps {
       is_archived?: boolean;
     }[],
   ) => Promise<void>;
+  onAddAction?: (
+    type: 'PRODUCT' | 'CATEGORY' | 'REFERENCE' | 'CAROUSEL',
+  ) => void;
   isStatic?: boolean;
   initialStep?: number;
 }
 
 export type ModalType =
   | 'ADD_PRODUCT'
-  | 'BULK_UPDATE'
+  | 'ADMIN_OPERATIONS'
   | 'NOTIFICATIONS'
   | 'DISPLAY_SETTINGS'
   | 'QR'

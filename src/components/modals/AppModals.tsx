@@ -10,7 +10,7 @@ import {
 } from './UtilityModals';
 
 const AddProductModal = lazy(() => import('./AddProductModal'));
-const BulkPriceUpdateModal = lazy(() => import('./BulkPriceUpdateModal'));
+const AdminOperationsModal = lazy(() => import('./AdminOperationsModal'));
 const DisplaySettingsModal = lazy(() => import('./DisplaySettingsModal'));
 const ChangePinModal = lazy(() => import('./ChangePinModal'));
 const PriceListModal = lazy(() => import('./PriceListModal'));
@@ -127,12 +127,13 @@ const AppModals = memo(() => {
             </Suspense>
 
             <Suspense fallback={null}>
-              <BulkPriceUpdateModal
-                isOpen={activeModal === 'BULK_UPDATE'}
+              <AdminOperationsModal
+                isOpen={activeModal === 'ADMIN_OPERATIONS'}
                 onClose={closeModal}
                 allProducts={allProducts}
                 categories={categoryOrder}
                 onGranularUpdate={executeGranularBulkActions}
+                onAddAction={handleGlobalAddAction}
               />
             </Suspense>
 

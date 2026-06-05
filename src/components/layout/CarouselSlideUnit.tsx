@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'motion/react';
 import { THEME } from '../../data/config';
 import SmartImage from '../ui/SmartImage';
 import { resolveVisualAssetUrl } from '../../utils/image';
-import Button from '../ui/Button';
 import * as Lucide from 'lucide-react';
 
 /**
@@ -126,21 +125,18 @@ const CarouselSlideUnit = memo(
                 exit={{ opacity: 0, scale: 0.8 }}
                 className="!pointer-events-auto"
               >
-                <Button
+                <button
                   onClick={(e) => {
                     e.stopPropagation();
                     onDeleteTrigger?.(slideData.id);
                   }}
-                  variant="glass"
-                  mode="square"
-                  className="w-7 h-7 shadow-xl border border-white/20 !rounded-md !bg-stone-900/60 backdrop-blur-md !p-0 flex items-center justify-center"
-                  icon={
-                    <div className="w-3.5 h-3.5 text-white hover:text-red-400 transition-colors flex items-center justify-center">
-                      {globalIcons.trash}
-                    </div>
-                  }
+                  className="w-7 h-7 flex items-center justify-center shadow-xl border border-white/20 rounded-md bg-stone-900/60 hover:bg-stone-900 backdrop-blur-md text-white hover:text-red-400 active:scale-95 transition-all duration-300 cursor-pointer p-0"
                   title="AFİŞİ SİL"
-                />
+                >
+                  <div className="w-3.5 h-3.5 flex items-center justify-center">
+                    {globalIcons.trash}
+                  </div>
+                </button>
               </motion.div>
             </div>
           )}

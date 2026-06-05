@@ -132,19 +132,30 @@ export default function CatalogPage() {
     );
   }
 
+  const announcementConfig = storeSettings?.announcementBar ?? {
+    enabled: false,
+    text: '',
+  };
+  const showAnnouncementBar =
+    announcementConfig.enabled &&
+    (announcementConfig.text || isAdmin);
+
+  const navbarHeight = showAnnouncementBar ? '80px' : '56px';
+
   const mobileContent = (
     <>
       <div className="relative w-full h-full overflow-hidden flex flex-col">
+        {/* FLOATING GLASS NAVBAR OVERLAY - Fixed on mobile, absolute inside phone frame on desktop */}
+        <div className="print:hidden fixed md:absolute top-0 left-0 right-0 z-[100] w-full pointer-events-none">
+          <Navbar isInlineEnabled={isInlineEnabled} />
+        </div>
+
         {/* SCROLLABLE LAYER */}
         <div
           id="mobile-viewport-scroll"
+          style={{ paddingTop: navbarHeight }}
           className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar scroll-smooth relative z-10"
         >
-          {/* FLOATING GLASS NAVBAR OVERLAY */}
-          <div className="print:hidden sticky top-0 left-0 right-0 z-[100] w-full pointer-events-none">
-            <Navbar isInlineEnabled={isInlineEnabled} />
-          </div>
-
           <main className="bg-stone-50">
             {storeSettings?.displayConfig?.showCarousel !== false && (
               <HeroCarousel isAdminModeActive={isAdmin} />
@@ -247,7 +258,7 @@ export default function CatalogPage() {
                 onPointerDown={handleMenuPointerDown}
                 onPointerUp={handleMenuPointerUp}
                 onProductAddTrigger={() => openModal('GLOBAL_ADD_MENU')}
-                onBulkUpdateTrigger={() => openModal('BULK_UPDATE')}
+                onBulkUpdateTrigger={() => openModal('ADMIN_OPERATIONS')}
                 onSettingsTrigger={() => openModal('DISPLAY_SETTINGS')}
               />
             </motion.div>

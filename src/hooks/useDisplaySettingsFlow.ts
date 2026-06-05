@@ -65,6 +65,18 @@ export function useDisplaySettingsFlow(
     }
   };
 
+  const setOptionValue = async (key: keyof DisplayConfig, val: any) => {
+    setLocalConfig((prev) => ({ ...prev, [key]: val }));
+    try {
+      await updateSetting('displayConfig', {
+        ...settings.displayConfig,
+        [key]: val,
+      });
+    } catch (err) {
+      setLocalConfig(settings.displayConfig || {});
+    }
+  };
+
   const toggleAnnouncement = async () => {
     const newVal = !localAnnouncement;
     setLocalAnnouncement(newVal);
@@ -139,6 +151,7 @@ export function useDisplaySettingsFlow(
     localInline,
     getOptionState,
     toggleOption,
+    setOptionValue,
     toggleAnnouncement,
     toggleMaintenance,
     handleToggleInline,

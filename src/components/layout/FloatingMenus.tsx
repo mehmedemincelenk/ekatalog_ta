@@ -1,92 +1,41 @@
 import * as Lucide from 'lucide-react';
 import BaseFloatingMenu, { FloatingAction } from './BaseFloatingMenu';
-import { useStore } from '../../store';
-import { THEME } from '../../data/config';
 import { FloatingAdminMenuProps, FloatingGuestMenuProps } from '../../types';
-import { useSettings } from '../../hooks/useSettingsHub';
-import { getNextCurrency } from '../../utils/price';
 import { openWhatsApp, callPhone, openInstagram } from '../../utils/contact';
+import { useStore } from '../../store';
 
 // ---------------------------------------------------------------------------
 // 1. FLOATING ADMIN MENU
 // ---------------------------------------------------------------------------
 export function FloatingAdminMenu({
-  onProductAddTrigger,
+  onProductAddTrigger: _onProductAddTrigger,
   onBulkUpdateTrigger,
   onSettingsTrigger,
   onPointerDown,
   onPointerUp,
 }: FloatingAdminMenuProps) {
-  const { settings } = useStore();
-  const { updateSetting } = useSettings(true);
-  const globalIcons = THEME.icons;
-
-  if (!settings) return null;
-
-  const activeCurrency = settings.activeCurrency;
-
-  const onCurrencyToggle = () => {
-    updateSetting('activeCurrency', getNextCurrency(activeCurrency));
-  };
-
   const adminActions: FloatingAction[] = [
     {
-      id: 'currency',
-      icon: (
-        <div className="w-full h-full flex items-center justify-center">
-          <span className="text-[20px] font-bold leading-none text-white">
-            {activeCurrency === 'TRY'
-              ? '₺'
-              : activeCurrency === 'USD'
-                ? '$'
-                : '€'}
-          </span>
-        </div>
-      ),
-      action: onCurrencyToggle,
-      label: '',
-      closeOnClick: false,
-    },
-    {
-      id: 'add',
-      icon: (
-        <div className="w-6 h-6 flex items-center justify-center">
-          {globalIcons.plus}
-        </div>
-      ),
-      action: onProductAddTrigger,
-      label: '',
-      primary: true,
+      id: 'bulk',
+      icon: null,
+      action: onBulkUpdateTrigger || (() => {}),
+      label: 'İŞLEMLER',
+      className:
+        '!col-span-2 !w-full !rounded-xl !bg-stone-100 !text-stone-900 border-none my-0.5',
     },
     {
       id: 'features',
-      icon: (
-        <div className="w-6 h-6 flex items-center justify-center">
-          {globalIcons.ai}
-        </div>
-      ),
+      icon: <Lucide.Sparkles size={18} className="text-white" />,
       action: () => useStore.getState().openModal('FEATURES'),
       label: '',
-    },
-    {
-      id: 'bulk',
-      icon: (
-        <div className="w-6 h-6 flex items-center justify-center">
-          {globalIcons.bulkPrice}
-        </div>
-      ),
-      action: onBulkUpdateTrigger || (() => {}),
-      label: '',
+      className: '!bg-stone-900 border border-white/10 !rounded-xl',
     },
     {
       id: 'settings',
-      icon: (
-        <div className="w-6 h-6 flex items-center justify-center">
-          {globalIcons.settings}
-        </div>
-      ),
+      icon: <Lucide.Settings size={18} className="text-white" />,
       action: onSettingsTrigger,
       label: '',
+      className: '!bg-stone-800/50 border border-white/10 !rounded-xl',
     },
   ];
 

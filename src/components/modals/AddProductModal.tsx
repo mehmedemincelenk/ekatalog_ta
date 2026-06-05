@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { THEME } from '../../data/config';
 import Button from '../ui/Button';
+import ToggleButton from '../ui/ToggleButton';
 import BaseModal from './BaseModal';
 import * as Lucide from 'lucide-react';
 import FormInput from '../ui/FormInput';
@@ -321,19 +322,17 @@ export default function AddProductModal({
                 className={`${theme.inputField} !text-5xl font-black py-8 text-center w-full bg-transparent border-none`}
                 autoFocus
               />
-              <div className="bg-stone-100 p-1 rounded-[var(--radius-button)] flex w-fit mx-auto relative overflow-hidden gap-1">
-                {['₺', '$', '€'].map((c) => (
-                  <Button
-                    key={c}
-                    onClick={() => setFormState((p) => ({ ...p, currency: c }))}
-                    variant={formState.currency === c ? 'primary' : 'ghost'}
-                    className="px-8 h-10 !rounded-[calc(var(--radius-button)-4px)] z-10"
-                    mode="rectangle"
-                  >
-                    <span className="text-lg font-black">{c}</span>
-                  </Button>
-                ))}
-              </div>
+              <ToggleButton
+                options={[
+                  { value: '₺', label: <span className="text-lg font-black">₺</span> },
+                  { value: '$', label: <span className="text-lg font-black">$</span> },
+                  { value: '€', label: <span className="text-lg font-black">€</span> },
+                ]}
+                value={formState.currency}
+                onChange={(val) => setFormState((p) => ({ ...p, currency: val }))}
+                className="mx-auto w-fit"
+                buttonClassName="px-8 !h-10"
+              />
             </div>
           </div>
         )}
@@ -342,25 +341,16 @@ export default function AddProductModal({
             className={`${theme.wizard.stepContent} relative pt-4 flex flex-col items-center`}
           >
             <div className="flex flex-col gap-6 w-full max-w-[320px]">
-              <div className="bg-stone-100 p-1 rounded-[var(--radius-button)] flex w-fit mx-auto relative overflow-hidden gap-1">
-                {[false, true].map((v) => (
-                  <Button
-                    key={v.toString()}
-                    onClick={() =>
-                      setFormState((p) => ({ ...p, isProductInStock: v }))
-                    }
-                    variant={
-                      formState.isProductInStock === v ? 'primary' : 'ghost'
-                    }
-                    className="px-8 h-10 !rounded-[calc(var(--radius-button)-4px)] z-10"
-                    mode="rectangle"
-                  >
-                    <span className="text-[10px] font-black whitespace-nowrap">
-                      {v ? 'STOKTA' : 'STOKTA YOK'}
-                    </span>
-                  </Button>
-                ))}
-              </div>
+              <ToggleButton
+                options={[
+                  { value: true, label: <span className="text-[10px] font-black whitespace-nowrap">STOKTA</span> },
+                  { value: false, label: <span className="text-[10px] font-black whitespace-nowrap">STOKTA YOK</span> },
+                ]}
+                value={formState.isProductInStock}
+                onChange={(val) => setFormState((p) => ({ ...p, isProductInStock: val }))}
+                className="mx-auto w-fit"
+                buttonClassName="px-8 !h-10"
+              />
             </div>
           </div>
         )}

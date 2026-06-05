@@ -32,6 +32,7 @@ const Navbar = memo(({ isInlineEnabled, isPreview }: NavbarProps) => {
     : '';
 
   const config = flow.settings.displayConfig;
+  const isLight = config.navbarTheme === 'light';
   const isRightSideVisible =
     config.showInstagram || config.showAddress || config.showWhatsapp;
   const showTitle = config.showTitle !== false;
@@ -97,7 +98,7 @@ const Navbar = memo(({ isInlineEnabled, isPreview }: NavbarProps) => {
       <nav className={theme.layout}>
         <div className={theme.container}>
           <div
-            className={`${theme.innerWrapper} ${isTitleOnly ? 'justify-center' : 'justify-between'}`}
+            className={`${isLight ? 'flex justify-between items-center w-full bg-white/60 backdrop-blur-xl border-b border-stone-200/40 px-4 py-3 pointer-events-auto shadow-sm text-stone-900' : theme.innerWrapper} ${isTitleOnly ? 'justify-center' : 'justify-between'}`}
             style={{
               backdropFilter: 'blur(30px)',
               WebkitBackdropFilter: 'blur(30px)',
@@ -157,7 +158,7 @@ const Navbar = memo(({ isInlineEnabled, isPreview }: NavbarProps) => {
                         objectFit="contain"
                       />
                     ) : (
-                      <span className="w-9 h-9 flex items-center justify-center text-2xl select-none rounded-[4px] bg-white/10 text-white">
+                      <span className={`w-9 h-9 flex items-center justify-center text-2xl select-none rounded-[4px] ${isLight ? 'bg-stone-100 text-stone-900' : 'bg-white/10 text-white'}`}>
                         📦
                       </span>
                     )}
@@ -194,8 +195,8 @@ const Navbar = memo(({ isInlineEnabled, isPreview }: NavbarProps) => {
                             'Mağaza Adı',
                           );
                         }}
-                        style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.4)' }}
-                        className={`!text-[0.85rem] font-black tracking-tighter text-white ${editStyle} ${flow.isAdmin ? 'pointer-events-auto' : ''}`}
+                        style={isLight ? {} : { textShadow: '0 1px 2px rgba(0, 0, 0, 0.4)' }}
+                        className={`!text-[0.85rem] font-black tracking-tighter ${isLight ? 'text-stone-950' : 'text-white'} ${editStyle} ${flow.isAdmin ? 'pointer-events-auto' : ''}`}
                       >
                         {flow.settings.title ||
                           flow.settings.name ||
@@ -248,8 +249,8 @@ const Navbar = memo(({ isInlineEnabled, isPreview }: NavbarProps) => {
                           20,
                         );
                       }}
-                      style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.4)' }}
-                      className={`!text-[0.55rem] text-stone-200/95 font-semibold ${editStyle} ${flow.isAdmin ? 'pointer-events-auto' : ''}`}
+                      style={isLight ? {} : { textShadow: '0 1px 2px rgba(0, 0, 0, 0.4)' }}
+                      className={`!text-[0.55rem] ${isLight ? 'text-stone-500 font-bold' : 'text-stone-200/95 font-semibold'} ${editStyle} ${flow.isAdmin ? 'pointer-events-auto' : ''}`}
                     >
                       {flow.settings.subtitle || DEFAULT_COMPANY.tagline}
                     </span>
@@ -304,8 +305,8 @@ const Navbar = memo(({ isInlineEnabled, isPreview }: NavbarProps) => {
                         'Şehir / Semt (Navbarda Gözükür)',
                       )
                     }
-                    style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.4)' }}
-                    className={`order-2 !text-[0.7rem] text-stone-200 hover:text-white transition-colors font-bold text-right leading-tight px-1 truncate max-w-[10rem] xs:max-w-[14rem] sm:max-w-[20rem] md:max-w-[28rem] block ${editStyle}`}
+                    style={isLight ? {} : { textShadow: '0 1px 2px rgba(0, 0, 0, 0.4)' }}
+                    className={`order-2 !text-[0.7rem] ${isLight ? 'text-stone-600 hover:text-stone-900' : 'text-stone-200 hover:text-white'} transition-colors font-bold text-right leading-tight px-1 truncate max-w-[10rem] xs:max-w-[14rem] sm:max-w-[20rem] md:max-w-[28rem] block ${editStyle}`}
                   >
                     {flow.settings.shortAddress || flow.settings.address}
                   </div>
@@ -322,7 +323,7 @@ const Navbar = memo(({ isInlineEnabled, isPreview }: NavbarProps) => {
                       }}
                       variant="glass"
                       mode="rectangle"
-                      className="!bg-stone-900/75 backdrop-blur-xl border border-white/10 !text-white !px-3 !py-1.5 !rounded-lg hover:!bg-stone-900/90 hover:scale-[1.03] active:scale-95 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15),0_6px_20px_-4px_rgba(0,0,0,0.15)] transition-all duration-200"
+                      className={`!px-3 !py-1.5 !rounded-lg hover:scale-[1.03] active:scale-95 transition-all duration-200 ${isLight ? '!bg-stone-950 !text-white hover:!bg-stone-900 shadow-md' : '!bg-stone-900/75 backdrop-blur-xl border border-white/10 !text-white hover:!bg-stone-900/90 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15),0_6px_20px_-4px_rgba(0,0,0,0.15)]'}`}
                     >
                       <div className="flex items-center gap-2">
                         <span

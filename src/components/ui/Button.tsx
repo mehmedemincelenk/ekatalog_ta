@@ -96,30 +96,25 @@ export default function Button({
       className={`${BASE_STYLE} ${VARIANT_CLASSES[variant]} ${SIZE_CLASSES[size]} ${roundedMode} ${customStyles} ${className}`}
       disabled={disabled || loading}
       {...props}
-    >
-      {loading && (
+    >{loading && (
         <div className="absolute inset-0 bg-inherit flex items-center justify-center">
           <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
         </div>
-      )}
-      {selected && (
+      )}{selected && (
         <div className="absolute top-4 right-4 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-lg animate-in zoom-in duration-300">
           <Lucide.Check size={14} className="text-stone-900" strokeWidth={3} />
         </div>
-      )}
-      {badge && (
+      )}{badge && (
         <div className="absolute -top-1 left-6 px-3 py-1 bg-amber-400 text-stone-900 text-[8px] font-black uppercase tracking-widest rounded-full shadow-sm border border-white">
           {badge}
         </div>
-      )}
-      {icon && (
+      )}{icon && (
         <div
           className={`flex items-center justify-center shrink-0 transition-transform duration-300 ${hasDescriptionOrSelected ? (isVertical ? 'w-20 h-28 mb-4' : 'w-14 h-14 rounded-3xl bg-white shadow-sm text-stone-400') : ''} ${selected && hasDescriptionOrSelected ? 'bg-white text-stone-900 shadow-xl' : ''}`}
         >
           {icon}
         </div>
-      )}
-      {children && (
+      )}{children && (
         <div
           className={`${hasDescriptionOrSelected ? 'flex-1 min-w-0' : ''} ${selected && !isVertical ? 'pr-8' : ''}`}
         >
@@ -142,7 +137,6 @@ export default function Button({
             children
           )}
         </div>
-      )}
-    </Component>
+      )}</Component>
   );
 }
